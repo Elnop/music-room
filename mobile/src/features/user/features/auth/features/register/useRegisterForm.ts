@@ -4,16 +4,12 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import {
-	registerSchema,
-	type RegisterInput,
-} from '@/features/user/features/auth/shared/sign-in/lib/validators';
+import { registerSchema } from '@/features/user/features/auth/shared/sign-in/lib/validators';
+import type { RegisterInput } from '@/features/user/features/auth/shared/sign-in/lib/validators';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { useRegisterMutation } from '@/features/user/features/auth/shared/sign-in/hooks/useSignInMutations';
-import {
-	useFieldBinding,
-	type FieldBinding,
-} from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
+import { useFieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
+import type { FieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
 
 interface RegisterForm {
 	email: FieldBinding;

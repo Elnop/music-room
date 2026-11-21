@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, screen, act } from '@testing-library/react-native';
-import { SoundCloudTrackItem } from './SoundCloudTrackItem';
+import { SoundCloudTrackItem } from '@/features/search/components/presenters/SoundCloudTrackItem';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
@@ -34,7 +34,7 @@ describe('SoundCloudTrackItem', () => {
 		jest.clearAllMocks();
 	});
 
-	const renderItem = async (track = sampleTrack) => {
+	async function renderItem(track = sampleTrack) {
 		render(
 			<SoundCloudTrackItem
 				track={track}
@@ -44,7 +44,7 @@ describe('SoundCloudTrackItem', () => {
 			/>
 		);
 		await act(async () => {});
-	};
+	}
 
 	it('renders track title, username and formatted duration', async () => {
 		await renderItem();

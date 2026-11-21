@@ -9,7 +9,8 @@ import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
 import { renderWithQuery } from '@test-utils/renderWithQuery';
 import { fail, ok } from '@test-utils/fetchResponses';
-import { EmailVerificationContainer } from './EmailVerificationContainer';
+import { EmailVerificationContainer } from '@/features/user/features/auth/features/email-verification/components/EmailVerificationContainer';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -34,7 +35,7 @@ const fetchMock = jest.fn();
 const navigate = jest.fn();
 const user = { id: 'user-a', email: 'a@example.com', username: 'alice' };
 const session = { accessToken: 'access', refreshToken: 'refresh', expiresIn: 3600, expiresAt: 9e9 };
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 function renderScreen(params?: object) {
 	const props = { navigation: { navigate }, route: { params } } as unknown as Props;
@@ -79,7 +80,7 @@ describe('EmailVerificationContainer', () => {
 		typeCode('123456');
 
 		await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true));
-		expect(request().url).toMatch(/\/api\/auth\/verify-email$/);
+		expect(request().url).toMatch(/\/api\/auth\/verify-email$/u);
 		expect(request().body).toEqual({ userId: 'user-a', code: '123456' });
 	});
 
@@ -102,7 +103,7 @@ describe('EmailVerificationContainer', () => {
 
 		expect(await screen.findByText('Renvoyer dans 60 s')).toBeTruthy();
 		expect(showSuccess).toHaveBeenCalledWith('Code renvoyé. Vérifiez votre email.');
-		expect(request().url).toMatch(/\/api\/auth\/resend-verification$/);
+		expect(request().url).toMatch(/\/api\/auth\/resend-verification$/u);
 		expect(request().body).toEqual(PARAMS);
 	});
 

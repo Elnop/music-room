@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
@@ -14,7 +15,9 @@ interface FriendPlaylistCardProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-const tracksLabel = (count: number) => `${count} ${count === 1 ? 'titre' : 'titres'}`;
+function tracksLabel(count: number) {
+	return `${count} ${count === 1 ? 'titre' : 'titres'}`;
+}
 
 export function FriendPlaylistCard({
 	playlist,
@@ -41,8 +44,8 @@ export function FriendPlaylistCard({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -65,3 +68,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

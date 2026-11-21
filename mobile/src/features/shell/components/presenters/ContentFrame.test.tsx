@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react-native';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { useContentWidth } from '@/shared/theme/hooks/useContentWidth';
 import { NOW_PLAYING_PANEL_WIDTH, SIDEBAR_WIDTH } from '@/shared/theme/lib/layout';
-import { ContentFrame } from './ContentFrame';
+import { ContentFrame } from '@/features/shell/components/presenters/ContentFrame';
 import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
@@ -17,8 +17,11 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	return { useTheme: () => ({ theme }) };
 });
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
 function WidthProbe() {
 	return <Text>{useContentWidth()}</Text>;

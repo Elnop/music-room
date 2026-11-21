@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { originalTheme } from '@/shared/theme/lib/original.theme';
-import { SearchBar } from './SearchBar';
+import { SearchBar } from '@/shared/theme/components/SearchBar';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
@@ -58,11 +58,11 @@ describe('SearchBar clear and loading (#307)', () => {
 		jest.replaceProperty(Platform, 'OS', 'web');
 		render(<SearchBar value="" onChangeText={jest.fn()} />);
 		const input = screen.getByPlaceholderText('Rechercher…');
-		const frame = () => {
+		function frame() {
 			let node = input.parent;
 			while (node && StyleSheet.flatten(node.props.style)?.height !== 44) node = node.parent;
 			return StyleSheet.flatten(node?.props.style);
-		};
+		}
 
 		fireEvent(input, 'focus');
 		expect(frame().boxShadow).toContain(originalTheme.colors.primary);

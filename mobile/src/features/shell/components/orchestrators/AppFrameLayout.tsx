@@ -1,4 +1,5 @@
-import React, { type ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
@@ -55,8 +56,8 @@ export function AppFrameLayout({
 	);
 }
 
-const createStyles = (theme: Theme, bottomInset: number) =>
-	StyleSheet.create({
+function createStyles(theme: Theme, bottomInset: number) {
+	return StyleSheet.create({
 		container: { flex: 1 },
 		body: { flex: 1, flexDirection: 'row' },
 		playerBar: {
@@ -65,3 +66,4 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			backgroundColor: theme.colors.background,
 		},
 	});
+}

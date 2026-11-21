@@ -1,9 +1,12 @@
 import type { UserProfile } from '@/shared/users/user.types';
 import type { AuthSessionTokens } from '@/features/user/features/auth/types';
-import * as authApi from './authApi';
+import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
 import { ApiError } from '@/shared/backend/lib/api';
 import { logger } from '@/shared/logging/logger';
-import type { GetAuthState, SetAuthState } from './authState';
+import type {
+	GetAuthState,
+	SetAuthState,
+} from '@/features/user/features/auth/shared/sign-in/lib/authState';
 
 interface TokenRefreshDeps {
 	set: SetAuthState;
@@ -22,7 +25,7 @@ export function createTokenRefresh({
 }: TokenRefreshDeps): () => Promise<boolean> {
 	let inFlight: Promise<boolean> | null = null;
 
-	const refresh = async (refreshToken: string): Promise<boolean> => {
+	async function refresh(refreshToken: string): Promise<boolean> {
 		try {
 			const response = await authApi.refreshToken(refreshToken);
 			if (!response.session) throw new Error('Token refresh did not return a session');
@@ -48,7 +51,7 @@ export function createTokenRefresh({
 			logger.warn('[AuthStore] Keeping the session after a refresh failure; will retry later');
 			return false;
 		}
-	};
+	}
 
 	return async () => {
 		if (inFlight) return inFlight;

@@ -1,9 +1,10 @@
 import React from 'react';
-import { ActivityIndicator, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { DISABLED_OPACITY } from './playerBarStyles';
+import { DISABLED_OPACITY } from '@/features/playback/features/player-bar/components/presenters/playerBarStyles';
 
 interface PlayerBarButtonProps {
 	icon: PixelIconSource;

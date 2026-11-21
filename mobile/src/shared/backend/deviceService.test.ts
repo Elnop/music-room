@@ -36,7 +36,7 @@ jest.mock('expo-device', () => ({
 }));
 
 import Constants from 'expo-constants';
-import { deviceService, formatBuildLabel, getAppVersion } from './deviceService';
+import { deviceService, formatBuildLabel, getAppVersion } from '@/shared/backend/deviceService';
 import { deviceStorage } from '@/shared/backend/lib/deviceStorage';
 import { Platform } from 'react-native';
 

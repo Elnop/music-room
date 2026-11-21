@@ -1,4 +1,4 @@
-import { formatDocumentTitle } from './documentTitle';
+import { formatDocumentTitle } from '@/features/shell/lib/documentTitle';
 
 describe('formatDocumentTitle', () => {
 	it('follows the screen title with the app name', () => {

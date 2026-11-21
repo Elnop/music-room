@@ -1,4 +1,5 @@
-import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSimilarProfiles } from '@/features/user/features/friends/shared/follows/hooks/useFriendsQueries';
 import type { RecommendedProfile } from '@/features/user/features/friends/types';
 
@@ -24,7 +25,9 @@ export function useSimilarProfilesSection(): SimilarProfilesSection {
 	const navigation = useNavigation<NavigationProp<ParamListBase>>();
 	const query = useSimilarProfiles();
 
-	const tabs = () => navigation.getParent() ?? navigation;
+	function tabs() {
+		return navigation.getParent() ?? navigation;
+	}
 
 	return {
 		status: statusOf(query),

@@ -1,7 +1,10 @@
 import { create } from 'zustand';
 import { getSession } from '@/shared/backend/lib/authSession';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
-import { useConnectStore, useActiveOwnerId } from './connectStore';
+import {
+	useConnectStore,
+	useActiveOwnerId,
+} from '@/features/playback/shared/player/stores/connectStore';
 import { asStep, mutate, runStep } from '@/features/playback/shared/player/lib/queueStepRunner';
 import {
 	addItemAction,

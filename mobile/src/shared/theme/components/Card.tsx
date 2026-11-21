@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
-import { useTheme } from './ThemeContext';
+import { View, StyleSheet } from 'react-native';
+import type { ViewStyle, StyleProp } from 'react-native';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Pressable } from './Pressable';
+import { Pressable } from '@/shared/theme/components/Pressable';
 
 type CardPress =
 	| { onPress?: undefined; accessibilityLabel?: undefined }
@@ -37,8 +38,8 @@ export function Card({
 	return <View style={cardStyle}>{children}</View>;
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		card: {
 			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
@@ -48,3 +49,4 @@ const createStyles = (theme: Theme) =>
 			...theme.shadows.medium,
 		},
 	});
+}

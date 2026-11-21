@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import * as passwordApi from './passwordApi';
+import * as passwordApi from '@/features/user/features/auth/shared/password-reset/passwordApi';
 
 export function useForgotPasswordMutation() {
 	return useMutation({ mutationFn: (email: string) => passwordApi.forgotPassword(email) });

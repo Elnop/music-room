@@ -1,4 +1,4 @@
-import type { AddQueueItemBody, PlaybackState } from './playback';
+import type { AddQueueItemBody, PlaybackState } from '@/shared/playback/lib/playback';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
 export interface PlaybackActions {

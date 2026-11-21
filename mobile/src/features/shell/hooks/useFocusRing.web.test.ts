@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 import { originalTheme } from '@/shared/theme/lib/original.theme';
-import { useFocusRing } from './useFocusRing.web';
+import { useFocusRing } from '@/features/shell/hooks/useFocusRing.web';
 
 const PRIMARY = originalTheme.colors.primary;
 

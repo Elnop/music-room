@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
-import {
-	matchShortcut,
-	type KeyboardShortcut,
-	type ShortcutKeyEvent,
+import { matchShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import type {
+	KeyboardShortcut,
+	ShortcutKeyEvent,
 } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
 
 interface BrowserKeyEvent extends ShortcutKeyEvent {
@@ -27,15 +27,16 @@ export function useKeyboardShortcuts(shortcuts: readonly KeyboardShortcut[]): vo
 	});
 
 	useEffect(() => {
-		const document = browser.document;
-		if (!document) return;
-		const onKeyDown = (event: BrowserKeyEvent) => {
+		const maybeDocument = browser.document;
+		if (!maybeDocument) return;
+		const document = maybeDocument;
+		function onKeyDown(event: BrowserKeyEvent) {
 			if (event.defaultPrevented || document.querySelector(OPEN_DIALOG)) return;
 			const shortcut = matchShortcut(event, latestRef.current);
 			if (!shortcut) return;
 			event.preventDefault();
 			shortcut.run();
-		};
+		}
 		document.addEventListener('keydown', onKeyDown);
 		return () => document.removeEventListener('keydown', onKeyDown);
 	}, []);

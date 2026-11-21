@@ -3,8 +3,9 @@ import { View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Text } from '@/shared/theme/components/Text';
 import type { ArtworkCarousel } from '@/features/playback/features/player-modal/hooks/useArtworkCarousel';
-import { CAROUSEL_TEXT_HEIGHT, type createStyles } from './playerModalStyles';
-import { PlayerCarouselSlot } from './PlayerCarouselSlot';
+import { CAROUSEL_TEXT_HEIGHT } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
+import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
+import { PlayerCarouselSlot } from '@/features/playback/features/player-modal/components/presenters/PlayerCarouselSlot';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface PlayerArtworkCarouselProps {

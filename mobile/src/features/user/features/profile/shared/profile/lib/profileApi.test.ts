@@ -1,5 +1,5 @@
 import { apiRequest, authRequest } from '@/shared/backend/lib/api';
-import { profileApi } from './profileApi';
+import { profileApi } from '@/features/user/features/profile/shared/profile/lib/profileApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({
 	apiRequest: jest.fn(),

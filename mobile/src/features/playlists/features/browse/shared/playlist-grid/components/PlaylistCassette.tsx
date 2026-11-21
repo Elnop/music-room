@@ -53,8 +53,8 @@ export function PlaylistCassette({ playlist, owner, width }: PlaylistCassettePro
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		cover: { ...pixelFrame(theme), backgroundColor: theme.colors.surfaceAlt },
 		name: {
 			fontSize: theme.typography.sizes.md,
@@ -71,3 +71,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.xs,
 		},
 	});
+}

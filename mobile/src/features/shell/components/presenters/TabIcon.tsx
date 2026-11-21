@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon, type PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
 import HomeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/home-solid.svg';
@@ -32,11 +33,11 @@ function TabIcon({ routeName, focused, color }: TabIconProps) {
 	);
 }
 
-export const tabIconFor =
-	(routeName: string) =>
-	({ focused, color }: { focused: boolean; color: string }) => (
+export function tabIconFor(routeName: string) {
+	return ({ focused, color }: { focused: boolean; color: string }) => (
 		<TabIcon routeName={routeName} focused={focused} color={color} />
 	);
+}
 
 const styles = StyleSheet.create({
 	icon: { alignItems: 'center' },

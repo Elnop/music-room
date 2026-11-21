@@ -1,6 +1,9 @@
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 
-export const ownerName = (owner: UserSummary) => owner.displayName || owner.username;
+export function ownerName(owner: UserSummary) {
+	return owner.displayName || owner.username;
+}
 
-export const playlistCardLabel = (name: string, owner: UserSummary | undefined) =>
-	owner ? `${name}, par ${ownerName(owner)}` : name;
+export function playlistCardLabel(name: string, owner: UserSummary | undefined) {
+	return owner ? `${name}, par ${ownerName(owner)}` : name;
+}

@@ -8,7 +8,7 @@ export function PlayerErrorToastContainer(): null {
 	const clearError = usePlayerStore(state => state.clearError);
 
 	const hasShownRef = useRef(false);
-	const shouldShow = !!error && !currentTrack;
+	const shouldShow = Boolean(error) && !currentTrack;
 
 	useEffect(() => {
 		if (shouldShow && !hasShownRef.current) {

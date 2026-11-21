@@ -9,13 +9,18 @@ import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
 import { renderWithQuery } from '@test-utils/renderWithQuery';
 import { fail, ok } from '@test-utils/fetchResponses';
-import { ForgotPasswordContainer } from './ForgotPasswordContainer';
+import { ForgotPasswordContainer } from '@/features/user/features/auth/features/forgot-password/components/ForgotPasswordContainer';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
+	signInWithGoogle: jest.fn(),
+}));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn', () => ({
+	signInWithFacebook: jest.fn(),
+}));
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
@@ -28,7 +33,7 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
 const fetchMock = jest.fn();
 const navigate = jest.fn();
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 function renderScreen(params?: object) {
 	const props = { navigation: { navigate }, route: { params } } as unknown as Props;
@@ -68,7 +73,7 @@ describe('ForgotPasswordContainer', () => {
 		await waitFor(() =>
 			expect(navigate).toHaveBeenCalledWith('ResetPassword', { email: 'a@example.com' })
 		);
-		expect(request().url).toMatch(/\/api\/auth\/forgot-password$/);
+		expect(request().url).toMatch(/\/api\/auth\/forgot-password$/u);
 		expect(request().body).toEqual({ email: 'a@example.com' });
 	});
 

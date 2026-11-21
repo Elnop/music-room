@@ -5,7 +5,8 @@ import { useContextMenuDismiss } from '@/shared/theme/hooks/useContextMenu';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
-import { menuPlacement, type MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import { menuPlacement } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 const MENU_WIDTH = 320;
 
@@ -35,8 +36,8 @@ export function AnchoredMenu({ anchor, onClose, children }: AnchoredMenuProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		menu: {
 			position: 'absolute',
 			width: MENU_WIDTH,
@@ -46,3 +47,4 @@ const createStyles = (theme: Theme) =>
 			...theme.shadows.large,
 		},
 	});
+}

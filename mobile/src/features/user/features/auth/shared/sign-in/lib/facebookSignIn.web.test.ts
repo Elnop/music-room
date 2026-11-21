@@ -1,10 +1,13 @@
-type FacebookWeb = typeof import('./facebookSignIn.web');
+import type * as FacebookWebModule from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web';
+import type * as LoggerModule from '@/shared/logging/logger';
+
+type FacebookWeb = typeof FacebookWebModule;
 type LoginResponse = { status?: string; authResponse?: { accessToken?: string } | null };
 
 const mockLoadScript = jest.fn();
 let mockAppId: string | undefined;
 
-jest.mock('./loadScript', () => ({
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/loadScript', () => ({
 	loadScript: (src: string) => mockLoadScript(src),
 }));
 jest.mock('expo-constants', () => ({
@@ -23,7 +26,7 @@ function answerLogin(response: LoginResponse): void {
 	login.mockImplementation((callback: (response: LoginResponse) => void) => callback(response));
 }
 
-type Logger = typeof import('@/shared/logging/logger');
+type Logger = typeof LoggerModule;
 
 function load(): FacebookWeb & Logger {
 	let module: (FacebookWeb & Logger) | undefined;

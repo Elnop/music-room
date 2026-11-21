@@ -6,7 +6,7 @@ import {
 	geocodeAddress,
 	geocoderNeedsLocationPermission,
 	placeName,
-} from './geocoder.web';
+} from '@/features/events/shared/events/lib/geocoder.web';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

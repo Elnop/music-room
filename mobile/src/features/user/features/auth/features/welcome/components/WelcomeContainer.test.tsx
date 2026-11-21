@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
-import { WelcomeContainer } from './WelcomeContainer';
+import { WelcomeContainer } from '@/features/user/features/auth/features/welcome/components/WelcomeContainer';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
@@ -73,7 +73,7 @@ describe('WelcomeContainer', () => {
 		renderWelcome();
 		expect(screen.queryByText('Fonctionnalités')).toBeNull();
 
-		expect(screen.queryByText(/@/)).toBeNull();
+		expect(screen.queryByText(/@/u)).toBeNull();
 
 		fireEvent.press(screen.getByLabelText('Politique de confidentialité'));
 		expect(navigate).toHaveBeenCalledWith('PrivacyPolicy');

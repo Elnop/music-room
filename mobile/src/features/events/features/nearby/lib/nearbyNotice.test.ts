@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { nearbyNotice } from './nearbyNotice';
+import { nearbyNotice } from '@/features/events/features/nearby/lib/nearbyNotice';
 
 afterEach(() => {
 	jest.restoreAllMocks();

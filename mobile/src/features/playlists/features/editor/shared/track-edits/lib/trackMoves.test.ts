@@ -1,9 +1,10 @@
-import { QueryObserver, type QueryClient } from '@tanstack/react-query';
+import { QueryObserver } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { ApiError } from '@/shared/backend/lib/api';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
-import * as tracksApi from './tracksApi';
+import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import { usePendingMovesStore } from '@/features/playlists/features/editor/shared/track-edits/pendingMovesStore';
 import type {
 	MoveTrackResult,
@@ -12,15 +13,18 @@ import type {
 import { deferred } from '@test-utils/deferred';
 import { playlistTrack } from '@test-utils/playlistFixtures';
 import { loadPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
-import { addTrack, removeTrack } from './trackEdits';
-import { moveTrack } from './trackMoves';
+import {
+	addTrack,
+	removeTrack,
+} from '@/features/playlists/features/editor/shared/track-edits/lib/trackEdits';
+import { moveTrack } from '@/features/playlists/features/editor/shared/track-edits/lib/trackMoves';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
-jest.mock('./tracksApi', () => ({
+jest.mock('@/features/playlists/features/editor/shared/track-edits/lib/tracksApi', () => ({
 	addTrack: jest.fn(),
 	removeTrack: jest.fn(),
 	moveTrack: jest.fn(),
@@ -33,27 +37,36 @@ const api = jest.mocked(tracksApi);
 const fetchPlaylist = jest.mocked(playlistApi.fetchPlaylistById);
 const key = queryKeys.playlists.detail('p');
 
-const start = (tracksVersion = 10): PlaylistWithTracks =>
-	({
+function start(tracksVersion = 10): PlaylistWithTracks {
+	return {
 		id: 'p',
 		name: 'Mix',
 		tracksVersion,
 		tracks: [playlistTrack('A', 'a'), playlistTrack('B', 'h'), playlistTrack('C', 'p')],
-	}) as PlaylistWithTracks;
+	} as PlaylistWithTracks;
+}
 
-const moved = (trackId: string, rank: string, tracksVersion: number): MoveTrackResult => ({
-	trackId,
-	rank,
-	tracksVersion,
-	rebalanced: false,
-});
+function moved(trackId: string, rank: string, tracksVersion: number): MoveTrackResult {
+	return {
+		trackId,
+		rank,
+		tracksVersion,
+		rebalanced: false,
+	};
+}
 
 let client: QueryClient;
 let unsubscribe: () => void;
 
-const shown = () => client.getQueryData<PlaylistWithTracks>(key)!;
-const order = () => shown().tracks.map(t => t.id);
-const pending = () => usePendingMovesStore.getState().count;
+function shown() {
+	return client.getQueryData<PlaylistWithTracks>(key)!;
+}
+function order() {
+	return shown().tracks.map(t => t.id);
+}
+function pending() {
+	return usePendingMovesStore.getState().count;
+}
 
 function open() {
 	const observer = new QueryObserver(client, {

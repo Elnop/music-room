@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FriendPlaylistSummary } from '@/features/user/features/friends/types';
-import { FriendPlaylistCard } from './FriendPlaylistCard';
+import { FriendPlaylistCard } from '@/features/user/features/friends/features/user-profile/components/presenters/FriendPlaylistCard';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
 import { Text } from '@/shared/theme/components/Text';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';

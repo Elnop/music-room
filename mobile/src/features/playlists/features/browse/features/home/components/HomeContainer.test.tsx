@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeContainer } from './HomeContainer';
+import { HomeContainer } from '@/features/playlists/features/browse/features/home/components/HomeContainer';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
@@ -14,6 +14,7 @@ import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { Text } from '@/shared/theme/components/Text';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -24,7 +25,7 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-let mockFocus: () => void = () => undefined;
+let mockFocus: () => void = noop;
 jest.mock('@react-navigation/native', () => {
 	const { useEffect } = jest.requireActual('react');
 	return {
@@ -40,19 +41,21 @@ type Props = NativeStackScreenProps<PlaylistStackParamList, 'Home'>;
 
 const ME = { id: 'me', username: 'me', displayName: 'Moi' };
 
-const playlist = (id: string, overrides: Partial<Playlist> = {}): Playlist => ({
-	id,
-	name: id,
-	ownerId: 'me',
-	collaboratorIds: [],
-	viewerIds: [],
-	trackCount: 1,
-	visibility: 'public',
-	editMode: 'open',
-	createdAt: '',
-	updatedAt: '',
-	...overrides,
-});
+function playlist(id: string, overrides: Partial<Playlist> = {}): Playlist {
+	return {
+		id,
+		name: id,
+		ownerId: 'me',
+		collaboratorIds: [],
+		viewerIds: [],
+		trackCount: 1,
+		visibility: 'public',
+		editMode: 'open',
+		createdAt: '',
+		updatedAt: '',
+		...overrides,
+	};
+}
 
 const parentNavigate = jest.fn();
 const navigation = {
@@ -61,7 +64,7 @@ const navigation = {
 	getParent: () => ({ navigate: parentNavigate }),
 };
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 function renderHome(nearbyEvents?: React.ReactNode) {
 	const view = renderWithClient(
@@ -129,7 +132,7 @@ describe('HomeContainer', () => {
 
 	it('shows every owner as an avatar badge, named only for a screen reader', async () => {
 		await renderScreen();
-		expect(screen.queryByText(/^par /)).toBeNull();
+		expect(screen.queryByText(/^par /u)).toBeNull();
 		expect(screen.getByLabelText('Fred mix, par fred')).toBeTruthy();
 		expect(screen.getByLabelText('Mine, par Moi')).toBeTruthy();
 		expect(screen.getByLabelText('Open, par bob')).toBeTruthy();
@@ -164,7 +167,7 @@ describe('HomeContainer', () => {
 
 	it('opens on the nearby events, above the playlists', async () => {
 		await renderScreen(<Text>nearby events</Text>);
-		expect(screen.getAllByText(/./)[0].props.children).toBe('nearby events');
+		expect(screen.getAllByText(/./u)[0].props.children).toBe('nearby events');
 	});
 
 	it('folds the public playlists', async () => {

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useSession, setAvatarUrl } from '@/shared/backend/lib/authSession';
 import { profileApi } from '@/features/user/features/profile/shared/profile/lib/profileApi';
-import { pickImage, type ImageSource } from '@/shared/image-picker/imagePicker';
+import { pickImage } from '@/shared/image-picker/imagePicker';
+import type { ImageSource } from '@/shared/image-picker/imagePicker';
 import { prepareSquareImage } from '@/shared/square-image/squareImage';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
@@ -16,7 +17,7 @@ export function useAvatarPicker() {
 	const accessToken = useSession(s => s.accessToken);
 	const [isUploading, setIsUploading] = useState(false);
 
-	const pickAndUpload = async (source: ImageSource): Promise<void> => {
+	async function pickAndUpload(source: ImageSource): Promise<void> {
 		if (!accessToken || isUploading) return;
 		const asset = await pickImage(source, () => showError(PERMISSION_DENIED[source]));
 		if (!asset) return;
@@ -32,9 +33,9 @@ export function useAvatarPicker() {
 		} finally {
 			setIsUploading(false);
 		}
-	};
+	}
 
-	const remove = async (): Promise<void> => {
+	async function remove(): Promise<void> {
 		if (!accessToken || isUploading) return;
 
 		setIsUploading(true);
@@ -47,7 +48,7 @@ export function useAvatarPicker() {
 		} finally {
 			setIsUploading(false);
 		}
-	};
+	}
 
 	return { isUploading, pickAndUpload, remove };
 }

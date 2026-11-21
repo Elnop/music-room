@@ -8,7 +8,7 @@ import { Button } from '@/shared/theme/components/Button';
 import { Input } from '@/shared/theme/components/Input';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import type { ResetPassword } from '@/features/user/features/auth/features/reset-password/hooks/useResetPassword';
-import { PasswordRequirements } from './PasswordRequirements';
+import { PasswordRequirements } from '@/features/user/features/auth/features/reset-password/components/presenters/PasswordRequirements';
 import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
@@ -21,7 +21,10 @@ export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 	const { theme } = useTheme();
 	const secondary = { color: theme.colors.textSecondary };
 	const canSubmit =
-		!form.isLoading && form.code.isComplete && !!form.newPassword && !!form.confirmation;
+		!form.isLoading &&
+		form.code.isComplete &&
+		Boolean(form.newPassword) &&
+		Boolean(form.confirmation);
 
 	return (
 		<PasswordScreenFrame

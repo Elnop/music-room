@@ -1,12 +1,11 @@
 import React from 'react';
-import {
-	Pressable as NativePressable,
-	StyleSheet,
-	type GestureResponderEvent,
-	type PressableProps as NativePressableProps,
-	type PressableStateCallbackType,
-	type StyleProp,
-	type ViewStyle,
+import { Pressable as NativePressable, StyleSheet } from 'react-native';
+import type {
+	GestureResponderEvent,
+	PressableProps as NativePressableProps,
+	PressableStateCallbackType,
+	StyleProp,
+	ViewStyle,
 } from 'react-native';
 import { hapticSelection, hapticSuccess, hapticTap } from '@/shared/theme/lib/haptics';
 import { useIconTooltip } from '@/shared/theme/hooks/useIconTooltip';
@@ -17,15 +16,13 @@ export const HOVERED_OPACITY = 0.85;
 
 type PressState = PressableStateCallbackType & { hovered?: boolean };
 
-export const pressableStyle = (
+export function pressableStyle(
 	style: StyleProp<ViewStyle>,
 	{ pressed, hovered }: PressState,
 	disabled?: boolean | null
-): StyleProp<ViewStyle> => [
-	style,
-	hovered && !pressed && !disabled && styles.hovered,
-	pressed && styles.pressed,
-];
+): StyleProp<ViewStyle> {
+	return [style, hovered && !pressed && !disabled && styles.hovered, pressed && styles.pressed];
+}
 
 const HAPTICS = {
 	tap: hapticTap,

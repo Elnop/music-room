@@ -4,7 +4,10 @@ import { logger } from '@/shared/logging/logger';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { useDeletePlaylist } from '@/features/playlists/features/editor/shared/playlist-mutations/usePlaylistMutations';
 import { confirmPlaylistDelete } from '@/features/playlists/features/editor/shared/delete-confirmation/confirmPlaylistDelete';
-import type { DetailNavigation, PlaylistDetailScreen } from './usePlaylistDetailScreen';
+import type {
+	DetailNavigation,
+	PlaylistDetailScreen,
+} from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistDetailScreen';
 
 interface OwnerActions {
 	sheetVisible: boolean;
@@ -23,7 +26,7 @@ export function useOwnerActions(
 	const [sheetVisible, setSheetVisible] = useState(false);
 	const deletePlaylist = useDeletePlaylist();
 
-	const confirmDelete = async () => {
+	async function confirmDelete() {
 		markDeleting(true);
 		try {
 			await deletePlaylist.mutateAsync(id);
@@ -34,7 +37,7 @@ export function useOwnerActions(
 			logger.error('[PlaylistDetailScreen] Delete playlist failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de supprimer la playlist'));
 		}
-	};
+	}
 
 	return {
 		sheetVisible,

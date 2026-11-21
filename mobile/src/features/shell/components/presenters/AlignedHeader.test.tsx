@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { Header, HeaderBackButton } from '@react-navigation/elements';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
-import { AlignedHeader } from './AlignedHeader';
+import { AlignedHeader } from '@/features/shell/components/presenters/AlignedHeader';
 
 jest.mock('@react-navigation/elements', () => {
 	const actual = jest.requireActual('@react-navigation/elements');

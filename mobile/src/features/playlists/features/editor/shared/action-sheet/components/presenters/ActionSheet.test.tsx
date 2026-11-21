@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ActionSheet } from './ActionSheet';
+import { ActionSheet } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheet';
 import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
@@ -18,12 +18,15 @@ jest.mock('react-native-safe-area-context', () => ({
 	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
 const anchor = { x: 1300, y: 20, width: 36, height: 36 };
 
-const renderSheet = (props: Partial<React.ComponentProps<typeof ActionSheet>> = {}) => {
+function renderSheet(props: Partial<React.ComponentProps<typeof ActionSheet>> = {}) {
 	const onClose = jest.fn();
 	render(
 		<ActionSheet visible title="Playlist" onClose={onClose} {...props}>
@@ -31,7 +34,7 @@ const renderSheet = (props: Partial<React.ComponentProps<typeof ActionSheet>> = 
 		</ActionSheet>
 	);
 	return onClose;
-};
+}
 
 describe('ActionSheet', () => {
 	it('drops down from its button on desktop, and its backdrop closes it', () => {

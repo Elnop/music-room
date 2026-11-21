@@ -59,8 +59,8 @@ export function ProfilePreferencesSection({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		genresContainer: {
 			flexDirection: 'row',
 			flexWrap: 'wrap',
@@ -85,3 +85,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 4,
 		},
 	});
+}

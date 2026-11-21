@@ -1,5 +1,9 @@
 import { io } from 'socket.io-client';
-import { DEVICE_RETRY_DELAY_MS, DEVICE_RETRY_MAX, useSocketStore } from './socketStore';
+import {
+	DEVICE_RETRY_DELAY_MS,
+	DEVICE_RETRY_MAX,
+	useSocketStore,
+} from '@/shared/backend/socketStore';
 import {
 	DEFAULT_BACKEND_URL,
 	resetBackendUrl,
@@ -7,11 +11,8 @@ import {
 } from '@/shared/backend/lib/backendUrl';
 import { onBackendError } from '@/shared/backend/lib/backendErrors';
 import { createStore } from 'zustand';
-import {
-	notifySessionEnd,
-	registerAuthSession,
-	type SessionView,
-} from '@/shared/backend/lib/authSession';
+import { notifySessionEnd, registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 
 type Handler = (...args: unknown[]) => void;
 
@@ -92,7 +93,7 @@ registerAuthSession({
 	refreshAccessToken: () => mockAuthState.refreshAccessToken(),
 });
 
-jest.mock('./deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	deviceService: { getDeviceInfo: jest.fn(() => Promise.resolve(mockDevice)) },
 	getAppVersion: () => '1.2.3',
 }));
@@ -112,7 +113,9 @@ function readHandshake(): Promise<object> {
 	return new Promise(resolve => lastAuthOption()(resolve));
 }
 
-const flush = () => new Promise<void>(resolve => setImmediate(resolve));
+function flush() {
+	return new Promise<void>(resolve => setImmediate(resolve));
+}
 const backendError = jest.fn();
 onBackendError(backendError);
 
@@ -209,8 +212,9 @@ describe('socketStore connect_error', () => {
 });
 
 describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
-	const refuseDevice = () =>
-		socket.trigger('connect_error', new Error('DEVICE_REGISTRATION_FAILED'));
+	function refuseDevice() {
+		return socket.trigger('connect_error', new Error('DEVICE_REGISTRATION_FAILED'));
+	}
 
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -275,7 +279,9 @@ describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
 });
 
 describe('socketStore backend address', () => {
-	const lastUrl = () => ioMock.mock.calls[ioMock.mock.calls.length - 1][0];
+	function lastUrl() {
+		return ioMock.mock.calls[ioMock.mock.calls.length - 1][0];
+	}
 
 	it('connects to the current backend address', () => {
 		expect(lastUrl()).toBe(DEFAULT_BACKEND_URL);
@@ -307,7 +313,9 @@ describe('socketStore backend address', () => {
 });
 
 describe('socketStore status', () => {
-	const status = () => useSocketStore.getState().status;
+	function status() {
+		return useSocketStore.getState().status;
+	}
 
 	it('is connecting until the first connect, then connected', () => {
 		expect(status()).toBe('connecting');

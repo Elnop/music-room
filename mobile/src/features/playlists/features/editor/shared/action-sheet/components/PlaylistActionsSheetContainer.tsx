@@ -1,10 +1,8 @@
 import React from 'react';
 import { useMenuAnchor } from '@/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchor';
 import { useDeferredSheetAction } from '@/features/playlists/features/editor/shared/action-sheet/hooks/useDeferredSheetAction';
-import {
-	PlaylistActionsView,
-	type PlaylistActionsViewProps,
-} from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/PlaylistActionsView';
+import { PlaylistActionsView } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/PlaylistActionsView';
+import type { PlaylistActionsViewProps } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/PlaylistActionsView';
 
 type PlaylistActionsSheetProps = Omit<PlaylistActionsViewProps, 'onDismiss' | 'anchor'>;
 

@@ -1,11 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '@/shared/backend/lib/apiConfig';
-import { reportBackendError } from './backendErrors';
+import { reportBackendError } from '@/shared/backend/lib/backendErrors';
 
 const STORAGE_KEY = 'zumik.backendUrl';
 
-const URL_PARTS = /^(https?):\/\/([^/?#@\s]*)\/*$/i;
-const AUTHORITY = /^(\[[0-9a-f:.]+\]|[a-z0-9-]+(?:\.[a-z0-9-]+)*)(?::(\d{1,5}))?$/i;
+const URL_PARTS = /^(https?):\/\/([^/?#@\s]*)\/*$/iu;
+const AUTHORITY = /^(\[[0-9a-f:.]+\]|[a-z0-9-]+(?:\.[a-z0-9-]+)*)(?::(\d{1,5}))?$/iu;
 
 export const DEFAULT_BACKEND_URL = normalize(API_CONFIG.BASE_URL) ?? 'http://localhost:3000';
 

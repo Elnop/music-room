@@ -32,8 +32,8 @@ export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		meta: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -60,3 +60,4 @@ const createStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.semibold,
 		},
 	});
+}

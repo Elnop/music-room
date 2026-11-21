@@ -1,4 +1,6 @@
-type Constants = typeof import('./platform');
+import type * as PlatformModule from '@/shared/platform/platform';
+
+type Constants = typeof PlatformModule;
 
 function loadFor(os: string): Constants {
 	let constants: Constants | undefined;

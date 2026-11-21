@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Platform } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { PlaylistActionsSheetContainer } from './PlaylistActionsSheetContainer';
+import { PlaylistActionsSheetContainer } from '@/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheetContainer';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
@@ -19,8 +19,8 @@ const onDelete = jest.fn();
 const onChangeCover = jest.fn();
 const onRemoveCover = jest.fn();
 
-const renderSheet = (visible = true, cover = { hasCover: false, coverLocked: false }) =>
-	render(
+function renderSheet(visible = true, cover = { hasCover: false, coverLocked: false }) {
+	return render(
 		<PlaylistActionsSheetContainer
 			visible={visible}
 			playlistName="Les tubes du Crabe Croustillant"
@@ -34,6 +34,7 @@ const renderSheet = (visible = true, cover = { hasCover: false, coverLocked: fal
 			onRemoveCover={onRemoveCover}
 		/>
 	);
+}
 
 const defaultOS = Platform.OS;
 

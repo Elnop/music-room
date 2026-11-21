@@ -1,4 +1,4 @@
-import { largeArtwork } from './artwork';
+import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
 
 describe('largeArtwork', () => {
 	it('asks SoundCloud for the 500×500 artwork', () => {

@@ -1,23 +1,26 @@
 import { renderHook } from '@testing-library/react-native';
 import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
-import { useContextMenu, useContextMenuDismiss } from './useContextMenu.web';
+import { useContextMenu, useContextMenuDismiss } from '@/shared/theme/hooks/useContextMenu.web';
 
 type Handler = (event: object) => void;
 
 const row = { getBoundingClientRect: () => ({ left: 40, top: 200, width: 900, height: 56 }) };
 
-const browserEvent = (fields: object) => ({
-	currentTarget: row,
-	preventDefault: jest.fn(),
-	stopPropagation: jest.fn(),
-	...fields,
-});
+function browserEvent(fields: object) {
+	return {
+		currentTarget: row,
+		preventDefault: jest.fn(),
+		stopPropagation: jest.fn(),
+		...fields,
+	};
+}
 
-const handlers = (onOpen: (() => void) | undefined) =>
-	renderHook(() => useContextMenu(onOpen)).result.current as {
+function handlers(onOpen: (() => void) | undefined) {
+	return renderHook(() => useContextMenu(onOpen)).result.current as {
 		onContextMenu?: Handler;
 		onKeyDown?: Handler;
 	};
+}
 
 afterEach(() => useMenuAnchorStore.setState({ anchor: null }));
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { TabBarLayout } from './TabBarLayout';
+import { TabBarLayout } from '@/features/shell/components/orchestrators/TabBarLayout';
 import { Text } from '@/shared/theme/components/Text';
 
 const mockNavigate = jest.fn();
@@ -31,18 +31,24 @@ jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	default: jest.fn(() => ({ width: 375, height: 800, scale: 1, fontScale: 1 })),
 }));
 
-const propsOn = (tab: string) =>
-	({
+function propsOn(tab: string) {
+	return {
 		navigation: { navigate: mockNavigate },
 		state: { index: 0, routes: [{ key: tab, name: tab }] },
-	}) as unknown as BottomTabBarProps;
+	} as unknown as BottomTabBarProps;
+}
 
 const props = propsOn('HomeTab');
 
-const setWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function setWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
-const texts = () => screen.UNSAFE_getAllByType(Text).map(node => node.props.children);
+function texts() {
+	return screen.UNSAFE_getAllByType(Text).map(node => node.props.children);
+}
 
 describe('TabBarLayout', () => {
 	it('stacks the mini-player right above the tab bar, in the tab bar slot', () => {

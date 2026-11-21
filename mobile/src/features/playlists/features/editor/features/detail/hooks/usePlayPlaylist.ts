@@ -20,7 +20,7 @@ export function usePlayPlaylist(
 	const pendingRef = useRef(false);
 	const playing = state === 'playing';
 
-	const start = async (startTrackId?: string) => {
+	async function start(startTrackId?: string) {
 		pendingRef.current = true;
 		setPending(true);
 		setPendingTrackId(startTrackId ?? null);
@@ -32,19 +32,19 @@ export function usePlayPlaylist(
 			setPending(false);
 			setPendingTrackId(null);
 		}
-	};
+	}
 
-	const press = async () => {
+	async function press() {
 		if (pendingRef.current) return;
 		if (playing) return playback.pause();
 		if (state === 'paused') return playback.resume();
 		await start();
-	};
+	}
 
-	const playFrom = async (track: { id: string; trackUri: string }) => {
+	async function playFrom(track: { id: string; trackUri: string }) {
 		if (pendingRef.current || track.trackUri === playingUri) return;
 		await start(track.id);
-	};
+	}
 
 	return {
 		loading: pending || state === 'loading' || state === 'ready',

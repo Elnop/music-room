@@ -1,4 +1,4 @@
-import { isPreviewOnly } from './soundcloudPreview';
+import { isPreviewOnly } from '@/shared/tracks/lib/soundcloudPreview';
 
 describe('isPreviewOnly', () => {
 	it('flags a SNIP policy', () => {

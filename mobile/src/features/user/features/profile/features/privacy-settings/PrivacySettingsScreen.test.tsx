@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PrivacySettingsContainer } from '@/features/user/features/profile/features/privacy-settings/components/PrivacySettingsContainer';
 import { privacyApi } from '@/features/user/features/profile/shared/profile/lib/privacyApi';
 import { showError } from '@/shared/theme/lib/toast';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -42,7 +43,7 @@ type LeaveEvent = { data: { action: { type: string } } };
 const mockGoBack = jest.fn(() => pressBack());
 const mockDispatch = jest.fn();
 let mockPreventRemove = false;
-let mockOnPreventRemove: (event: LeaveEvent) => void = () => undefined;
+let mockOnPreventRemove: (event: LeaveEvent) => void = noop;
 
 jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ goBack: mockGoBack, dispatch: mockDispatch }),
@@ -134,7 +135,7 @@ describe('PrivacySettingsScreen leave guard', () => {
 	});
 
 	it('still asks when back is pressed during a save that then fails', async () => {
-		let failSave: (error: Error) => void = () => undefined;
+		let failSave: (error: Error) => void = noop;
 		jest.mocked(privacyApi.updatePrivacySettings).mockReturnValue(
 			new Promise((_resolve, reject) => {
 				failSave = reject;

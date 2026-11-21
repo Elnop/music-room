@@ -1,4 +1,5 @@
-import React, { type ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useActiveQueue } from '@/features/playback/shared/player/stores/queueStore';
 import { selectPlaysPlaylist } from '@/features/playback/shared/player/lib/queueSelectors';

@@ -1,9 +1,15 @@
-import { trackToSoundCloud } from './trackToSoundCloud';
-import { currentItem } from './queueSelectors';
+import { trackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
+import { currentItem } from '@/features/playback/shared/player/lib/queueSelectors';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import { actionScope, handleRemoteRefusal, type StepOptions } from './queueScope';
-import type { QueueCallTarget, QueueState, QueueStepOutcome, QueueStepResult } from './queue.types';
+import { actionScope, handleRemoteRefusal } from '@/features/playback/shared/player/lib/queueScope';
+import type { StepOptions } from '@/features/playback/shared/player/lib/queueScope';
+import type {
+	QueueCallTarget,
+	QueueState,
+	QueueStepOutcome,
+	QueueStepResult,
+} from '@/features/playback/shared/player/lib/queue.types';
 import {
 	getPlayerState,
 	usePlayerStore,
@@ -50,12 +56,12 @@ export async function runStep(
 	return 'stopped';
 }
 
-export const asStep =
-	(request: (call: QueueCallTarget) => Promise<QueueState>) =>
-	async (call: QueueCallTarget): Promise<QueueStepResult> => ({
+export function asStep(request: (call: QueueCallTarget) => Promise<QueueState>) {
+	return async (call: QueueCallTarget): Promise<QueueStepResult> => ({
 		ok: true,
 		state: await request(call),
 	});
+}
 
 export async function mutate(
 	request: (call: QueueCallTarget) => Promise<QueueState>,

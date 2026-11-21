@@ -1,4 +1,4 @@
-import { useBreakpoint } from './useBreakpoint';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 
 export function useSeparatorColor(): string {

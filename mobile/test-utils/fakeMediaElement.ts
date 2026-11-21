@@ -3,7 +3,7 @@ export class FakeMediaElement {
 	currentTime = 0;
 	volume = 1;
 	preload = '';
-	duration = NaN;
+	duration = Number.NaN;
 	paused = true;
 	ended = false;
 	readyState = 0;
@@ -62,10 +62,11 @@ export class FakeMediaElement {
 	}
 }
 
-export const autoplayRefusal = () =>
-	Promise.reject(
+export function autoplayRefusal() {
+	return Promise.reject(
 		Object.assign(new Error('play() needs a user gesture'), { name: 'NotAllowedError' })
 	);
+}
 
 export function installFakeDocument(element: FakeMediaElement): void {
 	Object.assign(globalThis, { document: { createElement: () => element } });

@@ -2,11 +2,12 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
-import { Text } from './Text';
-import { TextInput } from './TextInput';
+import { Text } from '@/shared/theme/components/Text';
+import { TextInput } from '@/shared/theme/components/TextInput';
 
-const fontOf = (testID: string) =>
-	StyleSheet.flatten(screen.getByTestId(testID).props.style)?.fontFamily;
+function fontOf(testID: string) {
+	return StyleSheet.flatten(screen.getByTestId(testID).props.style)?.fontFamily;
+}
 
 describe('Text', () => {
 	it('sets the regular brand family on an unstyled text', () => {

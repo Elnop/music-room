@@ -1,5 +1,5 @@
 import { AppRegistry } from 'react-native';
-import { jsKeepAlive, registerJsKeepAliveTask } from './jsKeepAlive.web';
+import { jsKeepAlive, registerJsKeepAliveTask } from '@/features/playback/lib/jsKeepAlive.web';
 
 describe('jsKeepAlive (web)', () => {
 	it('registers no headless task, which react-native-web does not have', () => {

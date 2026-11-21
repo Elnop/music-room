@@ -60,8 +60,8 @@ export function AuthFormFrame({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -99,3 +99,4 @@ const createStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.semibold,
 		},
 	});
+}

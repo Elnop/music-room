@@ -1,5 +1,5 @@
 import { apiRequest, authRequest } from '@/shared/backend/lib/api';
-import { musicControlApi } from './musicControlApi';
+import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({
 	apiRequest: jest.fn(),

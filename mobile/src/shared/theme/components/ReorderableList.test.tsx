@@ -1,8 +1,8 @@
 import React from 'react';
 import { act, render, screen } from '@testing-library/react-native';
-import { ReorderableList } from './ReorderableList';
+import { ReorderableList } from '@/shared/theme/components/ReorderableList';
 import { hapticSelection } from '@/shared/theme/lib/haptics';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('@/shared/theme/lib/haptics', () => ({ hapticSelection: jest.fn() }));
 jest.mock('react-native-reanimated', () => jest.requireActual('react-native-reanimated/mock'));
@@ -43,10 +43,12 @@ jest.mock('react-native-reorderable-list', () => {
 });
 
 const data = ['a', 'b', 'c'];
-const rows = () => screen.getAllByTestId('row').map(row => row.props.children);
+function rows() {
+	return screen.getAllByTestId('row').map(row => row.props.children);
+}
 
-const renderList = (onReorder: (from: number, to: number) => Promise<unknown>) =>
-	render(
+function renderList(onReorder: (from: number, to: number) => Promise<unknown>) {
+	return render(
 		<ReorderableList
 			data={data}
 			keyExtractor={item => item}
@@ -58,6 +60,7 @@ const renderList = (onReorder: (from: number, to: number) => Promise<unknown>) =
 			)}
 		/>
 	);
+}
 
 describe('ReorderableList', () => {
 	beforeEach(() => jest.clearAllMocks());

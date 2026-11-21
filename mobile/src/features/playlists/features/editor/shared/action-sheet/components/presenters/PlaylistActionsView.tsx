@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import { ActionSheet } from './ActionSheet';
-import { ActionSheetRow } from './ActionSheetRow';
+import { ActionSheet } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheet';
+import { ActionSheetRow } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheetRow';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 import CameraSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/camera-solid.svg';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';

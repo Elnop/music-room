@@ -1,6 +1,6 @@
-import { toTrackInput } from './trackInput';
-import type { SoundCloudTrack } from './soundcloud.types';
-import type { Track } from './track.types';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { Track } from '@/shared/tracks/lib/track.types';
 
 const soundCloudTrack: SoundCloudTrack = {
 	id: 7,

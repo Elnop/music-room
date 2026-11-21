@@ -1,5 +1,8 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import { forgotPassword, resetPassword } from './passwordApi';
+import {
+	forgotPassword,
+	resetPassword,
+} from '@/features/user/features/auth/shared/password-reset/passwordApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
 

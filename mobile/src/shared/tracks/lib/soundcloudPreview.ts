@@ -1,4 +1,4 @@
-import type { SoundCloudTrack } from './soundcloud.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
 export function isPreviewOnly(track: Pick<SoundCloudTrack, 'policy' | 'media'>): boolean {
 	if (track.policy === 'SNIP') return true;

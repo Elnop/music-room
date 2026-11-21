@@ -1,4 +1,4 @@
-import { queryKeys } from './keys';
+import { queryKeys } from '@/shared/query-keys/keys';
 
 function startsWith(key: readonly unknown[], prefix: readonly unknown[]): boolean {
 	return prefix.every((part, index) => key[index] === part);

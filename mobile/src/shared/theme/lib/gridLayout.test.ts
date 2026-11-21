@@ -1,4 +1,4 @@
-import { rowColumns, tileColumns, tileWidth } from './gridLayout';
+import { rowColumns, tileColumns, tileWidth } from '@/shared/theme/lib/gridLayout';
 
 describe('tileColumns', () => {
 	it('keeps two columns on the phone, whatever its width', () => {

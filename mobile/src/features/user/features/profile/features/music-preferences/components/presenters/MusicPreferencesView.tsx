@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { GenreSelector } from './GenreSelector';
+import { GenreSelector } from '@/features/user/features/profile/features/music-preferences/components/presenters/GenreSelector';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
 import { Button } from '@/shared/theme/components/Button';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
@@ -59,8 +59,8 @@ export function MusicPreferencesView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		selectorContainer: {
 			backgroundColor: theme.colors.surface,
 			marginBottom: theme.spacing.lg,
@@ -69,3 +69,4 @@ const createStyles = (theme: Theme) =>
 			marginHorizontal: 0,
 		},
 	});
+}

@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, ScrollView, type RefreshControlProps } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
+import type { RefreshControlProps } from 'react-native';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
@@ -24,8 +25,8 @@ export function MyDevicesErrorView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		errorScreen: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -42,3 +43,4 @@ const createStyles = (theme: Theme) =>
 			textAlign: 'center',
 		},
 	});
+}

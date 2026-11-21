@@ -9,8 +9,8 @@ export function FieldLabel({ children }: { children: string }) {
 	return <Text style={styles.label}>{children}</Text>;
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		label: {
 			fontSize: theme.typography.sizes.md,
 			fontFamily: theme.typography.families.semibold,
@@ -18,3 +18,4 @@ const createStyles = (theme: Theme) =>
 			marginBottom: theme.spacing.sm,
 		},
 	});
+}

@@ -54,8 +54,8 @@ export function ProfileScreenFrame({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -85,3 +85,4 @@ const createStyles = (theme: Theme) =>
 			textAlign: 'center',
 		},
 	});
+}

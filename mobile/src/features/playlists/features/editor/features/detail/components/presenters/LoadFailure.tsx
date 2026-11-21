@@ -33,8 +33,8 @@ export function LoadFailure({ notFound, onRetry }: LoadFailureProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		failure: {
 			flex: 1,
 			alignItems: 'center',
@@ -45,3 +45,4 @@ const createStyles = (theme: Theme) =>
 			marginBottom: theme.spacing.lg,
 		},
 	});
+}

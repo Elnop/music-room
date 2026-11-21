@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import { onSessionEnd } from '@/shared/backend/lib/authSession';
-import {
-	initialPlayerState,
-	type PlayerState,
-} from '@/features/playback/shared/player/lib/playerState';
+import { initialPlayerState } from '@/features/playback/shared/player/lib/playerState';
+import type { PlayerState } from '@/features/playback/shared/player/lib/playerState';
 
 import { readPositionMs } from '@/features/playback/shared/player/lib/positionReader';
 
 export { readPositionMs };
 export { setPositionReader } from '@/features/playback/shared/player/lib/positionReader';
 
-const validPos = (p: number | null) => (p !== null && Number.isFinite(p) && p > 0 ? p : null);
+function validPos(p: number | null) {
+	return p !== null && Number.isFinite(p) && p > 0 ? p : null;
+}
 
 function loadRestored(state: PlayerState): boolean {
 	if (!state.needsStreamLoad || !state.currentTrack) return false;

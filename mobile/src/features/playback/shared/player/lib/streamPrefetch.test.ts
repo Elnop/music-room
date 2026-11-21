@@ -1,15 +1,21 @@
-import { STREAM_RENEW_MARGIN_MS, isStreamStale, streamPrefetch } from './streamPrefetch';
+import {
+	STREAM_RENEW_MARGIN_MS,
+	isStreamStale,
+	streamPrefetch,
+} from '@/features/playback/shared/player/lib/streamPrefetch';
 
 const NOW = 1_000_000_000;
 const MINUTE_MS = 60 * 1000;
 
-const entry = (expiresAt: number | null = NOW + 30 * MINUTE_MS) => ({
-	queueItemId: 'b',
-	permalink: 'https://soundcloud.com/artist/b',
-	streamUrl: 'ub',
-	protocol: 'hls' as const,
-	expiresAt,
-});
+function entry(expiresAt: number | null = NOW + 30 * MINUTE_MS) {
+	return {
+		queueItemId: 'b',
+		permalink: 'https://soundcloud.com/artist/b',
+		streamUrl: 'ub',
+		protocol: 'hls' as const,
+		expiresAt,
+	};
+}
 
 beforeEach(() => streamPrefetch.clear());
 

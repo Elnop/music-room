@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { View } from 'react-native';
 import { logger } from '@/shared/logging/logger';
-import {
-	renderGoogleButton,
-	type GoogleButtonTarget,
-} from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn.web';
+import { renderGoogleButton } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn.web';
+import type { GoogleButtonTarget } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn.web';
 import { preloadFacebookSdk } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web';
 import type { GoogleButtonSlot, GoogleButtonVariant } from '@/features/user/features/auth/types';
 

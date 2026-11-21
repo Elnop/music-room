@@ -7,21 +7,21 @@ import {
 	openPendingLink,
 	stateFromLinkPath,
 	takePendingLink,
-} from './linking';
+} from '@/features/shell/lib/linking';
 import { playlistLink, userLink } from '@/shared/share-links/shareLinks';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
 type Options = Parameters<NonNullable<ReturnType<typeof createLinking>['getStateFromPath']>>[1];
 
-const fakeRef = (ready = true) => {
+function fakeRef(ready = true) {
 	const ref = {
 		isReady: jest.fn(() => ready),
 		dispatch: jest.fn(),
 		resetRoot: jest.fn(),
 	};
 	return ref as typeof ref & NavigationContainerRef<AppTabsParamList>;
-};
+}
 
 beforeEach(() => clearPendingLink());
 
@@ -226,10 +226,10 @@ describe('createLinking in a browser', () => {
 });
 
 describe('openPendingLink', () => {
-	const keepLink = (path: string) => {
+	function keepLink(path: string) {
 		const linking = createLinking(() => false);
 		linking.getStateFromPath!(path, linking.config as Options);
-	};
+	}
 
 	it('navigates to the pending link once, then forgets it', () => {
 		keepLink(`playlist/${ID}`);

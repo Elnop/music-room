@@ -3,11 +3,11 @@ import {
 	AdvertiseError,
 	startEventBeacon,
 	stopEventBeacon,
-} from './beaconAdvertiser';
-import { useBeaconStore } from './beaconStore';
+} from '@/features/events/features/detail/beaconAdvertiser';
+import { useBeaconStore } from '@/features/events/features/detail/beaconStore';
 
-jest.mock('./beaconAdvertiser', () => {
-	const actual = jest.requireActual('./beaconAdvertiser');
+jest.mock('@/features/events/features/detail/beaconAdvertiser', () => {
+	const actual = jest.requireActual('@/features/events/features/detail/beaconAdvertiser');
 	return {
 		AdvertiseError: actual.AdvertiseError,
 		startEventBeacon: jest.fn(),
@@ -16,11 +16,13 @@ jest.mock('./beaconAdvertiser', () => {
 });
 
 const start = jest.mocked(startEventBeacon);
-const event = (endsIn: number) => ({
-	id: 'e1',
-	beaconMinor: 42,
-	endsAt: new Date(Date.now() + endsIn).toISOString(),
-});
+function event(endsIn: number) {
+	return {
+		id: 'e1',
+		beaconMinor: 42,
+		endsAt: new Date(Date.now() + endsIn).toISOString(),
+	};
+}
 
 beforeEach(() => {
 	jest.useFakeTimers();

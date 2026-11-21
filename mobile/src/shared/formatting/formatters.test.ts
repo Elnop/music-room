@@ -4,7 +4,7 @@ import {
 	formatDuration,
 	formatRelativeTime,
 	truncateText,
-} from './formatters';
+} from '@/shared/formatting/formatters';
 
 describe('formatDuration', () => {
 	it.each([
@@ -27,7 +27,9 @@ describe('formatDate', () => {
 
 describe('formatRelativeTime', () => {
 	const NOW = new Date('2026-10-05T12:00:00Z');
-	const ago = (ms: number) => new Date(NOW.getTime() - ms);
+	function ago(ms: number) {
+		return new Date(NOW.getTime() - ms);
+	}
 
 	beforeEach(() => {
 		jest.useFakeTimers({ now: NOW });
@@ -47,7 +49,7 @@ describe('formatRelativeTime', () => {
 	});
 
 	it('falls back to an absolute date after a week', () => {
-		expect(formatRelativeTime(ago(8 * 86_400_000))).toMatch(/2026/);
+		expect(formatRelativeTime(ago(8 * 86_400_000))).toMatch(/2026/u);
 	});
 });
 

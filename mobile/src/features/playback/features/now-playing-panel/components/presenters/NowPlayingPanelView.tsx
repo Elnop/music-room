@@ -13,10 +13,13 @@ import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActi
 import type { Theme } from '@/shared/theme/lib/types';
 import { PANEL_CLOSE_ID, PANEL_ID } from '@/features/playback/shared/player/lib/constants';
 import type { NowPlayingPanelData } from '@/features/playback/features/now-playing-panel/hooks/useNowPlayingPanel';
-import { PanelDeviceCard } from './PanelDeviceCard';
-import { PanelTrackActions } from './PanelTrackActions';
-import { UpNextSection } from './UpNextSection';
-import { createStyles, PANEL_ARTWORK_SIZE } from './nowPlayingPanelStyles';
+import { PanelDeviceCard } from '@/features/playback/features/now-playing-panel/components/presenters/PanelDeviceCard';
+import { PanelTrackActions } from '@/features/playback/features/now-playing-panel/components/presenters/PanelTrackActions';
+import { UpNextSection } from '@/features/playback/features/now-playing-panel/components/presenters/UpNextSection';
+import {
+	createStyles,
+	PANEL_ARTWORK_SIZE,
+} from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 

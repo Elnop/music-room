@@ -1,7 +1,7 @@
 import { LoginManager, AccessToken, Settings } from 'react-native-fbsdk-next';
 import Constants from 'expo-constants';
 import { logger } from '@/shared/logging/logger';
-import { SIGN_IN_CANCELLED } from './signInCancelled';
+import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
 
 const FACEBOOK_APP_ID =
 	Constants.expoConfig?.extra?.EXPO_PUBLIC_FACEBOOK_APP_ID ||
@@ -37,7 +37,7 @@ export async function signInWithFacebook(): Promise<string> {
 		return accessToken;
 	} catch (error: unknown) {
 		const fbError = error as { message?: string };
-		if (fbError.message === SIGN_IN_CANCELLED) throw new Error(SIGN_IN_CANCELLED);
+		if (fbError.message === SIGN_IN_CANCELLED) throw new Error(SIGN_IN_CANCELLED, { cause: error });
 
 		logger.error('[OAuth] Facebook Sign-In failed:', {
 			errorMessage: fbError.message,

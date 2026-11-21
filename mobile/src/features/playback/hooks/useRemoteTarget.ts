@@ -3,7 +3,8 @@ import { useSocketStore } from '@/shared/backend/socketStore';
 import { useSession } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import { controlErrorMessage, type ControlError } from '@/shared/control-error/controlError';
+import { controlErrorMessage } from '@/shared/control-error/controlError';
+import type { ControlError } from '@/shared/control-error/controlError';
 import {
 	acquireListening,
 	releaseListening,
@@ -35,7 +36,7 @@ export function useRemoteTarget(): void {
 		if (!socket || !isConnected || !ownerId || !deviceId) return;
 		const { setLocal, setRemoteStatus, setControlPending } = useConnectStore.getState();
 
-		const handleStatus = (status: UserListeningStatus) => {
+		function handleStatus(status: UserListeningStatus) {
 			if (status.ownerId !== ownerId) return;
 			const device = status.devices.find(d => d.device.deviceId === deviceId);
 			if (!device) {
@@ -43,29 +44,29 @@ export function useRemoteTarget(): void {
 				return;
 			}
 			setRemoteStatus(device);
-		};
+		}
 
-		const handleRevoked = (payload: ControlRevokedPayload) => {
+		function handleRevoked(payload: ControlRevokedPayload) {
 			if (payload.ownerId === ownerId) setLocal('Accès retiré');
-		};
+		}
 
-		const handleListeningError = (err: { code: string; message: string }) => {
+		function handleListeningError(err: { code: string; message: string }) {
 			logger.error('[RemoteTarget] Listening error:', err);
 			if (err.code === 'NOT_AUTHORIZED') setLocal('Accès refusé à cet appareil');
-		};
+		}
 
-		const handleControlError = (err: ControlError) => {
+		function handleControlError(err: ControlError) {
 			if (!useConnectStore.getState().controlPending) return;
 			setControlPending(false);
 			logger.error('[RemoteTarget] Control error:', err);
 			showError(controlErrorMessage(err));
-		};
+		}
 
-		const handleControlSuccess = (reply: { targetUserId: string; targetDeviceId: string }) => {
+		function handleControlSuccess(reply: { targetUserId: string; targetDeviceId: string }) {
 			if (reply.targetUserId === ownerId && reply.targetDeviceId === deviceId) {
 				setControlPending(false);
 			}
-		};
+		}
 
 		socket.on('listening:status', handleStatus);
 		socket.on('listening:error', handleListeningError);

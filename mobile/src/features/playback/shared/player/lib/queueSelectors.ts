@@ -1,5 +1,5 @@
 import { ApiError } from '@/shared/backend/lib/api';
-import type { QueueState, OwnerQueue } from './queue.types';
+import type { QueueState, OwnerQueue } from '@/features/playback/shared/player/lib/queue.types';
 
 export {
 	previousAction,
@@ -7,7 +7,7 @@ export {
 	nextItem,
 	selectHasNext,
 	selectHasPrevious,
-} from './queueNavigation';
+} from '@/features/playback/shared/player/lib/queueNavigation';
 
 type QueueItemsView = Pick<QueueState, 'currentItemId' | 'items'>;
 

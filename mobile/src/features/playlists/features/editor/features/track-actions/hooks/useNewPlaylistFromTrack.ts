@@ -31,7 +31,7 @@ export function useNewPlaylistFromTrack(
 	const create = useCreatePlaylist();
 	const addTrack = useAddTrack();
 
-	const submit = async () => {
+	async function submit() {
 		if (!track || creating) return;
 		const parsed = playlistFormSchema.shape.name.safeParse(name.trim());
 		if (!parsed.success) {
@@ -58,7 +58,7 @@ export function useNewPlaylistFromTrack(
 			showError(`Playlist « ${created.name} » créée, mais le titre n'a pas pu y être ajouté`);
 		}
 		void client.invalidateQueries({ queryKey: queryKeys.playlists.list() });
-	};
+	}
 
 	return {
 		name,

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Modal, StyleSheet, View, type DimensionValue } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
+import type { DimensionValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { AnchoredMenu } from './AnchoredMenu';
+import { AnchoredMenu } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/AnchoredMenu';
 import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
@@ -103,8 +104,8 @@ export function ActionSheet({
 	);
 }
 
-const createStyles = (theme: Theme, bottomInset: number) =>
-	StyleSheet.create({
+function createStyles(theme: Theme, bottomInset: number) {
+	return StyleSheet.create({
 		backdrop: {
 			flex: 1,
 			backgroundColor: theme.colors.backdrop,
@@ -144,3 +145,4 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			marginTop: 2,
 		},
 	});
+}

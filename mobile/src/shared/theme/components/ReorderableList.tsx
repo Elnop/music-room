@@ -1,13 +1,14 @@
 import React from 'react';
 import type { FlatListProps } from 'react-native';
 import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS, useSharedValue, type SharedValue } from 'react-native-reanimated';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import LibReorderableList, {
 	reorderItems,
 	useIsActive,
 	useReorderableDrag,
-	type ReorderableListReorderEvent,
 } from 'react-native-reorderable-list';
+import type { ReorderableListReorderEvent } from 'react-native-reorderable-list';
 import { hapticSelection } from '@/shared/theme/lib/haptics';
 
 interface ReorderableRenderItemInfo<T> {
@@ -45,10 +46,10 @@ interface CellProps<T> {
 function Cell<T>({ item, index, renderItem, dragRequested }: CellProps<T>) {
 	const startDrag = useReorderableDrag();
 	const isActive = useIsActive();
-	const drag = () => {
+	function drag() {
 		dragRequested.set(true);
 		startDrag();
-	};
+	}
 	return renderItem({ item, index, drag, isActive });
 }
 
@@ -96,20 +97,22 @@ export function ReorderableList<T>({
 		[dragRequested, touchStart]
 	);
 
-	const handleReorder = ({ from, to }: ReorderableListReorderEvent) => {
+	function handleReorder({ from, to }: ReorderableListReorderEvent) {
 		if (from === to) return;
 		setOverride({ base: data, items: reorderItems(items, from, to) });
 		const result = onReorder(from, to);
 		if (result) {
-			const clear = () => setOverride(null);
+			function clear() {
+				return setOverride(null);
+			}
 			result.then(clear, clear);
 		}
-	};
+	}
 
-	const handleDragEdge = () => {
+	function handleDragEdge() {
 		'worklet';
 		runOnJS(hapticSelection)();
-	};
+	}
 
 	return (
 		<LibReorderableList

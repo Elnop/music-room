@@ -8,9 +8,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "react(no-unstable-nested-components)": {
       "count": 1
     }
@@ -20,23 +17,7 @@
       "count": 1
     }
   },
-  "src/app/KeyboardShortcuts.tsx": {
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    }
-  },
-  "src/app/QueueSheet.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/app/RootNavigator.test.tsx": {
-    "eslint(func-style)": {
-      "count": 5
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
@@ -46,9 +27,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     }
   },
@@ -76,9 +54,6 @@
     }
   },
   "src/features/events/features/detail/beaconAdvertiser.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     },
@@ -87,9 +62,6 @@
     }
   },
   "src/features/events/features/detail/beaconAdvertiser.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -104,24 +76,12 @@
     }
   },
   "src/features/events/features/detail/beaconStore.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "jest(prefer-called-with)": {
       "count": 2
     }
   },
   "src/features/events/features/detail/beaconStore.ts": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "store-layout(store-layout)": {
@@ -132,17 +92,8 @@
     }
   },
   "src/features/events/features/detail/components/EventDetailContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-nested-callbacks)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
     },
     "jest(prefer-called-with)": {
       "count": 3
@@ -151,25 +102,11 @@
   "src/features/events/features/detail/components/presenters/BeaconCard.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/events/features/detail/components/presenters/BeaconUnavailableCard.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/events/features/detail/components/presenters/EventDetailView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "react-native(no-unused-styles)": {
       "count": 8
@@ -182,9 +119,6 @@
     }
   },
   "src/features/events/features/detail/components/presenters/InfoRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 5
     },
@@ -196,9 +130,6 @@
     }
   },
   "src/features/events/features/detail/components/presenters/beaconCardStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -207,16 +138,10 @@
     }
   },
   "src/features/events/features/detail/hooks/useBeaconBroadcast.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "function-size(max-variables)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -224,9 +149,6 @@
     }
   },
   "src/features/events/features/detail/hooks/useEventDetailScreen.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -241,23 +163,11 @@
     }
   },
   "src/features/events/features/event-form/components/EventFormContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
   },
   "src/features/events/features/event-form/components/presenters/DateTimeRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 3
     },
@@ -272,9 +182,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     },
@@ -286,23 +193,11 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     }
   },
   "src/features/events/features/event-form/components/presenters/GenreSelector.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "react-native(no-raw-text)": {
       "count": 1
     },
@@ -314,13 +209,7 @@
     }
   },
   "src/features/events/features/event-form/components/presenters/PlaylistSelector.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-raw-text)": {
@@ -334,50 +223,29 @@
     }
   },
   "src/features/events/features/event-form/hooks/useEventForm.ts": {
-    "eslint(func-style)": {
-      "count": 4
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/events/features/event-form/hooks/useEventPlace.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
   "src/features/events/features/event-form/hooks/useEventPlace.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -385,12 +253,6 @@
     }
   },
   "src/features/events/features/event-form/lib/pickDateTime.web.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -402,9 +264,6 @@
     }
   },
   "src/features/events/features/event-form/lib/pickDateTime.web.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -421,23 +280,11 @@
     }
   },
   "src/features/events/features/nearby/components/NearbyEventsContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 5
-    },
     "jest(prefer-called-with)": {
       "count": 14
     }
   },
   "src/features/events/features/nearby/components/presenters/BeaconStatusLine.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -449,9 +296,6 @@
     }
   },
   "src/features/events/features/nearby/components/presenters/EventRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 3
     },
@@ -466,13 +310,7 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
       "count": 3
     },
     "react-native(no-unused-styles)": {
@@ -484,9 +322,6 @@
   },
   "src/features/events/features/nearby/components/presenters/RadarScope.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
       "count": 1
     },
     "eslint(max-lines-per-function)": {
@@ -502,28 +337,14 @@
       "count": 13
     }
   },
-  "src/features/events/features/nearby/hooks/useAppActive.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
   "src/features/events/features/nearby/hooks/useBeaconScan.ts": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react(set-state-in-effect)": {
@@ -534,22 +355,13 @@
     }
   },
   "src/features/events/features/nearby/hooks/useForegroundPosition.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react(exhaustive-effect-dependencies)": {
@@ -563,45 +375,27 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/events/features/nearby/lib/base64.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
   },
   "src/features/events/features/nearby/lib/base64.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "unicorn(prefer-string-replace-all)": {
       "count": 1
     }
   },
   "src/features/events/features/nearby/lib/beaconDistance.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
@@ -615,12 +409,6 @@
     }
   },
   "src/features/events/features/nearby/lib/beaconScanner.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -628,11 +416,6 @@
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/events/features/nearby/lib/beaconScanner.web.test.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -649,35 +432,13 @@
       "count": 4
     }
   },
-  "src/features/events/features/nearby/lib/geo.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/events/features/nearby/lib/geo.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    }
-  },
   "src/features/events/features/nearby/lib/nearbyEvents.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 6
     }
   },
   "src/features/events/features/nearby/lib/nearbyEvents.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -685,11 +446,6 @@
     },
     "unicorn(no-array-sort)": {
       "count": 2
-    }
-  },
-  "src/features/events/features/nearby/lib/nearbyNotice.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/events/features/nearby/lib/nearbyNotice.ts": {
@@ -701,12 +457,6 @@
     }
   },
   "src/features/events/features/nearby/lib/radarBlips.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     },
@@ -715,9 +465,6 @@
     }
   },
   "src/features/events/features/nearby/lib/radarBlips.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -726,12 +473,6 @@
     }
   },
   "src/features/events/lib/eventSocketRules.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     },
@@ -743,12 +484,6 @@
     }
   },
   "src/features/events/lib/eventSocketRules.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -771,29 +506,11 @@
     }
   },
   "src/features/events/shared/beacon/ibeacon.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
-    },
-    "unicorn(prefer-string-replace-all)": {
-      "count": 1
     }
   },
   "src/features/events/shared/beacon/ibeacon.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 3
     },
@@ -802,64 +519,34 @@
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 1
-    },
-    "unicorn(prefer-string-replace-all)": {
-      "count": 1
     }
   },
   "src/features/events/shared/event-dates/eventDates.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/events/shared/event-screen/eventScreenStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
   "src/features/events/shared/events/hooks/useEventMutations.ts": {
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/events/shared/events/lib/eventCache.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
   },
   "src/features/events/shared/events/lib/eventCache.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "unicorn(no-array-sort)": {
       "count": 1
     }
   },
   "src/features/events/shared/events/lib/eventLocation.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -881,23 +568,12 @@
     }
   },
   "src/features/events/shared/events/lib/geocoder.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
   "src/features/events/shared/events/lib/geocoder.web.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/legal/components/PrivacyPolicyContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -916,14 +592,8 @@
     }
   },
   "src/features/legal/components/presenters/PrivacyPolicyView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "react(no-array-index-key)": {
       "count": 3
@@ -947,16 +617,7 @@
     }
   },
   "src/features/playback/components/PlayerProvider.test.tsx": {
-    "eslint(func-style)": {
-      "count": 5
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-functions)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "jest(prefer-called-with)": {
@@ -974,40 +635,17 @@
       "count": 1
     }
   },
-  "src/features/playback/components/PlaylistPlaybackContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/components/PlaylistPlaybackContainer.tsx": {
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/control-delegation/FriendListeningContainer.tsx": {
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -1027,27 +665,15 @@
     "component-roles(no-restricted-syntax)": {
       "count": 2
     },
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/device-picker/components/presenters/DeviceRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -1058,9 +684,6 @@
     }
   },
   "src/features/playback/features/control-delegation/features/device-picker/components/presenters/devicePickerStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1072,15 +695,6 @@
     }
   },
   "src/features/playback/features/control-delegation/features/device-picker/transferPlayback.test.ts": {
-    "eslint(func-style)": {
-      "count": 4
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -1089,9 +703,6 @@
     }
   },
   "src/features/playback/features/control-delegation/features/device-picker/transferPlayback.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1109,9 +720,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -1126,34 +734,17 @@
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/MyDevicesScreen.test.tsx": {
-    "eslint(func-style)": {
-      "count": 4
-    },
     "eslint(max-nested-callbacks)": {
       "count": 6
     },
-    "eslint(require-unicode-regexp)": {
-      "count": 18
-    },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "jest(prefer-called-with)": {
       "count": 2
     }
   },
-  "src/features/playback/features/control-delegation/features/my-devices/components/orchestrators/MyDevicesContainer.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/control-delegation/features/my-devices/components/orchestrators/RenameDeviceModalContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
@@ -1164,16 +755,7 @@
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceCard.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(no-duplicates)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -1187,9 +769,6 @@
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceCardSkeleton.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1201,9 +780,6 @@
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceFriendRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1219,9 +795,6 @@
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceHeader.tsx": {
     "component-roles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
       "count": 1
     },
     "eslint(max-lines-per-function)": {
@@ -1241,12 +814,6 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 3
     },
@@ -1255,9 +822,6 @@
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -1266,27 +830,12 @@
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesLoadingView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 4
-    },
-    "import(no-duplicates)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -1322,18 +871,9 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "import(no-duplicates)": {
-      "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/hooks/useRenameDeviceForm.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1344,18 +884,7 @@
       "count": 1
     }
   },
-  "src/features/playback/features/control-delegation/features/my-devices/lib/devicePermissions.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "import(no-duplicates)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/control-delegation/hooks/useControllableDevices.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1370,12 +899,6 @@
     }
   },
   "src/features/playback/features/control-delegation/hooks/useFriendListening.test.ts": {
-    "eslint(func-style)": {
-      "count": 7
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "function-size(max-functions)": {
       "count": 1
     },
@@ -1384,36 +907,21 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 3
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 1
     }
   },
   "src/features/playback/features/control-delegation/hooks/useFriendListening.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
     }
   },
   "src/features/playback/features/control-delegation/hooks/useMusicControlEmitter.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react(exhaustive-effect-dependencies)": {
@@ -1421,19 +929,10 @@
     }
   },
   "src/features/playback/features/control-delegation/hooks/useMusicControlEmitter.webDelegation.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-nested-callbacks)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
-      "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
       "count": 1
     }
   },
@@ -1446,26 +945,12 @@
     }
   },
   "src/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 6
     }
   },
-  "src/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/control-delegation/shared/delegation/lib/types.ts": {
     "check-file(filename-blocklist)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -1476,9 +961,6 @@
     }
   },
   "src/features/playback/features/media-session/MediaSessionBridgeContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 3
     },
@@ -1486,23 +968,12 @@
       "count": 1
     }
   },
-  "src/features/playback/features/media-session/MediaSessionBridgeContainer.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/media-session/useMediaSession.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 3
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
     },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
@@ -1512,9 +983,6 @@
     }
   },
   "src/features/playback/features/media-session/useMediaSession.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 2
     },
@@ -1523,9 +991,6 @@
     }
   },
   "src/features/playback/features/media-session/useMediaSession.web.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -1545,33 +1010,8 @@
       "count": 2
     }
   },
-  "src/features/playback/features/mini-player/components/MiniPlayerContainer.gestures.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/mini-player/components/MiniPlayerContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/mini-player/components/presenters/MiniPlayerView.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "function-size(max-variables)": {
@@ -1585,9 +1025,6 @@
     }
   },
   "src/features/playback/features/mini-player/components/presenters/miniPlayerStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1599,9 +1036,6 @@
     }
   },
   "src/features/playback/features/mini-player/useMiniPlayer.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1611,9 +1045,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "react(capitalized-calls)": {
       "count": 1
     },
@@ -1621,20 +1052,9 @@
       "count": 1
     }
   },
-  "src/features/playback/features/now-playing-panel/components/NowPlayingPanelContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/now-playing-panel/components/presenters/NowPlayingPanelView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 4
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -1642,9 +1062,6 @@
   },
   "src/features/playback/features/now-playing-panel/components/presenters/PanelDeviceCard.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -1655,36 +1072,21 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/now-playing-panel/components/presenters/UpNextRow.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/now-playing-panel/components/presenters/UpNextSection.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1696,13 +1098,7 @@
     }
   },
   "src/features/playback/features/now-playing-panel/hooks/useNowPlayingPanel.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -1716,13 +1112,7 @@
     }
   },
   "src/features/playback/features/now-playing-panel/hooks/usePanelFocus.web.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "jest(prefer-called-with)": {
@@ -1736,9 +1126,6 @@
     }
   },
   "src/features/playback/features/now-playing-panel/hooks/usePanelFocus.web.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -1750,12 +1137,6 @@
     }
   },
   "src/features/playback/features/now-playing-panel/upNext.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
@@ -1766,15 +1147,6 @@
     }
   },
   "src/features/playback/features/player-bar/components/PlayerBarContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 3
     }
@@ -1788,12 +1160,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     },
@@ -1805,17 +1171,11 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/player-bar/components/presenters/playerBarStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1837,21 +1197,7 @@
       "count": 1
     }
   },
-  "src/features/playback/features/player-modal/components/orchestrators/PlayerErrorToastContainer.tsx": {
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 9
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
@@ -1865,12 +1211,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 5
     },
@@ -1882,21 +1222,12 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/player-modal/components/presenters/PlayerCarouselSlot.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
@@ -1910,21 +1241,12 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/player-modal/components/presenters/PlayerHeader.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
@@ -1938,17 +1260,11 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 6
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/player-modal/components/presenters/PlayerTrackError.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
     },
@@ -1957,9 +1273,6 @@
     }
   },
   "src/features/playback/features/player-modal/components/presenters/playerModalStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -1970,39 +1283,17 @@
       "count": 33
     }
   },
-  "src/features/playback/features/player-modal/displayedQueueIndex.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/player-modal/displayedQueueIndex.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/player-modal/hooks/useArtworkCarousel.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react(capitalized-calls)": {
@@ -2019,9 +1310,6 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-variables)": {
       "count": 1
     }
@@ -2035,18 +1323,6 @@
     }
   },
   "src/features/playback/features/queue-modal/components/QueueModalContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 4
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 6
     }
@@ -2063,16 +1339,7 @@
     }
   },
   "src/features/playback/features/queue-modal/components/presenters/QueueItemRow.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "function-size(max-variables)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -2083,28 +1350,16 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/queue-modal/components/presenters/QueueTrackDetails.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    },
-    "typescript(consistent-type-imports)": {
       "count": 1
     }
   },
   "src/features/playback/features/queue-modal/components/presenters/queueModalStyles.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -2128,29 +1383,12 @@
       "count": 2
     }
   },
-  "src/features/playback/hooks/useBackgroundKeepAlive.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/hooks/useLastTrackPersistence.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/playback/hooks/useLastTrackPersistence.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -2159,9 +1397,6 @@
     },
     "function-size(max-variables)": {
       "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
     },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
@@ -2179,36 +1414,16 @@
     }
   },
   "src/features/playback/hooks/usePlayerShortcuts.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/playback/hooks/usePlayerShortcuts.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     }
   },
-  "src/features/playback/hooks/useQueueSync.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
   "src/features/playback/hooks/useQueueSync.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -2217,31 +1432,13 @@
     }
   },
   "src/features/playback/hooks/useRemoteTarget.test.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
   },
   "src/features/playback/hooks/useRemoteTarget.ts": {
-    "eslint(func-style)": {
-      "count": 5
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
     }
   },
   "src/features/playback/hooks/useStreamWatchdog.ts": {
@@ -2254,11 +1451,6 @@
   },
   "src/features/playback/lib/audioMode.ts": {
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/lib/audioMode.web.test.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -2275,37 +1467,13 @@
       "count": 2
     }
   },
-  "src/features/playback/lib/jsKeepAlive.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/lib/playbackActions.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 2
     }
   },
-  "src/features/playback/shared/artwork/artwork.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/shared/artwork/artwork.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/full-screen-sheet/FullScreenSheet.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -2331,17 +1499,11 @@
     }
   },
   "src/features/playback/shared/player/hooks/useAudioPlaybackSync.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/hooks/useAudioPlaybackSync.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 3
     },
@@ -2350,12 +1512,6 @@
     }
   },
   "src/features/playback/shared/player/hooks/useAutoplayPrompt.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
@@ -2365,45 +1521,19 @@
       "count": 1
     }
   },
-  "src/features/playback/shared/player/hooks/useNowPlaying.test.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
   "src/features/playback/shared/player/hooks/useNowPlaying.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "function-size(max-variables)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/hooks/usePlaybackControls.ts": {
-    "eslint(func-style)": {
-      "count": 5
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "function-size(max-variables)": {
@@ -2411,14 +1541,8 @@
     }
   },
   "src/features/playback/shared/player/hooks/usePlayerAudio.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "function-size(max-variables)": {
       "count": 1
@@ -2436,9 +1560,6 @@
     }
   },
   "src/features/playback/shared/player/hooks/useRemoteNowPlaying.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -2458,9 +1579,6 @@
     }
   },
   "src/features/playback/shared/player/lib/PlayerContext.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -2469,36 +1587,18 @@
     }
   },
   "src/features/playback/shared/player/lib/audioPlayer.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "hook-naming(no-restricted-syntax)": {
       "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/lib/audioPlayer.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 3
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/lib/audioPlayer.web.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "hook-naming(no-restricted-syntax)": {
       "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/lib/constants.ts": {
@@ -2507,19 +1607,7 @@
     }
   },
   "src/features/playback/shared/player/lib/htmlAudioPlayer.ts": {
-    "eslint(curly)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -2548,11 +1636,6 @@
       "count": 7
     }
   },
-  "src/features/playback/shared/player/lib/openPlayerLabel.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/shared/player/lib/playerState.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
@@ -2562,9 +1645,6 @@
     }
   },
   "src/features/playback/shared/player/lib/queue.types.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 4
     },
@@ -2572,34 +1652,7 @@
       "count": 3
     }
   },
-  "src/features/playback/shared/player/lib/queueApi.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/player/lib/queueItemActions.ts": {
-    "eslint(curly)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 4
-    }
-  },
-  "src/features/playback/shared/player/lib/queueNavigation.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playback/shared/player/lib/queueNavigation.ts": {
-    "eslint(func-style)": {
-      "count": 5
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -2611,12 +1664,6 @@
     }
   },
   "src/features/playback/shared/player/lib/queueScope.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -2628,85 +1675,44 @@
     "eslint(func-style)": {
       "count": 3
     },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/lib/queueStepRunner.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 4
-    },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/player/lib/remotePosition.test.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/lib/remotePosition.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/lib/streamApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/lib/streamApi.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/lib/streamPrefetch.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
   "src/features/playback/shared/player/lib/streamPrefetch.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/shared/player/lib/streamSource.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -2718,13 +1724,7 @@
     }
   },
   "src/features/playback/shared/player/lib/trackToSoundCloud.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
       "count": 1
     }
   },
@@ -2751,15 +1751,6 @@
     }
   },
   "src/features/playback/shared/player/stores/connectStore.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 4
     }
@@ -2779,24 +1770,12 @@
     }
   },
   "src/features/playback/shared/player/stores/playerStore.test.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
   },
   "src/features/playback/shared/player/stores/playerStore.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "store-layout(store-layout)": {
@@ -2804,16 +1783,7 @@
     }
   },
   "src/features/playback/shared/player/stores/queueStore.test.ts": {
-    "eslint(func-style)": {
-      "count": 11
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "function-size(max-functions)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "jest(prefer-called-with)": {
@@ -2830,9 +1800,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "hook-naming(no-restricted-syntax)": {
       "count": 1
     },
@@ -2844,17 +1811,8 @@
     }
   },
   "src/features/playback/shared/seek-bar/PlayerProgressSlider.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
     },
     "react-native(no-unused-styles)": {
       "count": 2
@@ -2863,17 +1821,6 @@
       "count": 5
     },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/seek-bar/useSeekPosition.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -2889,9 +1836,6 @@
     }
   },
   "src/features/playback/shared/sheet-header/sheetHeaderStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     }
@@ -2912,31 +1856,12 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/browse/features/home/components/HomeContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    }
-  },
   "src/features/playlists/features/browse/features/home/components/HomeContainer.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
     }
   },
-  "src/features/playlists/features/browse/features/home/components/presenters/FriendCardSkeleton.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/browse/features/home/components/presenters/FriendPlaylistCarousel.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -2954,12 +1879,6 @@
     }
   },
   "src/features/playlists/features/browse/features/home/components/presenters/HomeSkeleton.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 3
     }
@@ -2968,29 +1887,17 @@
     "component-roles(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/features/browse/features/home/useHomeScreen.ts": {
-    "eslint(curly)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3005,21 +1912,12 @@
     }
   },
   "src/features/playlists/features/browse/features/library/components/LibraryContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/playlists/features/browse/features/library/components/LibraryContainer.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react(no-unstable-nested-components)": {
@@ -3035,9 +1933,6 @@
     }
   },
   "src/features/playlists/features/browse/features/library/useLibraryScreen.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3051,24 +1946,7 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCards.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCards.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -3083,9 +1961,6 @@
     }
   },
   "src/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCassette.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3100,9 +1975,6 @@
     }
   },
   "src/features/playlists/features/browse/shared/playlist-grid/components/PlaylistGrid.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -3116,9 +1988,6 @@
     }
   },
   "src/features/playlists/features/browse/shared/playlist-grid/lib/listStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3129,33 +1998,16 @@
       "count": 2
     }
   },
-  "src/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    }
-  },
   "src/features/playlists/features/editor/features/card-menu/PlaylistCardMenuContainer.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-nested-callbacks)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "jest(prefer-called-with)": {
@@ -3163,13 +2015,7 @@
     }
   },
   "src/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-implicit-coercion)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -3183,18 +2029,6 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/components/PlaylistDetailContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 8
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
-    "function-size(max-functions)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -3212,9 +2046,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-implicit-coercion)": {
-      "count": 2
-    },
     "function-size(max-variables)": {
       "count": 1
     },
@@ -3226,9 +2057,6 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 3
     },
@@ -3237,20 +2065,11 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/DetailSkeleton.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 3
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/LoadFailure.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -3267,9 +2086,6 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3281,12 +2097,6 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     }
@@ -3294,9 +2104,6 @@
   "src/features/playlists/features/editor/features/detail/components/presenters/PlaylistDetailView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "function-size(max-variables)": {
       "count": 1
@@ -3309,25 +2116,13 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/PlaylistHeader.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/PlaylistHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
@@ -3343,17 +2138,8 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/PlaylistWideHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "react-native(no-unused-styles)": {
       "count": 7
@@ -3362,20 +2148,9 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
@@ -3394,9 +2169,6 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/TrackTableHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3407,23 +2179,9 @@
       "count": 3
     }
   },
-  "src/features/playlists/features/editor/features/detail/components/presenters/TrackTableRow.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/editor/features/detail/components/presenters/TrackTableRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 1
     },
     "eslint(no-nested-ternary)": {
       "count": 2
@@ -3445,35 +2203,17 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/detailStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/useAnchoredPress.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/useOwnerActions.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "function-size(max-variables)": {
@@ -3484,20 +2224,11 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/usePlayPlaylist.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "hook-files(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/usePlayPlaylist.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3512,16 +2243,10 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/usePlaylistDetailScreen.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -3535,9 +2260,6 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3549,9 +2271,6 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/usePlaylistTracks.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3566,12 +2285,6 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/lib/playlistSocketRules.test.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 8
     },
@@ -3580,9 +2293,6 @@
     }
   },
   "src/features/playlists/features/editor/features/detail/lib/playlistSocketRules.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -3605,12 +2315,6 @@
     }
   },
   "src/features/playlists/features/editor/features/playlist-form/components/PlaylistFormContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 3
     },
@@ -3619,13 +2323,7 @@
     }
   },
   "src/features/playlists/features/editor/features/playlist-form/components/presenters/PlaylistFormView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -3639,9 +2337,6 @@
     }
   },
   "src/features/playlists/features/editor/features/playlist-form/components/presenters/ToggleCard.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3653,9 +2348,6 @@
     }
   },
   "src/features/playlists/features/editor/features/playlist-form/usePlaylistForm.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -3665,20 +2357,11 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/components/SearchTracksContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -3687,9 +2370,6 @@
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/components/presenters/AddableTrackRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -3704,13 +2384,7 @@
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/components/presenters/SearchTracksView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -3724,9 +2398,6 @@
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/trackSearchApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
@@ -3740,16 +2411,10 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react(memo-dependencies)": {
@@ -3763,25 +2428,13 @@
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/PlaylistSharingContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 3
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/MembersSection.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "react-native(no-unused-styles)": {
       "count": 2
@@ -3791,12 +2444,6 @@
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/OpenPlaylistInfo.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 4
     },
@@ -3805,13 +2452,7 @@
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/SettingRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -3828,14 +2469,8 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 5
     },
     "function-size(max-variables)": {
       "count": 1
@@ -3848,9 +2483,6 @@
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/SwipeableUserItem.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -3865,16 +2497,10 @@
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/UserResults.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -3888,9 +2514,6 @@
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -3902,23 +2525,14 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/hooks/useSharingMembers.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3926,9 +2540,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "query-conventions(named-cache-windows)": {
@@ -3945,9 +2556,6 @@
     }
   },
   "src/features/playlists/features/editor/features/sharing/hooks/useSharingSettings.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -3965,25 +2573,16 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/lib/membersApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/lib/sharingTexts.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
@@ -3997,13 +2596,7 @@
     }
   },
   "src/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 4
-    },
     "eslint(max-nested-callbacks)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "jest(prefer-called-with)": {
@@ -4019,9 +2612,6 @@
     }
   },
   "src/features/playlists/features/editor/features/track-actions/components/presenters/NewPlaylistForm.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     },
@@ -4030,17 +2620,11 @@
     }
   },
   "src/features/playlists/features/editor/features/track-actions/components/presenters/TrackActionsView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
       "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 3
@@ -4053,9 +2637,6 @@
     }
   },
   "src/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -4070,25 +2651,13 @@
     }
   },
   "src/features/playlists/features/editor/features/track-actions/hooks/useTrackActions.ts": {
-    "eslint(curly)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -4104,49 +2673,23 @@
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheetContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-nested-callbacks)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheetContainer.tsx": {
     "check-file(filename-blocklist)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheet.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheet.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
     "eslint(no-nested-ternary)": {
       "count": 2
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -4160,9 +2703,6 @@
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheetRow.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -4177,12 +2717,6 @@
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/components/presenters/AnchoredMenu.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     },
@@ -4193,9 +2727,6 @@
   "src/features/playlists/features/editor/shared/action-sheet/components/presenters/PlaylistActionsView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
@@ -4210,20 +2741,11 @@
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchor.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
   },
   "src/features/playlists/features/editor/shared/cover-actions/useCoverActions.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "hook-files(no-restricted-syntax)": {
       "count": 1
     },
@@ -4232,13 +2754,7 @@
     }
   },
   "src/features/playlists/features/editor/shared/cover-actions/useCoverActions.ts": {
-    "eslint(func-style)": {
-      "count": 4
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "function-size(max-variables)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -4246,27 +2762,10 @@
     }
   },
   "src/features/playlists/features/editor/shared/debounced-text/useDebouncedText.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "function-size(max-variables)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/shared/permissions/playlistPermissions.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     }
   },
@@ -4280,22 +2779,8 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/editor/shared/track-edits/lib/trackEdits.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/editor/shared/track-edits/lib/trackMoves.test.ts": {
-    "eslint(func-style)": {
-      "count": 5
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "function-size(max-functions)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "jest(prefer-strict-equal)": {
@@ -4309,13 +2794,7 @@
     }
   },
   "src/features/playlists/features/editor/shared/track-edits/lib/trackMoves.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -4323,9 +2802,6 @@
     }
   },
   "src/features/playlists/features/editor/shared/track-edits/lib/tracksApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 7
     }
@@ -4358,17 +2834,11 @@
     }
   },
   "src/features/playlists/shared/playlist/lib/playlistApi.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "function-size(max-functions)": {
       "count": 1
     }
   },
   "src/features/playlists/shared/playlist/lib/playlistCache.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "function-size(max-functions)": {
       "count": 1
     },
@@ -4383,21 +2853,12 @@
     }
   },
   "src/features/playlists/shared/playlist/lib/playlistSync.test.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 8
     }
   },
   "src/features/playlists/shared/playlist/lib/playlistSync.ts": {
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "unicorn(no-array-sort)": {
@@ -4416,16 +2877,8 @@
     }
   },
   "src/features/playlists/shared/playlist/lib/usersApi.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "hook-naming(no-restricted-syntax)": {
       "count": 3
-    }
-  },
-  "src/features/playlists/shared/playlist/lib/validators.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/playlists/shared/playlist/lib/validators.ts": {
@@ -4455,28 +2908,11 @@
       "count": 1
     }
   },
-  "src/features/search/components/SearchScreen.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/search/components/presenters/SearchView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -4489,18 +2925,7 @@
       "count": 1
     }
   },
-  "src/features/search/components/presenters/SoundCloudTrackItem.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/search/components/presenters/SoundCloudTrackItem.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -4515,12 +2940,6 @@
     }
   },
   "src/features/search/hooks/useSoundCloudSearch.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "hook-files(no-restricted-syntax)": {
       "count": 1
     },
@@ -4530,9 +2949,6 @@
   },
   "src/features/search/hooks/useSoundCloudSearchScreen.ts": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "function-size(max-variables)": {
@@ -4546,16 +2962,8 @@
     }
   },
   "src/features/search/lib/searchApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 4
-    }
-  },
-  "src/features/search/lib/searchApi.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/search/lib/types.ts": {
@@ -4579,25 +2987,8 @@
       "count": 1
     }
   },
-  "src/features/shell/components/orchestrators/AlertHostContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/shell/components/orchestrators/AlertHostContainer.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react(no-array-index-key)": {
@@ -4608,16 +2999,10 @@
     }
   },
   "src/features/shell/components/orchestrators/AppFrameLayout.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -4631,9 +3016,6 @@
     }
   },
   "src/features/shell/components/orchestrators/AppProvidersContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     },
@@ -4642,20 +3024,11 @@
     }
   },
   "src/features/shell/components/orchestrators/AppProvidersContainer.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/shell/components/orchestrators/BackendUrlFieldContainer.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -4669,9 +3042,6 @@
   "src/features/shell/components/orchestrators/NavigationRootLayout.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 4
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -4687,9 +3057,6 @@
     "hook-naming(no-restricted-syntax)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "react(only-export-components)": {
       "count": 1
     }
@@ -4700,9 +3067,6 @@
     }
   },
   "src/features/shell/components/orchestrators/SidebarAccountContainer.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -4717,12 +3081,6 @@
     }
   },
   "src/features/shell/components/orchestrators/TabBarLayout.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     },
@@ -4734,19 +3092,8 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    }
-  },
-  "src/features/shell/components/presenters/AlignedHeader.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/shell/components/presenters/AlignedHeader.tsx": {
@@ -4766,15 +3113,7 @@
       "count": 2
     }
   },
-  "src/features/shell/components/presenters/ConnectionBanner.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/shell/components/presenters/ConnectionBanner.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -4788,22 +3127,8 @@
       "count": 1
     }
   },
-  "src/features/shell/components/presenters/ContentFrame.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/shell/components/presenters/ContentFrame.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -4813,11 +3138,6 @@
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/shell/components/presenters/ErrorBoundary.test.tsx": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -4833,9 +3153,6 @@
     }
   },
   "src/features/shell/components/presenters/ShortcutsHelpDialog.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -4850,13 +3167,7 @@
     }
   },
   "src/features/shell/components/presenters/TabIcon.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react(only-export-components)": {
@@ -4874,25 +3185,12 @@
       "count": 1
     }
   },
-  "src/features/shell/hooks/useConnectionStatus.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/shell/hooks/useConnectionStatus.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
     }
   },
-  "src/features/shell/hooks/useFocusRing.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/shell/hooks/useFocusRing.web.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -4904,12 +3202,6 @@
     }
   },
   "src/features/shell/hooks/useKeyboardShortcuts.web.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -4918,14 +3210,8 @@
     }
   },
   "src/features/shell/hooks/useKeyboardShortcuts.web.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -4944,20 +3230,7 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/shell/lib/dialogStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    }
-  },
-  "src/features/shell/lib/documentTitle.test.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -4967,27 +3240,15 @@
     }
   },
   "src/features/shell/lib/linking.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-nested-callbacks)": {
       "count": 4
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "jest(prefer-strict-equal)": {
       "count": 6
     }
   },
   "src/features/shell/lib/linking.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "function-size(max-functions)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     }
   },
@@ -5000,12 +3261,6 @@
     }
   },
   "src/features/shell/lib/screenPaths.test.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 4
     },
@@ -5014,15 +3269,6 @@
     }
   },
   "src/features/shell/lib/screenPaths.ts": {
-    "eslint(curly)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 3
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -5034,9 +3280,6 @@
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 6
-    },
-    "unicorn(prefer-string-replace-all)": {
-      "count": 1
     }
   },
   "src/features/shell/lib/screenWidths.ts": {
@@ -5045,28 +3288,11 @@
     }
   },
   "src/features/shell/lib/textContrast.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "unicorn(no-array-sort)": {
-      "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 1
-    }
-  },
-  "src/features/shell/lib/webBasePath.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
   "src/features/shell/lib/webBasePath.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     },
@@ -5075,20 +3301,11 @@
     }
   },
   "src/features/shell/screenLayout.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/subscription/PlanContainer.tsx": {
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -5101,20 +3318,7 @@
       "count": 2
     }
   },
-  "src/features/subscription/lib/subscriptionApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/subscription/lib/subscriptionApi.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/subscription/usePlan.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "hook-files(no-restricted-syntax)": {
       "count": 1
     },
@@ -5128,28 +3332,11 @@
     }
   },
   "src/features/user/features/auth/features/email-verification/components/EmailVerificationContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
-  "src/features/user/features/auth/features/email-verification/components/EmailVerificationContainer.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/auth/features/email-verification/components/EmailVerificationView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -5164,9 +3351,6 @@
     }
   },
   "src/features/user/features/auth/features/email-verification/useEmailVerification.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -5176,29 +3360,12 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/features/forgot-password/components/ForgotPasswordContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/features/forgot-password/components/ForgotPasswordContainer.tsx": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -5214,19 +3381,10 @@
     }
   },
   "src/features/user/features/auth/features/forgot-password/useForgotPassword.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "function-size(max-variables)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -5234,12 +3392,6 @@
     }
   },
   "src/features/user/features/auth/features/linked-accounts/LinkedAccountsScreen.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
@@ -5250,9 +3402,6 @@
     }
   },
   "src/features/user/features/auth/features/linked-accounts/components/presenters/LinkedAccountRow.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 3
     },
@@ -5270,13 +3419,7 @@
     }
   },
   "src/features/user/features/auth/features/linked-accounts/components/presenters/LinkedAccountsView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -5293,9 +3436,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-variables)": {
       "count": 1
     },
@@ -5308,34 +3448,12 @@
       "count": 3
     }
   },
-  "src/features/user/features/auth/features/linked-accounts/providersApi.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/auth/features/login/components/LoginContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    },
     "jest(prefer-called-with)": {
       "count": 4
     }
   },
-  "src/features/user/features/auth/features/login/components/LoginContainer.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/auth/features/login/components/LoginView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -5355,48 +3473,22 @@
     }
   },
   "src/features/user/features/auth/features/login/hooks/useLoginForm.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/features/register/components/RegisterContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
-  "src/features/user/features/auth/features/register/components/RegisterContainer.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/auth/features/register/components/RegisterView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -5417,23 +3509,11 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/features/reset-password/components/ResetPasswordContainer.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
@@ -5447,12 +3527,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-implicit-coercion)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "react-native(no-raw-text)": {
       "count": 1
     },
@@ -5464,24 +3538,15 @@
     }
   },
   "src/features/user/features/auth/features/reset-password/hooks/useResendResetCode.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/features/reset-password/hooks/useResetPassword.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -5490,37 +3555,22 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/features/reset-password/passwordRules.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 3
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/features/welcome/components/WelcomeContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
   "src/features/user/features/auth/features/welcome/components/presenters/FeatureCard.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -5539,16 +3589,10 @@
     }
   },
   "src/features/user/features/auth/features/welcome/components/presenters/LandingSections.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -5562,13 +3606,7 @@
     }
   },
   "src/features/user/features/auth/features/welcome/components/presenters/WelcomeView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
       "count": 2
     },
     "react(no-array-index-key)": {
@@ -5593,9 +3631,6 @@
     }
   },
   "src/features/user/features/auth/features/welcome/useFloatingIcons.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -5610,9 +3645,6 @@
     }
   },
   "src/features/user/features/auth/shared/auth-form/AuthFormFrame.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -5630,12 +3662,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
-    },
     "react(no-array-index-key)": {
       "count": 1
     },
@@ -5644,18 +3670,12 @@
     }
   },
   "src/features/user/features/auth/shared/code-input/codeDigits.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 12
     }
   },
   "src/features/user/features/auth/shared/code-input/codeDigits.ts": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -5666,25 +3686,13 @@
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
-    },
-    "unicorn(prefer-string-replace-all)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/code-input/useCodeInput.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "function-size(max-variables)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -5708,24 +3716,13 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/shared/password-reset/passwordApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
-    }
-  },
-  "src/features/user/features/auth/shared/password-reset/usePasswordResetMutations.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/password-screen/PasswordScreenFrame.tsx": {
@@ -5736,15 +3733,7 @@
       "count": 1
     }
   },
-  "src/features/user/features/auth/shared/sign-in/SocialSignInButtons.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/auth/shared/sign-in/SocialSignInButtons.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -5759,12 +3748,6 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/authStore.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 3
-    },
     "function-size(max-functions)": {
       "count": 1
     },
@@ -5776,20 +3759,11 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/authStore.ts": {
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 2
     }
   },
   "src/features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
@@ -5800,9 +3774,6 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/hooks/useProviderSignIn.ts": {
@@ -5811,9 +3782,6 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/authApi.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-functions)": {
       "count": 1
     }
@@ -5834,68 +3802,24 @@
       "count": 1
     }
   },
-  "src/features/user/features/auth/shared/sign-in/lib/facebookSignIn.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(preserve-caught-error)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.test.ts": {
-    "typescript(consistent-type-imports)": {
-      "count": 2
-    }
-  },
   "src/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/lib/googleIosClientId.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.ts": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "eslint(preserve-caught-error)": {
-      "count": 3
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.web.test.ts": {
     "type-definitions(no-restricted-syntax)": {
       "count": 1
-    },
-    "typescript(consistent-type-imports)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.web.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
@@ -5908,9 +3832,6 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/loadScript.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -5927,34 +3848,19 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/oauthErrors.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/sessionActions.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 4
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/sessionStorage.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -5963,28 +3869,14 @@
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/signIn.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 4
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 7
-    },
     "function-size(max-functions)": {
       "count": 1
     },
     "jest(prefer-strict-equal)": {
       "count": 9
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/lib/signIn.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 5
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/signInCancelled.ts": {
@@ -5993,14 +3885,8 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/tokenRefresh.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
@@ -6010,9 +3896,6 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/validators.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 4
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 4
     }
@@ -6028,18 +3911,7 @@
       "count": 6
     }
   },
-  "src/features/user/features/friends/features/friends-list/components/FriendsContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/friends/features/friends-list/components/presenters/ControlSwitch.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -6047,9 +3919,6 @@
   "src/features/user/features/friends/features/friends-list/components/presenters/FriendCard.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -6059,33 +3928,13 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/friends/features/friends-list/components/presenters/FriendsListTab.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
       "count": 1
     }
   },
   "src/features/user/features/friends/features/friends-list/components/presenters/FriendsListTab.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
@@ -6098,17 +3947,11 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/friends/features/friends-list/components/presenters/SearchResultItemRow.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -6116,9 +3959,6 @@
   "src/features/user/features/friends/features/friends-list/components/presenters/SearchUsersTab.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
@@ -6128,9 +3968,6 @@
     }
   },
   "src/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -6153,34 +3990,17 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-variables)": {
       "count": 1
     }
   },
-  "src/features/user/features/friends/features/similar-profiles/components/SimilarProfilesContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/friends/features/similar-profiles/components/presenters/SimilarProfileCard.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/friends/features/similar-profiles/components/presenters/SimilarProfilesSection.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
       "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
@@ -6199,21 +4019,10 @@
     }
   },
   "src/features/user/features/friends/features/similar-profiles/useSimilarProfilesSection.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/friends/features/user-profile/components/UserProfileContainer.test.tsx": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -6223,12 +4032,6 @@
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/FriendPlaylistCard.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 5
     },
@@ -6245,9 +4048,6 @@
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/NowPlayingInline.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -6268,9 +4068,6 @@
     "eslint(no-nested-ternary)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "react-native(no-raw-text)": {
       "count": 3
     }
@@ -6280,20 +4077,12 @@
       "count": 1
     }
   },
-  "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileHeader.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileInfo.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "function-size(max-variables)": {
       "count": 1
@@ -6303,18 +4092,12 @@
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileListening.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfilePlaylists.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -6324,9 +4107,6 @@
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 5
     },
     "function-size(max-variables)": {
       "count": 1
@@ -6339,14 +4119,8 @@
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileWideHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "function-size(max-variables)": {
       "count": 1
@@ -6359,22 +4133,10 @@
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileWideSections.tsx": {
-    "eslint(curly)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -6421,9 +4183,6 @@
     }
   },
   "src/features/user/features/friends/shared/follows/friendsApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 8
     }
@@ -6461,13 +4220,7 @@
     }
   },
   "src/features/user/features/profile/features/edit-profile/components/presenters/EditProfileFormFields.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -6481,9 +4234,6 @@
     }
   },
   "src/features/user/features/profile/features/edit-profile/components/presenters/EditProfilePhoto.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -6504,9 +4254,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "react-native(no-raw-text)": {
       "count": 2
     },
@@ -6521,21 +4268,12 @@
     }
   },
   "src/features/user/features/profile/features/edit-profile/hooks/useAvatarPicker.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 4
     }
   },
   "src/features/user/features/profile/features/edit-profile/hooks/useAvatarPicker.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     }
   },
@@ -6543,13 +4281,7 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     }
   },
@@ -6559,9 +4291,6 @@
     }
   },
   "src/features/user/features/profile/features/music-preferences/MusicPreferencesScreen.test.tsx": {
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
@@ -6572,9 +4301,6 @@
     }
   },
   "src/features/user/features/profile/features/music-preferences/components/presenters/GenreSelector.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -6589,13 +4315,7 @@
     }
   },
   "src/features/user/features/profile/features/music-preferences/components/presenters/MusicPreferencesView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-raw-text)": {
@@ -6620,9 +4340,6 @@
     }
   },
   "src/features/user/features/profile/features/privacy-settings/PrivacySettingsScreen.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "jest(prefer-called-with)": {
       "count": 2
     }
@@ -6633,13 +4350,7 @@
     }
   },
   "src/features/user/features/profile/features/privacy-settings/components/presenters/PrivacySettingsView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     },
     "react-native(no-raw-text)": {
@@ -6653,9 +4364,6 @@
     }
   },
   "src/features/user/features/profile/features/privacy-settings/components/presenters/VisibilityToggle.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -6678,12 +4386,6 @@
     }
   },
   "src/features/user/features/profile/features/profile-screen/ProfileScreen.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
@@ -6700,9 +4402,6 @@
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -6729,20 +4428,9 @@
       "count": 1
     }
   },
-  "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileMenuItems.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileMenuItems.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 5
@@ -6755,9 +4443,6 @@
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileNavigationItem.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -6772,9 +4457,6 @@
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfilePreferencesSection.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -6789,14 +4471,8 @@
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 5
     },
     "function-size(max-variables)": {
       "count": 1
@@ -6830,15 +4506,7 @@
       "count": 1
     }
   },
-  "src/features/user/features/profile/shared/profile/lib/privacyApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/profile/shared/profile/lib/profileApi.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
@@ -6863,14 +4531,8 @@
     }
   },
   "src/features/user/features/settings/components/presenters/SettingsView.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 5
@@ -6883,9 +4545,6 @@
     }
   },
   "src/features/user/features/settings/components/presenters/SubscriptionSection.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -6899,19 +4558,11 @@
       "count": 1
     }
   },
-  "src/features/user/features/settings/useSettingsScreen.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    }
-  },
   "src/features/user/shared/profile-info-rows/ProfileInfoRows.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
     "component-roles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -6931,9 +4582,6 @@
     }
   },
   "src/features/user/shared/profile-layout/ProfileScreenFrame.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
@@ -6948,9 +4596,6 @@
     }
   },
   "src/features/user/shared/profile-section/ProfileSection.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -6965,17 +4610,8 @@
     }
   },
   "src/features/user/shared/wide-profile-header/WideProfileHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
     },
     "react(only-export-components)": {
       "count": 1
@@ -6993,23 +4629,14 @@
   "src/shared/alerts/alert.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
     }
   },
   "src/shared/alerts/alert.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/shared/alerts/alert.web.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
@@ -7023,9 +4650,6 @@
     }
   },
   "src/shared/backend/deviceService.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "eslint(no-underscore-dangle)": {
       "count": 1
     },
@@ -7048,27 +4672,15 @@
     }
   },
   "src/shared/backend/lib/api.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/shared/backend/lib/api.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
     },
     "eslint(max-params)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
-    "eslint(require-unicode-regexp)": {
       "count": 1
     },
     "fetch-placement(no-restricted-syntax)": {
@@ -7081,24 +4693,8 @@
       "count": 2
     }
   },
-  "src/shared/backend/lib/apiErrorMessage.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
-  "src/shared/backend/lib/apiErrorMessage.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/backend/lib/authSession.test.ts": {
     "eslint(max-nested-callbacks)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "jest(prefer-strict-equal)": {
@@ -7106,9 +4702,6 @@
     }
   },
   "src/shared/backend/lib/authSession.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -7116,9 +4709,6 @@
       "count": 1
     },
     "hook-naming(no-restricted-syntax)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -7129,23 +4719,11 @@
     }
   },
   "src/shared/backend/lib/backendUrl.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
   },
   "src/shared/backend/lib/backendUrl.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 2
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
@@ -7156,46 +4734,14 @@
       "count": 1
     }
   },
-  "src/shared/backend/lib/deviceIdentity.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/backend/lib/deviceIdentity.web.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 11
-    }
-  },
-  "src/shared/backend/lib/deviceStorage.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/backend/lib/jpegFormData.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
   "src/shared/backend/lib/jpegFormData.web.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
   "src/shared/backend/lib/socketCache.test.tsx": {
-    "eslint(func-style)": {
-      "count": 4
-    },
     "eslint(max-nested-callbacks)": {
       "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "query-conventions(query-key-factory)": {
       "count": 15
@@ -7208,17 +4754,11 @@
     }
   },
   "src/shared/backend/lib/socketCache.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "hook-naming(no-restricted-syntax)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "query-conventions(query-key-factory)": {
       "count": 3
@@ -7227,26 +4767,12 @@
       "count": 2
     }
   },
-  "src/shared/backend/queryClient.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/backend/queryClient.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/shared/backend/socketStore.test.ts": {
-    "eslint(func-style)": {
-      "count": 4
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 7
     },
@@ -7261,14 +4787,8 @@
     }
   },
   "src/shared/backend/socketStore.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
@@ -7281,18 +4801,10 @@
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
-    },
-    "typescript(consistent-type-imports)": {
-      "count": 1
     }
   },
   "src/shared/content-column/useContentColumn.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/control-error/controlError.test.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -7304,15 +4816,7 @@
       "count": 1
     }
   },
-  "src/shared/debounce/debounce.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/debounce/debounce.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -7322,53 +4826,21 @@
       "count": 1
     }
   },
-  "src/shared/formatting/formatters.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    }
-  },
   "src/shared/formatting/formatters.ts": {
-    "eslint(func-style)": {
-      "count": 5
-    },
     "function-size(max-variables)": {
       "count": 1
     }
   },
   "src/shared/image-colors/adaptivePalette.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-nested-callbacks)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
       "count": 1
     },
     "jest(prefer-strict-equal)": {
       "count": 2
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 3
     }
   },
   "src/shared/image-colors/adaptivePalette.ts": {
-    "eslint(func-style)": {
-      "count": 10
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
@@ -7382,37 +4854,15 @@
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 3
-    }
-  },
-  "src/shared/image-colors/useImageColors.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/shared/image-colors/useImageColors.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/shared/image-colors/useImageColors.web.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
-  "src/shared/image-colors/useImageColors.web.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -7424,21 +4874,7 @@
       "count": 1
     }
   },
-  "src/shared/keyboard-shortcuts/keyboardShortcuts.test.ts": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    }
-  },
   "src/shared/keyboard-shortcuts/keyboardShortcuts.ts": {
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
@@ -7447,12 +4883,6 @@
     }
   },
   "src/shared/logging/logger.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "eslint(no-underscore-dangle)": {
       "count": 1
     }
@@ -7465,9 +4895,6 @@
   "src/shared/platform/platform.test.ts": {
     "jest(prefer-strict-equal)": {
       "count": 2
-    },
-    "typescript(consistent-type-imports)": {
-      "count": 1
     }
   },
   "src/shared/platform/platform.ts": {
@@ -7476,23 +4903,11 @@
     }
   },
   "src/shared/playback/lib/lastTrackStorage.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/shared/playback/lib/lastTrackStorage.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
@@ -7509,9 +4924,6 @@
     }
   },
   "src/shared/playback/lib/playbackActions.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
@@ -7520,9 +4932,6 @@
     }
   },
   "src/shared/playback/lib/queue.types.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 9
     },
@@ -7531,9 +4940,6 @@
     }
   },
   "src/shared/playback/lib/trackActionsSheet.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 3
     },
@@ -7547,9 +4953,6 @@
     }
   },
   "src/shared/query-keys/keys.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
@@ -7563,15 +4966,7 @@
     }
   },
   "src/shared/refresh-control/ThemedRefreshControl.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
-  "src/shared/refresh-control/ThemedRefreshControl.tsx": {
-    "import(consistent-type-specifier-style)": {
       "count": 1
     }
   },
@@ -7581,15 +4976,7 @@
     }
   },
   "src/shared/share-links/shareLinks.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/square-image/squareImage.test.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -7601,26 +4988,7 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/AppToast.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/AppToast.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
-    }
-  },
   "src/shared/theme/components/Artwork.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "eslint(no-unused-vars)": {
       "count": 1
     },
@@ -7629,12 +4997,6 @@
     }
   },
   "src/shared/theme/components/Artwork.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     },
@@ -7643,28 +5005,16 @@
     }
   },
   "src/shared/theme/components/Avatar.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/shared/theme/components/Avatar.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "react-native(no-unused-styles)": {
       "count": 2
@@ -7688,9 +5038,6 @@
     }
   },
   "src/shared/theme/components/AvatarPhoto.web.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -7699,22 +5046,13 @@
     }
   },
   "src/shared/theme/components/Button.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "react-native(no-raw-text)": {
       "count": 1
     }
   },
   "src/shared/theme/components/Button.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "function-size(max-variables)": {
       "count": 1
@@ -7724,22 +5062,10 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 6
-    },
-    "typescript(consistent-type-imports)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/CappedInput.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -7752,32 +5078,12 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/Card.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
   "src/shared/theme/components/Card.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     }
   },
   "src/shared/theme/components/CenteredDialog.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 4
     },
@@ -7785,23 +5091,9 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/EmptyState.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
   "src/shared/theme/components/EmptyState.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 5
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "react-native(no-unused-styles)": {
       "count": 7
@@ -7811,9 +5103,6 @@
     }
   },
   "src/shared/theme/components/EqualizerBars.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
@@ -7824,18 +5113,7 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/FormError.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/FormError.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -7844,14 +5122,8 @@
     }
   },
   "src/shared/theme/components/GenreChip.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "function-size(max-variables)": {
       "count": 1
@@ -7866,23 +5138,9 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/Input.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/Input.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 5
     },
     "function-size(max-variables)": {
       "count": 1
@@ -7892,23 +5150,11 @@
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
-    },
-    "typescript(consistent-type-imports)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/KeyButton.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "react-native(no-unused-styles)": {
       "count": 5
@@ -7920,20 +5166,9 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/LoadingSpinner.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
   "src/shared/theme/components/LoadingSpinner.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "react-native(no-unused-styles)": {
       "count": 3
@@ -7943,22 +5178,13 @@
     }
   },
   "src/shared/theme/components/PixelIcon.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/shared/theme/components/PixelIcon.tsx": {
-    "eslint(no-implicit-coercion)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
@@ -7971,12 +5197,6 @@
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     },
@@ -7985,12 +5205,6 @@
     }
   },
   "src/shared/theme/components/PlaylistCardSkeleton.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -8002,12 +5216,6 @@
     }
   },
   "src/shared/theme/components/Pressable.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     },
@@ -8016,17 +5224,11 @@
     }
   },
   "src/shared/theme/components/Pressable.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 5
     },
     "react(only-export-components)": {
       "count": 3
@@ -8036,12 +5238,6 @@
     }
   },
   "src/shared/theme/components/PreviewBadge.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     },
@@ -8050,17 +5246,8 @@
     }
   },
   "src/shared/theme/components/QueueSwipe.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-implicit-coercion)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 3
     },
     "react-native(no-unused-styles)": {
       "count": 2
@@ -8073,28 +5260,16 @@
     }
   },
   "src/shared/theme/components/ReorderableList.test.tsx": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "jest(prefer-strict-equal)": {
       "count": 4
     }
   },
   "src/shared/theme/components/ReorderableList.tsx": {
-    "eslint(func-style)": {
-      "count": 4
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "react(capitalized-calls)": {
       "count": 1
@@ -8104,24 +5279,12 @@
     }
   },
   "src/shared/theme/components/RowGrid.test.tsx": {
-    "eslint(func-style)": {
-      "count": 3
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
   "src/shared/theme/components/RowGrid.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "eslint(func-style)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -8131,26 +5294,12 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/SearchBar.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/SearchBar.tsx": {
     "eslint(func-style)": {
       "count": 1
     },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 4
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     },
     "react-native(no-unused-styles)": {
       "count": 5
@@ -8163,14 +5312,8 @@
     }
   },
   "src/shared/theme/components/SectionHeader.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 4
     },
     "react-native(no-unused-styles)": {
       "count": 3
@@ -8179,21 +5322,7 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/ShareLinkButton.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/ShareLinkButton.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 4
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -8205,9 +5334,6 @@
     }
   },
   "src/shared/theme/components/Skeleton.test.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 1
     },
@@ -8215,20 +5341,9 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/Skeleton.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 5
-    }
-  },
   "src/shared/theme/components/SkeletonBlock.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
@@ -8238,31 +5353,16 @@
     }
   },
   "src/shared/theme/components/SkeletonList.tsx": {
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/shared/theme/components/SkeletonRow.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/shared/theme/components/Text.test.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
     }
@@ -8270,9 +5370,6 @@
   "src/shared/theme/components/TextInput.tsx": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
     }
   },
   "src/shared/theme/components/ThemeContext.tsx": {
@@ -8286,26 +5383,12 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/ThemedSwitch.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/ThemedToast.tsx": {
     "component-roles(no-restricted-syntax)": {
       "count": 1
     },
-    "eslint(func-style)": {
-      "count": 1
-    },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 4
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
@@ -8321,9 +5404,6 @@
     }
   },
   "src/shared/theme/components/TrackActionsButton.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
     },
@@ -8331,28 +5411,7 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/TrackRowSkeleton.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/UserRowSkeleton.tsx": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useBottomPadding.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/hooks/useBreakpoint.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     }
@@ -8372,9 +5431,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "import(consistent-type-specifier-style)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -8393,12 +5449,6 @@
     }
   },
   "src/shared/theme/hooks/useContextMenu.web.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-called-with)": {
       "count": 4
     },
@@ -8407,14 +5457,8 @@
     }
   },
   "src/shared/theme/hooks/useContextMenu.web.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
     "eslint(max-params)": {
       "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 4
@@ -8424,42 +5468,12 @@
     }
   },
   "src/shared/theme/hooks/useFieldFocus.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
     "jest(prefer-called-with)": {
       "count": 1
     }
   },
-  "src/shared/theme/hooks/useFieldFocus.ts": {
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useGridTileWidth.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
-  "src/shared/theme/hooks/useIconTooltip.web.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/hooks/useIconTooltip.web.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -8467,68 +5481,14 @@
     },
     "typescript(method-signature-style)": {
       "count": 3
-    },
-    "unicorn(prefer-string-replace-all)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useMeasuredPress.test.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useMeasuredPress.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useSeparatorColor.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/lib/avatarInitials.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
-  "src/shared/theme/lib/avatarInitials.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/lib/avatarUri.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/avatarUri.ts": {
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
   "src/shared/theme/lib/fieldFocus.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
@@ -8543,33 +5503,12 @@
       "count": 2
     }
   },
-  "src/shared/theme/lib/gridLayout.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/lib/haptics.test.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/lib/haptics.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/lib/layout.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 8
     }
   },
   "src/shared/theme/lib/menuPlacement.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 3
     }
@@ -8586,9 +5525,6 @@
     }
   },
   "src/shared/theme/lib/original.theme.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
@@ -8597,23 +5533,11 @@
     }
   },
   "src/shared/theme/lib/pixelFrame.ts": {
-    "eslint(func-style)": {
-      "count": 6
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "function-size(max-functions)": {
       "count": 1
     }
   },
   "src/shared/theme/lib/skeletonStyles.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
@@ -8629,15 +5553,7 @@
       "count": 1
     }
   },
-  "src/shared/theme/lib/toast.ts": {
-    "eslint(func-style)": {
-      "count": 4
-    }
-  },
   "src/shared/theme/lib/tokens.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 8
     }
@@ -8646,17 +5562,11 @@
     "check-file(filename-blocklist)": {
       "count": 1
     },
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "export-placement(no-restricted-syntax)": {
       "count": 4
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 3
-    },
-    "typescript(consistent-type-imports)": {
-      "count": 2
     }
   },
   "src/shared/theme/menuAnchorStore.ts": {
@@ -8664,16 +5574,6 @@
       "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/tracks/lib/moveTarget.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    }
-  },
-  "src/shared/tracks/lib/moveTarget.ts": {
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },
@@ -8685,15 +5585,7 @@
       "count": 3
     }
   },
-  "src/shared/tracks/lib/soundcloudPreview.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
   "src/shared/tracks/lib/soundcloudPreview.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
@@ -8707,17 +5599,11 @@
     }
   },
   "src/shared/tracks/lib/trackInput.test.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 3
-    },
     "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
   "src/shared/tracks/lib/trackInput.ts": {
-    "eslint(no-restricted-imports)": {
-      "count": 2
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
@@ -8731,12 +5617,6 @@
     }
   },
   "test-utils/api-clients.test.ts": {
-    "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "jest(consistent-test-it)": {
-      "count": 1
-    },
     "jest(prefer-strict-equal)": {
       "count": 1
     },
@@ -8750,28 +5630,11 @@
     }
   },
   "test-utils/fakeMediaElement.ts": {
-    "eslint(func-style)": {
-      "count": 1
-    },
     "unicorn(no-array-for-each)": {
       "count": 1
-    },
-    "unicorn(prefer-number-properties)": {
-      "count": 1
-    }
-  },
-  "test-utils/fetchResponses.ts": {
-    "eslint(func-style)": {
-      "count": 2
     }
   },
   "test-utils/fetchRoutes.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    },
-    "eslint(require-unicode-regexp)": {
-      "count": 1
-    },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
@@ -8789,21 +5652,8 @@
       "count": 1
     }
   },
-  "test-utils/playlistFixtures.ts": {
-    "eslint(func-style)": {
-      "count": 2
-    }
-  },
-  "test-utils/renderWithClient.tsx": {
-    "eslint(func-style)": {
-      "count": 1
-    }
-  },
   "test-utils/session.ts": {
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "import(consistent-type-specifier-style)": {
       "count": 1
     }
   },

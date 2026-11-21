@@ -61,8 +61,8 @@ export function GenreSelector({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			padding: theme.spacing.md,
 		},
@@ -94,3 +94,4 @@ const createStyles = (theme: Theme) =>
 			fontStyle: 'italic',
 		},
 	});
+}

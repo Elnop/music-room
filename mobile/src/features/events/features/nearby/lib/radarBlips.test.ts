@@ -1,4 +1,4 @@
-import { radarSpot } from './radarBlips';
+import { radarSpot } from '@/features/events/features/nearby/lib/radarBlips';
 
 describe('radarSpot', () => {
 	it('keeps an event at the same spot from one render to the next', () => {
@@ -6,8 +6,9 @@ describe('radarSpot', () => {
 	});
 
 	it('puts a nearer event closer to the user at the bottom centre', () => {
-		const distanceFromUser = ({ left, top }: { left: number; top: number }) =>
-			Math.hypot(left - 50, 100 - top);
+		function distanceFromUser({ left, top }: { left: number; top: number }) {
+			return Math.hypot(left - 50, 100 - top);
+		}
 
 		expect(distanceFromUser(radarSpot('event-a', 0, 3))).toBeLessThan(
 			distanceFromUser(radarSpot('event-a', 2, 3))

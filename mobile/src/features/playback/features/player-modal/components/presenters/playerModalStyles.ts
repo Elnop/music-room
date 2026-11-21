@@ -26,8 +26,8 @@ const CAROUSEL_TEXT_GAP = 24;
 export const CAROUSEL_TEXT_HEIGHT =
 	CAROUSEL_TEXT_GAP + TITLE_LINE_HEIGHT * 2 + TITLE_GAP + ARTIST_LINE_HEIGHT;
 
-export const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
-	StyleSheet.create({
+export function createStyles(theme: Theme, insets: { top: number; bottom: number }) {
+	return StyleSheet.create({
 		container: { flex: 1 },
 		modalContent: { backgroundColor: theme.colors.background },
 		dialogFrame: { alignItems: 'center', justifyContent: 'center' },
@@ -153,3 +153,4 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		loadingText: { fontSize: 14, fontFamily: FONT_FAMILIES.medium },
 	});
+}

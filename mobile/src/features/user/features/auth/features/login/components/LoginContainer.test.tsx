@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { LoginContainer } from './LoginContainer';
+import { LoginContainer } from '@/features/user/features/auth/features/login/components/LoginContainer';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
 import { signInWithFacebook } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
@@ -13,6 +13,7 @@ import { showError, showWarning } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
 import { renderWithQuery } from '@test-utils/renderWithQuery';
 import { fail, ok } from '@test-utils/fetchResponses';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -44,14 +45,14 @@ function renderLogin() {
 	const props = { navigation: { navigate }, route: {} } as unknown as Props;
 	const view = renderWithQuery(<LoginContainer {...props} />);
 	clear = () => view.client.clear();
-	const setFocused = (focused: boolean) => {
+	function setFocused(focused: boolean) {
 		mockFocused = focused;
 		view.rerender(
 			<QueryClientProvider client={view.client}>
 				<LoginContainer {...props} />
 			</QueryClientProvider>
 		);
-	};
+	}
 	return { ...view, setFocused };
 }
 
@@ -61,7 +62,7 @@ function fillAndSubmit(email: string, password: string) {
 	fireEvent.press(screen.getByLabelText('Se connecter'));
 }
 
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 beforeEach(async () => {
 	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
@@ -91,7 +92,7 @@ describe('LoginContainer', () => {
 		fillAndSubmit('a@example.com', 'Secret1!');
 
 		await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true));
-		expect(fetchMock.mock.calls[0][0]).toMatch(/\/api\/auth\/login$/);
+		expect(fetchMock.mock.calls[0][0]).toMatch(/\/api\/auth\/login$/u);
 		expect(showError).not.toHaveBeenCalled();
 	});
 
@@ -150,7 +151,7 @@ describe('LoginContainer', () => {
 		fireEvent.press(screen.getByLabelText('Continuer avec Google'));
 
 		await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true));
-		expect(fetchMock.mock.calls[0][0]).toMatch(/\/api\/auth\/google$/);
+		expect(fetchMock.mock.calls[0][0]).toMatch(/\/api\/auth\/google$/u);
 	});
 
 	it('shows nothing when the Facebook sign-in is cancelled', async () => {
@@ -192,7 +193,7 @@ describe('LoginContainer', () => {
 	});
 
 	it('shows no error toast once the screen has unmounted', async () => {
-		let answer: (response: Response) => void = () => undefined;
+		let answer: (response: Response) => void = noop;
 		fetchMock.mockReturnValue(new Promise<Response>(resolve => (answer = resolve)));
 		const view = renderLogin();
 

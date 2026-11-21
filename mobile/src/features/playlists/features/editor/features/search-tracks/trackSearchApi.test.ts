@@ -1,4 +1,4 @@
-import * as trackSearchApi from './trackSearchApi';
+import * as trackSearchApi from '@/features/playlists/features/editor/features/search-tracks/trackSearchApi';
 import { apiRequest } from '@/shared/backend/lib/api';
 
 jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));

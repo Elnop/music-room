@@ -1,4 +1,5 @@
-import { AppState, type AppStateStatus } from 'react-native';
+import { AppState } from 'react-native';
+import type { AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
@@ -6,17 +7,15 @@ import {
 	LAST_TRACK_PLAY_SAVE_DELAY_MS,
 	LAST_TRACK_SAVE_INTERVAL_MS,
 	useLastTrackPersistence,
-} from './useLastTrackPersistence';
-import { lastTrackStorage, type LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
+} from '@/features/playback/hooks/useLastTrackPersistence';
+import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
+import type { LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
 import {
 	usePlayerStore,
 	setPositionReader,
 } from '@/features/playback/shared/player/stores/playerStore';
-import {
-	registerAuthSession,
-	notifySessionEnd,
-	type SessionView,
-} from '@/shared/backend/lib/authSession';
+import { registerAuthSession, notifySessionEnd } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { queueTrackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import type { UserProfile } from '@/shared/users/user.types';
@@ -64,12 +63,12 @@ registerAuthSession({
 	refreshAccessToken: async () => true,
 });
 
-const mockLogout = async () => {
+async function mockLogout() {
 	const user = testSessionStore.getState().user;
 	if (user) await lastTrackStorage.clear(user.id);
 	testSessionStore.setState({ user: null, accessToken: null, isAuthenticated: false });
 	notifySessionEnd();
-};
+}
 
 async function flush() {
 	await act(async () => {
@@ -83,7 +82,9 @@ async function mount() {
 	return view;
 }
 
-const stored = () => lastTrackStorage.load('me');
+function stored() {
+	return lastTrackStorage.load('me');
+}
 
 beforeEach(async () => {
 	await AsyncStorage.clear();

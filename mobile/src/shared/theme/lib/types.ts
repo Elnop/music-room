@@ -1,5 +1,5 @@
-import { SPACING } from '@/shared/theme/lib/spacing';
-import { PIXEL_BORDERS, PIXEL_SHADOWS, PIXEL_TYPOGRAPHY } from './tokens';
+import type { SPACING } from '@/shared/theme/lib/spacing';
+import type { PIXEL_BORDERS, PIXEL_SHADOWS, PIXEL_TYPOGRAPHY } from '@/shared/theme/lib/tokens';
 
 export type ThemeName = 'original';
 

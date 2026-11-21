@@ -1,4 +1,4 @@
-import { getDeviceName, getModelName } from './deviceIdentity.web';
+import { getDeviceName, getModelName } from '@/shared/backend/lib/deviceIdentity.web';
 
 const AGENTS = {
 	chromeWindows:

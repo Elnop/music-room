@@ -1,4 +1,5 @@
-import React, { type ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 import { useFriendListening } from '@/features/playback/features/control-delegation/hooks/useFriendListening';
 import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 

@@ -1,14 +1,17 @@
 import { renderHook } from '@testing-library/react-native';
 import { useWindowDimensions } from 'react-native';
-import { breakpointOf, useBreakpoint } from './useBreakpoint';
+import { breakpointOf, useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
 	default: jest.fn(),
 }));
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
 describe('breakpointOf', () => {
 	it.each([

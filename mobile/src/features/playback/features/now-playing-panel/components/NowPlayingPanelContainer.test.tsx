@@ -1,9 +1,9 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { NowPlayingPanelContainer } from './NowPlayingPanelContainer';
+import { NowPlayingPanelContainer } from '@/features/playback/features/now-playing-panel/components/NowPlayingPanelContainer';
 import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { TrackActionsSheetProps } from '@/shared/playback/lib/trackActionsSheet';
 import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
 import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
 import type { OwnerQueue, QueueItem } from '@/shared/playback/lib/playback';
@@ -25,21 +25,23 @@ jest.mock('@/features/playback/shared/player/hooks/useNowPlaying', () => ({
 	useNowPlaying: () => mockNowPlaying,
 }));
 
-const item = (id: string, title: string): QueueItem => ({
-	id,
-	rank: id,
-	track: {
-		trackUri: `https://soundcloud.com/artist/${id}`,
-		title,
-		artist: 'Matthew',
-		album: null,
-		albumArt: null,
-		durationMs: 1000,
-	},
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-});
+function item(id: string, title: string): QueueItem {
+	return {
+		id,
+		rank: id,
+		track: {
+			trackUri: `https://soundcloud.com/artist/${id}`,
+			title,
+			artist: 'Matthew',
+			album: null,
+			albumArt: null,
+			durationMs: 1000,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	};
+}
 
 let mockQueue: OwnerQueue;
 const mockPlayItem = jest.fn(async () => 'played' as const);
@@ -54,25 +56,28 @@ const sheets: PlayerSheets = {
 	DevicePicker: ({ visible }) => (visible ? <Text>devices-sheet</Text> : null),
 };
 
-const TrackActionsSheet: TrackActionsSheetComponent = ({ track, start }) =>
-	track ? <Text>{`actions-sheet ${start} ${track.title}`}</Text> : null;
+function TrackActionsSheet({ track, start }: TrackActionsSheetProps) {
+	return track ? <Text>{`actions-sheet ${start} ${track.title}`}</Text> : null;
+}
 
-const playing = (overrides: Partial<NowPlaying> = {}): NowPlaying => ({
-	isRemote: false,
-	track: { id: 1, title: 'Goofy Goober Rock', artist: 'Matthew', artworkUrl: null },
-	isPlaying: true,
-	isLoading: false,
-	canToggle: true,
-	positionMs: 0,
-	durationMs: 1000,
-	deviceLabel: null,
-	toggle: jest.fn(),
-	next: jest.fn(),
-	previous: jest.fn(),
-	hasNext: true,
-	hasPrevious: false,
-	...overrides,
-});
+function playing(overrides: Partial<NowPlaying> = {}): NowPlaying {
+	return {
+		isRemote: false,
+		track: { id: 1, title: 'Goofy Goober Rock', artist: 'Matthew', artworkUrl: null },
+		isPlaying: true,
+		isLoading: false,
+		canToggle: true,
+		positionMs: 0,
+		durationMs: 1000,
+		deviceLabel: null,
+		toggle: jest.fn(),
+		next: jest.fn(),
+		previous: jest.fn(),
+		hasNext: true,
+		hasPrevious: false,
+		...overrides,
+	};
+}
 
 describe('NowPlayingPanelContainer', () => {
 	beforeEach(() => {

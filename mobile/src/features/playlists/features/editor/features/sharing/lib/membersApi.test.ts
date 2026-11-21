@@ -1,4 +1,4 @@
-import * as membersApi from './membersApi';
+import * as membersApi from '@/features/playlists/features/editor/features/sharing/lib/membersApi';
 import { apiRequest } from '@/shared/backend/lib/api';
 
 jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));

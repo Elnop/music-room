@@ -1,5 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
-import { startEventBeacon } from './beaconAdvertiser';
+import { startEventBeacon } from '@/features/events/features/detail/beaconAdvertiser';
 
 const mockNative = { getState: jest.fn(), start: jest.fn(), stop: jest.fn() };
 jest.mock('expo', () => ({ requireOptionalNativeModule: () => mockNative }));

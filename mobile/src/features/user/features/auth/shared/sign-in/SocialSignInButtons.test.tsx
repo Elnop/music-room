@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { SocialSignInButtons } from './SocialSignInButtons';
+import { SocialSignInButtons } from '@/features/user/features/auth/shared/sign-in/SocialSignInButtons';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');

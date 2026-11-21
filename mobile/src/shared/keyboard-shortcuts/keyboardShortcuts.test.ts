@@ -1,12 +1,18 @@
-import { matchShortcut, type KeyboardShortcut, type ShortcutKeyEvent } from './keyboardShortcuts';
+import { matchShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import type {
+	KeyboardShortcut,
+	ShortcutKeyEvent,
+} from '@/shared/keyboard-shortcuts/keyboardShortcuts';
 
-const shortcut = (key: string, shift?: boolean): KeyboardShortcut => ({
-	key,
-	shift,
-	keys: key,
-	description: key,
-	run: jest.fn(),
-});
+function shortcut(key: string, shift?: boolean): KeyboardShortcut {
+	return {
+		key,
+		shift,
+		keys: key,
+		description: key,
+		run: jest.fn(),
+	};
+}
 
 const SPACE = shortcut(' ');
 const SEEK = shortcut('ArrowRight', false);
@@ -14,21 +20,25 @@ const NEXT = shortcut('ArrowRight', true);
 const HELP = shortcut('?');
 const SHORTCUTS = [SPACE, SEEK, NEXT, HELP];
 
-const element = (tagName: string, role: string | null = null, isContentEditable = false) => ({
-	tagName,
-	isContentEditable,
-	getAttribute: (name: string) => (name === 'role' ? role : null),
-});
+function element(tagName: string, role: string | null = null, isContentEditable = false) {
+	return {
+		tagName,
+		isContentEditable,
+		getAttribute: (name: string) => (name === 'role' ? role : null),
+	};
+}
 
-const press = (key: string, overrides: Partial<ShortcutKeyEvent> = {}): ShortcutKeyEvent => ({
-	key,
-	shiftKey: false,
-	ctrlKey: false,
-	altKey: false,
-	metaKey: false,
-	target: element('BODY'),
-	...overrides,
-});
+function press(key: string, overrides: Partial<ShortcutKeyEvent> = {}): ShortcutKeyEvent {
+	return {
+		key,
+		shiftKey: false,
+		ctrlKey: false,
+		altKey: false,
+		metaKey: false,
+		target: element('BODY'),
+		...overrides,
+	};
+}
 
 describe('matchShortcut', () => {
 	it('tells the arrows from Shift and the arrows', () => {

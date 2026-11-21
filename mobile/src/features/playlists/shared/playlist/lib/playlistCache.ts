@@ -1,8 +1,15 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/keys';
-import * as playlistApi from './playlistApi';
-import type { Playlist, PlaylistUpdatedEvent, PlaylistWithTracks } from './types';
-import { applyPlaylistEvent, sortByRank } from './playlistSync';
+import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
+import type {
+	Playlist,
+	PlaylistUpdatedEvent,
+	PlaylistWithTracks,
+} from '@/features/playlists/shared/playlist/lib/types';
+import {
+	applyPlaylistEvent,
+	sortByRank,
+} from '@/features/playlists/shared/playlist/lib/playlistSync';
 
 const detailKey = queryKeys.playlists.detail;
 

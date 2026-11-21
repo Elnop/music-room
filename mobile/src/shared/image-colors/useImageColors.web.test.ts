@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-native';
-import { useImageColors } from './useImageColors.web';
+import { useImageColors } from '@/shared/image-colors/useImageColors.web';
 
 jest.mock('react-native-image-colors', () => {
 	throw new Error('the web variant must not load react-native-image-colors');

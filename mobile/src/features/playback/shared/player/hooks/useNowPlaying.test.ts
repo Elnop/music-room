@@ -1,7 +1,8 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { useNowPlaying } from './useNowPlaying';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { useNowPlaying } from '@/features/playback/shared/player/hooks/useNowPlaying';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
@@ -22,7 +23,7 @@ jest.mock('@/features/playback/shared/player/lib/PlayerContext', () => ({
 	usePlayer: () => ({ player: {}, seekTo: mockSeekTo }),
 }));
 
-jest.mock('./usePlayerProgress', () => ({
+jest.mock('@/features/playback/shared/player/hooks/usePlayerProgress', () => ({
 	usePlayerProgress: () => mockProgress,
 }));
 
@@ -46,33 +47,37 @@ const localTrack: SoundCloudTrack = {
 	playable: true,
 };
 
-const item = (id: string, durationMs = 200_000): QueueItem => ({
-	id,
-	rank: id,
-	track: {
-		trackUri: `https://soundcloud.com/artist/${id}`,
-		title: `Title ${id}`,
-		artist: 'Artist',
-		album: null,
-		albumArt: null,
-		durationMs,
-	},
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-});
+function item(id: string, durationMs = 200_000): QueueItem {
+	return {
+		id,
+		rank: id,
+		track: {
+			trackUri: `https://soundcloud.com/artist/${id}`,
+			title: `Title ${id}`,
+			artist: 'Artist',
+			album: null,
+			albumArt: null,
+			durationMs,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	};
+}
 
 const NOW = Date.parse('2026-10-15T12:00:00Z');
 
-const remoteStatus = (overrides: Partial<ListeningStatus> = {}): ListeningStatus => ({
-	ownerId: 'friend',
-	device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
-	track: { id: 0, title: 'Title b', artist: 'Artist', artworkUrl: null },
-	isPlaying: true,
-	positionMs: 10_000,
-	updatedAt: new Date(NOW - 5000).toISOString(),
-	...overrides,
-});
+function remoteStatus(overrides: Partial<ListeningStatus> = {}): ListeningStatus {
+	return {
+		ownerId: 'friend',
+		device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
+		track: { id: 0, title: 'Title b', artist: 'Artist', artworkUrl: null },
+		isPlaying: true,
+		positionMs: 10_000,
+		updatedAt: new Date(NOW - 5000).toISOString(),
+		...overrides,
+	};
+}
 
 const testSessionStore = createStore<SessionView>(() => ({
 	user: { id: 'me' } as UserProfile,
@@ -188,13 +193,13 @@ describe('useNowPlaying restored track (#312)', () => {
 });
 
 describe('useNowPlaying remote', () => {
-	const goRemote = (ownerId = 'friend', ownerUsername?: string) => {
+	function goRemote(ownerId = 'friend', ownerUsername?: string) {
 		useConnectStore.setState({
 			target: { kind: 'remote', ownerId, deviceId: 'tablet', ownerUsername },
 			remoteStatus: null,
 			controlPending: false,
 		});
-	};
+	}
 
 	it("shows the device's track, estimated progress and the queue item's duration", () => {
 		const { hashStringToNumber } = jest.requireActual(

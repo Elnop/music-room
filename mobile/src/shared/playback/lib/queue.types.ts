@@ -1,4 +1,4 @@
-import type { AddQueueItemBody, QueueItem, QueueTrack } from './playback';
+import type { AddQueueItemBody, QueueItem, QueueTrack } from '@/shared/playback/lib/playback';
 
 export type { AddQueueItemBody, QueueItem, QueueTrack };
 

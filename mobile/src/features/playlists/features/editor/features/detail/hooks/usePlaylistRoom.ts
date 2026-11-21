@@ -31,9 +31,9 @@ export function usePlaylistRoom(playlistId: string): PlaylistRoom {
 		}
 		joinedRef.current = playlistId;
 
-		const handleDeleted = (data: PlaylistDeletedEvent) => {
+		function handleDeleted(data: PlaylistDeletedEvent) {
 			if (data.playlistId === playlistId) setDeletedId(playlistId);
-		};
+		}
 		socket.on('playlist:deleted', handleDeleted);
 
 		return () => {

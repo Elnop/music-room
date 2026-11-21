@@ -5,9 +5,9 @@ import { SkeletonList, UserRowSkeleton } from '@/shared/theme/components/Skeleto
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfile } from '@/features/user/features/friends/types';
-import { SearchResultItemRow } from './SearchResultItemRow';
+import { SearchResultItemRow } from '@/features/user/features/friends/features/friends-list/components/presenters/SearchResultItemRow';
 import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
-import { createFriendsListStyles } from './friendsListStyles';
+import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
 

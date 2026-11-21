@@ -1,4 +1,4 @@
-import { googleIosClientId } from './googleIosClientId';
+import { googleIosClientId } from '@/features/user/features/auth/shared/sign-in/lib/googleIosClientId';
 
 describe('googleIosClientId', () => {
 	it('turns the reversed URL scheme back into the client ID', () => {

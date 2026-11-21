@@ -8,7 +8,7 @@ import { EqualizerBars } from '@/shared/theme/components/EqualizerBars';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { KeyButton } from '@/shared/theme/components/KeyButton';
 import type { MiniPlayerData } from '@/features/playback/features/mini-player/useMiniPlayer';
-import { createStyles } from './miniPlayerStyles';
+import { createStyles } from '@/features/playback/features/mini-player/components/presenters/miniPlayerStyles';
 import { Text } from '@/shared/theme/components/Text';
 import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';

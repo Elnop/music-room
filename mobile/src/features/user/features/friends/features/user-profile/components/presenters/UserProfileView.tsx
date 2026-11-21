@@ -10,11 +10,11 @@ import type {
 	FriendPlaylistSummary,
 	FriendListeningDevice,
 } from '@/features/user/features/friends/types';
-import { UserProfileHeader } from './UserProfileHeader';
-import { UserProfileListening } from './UserProfileListening';
-import { UserProfileWideHeader } from './UserProfileWideHeader';
-import { UserProfileWideSections } from './UserProfileWideSections';
-import { UserProfilePlaylists } from './UserProfilePlaylists';
+import { UserProfileHeader } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileHeader';
+import { UserProfileListening } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileListening';
+import { UserProfileWideHeader } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileWideHeader';
+import { UserProfileWideSections } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileWideSections';
+import { UserProfilePlaylists } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfilePlaylists';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
 import { Text } from '@/shared/theme/components/Text';
 

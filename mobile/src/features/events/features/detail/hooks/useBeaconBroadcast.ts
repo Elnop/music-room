@@ -31,7 +31,7 @@ export function useBeaconBroadcast(event: MusicEvent | undefined): BeaconBroadca
 	);
 	const mine = event !== undefined && eventId === event.id;
 
-	const toggle = (on: boolean) => {
+	function toggle(on: boolean) {
 		if (!event) return;
 		if (!on) {
 			stop();
@@ -41,7 +41,7 @@ export function useBeaconBroadcast(event: MusicEvent | undefined): BeaconBroadca
 			if (failure) showError(FAILURES[failure]);
 			else showSuccess('Balise diffusée : les téléphones proches voient votre événement');
 		});
-	};
+	}
 
 	return {
 		available: event !== undefined && isOngoing(event),

@@ -1,4 +1,7 @@
-import { isScriptLoadError, loadScript } from './loadScript';
+import {
+	isScriptLoadError,
+	loadScript,
+} from '@/features/user/features/auth/shared/sign-in/lib/loadScript';
 
 interface FakeScript {
 	src: string;

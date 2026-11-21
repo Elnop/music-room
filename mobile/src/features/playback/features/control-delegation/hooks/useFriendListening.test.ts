@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useFriendListening } from './useFriendListening';
-import { useMusicControlEmitter } from './useMusicControlEmitter';
+import { useFriendListening } from '@/features/playback/features/control-delegation/hooks/useFriendListening';
+import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { controlErrorMessage } from '@/shared/control-error/controlError';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { logger } from '@/shared/logging/logger';
@@ -26,9 +26,9 @@ const mockSetCurrentItem = jest.fn();
 const mockSetLocal = jest.fn();
 
 let mockReader: (() => number) | null = null;
-const setPositionReader = (r: (() => number) | null) => {
+function setPositionReader(r: (() => number) | null) {
 	mockReader = r;
-};
+}
 
 jest.mock('@/shared/backend/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
@@ -131,7 +131,7 @@ describe('useMusicControlEmitter', () => {
 	});
 
 	it('sends 0 when the reader returns a non-finite position', async () => {
-		setPositionReader(() => NaN);
+		setPositionReader(() => Number.NaN);
 		const { unmount } = renderHook(() => useMusicControlEmitter());
 		await act(async () => {
 			await Promise.resolve();
@@ -191,14 +191,14 @@ describe('useMusicControlEmitter control:command', () => {
 		durationMs: 200_000,
 	};
 
-	const commandHandler = async () => {
+	async function commandHandler() {
 		const rendered = renderHook(() => useMusicControlEmitter());
 		await act(async () => {
 			await Promise.resolve();
 		});
 		const calls = mockSocket.on.mock.calls.filter(call => call[0] === 'control:command');
 		return { ...rendered, handle: calls[calls.length - 1][1] as (data: unknown) => void };
-	};
+	}
 
 	it('plays a play-item from its position, marks it current and goes back to local', async () => {
 		const { handle, unmount } = await commandHandler();
@@ -249,35 +249,43 @@ describe('useMusicControlEmitter control:command', () => {
 
 const FRIEND = 'friend-1';
 
-const device = (deviceId: string) => ({
-	deviceId,
-	deviceName: deviceId,
-	platform: 'android',
-	model: 'Pixel',
-	lastSeenAt: '2026-10-09T00:00:00Z',
-	access: 'license' as const,
-});
+function device(deviceId: string) {
+	return {
+		deviceId,
+		deviceName: deviceId,
+		platform: 'android',
+		model: 'Pixel',
+		lastSeenAt: '2026-10-09T00:00:00Z',
+		access: 'license' as const,
+	};
+}
 
-const status = (deviceId: string) => ({
-	ownerId: FRIEND,
-	device: { deviceId, deviceName: deviceId, platform: 'android', model: 'Pixel' },
-	track: { id: 1, title: 'Song', artist: 'Artist', artworkUrl: null },
-	isPlaying: true,
-	positionMs: 0,
-	updatedAt: '2026-10-09T00:00:00Z',
-});
+function status(deviceId: string) {
+	return {
+		ownerId: FRIEND,
+		device: { deviceId, deviceName: deviceId, platform: 'android', model: 'Pixel' },
+		track: { id: 1, title: 'Song', artist: 'Artist', artworkUrl: null },
+		isPlaying: true,
+		positionMs: 0,
+		updatedAt: '2026-10-09T00:00:00Z',
+	};
+}
 
-const controllable = (ids: string[], allDevices = false) => ({
-	allDevices,
-	devices: ids.map(device),
-});
+function controllable(ids: string[], allDevices = false) {
+	return {
+		allDevices,
+		devices: ids.map(device),
+	};
+}
 
-const handler = (event: string) => {
+function handler(event: string) {
 	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
 	return calls[calls.length - 1]?.[1] as (data: unknown) => void;
-};
+}
 
-const emitted = (event: string) => mockSocket.emit.mock.calls.filter(call => call[0] === event);
+function emitted(event: string) {
+	return mockSocket.emit.mock.calls.filter(call => call[0] === event);
+}
 
 async function renderFriend() {
 	const hook = renderHook(() => useFriendListening(FRIEND));

@@ -6,11 +6,13 @@ import {
 	setPositionReader,
 } from '@/features/playback/shared/player/stores/playerStore';
 import { isStreamStale } from '@/features/playback/shared/player/lib/streamPrefetch';
-import { useStreamLoader } from './useStreamLoader';
-import { useAudioPlaybackSync } from './useAudioPlaybackSync';
+import { useStreamLoader } from '@/features/playback/shared/player/hooks/useStreamLoader';
+import { useAudioPlaybackSync } from '@/features/playback/shared/player/hooks/useAudioPlaybackSync';
 import { isLocalTarget } from '@/features/playback/shared/player/stores/connectStore';
 
-const playsLocally = () => isLocalTarget();
+function playsLocally() {
+	return isLocalTarget();
+}
 
 interface PlayerAudio {
 	player: AudioPlayer;

@@ -1,10 +1,10 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { PixelIcon } from './PixelIcon';
-import { EmptyState } from './EmptyState';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });

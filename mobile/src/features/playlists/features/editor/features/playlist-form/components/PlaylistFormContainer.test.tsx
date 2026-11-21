@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { PlaylistFormContainer } from './PlaylistFormContainer';
+import { PlaylistFormContainer } from '@/features/playlists/features/editor/features/playlist-form/components/PlaylistFormContainer';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/keys';
@@ -17,6 +17,7 @@ import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { playlistWithTracks } from '@test-utils/playlistFixtures';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -37,12 +38,12 @@ type Props = NativeStackScreenProps<PlaylistStackParamList, 'CreatePlaylist'>;
 
 const mockNavigation = { goBack: jest.fn(), replace: jest.fn() };
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 let sentBody: unknown;
 
 const created = { id: 'new-id', name: 'Les tubes du Crabe Croustillant' } as Playlist;
 
-const renderScreen = (params?: { playlistId?: string }) => {
+function renderScreen(params?: { playlistId?: string }) {
 	const client = createQueryClient();
 	client.setQueryData(
 		queryKeys.playlists.detail('p1'),
@@ -58,7 +59,7 @@ const renderScreen = (params?: { playlistId?: string }) => {
 	);
 	clear = () => client.clear();
 	return view;
-};
+}
 
 beforeEach(async () => {
 	jest.clearAllMocks();

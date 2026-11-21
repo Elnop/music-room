@@ -1,10 +1,10 @@
 import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { ShareLinkButton } from './ShareLinkButton';
+import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });

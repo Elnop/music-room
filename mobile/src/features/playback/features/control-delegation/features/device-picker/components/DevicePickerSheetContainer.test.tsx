@@ -1,11 +1,12 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { DevicePickerSheetContainer } from './DevicePickerSheetContainer';
+import { DevicePickerSheetContainer } from '@/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { ApiError } from '@/shared/backend/lib/api';
@@ -53,15 +54,17 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 const mockGetDevicePicker = jest.mocked(musicControlApi.getDevicePicker);
 const transfer = queueApi.transfer as jest.Mock;
 
-const device = (deviceId: string, deviceName: string, online = true) => ({
-	deviceId,
-	deviceName,
-	platform: 'android',
-	model: 'Model',
-	lastSeenAt: '2026-10-15T00:00:00Z',
-	access: 'all-devices' as const,
-	online,
-});
+function device(deviceId: string, deviceName: string, online = true) {
+	return {
+		deviceId,
+		deviceName,
+		platform: 'android',
+		model: 'Model',
+		lastSeenAt: '2026-10-15T00:00:00Z',
+		access: 'all-devices' as const,
+		online,
+	};
+}
 
 const picker: DevicePickerResponse = {
 	owners: [
@@ -112,10 +115,10 @@ registerAuthSession({
 
 const initialPlayerState = usePlayerStore.getState();
 
-const renderSheet = async () => {
+async function renderSheet() {
 	render(<DevicePickerSheetContainer visible onClose={onClose} />);
 	await screen.findByText('Mon PC');
-};
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

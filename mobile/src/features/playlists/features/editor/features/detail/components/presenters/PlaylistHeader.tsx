@@ -11,7 +11,7 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { playlistLink } from '@/shared/share-links/shareLinks';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import { headerFacts } from '@/features/playlists/features/editor/features/detail/lib/headerFacts';
-import { PlaylistCover } from './PlaylistCover';
+import { PlaylistCover } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistCover';
 import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
 import EyeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-solid.svg';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
@@ -69,7 +69,9 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 				</View>
 			</View>
 
-			{!!playlist.description && <Text style={styles.description}>{playlist.description}</Text>}
+			{Boolean(playlist.description) && (
+				<Text style={styles.description}>{playlist.description}</Text>
+			)}
 
 			<View style={styles.actions}>
 				{trackCount > 0 && playButton}
@@ -85,8 +87,8 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: { padding: theme.spacing.md, gap: theme.spacing.md },
 		top: { flexDirection: 'row', alignItems: 'flex-end', gap: theme.spacing.md },
 		side: { flex: 1, gap: theme.spacing.sm },
@@ -123,3 +125,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

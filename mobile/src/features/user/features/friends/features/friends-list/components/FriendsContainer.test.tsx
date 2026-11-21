@@ -1,11 +1,12 @@
 import React from 'react';
 import { act, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { signIn } from '@test-utils/session';
-import { FriendsContainer } from './FriendsContainer';
+import { FriendsContainer } from '@/features/user/features/friends/features/friends-list/components/FriendsContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

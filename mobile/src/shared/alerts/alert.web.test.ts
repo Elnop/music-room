@@ -1,5 +1,5 @@
-import { useAlertStore } from './alertStore';
-import { showAlert } from './alert.web';
+import { useAlertStore } from '@/shared/alerts/alertStore';
+import { showAlert } from '@/shared/alerts/alert.web';
 
 beforeEach(() => useAlertStore.setState({ queue: [] }));
 

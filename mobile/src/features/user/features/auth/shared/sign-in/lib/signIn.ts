@@ -1,16 +1,19 @@
 import { ApiError } from '@/shared/backend/lib/api';
 import { logger } from '@/shared/logging/logger';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
-import type { LoginInput, RegisterInput } from './validators';
+import type {
+	LoginInput,
+	RegisterInput,
+} from '@/features/user/features/auth/shared/sign-in/lib/validators';
 import type {
 	AuthResponse,
 	OAuthProvider,
 	RegisterResult,
 } from '@/features/user/features/auth/types';
-import * as authApi from './authApi';
-import { signInWithGoogle } from './googleSignIn';
-import { signInWithFacebook } from './facebookSignIn';
-import { isSignInCancelled } from './signInCancelled';
+import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
+import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
+import { signInWithFacebook } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
+import { isSignInCancelled } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
 
 async function open(response: AuthResponse): Promise<void> {
 	if (!response.session) throw new Error('The backend did not return a session');

@@ -7,7 +7,10 @@ import {
 	autoplayRefusal,
 	installFakeDocument,
 } from '@test-utils/fakeMediaElement';
-import { useAudioPlayer, useAudioPlayerStatus } from './audioPlayer.web';
+import {
+	useAudioPlayer,
+	useAudioPlayerStatus,
+} from '@/features/playback/shared/player/lib/audioPlayer.web';
 
 const mockHls = {
 	instances: [] as {
@@ -67,7 +70,13 @@ beforeEach(() => {
 	jest.clearAllMocks();
 	mockHls.instances = [];
 	mockHls.supported = true;
-	Object.assign(media, { nativeHls: '', paused: true, ended: false, readyState: 0, duration: NaN });
+	Object.assign(media, {
+		nativeHls: '',
+		paused: true,
+		ended: false,
+		readyState: 0,
+		duration: Number.NaN,
+	});
 	media.currentTime = 0;
 	media.error = null;
 	media.playResult = () => Promise.resolve();

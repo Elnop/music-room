@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { ProfileNavigationItem } from './ProfileNavigationItem';
+import { ProfileNavigationItem } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileNavigationItem';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
@@ -70,8 +70,8 @@ export function ProfileMenuItems({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		logoutSection: {
 			paddingHorizontal: theme.spacing.lg,
 			marginTop: theme.spacing.lg,
@@ -104,3 +104,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.error,
 		},
 	});
+}

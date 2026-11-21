@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
-import { LinkedAccountRow } from './LinkedAccountRow';
+import { LinkedAccountRow } from '@/features/user/features/auth/features/linked-accounts/components/presenters/LinkedAccountRow';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import type {
@@ -82,8 +82,8 @@ export function LinkedAccountsView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		list: {
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.lg,
@@ -93,3 +93,4 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.border,
 		},
 	});
+}

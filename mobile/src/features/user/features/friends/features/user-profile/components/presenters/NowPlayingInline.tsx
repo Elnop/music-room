@@ -80,8 +80,8 @@ export function NowPlayingInline({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		trackCard: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -129,3 +129,4 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 		},
 	});
+}

@@ -1,8 +1,9 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { useRemoteTarget } from './useRemoteTarget';
+import { useRemoteTarget } from '@/features/playback/hooks/useRemoteTarget';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { showError, showInfo } from '@/shared/theme/lib/toast';
 import type {
 	ListeningStatus,
@@ -57,21 +58,25 @@ registerAuthSession({
 	refreshAccessToken: async () => true,
 });
 
-const deviceStatus = (deviceId: string): ListeningStatus => ({
-	ownerId: 'friend',
-	device: { deviceId, deviceName: 'Tablette', platform: 'android', model: 'Tab' },
-	track: { id: 1, title: 'Song', artist: 'Artist', artworkUrl: null },
-	isPlaying: true,
-	positionMs: 1000,
-	updatedAt: '2026-10-15T00:00:00Z',
-});
+function deviceStatus(deviceId: string): ListeningStatus {
+	return {
+		ownerId: 'friend',
+		device: { deviceId, deviceName: 'Tablette', platform: 'android', model: 'Tab' },
+		track: { id: 1, title: 'Song', artist: 'Artist', artworkUrl: null },
+		isPlaying: true,
+		positionMs: 1000,
+		updatedAt: '2026-10-15T00:00:00Z',
+	};
+}
 
-const handler = <T>(event: string) => {
+function handler<T>(event: string) {
 	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
 	return calls[calls.length - 1]?.[1] as (data: T) => void;
-};
+}
 
-const connect = () => useConnectStore.getState();
+function connect() {
+	return useConnectStore.getState();
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

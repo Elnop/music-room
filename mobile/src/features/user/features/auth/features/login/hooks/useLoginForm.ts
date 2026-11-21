@@ -5,17 +5,13 @@ import { ApiError } from '@/shared/backend/lib/api';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showWarning } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import {
-	loginSchema,
-	type LoginInput,
-} from '@/features/user/features/auth/shared/sign-in/lib/validators';
+import { loginSchema } from '@/features/user/features/auth/shared/sign-in/lib/validators';
+import type { LoginInput } from '@/features/user/features/auth/shared/sign-in/lib/validators';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { useLoginMutation } from '@/features/user/features/auth/shared/sign-in/hooks/useSignInMutations';
-import {
-	useFieldBinding,
-	type FieldBinding,
-} from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
-import { useFocusedErrorToast } from './useFocusedErrorToast';
+import { useFieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
+import type { FieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
+import { useFocusedErrorToast } from '@/features/user/features/auth/features/login/hooks/useFocusedErrorToast';
 
 const REDIRECT_DELAY_MS = 1500;
 
@@ -42,7 +38,7 @@ export function useLoginForm(
 	const login = useLoginMutation();
 	const reportError = useFocusedErrorToast();
 
-	const onError = (error: unknown) => {
+	function onError(error: unknown) {
 		logger.error('[LoginScreen] Login error:', error);
 		const details =
 			error instanceof ApiError && error.code === 'EMAIL_NOT_VERIFIED'
@@ -56,7 +52,7 @@ export function useLoginForm(
 			return;
 		}
 		reportError(apiErrorMessage(error, 'Connexion impossible, réessayez'));
-	};
+	}
 
 	return {
 		email,

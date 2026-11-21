@@ -1,14 +1,15 @@
 import { queryKeys } from '@/shared/query-keys/keys';
 import { socketCacheRule } from '@/shared/backend/lib/socketCache';
 import { removeEvent, upsertEvent } from '@/features/events/shared/events/lib/eventCache';
-import type { EventDeletedPayload, MusicEvent } from './types';
+import type { EventDeletedPayload, MusicEvent } from '@/features/events/lib/types';
 
-const listUpsert = (event: 'event:created' | 'event:updated') =>
-	socketCacheRule<MusicEvent, MusicEvent[]>({
+function listUpsert(event: 'event:created' | 'event:updated') {
+	return socketCacheRule<MusicEvent, MusicEvent[]>({
 		event,
 		queryKey: () => queryKeys.events.list(),
 		update: (list, payload) => upsertEvent(list, payload),
 	});
+}
 
 export const EVENT_SOCKET_RULES = [
 	listUpsert('event:created'),

@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-native';
-import { useConnectionStatus } from './useConnectionStatus';
+import { useConnectionStatus } from '@/features/shell/hooks/useConnectionStatus';
 import type { SocketStatus } from '@/shared/backend/socketStore';
 
 let mockNetwork: { isConnected?: boolean; isInternetReachable?: boolean } = {};

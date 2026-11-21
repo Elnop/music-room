@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
-import { AppProvidersContainer } from './AppProvidersContainer';
+import { AppProvidersContainer } from '@/features/shell/components/orchestrators/AppProvidersContainer';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { notifySessionEnd } from '@/shared/backend/lib/authSession';

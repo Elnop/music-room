@@ -1,9 +1,9 @@
 import React from 'react';
 import { AccessibilityInfo, Animated } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
-import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from './Skeleton';
+import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });

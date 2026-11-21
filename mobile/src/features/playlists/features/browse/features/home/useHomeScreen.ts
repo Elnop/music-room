@@ -47,14 +47,15 @@ export function useHomeScreen(navigation: Navigation): HomeScreen {
 	);
 
 	useEffect(() => {
-		if (friends.error)
+		if (friends.error) {
 			logger.error('[HomeScreen] Failed to load friends playlists:', friends.error);
+		}
 	}, [friends.error]);
 	useEffect(() => {
 		if (publics.error) logger.error('[HomeScreen] Failed to load public playlists:', publics.error);
 	}, [publics.error]);
 
-	const refresh = async () => {
+	async function refresh() {
 		setIsRefreshing(true);
 		const [result] = await Promise.all([refetchPublic(), refetchFriends()]);
 		setIsRefreshing(false);
@@ -62,7 +63,7 @@ export function useHomeScreen(navigation: Navigation): HomeScreen {
 			logger.error('[HomeScreen] Refresh failed:', result.error);
 			showError(apiErrorMessage(result.error, 'Impossible de rafraîchir les playlists'));
 		}
-	};
+	}
 
 	return {
 		isInitialLoading: friends.isLoading && publics.isLoading,

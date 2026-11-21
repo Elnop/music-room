@@ -11,18 +11,24 @@ interface QueueItemsView {
 	items: QueueItem[];
 }
 
-const currentIndex = (state: QueueItemsView): number =>
-	state.currentItemId === null
+function currentIndex(state: QueueItemsView): number {
+	return state.currentItemId === null
 		? -1
 		: state.items.findIndex(item => item.id === state.currentItemId);
+}
 
-export const currentItem = (state: QueueItemsView): QueueItem | undefined =>
-	state.items.find(item => item.id === state.currentItemId);
+export function currentItem(state: QueueItemsView): QueueItem | undefined {
+	return state.items.find(item => item.id === state.currentItemId);
+}
 
-export const nextItem = (state: QueueItemsView): QueueItem | undefined =>
-	state.items[currentIndex(state) + 1];
+export function nextItem(state: QueueItemsView): QueueItem | undefined {
+	return state.items[currentIndex(state) + 1];
+}
 
-export const selectHasNext = (state: QueueItemsView): boolean =>
-	currentIndex(state) < state.items.length - 1;
+export function selectHasNext(state: QueueItemsView): boolean {
+	return currentIndex(state) < state.items.length - 1;
+}
 
-export const selectHasPrevious = (state: QueueItemsView): boolean => currentIndex(state) > 0;
+export function selectHasPrevious(state: QueueItemsView): boolean {
+	return currentIndex(state) > 0;
+}

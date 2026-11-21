@@ -8,7 +8,7 @@ import { useImageColors } from '@/shared/image-colors/useImageColors';
 import { getAdaptiveColors, hexToRgba } from '@/shared/image-colors/adaptivePalette';
 import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
 import { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
-import { useColorFade } from './useColorFade';
+import { useColorFade } from '@/features/playback/features/player-modal/hooks/useColorFade';
 
 export function usePlayerModal() {
 	const { theme } = useTheme();

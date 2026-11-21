@@ -66,15 +66,15 @@ export function useControllableDevices(targetUserId: string | null) {
 	useEffect(() => {
 		if (!socket || !isConnected || !targetUserId) return;
 
-		const handlePermissionChanged = (data: PermissionChangedEvent) => {
+		function handlePermissionChanged(data: PermissionChangedEvent) {
 			if (data.ownerId === targetUserId) reloadControllable();
-		};
+		}
 
-		const handleControlError = (err: ControlError) => {
+		function handleControlError(err: ControlError) {
 			logger.error('[MusicControl] Control error:', err);
 			setControlError({ code: err.code, message: err.message });
 			if (err.code === 'NOT_AUTHORIZED') reloadControllable();
-		};
+		}
 
 		socket.on('permission:changed', handlePermissionChanged);
 		socket.on('control:error', handleControlError);

@@ -2,10 +2,8 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import {
-	PROFILE_LIMITS,
-	type UpdateProfileInput,
-} from '@/features/user/features/profile/features/edit-profile/profileSchema';
+import { PROFILE_LIMITS } from '@/features/user/features/profile/features/edit-profile/profileSchema';
+import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import { Input } from '@/shared/theme/components/Input';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
@@ -79,8 +77,8 @@ export function EditProfileFormFields({ control, errors, onSubmit }: EditProfile
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		bioInput: {
 			minHeight: 100,
 			textAlignVertical: 'top',
@@ -100,3 +98,4 @@ const createStyles = (theme: Theme) =>
 			marginBottom: theme.spacing.lg,
 		},
 	});
+}

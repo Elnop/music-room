@@ -1,4 +1,5 @@
-import { useController, type Control, type FieldValues, type Path } from 'react-hook-form';
+import { useController } from 'react-hook-form';
+import type { Control, FieldValues, Path } from 'react-hook-form';
 
 export interface CappedField {
 	value: string;

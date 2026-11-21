@@ -3,11 +3,9 @@ import { Linking, Platform } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { logger } from '@/shared/logging/logger';
-import { useAppActive } from './useAppActive';
-import {
-	requestLocationPermission,
-	type Coordinates,
-} from '@/features/events/shared/events/lib/eventLocation';
+import { useAppActive } from '@/features/events/features/nearby/hooks/useAppActive';
+import { requestLocationPermission } from '@/features/events/shared/events/lib/eventLocation';
+import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
 
 export type PositionState =
 	| { status: 'checking' }
@@ -49,7 +47,7 @@ export function useForegroundPosition(): ForegroundPosition {
 		let subscription: Location.LocationSubscription | undefined;
 		let timeout: ReturnType<typeof setTimeout> | undefined;
 
-		const watch = async () => {
+		async function watch() {
 			const permission = await Location.getForegroundPermissionsAsync();
 			if (permission.status !== 'granted') {
 				setState({ status: isRefusedForGood(permission) ? 'denied' : 'needs-permission' });
@@ -74,7 +72,7 @@ export function useForegroundPosition(): ForegroundPosition {
 				}
 			});
 			if (cancelled) subscription.remove();
-		};
+		}
 
 		watch().catch(error => {
 			logger.warn('[NearbyEvents] Position unavailable:', error);

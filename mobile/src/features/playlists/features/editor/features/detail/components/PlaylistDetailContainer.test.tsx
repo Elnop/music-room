@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Platform } from 'react-native';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { PlaylistDetailContainer } from './PlaylistDetailContainer';
+import { PlaylistDetailContainer } from '@/features/playlists/features/editor/features/detail/components/PlaylistDetailContainer';
 import { testPlayback } from '@test-utils/playback';
 import { useSocketStore } from '@/shared/backend/socketStore';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
@@ -17,6 +17,7 @@ import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -116,20 +117,23 @@ const navigation = {
 };
 const { addToQueue } = testPlayback;
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
-const answer = (playlist: Partial<PlaylistWithTracks>) =>
-	ok({ playlist: playlistWithTracks(playlist) });
+function answer(playlist: Partial<PlaylistWithTracks>) {
+	return ok({ playlist: playlistWithTracks(playlist) });
+}
 
-const element = () => (
-	<PlaylistDetailContainer
-		route={{ key: 'k', name: 'PlaylistDetail', params: { id: ID } } as Props['route']}
-		navigation={navigation as unknown as Props['navigation']}
-		premium={{ isPremium: false, refetch: jest.fn() }}
-		TrackActionsSheet={() => null}
-		playback={{ ...testPlayback }}
-	/>
-);
+function element() {
+	return (
+		<PlaylistDetailContainer
+			route={{ key: 'k', name: 'PlaylistDetail', params: { id: ID } } as Props['route']}
+			navigation={navigation as unknown as Props['navigation']}
+			premium={{ isPremium: false, refetch: jest.fn() }}
+			TrackActionsSheet={() => null}
+			playback={{ ...testPlayback }}
+		/>
+	);
+}
 
 async function renderScreen(playlist: Partial<PlaylistWithTracks> | null = {}) {
 	if (playlist) routes.routes[`GET /api/playlists/${ID}`] = answer(playlist);
@@ -142,21 +146,21 @@ async function renderScreen(playlist: Partial<PlaylistWithTracks> | null = {}) {
 	return view;
 }
 
-const renderHeaderRight = () => {
+function renderHeaderRight() {
 	const options = navigation.setOptions.mock.calls.at(-1)?.[0] as {
 		headerRight: () => React.ReactElement;
 	};
 	return render(options.headerRight());
-};
+}
 
-const openOwnerSheet = () => {
+function openOwnerSheet() {
 	const options = navigation.setOptions.mock.calls.at(-1)?.[0] as {
 		headerRight: () => React.ReactElement<{
 			children: React.ReactElement<{ onPress: () => void }>;
 		}>;
 	};
 	act(() => options.headerRight().props.children.props.onPress());
-};
+}
 
 beforeEach(async () => {
 	jest.clearAllMocks();
@@ -254,7 +258,7 @@ describe('PlaylistDetailContainer tracks (#307)', () => {
 
 	it('highlights nothing when nothing plays from this playlist', async () => {
 		await renderScreen({ tracks });
-		expect(screen.queryByText(/\(current\)/)).toBeNull();
+		expect(screen.queryByText(/\(current\)/u)).toBeNull();
 	});
 
 	it('shows the empty state', async () => {
@@ -277,7 +281,7 @@ describe('PlaylistDetailContainer tracks (#307)', () => {
 	});
 
 	it('plays the playlist from the tapped track, with feedback on the row while it starts', async () => {
-		let settle: (outcome: string) => void = () => undefined;
+		let settle: (outcome: string) => void = noop;
 		testPlayback.playPlaylist.mockReturnValueOnce(new Promise(resolve => (settle = resolve)));
 		await renderScreen({ tracks });
 
@@ -358,18 +362,18 @@ describe('PlaylistDetailContainer owner actions (#342)', () => {
 		Platform.OS = defaultOS;
 	});
 
-	const pressAction = (label: string) => {
+	function pressAction(label: string) {
 		openOwnerSheet();
 		fireEvent.press(screen.getByLabelText(label));
-	};
+	}
 
-	const alertButton = (text: string) => {
+	function alertButton(text: string) {
 		const buttons = (jest.mocked(Alert.alert).mock.calls.at(-1)?.[2] ?? []) as {
 			text: string;
 			onPress?: () => void;
 		}[];
 		return buttons.find(b => b.text === text);
-	};
+	}
 
 	it('opens the edit form and « Visibilité et droits »', async () => {
 		await renderScreen();

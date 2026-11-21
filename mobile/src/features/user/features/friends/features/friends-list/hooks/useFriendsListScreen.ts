@@ -9,7 +9,7 @@ import {
 	useControlPermissions,
 } from '@/features/user/features/friends/shared/follows/hooks/useFriendsQueries';
 import { useToggleControlMutation } from '@/features/user/features/friends/shared/follows/hooks/useFriendsMutations';
-import { useDebouncedUserSearch } from './useDebouncedUserSearch';
+import { useDebouncedUserSearch } from '@/features/user/features/friends/features/friends-list/hooks/useDebouncedUserSearch';
 
 export function useFriendsListScreen(onNavigateToProfile: (userId: string) => void) {
 	const bottomPadding = useBottomPadding();

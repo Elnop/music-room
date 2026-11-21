@@ -6,12 +6,12 @@ import { FullScreenSheet } from '@/features/playback/shared/full-screen-sheet/Fu
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { AppToast } from '@/shared/theme/components/AppToast';
 import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
-import { DeviceRow } from './DeviceRow';
+import { DeviceRow } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/DeviceRow';
 import type { DevicePickerOwner } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
 import type { Theme } from '@/shared/theme/lib/types';
-import type { createPickerStyles } from './devicePickerStyles';
+import type { createPickerStyles } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/devicePickerStyles';
 import type { LoadedDevices } from '@/features/playback/features/control-delegation/features/device-picker/useDevicePicker';
-import type { PickerDevice } from './DeviceRow';
+import type { PickerDevice } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/DeviceRow';
 import { Text } from '@/shared/theme/components/Text';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
@@ -45,21 +45,23 @@ export function DevicePickerSheetView({
 }: DevicePickerSheetViewProps) {
 	const { isWide } = useBreakpoint();
 
-	const renderDevice = (owner: DevicePickerOwner, device: PickerDevice) => (
-		<DeviceRow
-			key={`${owner.ownerId}:${device.deviceId}`}
-			owner={owner}
-			device={device}
-			active={isActive(owner, device.deviceId)}
-			isPending={pendingKey === `${owner.ownerId}:${device.deviceId}`}
-			disabled={!device.online || pendingKey !== null}
-			theme={theme}
-			styles={styles}
-			onPick={onPick}
-		/>
-	);
+	function renderDevice(owner: DevicePickerOwner, device: PickerDevice) {
+		return (
+			<DeviceRow
+				key={`${owner.ownerId}:${device.deviceId}`}
+				owner={owner}
+				device={device}
+				active={isActive(owner, device.deviceId)}
+				isPending={pendingKey === `${owner.ownerId}:${device.deviceId}`}
+				disabled={!device.online || pendingKey !== null}
+				theme={theme}
+				styles={styles}
+				onPick={onPick}
+			/>
+		);
+	}
 
-	const renderContent = () => {
+	function renderContent() {
 		if (loading && !loaded) {
 			return (
 				<View style={styles.centered}>
@@ -118,7 +120,7 @@ export function DevicePickerSheetView({
 				)}
 			</ScrollView>
 		);
-	};
+	}
 
 	const content = (
 		<View style={styles.container}>

@@ -1,6 +1,6 @@
 import Hls from 'hls.js';
 import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
-import type { MediaElement } from './mediaElement';
+import type { MediaElement } from '@/features/playback/shared/player/lib/mediaElement';
 
 const HLS_MIME = 'application/vnd.apple.mpegurl';
 

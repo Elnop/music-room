@@ -20,8 +20,8 @@ export function AddTrackRow({ onPress }: { onPress: () => void }) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -44,3 +44,4 @@ const createStyles = (theme: Theme) =>
 			marginLeft: theme.spacing.md,
 		},
 	});
+}

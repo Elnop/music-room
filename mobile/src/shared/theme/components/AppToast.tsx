@@ -1,13 +1,17 @@
 import React from 'react';
-import Toast, { type ToastConfig, type ToastConfigParams } from 'react-native-toast-message';
-import { useTheme } from './ThemeContext';
+import Toast from 'react-native-toast-message';
+import type { ToastConfig, ToastConfigParams } from 'react-native-toast-message';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
-import { ThemedToast, type ToastKind } from './ThemedToast';
+import { ThemedToast } from '@/shared/theme/components/ThemedToast';
+import type { ToastKind } from '@/shared/theme/components/ThemedToast';
 
 function buildConfig(theme: Theme): ToastConfig {
-	const render = (kind: ToastKind) => (params: ToastConfigParams<unknown>) => (
-		<ThemedToast kind={kind} params={params} theme={theme} />
-	);
+	function render(kind: ToastKind) {
+		return (params: ToastConfigParams<unknown>) => (
+			<ThemedToast kind={kind} params={params} theme={theme} />
+		);
+	}
 	return {
 		success: render('success'),
 		error: render('error'),

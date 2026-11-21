@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from './ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useGridTileWidth } from '@/shared/theme/hooks/useGridTileWidth';
-import { SkeletonBlock } from './SkeletonBlock';
+import { SkeletonBlock } from '@/shared/theme/components/SkeletonBlock';
 
 interface PlaylistCardSkeletonProps {
 	width?: number;
@@ -23,8 +23,8 @@ export function PlaylistCardSkeleton({ width: fixedWidth }: PlaylistCardSkeleton
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		cardTitle: {
 			marginTop: theme.spacing.sm,
 		},
@@ -32,3 +32,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 6,
 		},
 	});
+}

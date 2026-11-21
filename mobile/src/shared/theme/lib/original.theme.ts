@@ -1,6 +1,12 @@
 import { SPACING } from '@/shared/theme/lib/spacing';
-import { FIXED_COLORS, INK, PIXEL_BORDERS, PIXEL_SHADOWS, PIXEL_TYPOGRAPHY } from './tokens';
-import type { Theme } from './types';
+import {
+	FIXED_COLORS,
+	INK,
+	PIXEL_BORDERS,
+	PIXEL_SHADOWS,
+	PIXEL_TYPOGRAPHY,
+} from '@/shared/theme/lib/tokens';
+import type { Theme } from '@/shared/theme/lib/types';
 
 export const originalTheme: Theme = {
 	name: 'original',

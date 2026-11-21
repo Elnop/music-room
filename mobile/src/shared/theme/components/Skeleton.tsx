@@ -1,5 +1,5 @@
-export { SkeletonBlock } from './SkeletonBlock';
-export { TrackRowSkeleton } from './TrackRowSkeleton';
-export { UserRowSkeleton } from './UserRowSkeleton';
-export { PlaylistCardSkeleton } from './PlaylistCardSkeleton';
-export { SkeletonList } from './SkeletonList';
+export { SkeletonBlock } from '@/shared/theme/components/SkeletonBlock';
+export { TrackRowSkeleton } from '@/shared/theme/components/TrackRowSkeleton';
+export { UserRowSkeleton } from '@/shared/theme/components/UserRowSkeleton';
+export { PlaylistCardSkeleton } from '@/shared/theme/components/PlaylistCardSkeleton';
+export { SkeletonList } from '@/shared/theme/components/SkeletonList';

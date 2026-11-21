@@ -45,11 +45,12 @@ export function FriendPlaylistCarousel({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		scrollContent: {
 			paddingHorizontal: theme.spacing.md,
 			paddingBottom: theme.spacing.sm,
 		},
 		card: { marginRight: theme.spacing.md },
 	});
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
-import { VisibilityToggle } from './VisibilityToggle';
+import { VisibilityToggle } from '@/features/user/features/profile/features/privacy-settings/components/presenters/VisibilityToggle';
 import { Button } from '@/shared/theme/components/Button';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
@@ -82,9 +82,10 @@ export function PrivacySettingsView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		settings: {
 			marginBottom: theme.spacing.xl,
 		},
 	});
+}

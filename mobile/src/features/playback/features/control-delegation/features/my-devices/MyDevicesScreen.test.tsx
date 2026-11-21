@@ -2,8 +2,10 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { createStore, type StoreApi } from 'zustand';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { createStore } from 'zustand';
+import type { StoreApi } from 'zustand';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
@@ -13,6 +15,7 @@ import type {
 } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 import { MyDevicesContainer } from '@/features/playback/features/control-delegation/features/my-devices/components/orchestrators/MyDevicesContainer';
 import { logger } from '@/shared/logging/logger';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -54,9 +57,12 @@ function jsonResponse(status: number, body: object): Response {
 	} as unknown as Response;
 }
 
-const ok = (data: object) => jsonResponse(200, { success: true, data });
-const fail = (status: number, code: string, message: string) =>
-	jsonResponse(status, { success: false, error: { code, message } });
+function ok(data: object) {
+	return jsonResponse(200, { success: true, data });
+}
+function fail(status: number, code: string, message: string) {
+	return jsonResponse(status, { success: false, error: { code, message } });
+}
 
 const alice: FriendUserSummary = { id: 'user-a', username: 'alice' };
 const bob: FriendUserSummary = { id: 'user-b', username: 'bob', displayName: 'Bob' };
@@ -102,7 +108,9 @@ function requests(): {
 	}));
 }
 
-const toggle = (label: string) => screen.getByLabelText(label);
+function toggle(label: string) {
+	return screen.getByLabelText(label);
+}
 
 const FIRST_RENDER = { timeout: 15_000 };
 jest.setTimeout(20_000);
@@ -170,12 +178,12 @@ describe('MyDevicesScreen', () => {
 		await renderLoaded([phone, tablet], [alice, bob]);
 
 		expect(requests()[0]).toMatchObject({ method: 'GET', authorization: 'Bearer access' });
-		expect(requests()[0].url).toMatch(/\/api\/music-control\/devices$/);
+		expect(requests()[0].url).toMatch(/\/api\/music-control\/devices$/u);
 		expect(getFriends).toHaveBeenCalledWith('access');
 
-		expect(screen.getByTestId('device-device-1')).toHaveTextContent(/Cet appareil/);
-		expect(screen.getByTestId('device-device-2')).not.toHaveTextContent(/Cet appareil/);
-		expect(screen.getByTestId('device-device-1')).toHaveTextContent(/Pixel 8/);
+		expect(screen.getByTestId('device-device-1')).toHaveTextContent(/Cet appareil/u);
+		expect(screen.getByTestId('device-device-2')).not.toHaveTextContent(/Cet appareil/u);
+		expect(screen.getByTestId('device-device-1')).toHaveTextContent(/Pixel 8/u);
 
 		expect(toggle('alice sur Phone').props.value).toBe(true);
 		expect(toggle('alice sur Tablet').props.value).toBe(false);
@@ -201,24 +209,24 @@ describe('MyDevicesScreen', () => {
 	it('hides the model when it repeats the device name', async () => {
 		await renderLoaded([device('device-3', 'Pixel 8'), tablet], [alice]);
 
-		expect(screen.getByTestId('device-device-3')).not.toHaveTextContent(/Pixel 8 ·/);
-		expect(screen.getByTestId('device-device-3')).toHaveTextContent(/Vu le/);
-		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Pixel 8 ·/);
+		expect(screen.getByTestId('device-device-3')).not.toHaveTextContent(/Pixel 8 ·/u);
+		expect(screen.getByTestId('device-device-3')).toHaveTextContent(/Vu le/u);
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Pixel 8 ·/u);
 	});
 
 	it('shows an empty state when I have no device', async () => {
 		await renderLoaded([], [alice]);
 
-		expect(screen.getByText(/Aucun appareil/)).toBeTruthy();
-		expect(screen.queryByLabelText(/sur/)).toBeNull();
+		expect(screen.getByText(/Aucun appareil/u)).toBeTruthy();
+		expect(screen.queryByLabelText(/sur/u)).toBeNull();
 	});
 
 	it('shows an empty state when I have no friend', async () => {
 		await renderLoaded([tablet], []);
 
-		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Aucun ami/);
-		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/vous suivent en retour/);
-		expect(screen.queryByLabelText(/sur Tablet/)).toBeNull();
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Aucun ami/u);
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/vous suivent en retour/u);
+		expect(screen.queryByLabelText(/sur Tablet/u)).toBeNull();
 
 		fireEvent.press(screen.getByRole('button', { name: 'Trouver des amis' }));
 		expect(mockNavigate).toHaveBeenCalledWith('FriendsTab');
@@ -232,7 +240,9 @@ describe('MyDevicesScreen', () => {
 
 		await waitFor(() => expect(showSuccess).toHaveBeenCalled());
 		expect(requests()[1]).toMatchObject({ method: 'POST', authorization: 'Bearer access' });
-		expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2\/licenses\/user-b$/);
+		expect(requests()[1].url).toMatch(
+			/\/api\/music-control\/devices\/device-2\/licenses\/user-b$/u
+		);
 		expect(toggle('Bob sur Tablet').props.value).toBe(true);
 		expect(toggle('Bob sur Phone').props.value).toBe(false);
 	});
@@ -261,7 +271,9 @@ describe('MyDevicesScreen', () => {
 
 		await waitFor(() => expect(showSuccess).toHaveBeenCalled());
 		expect(requests()[1]).toMatchObject({ method: 'DELETE' });
-		expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-1\/licenses\/user-a$/);
+		expect(requests()[1].url).toMatch(
+			/\/api\/music-control\/devices\/device-1\/licenses\/user-a$/u
+		);
 		expect(toggle('alice sur Phone').props.value).toBe(false);
 	});
 
@@ -277,7 +289,7 @@ describe('MyDevicesScreen', () => {
 
 	it('disables only the pending switch while a toggle runs', async () => {
 		await renderLoaded([phone, tablet], [alice, bob]);
-		let answer: (response: Response) => void = () => undefined;
+		let answer: (response: Response) => void = noop;
 		fetchMock.mockReturnValueOnce(
 			new Promise<Response>(resolve => {
 				answer = resolve;
@@ -323,7 +335,7 @@ describe('MyDevicesScreen', () => {
 		mockGetDeviceInfo.mockRejectedValue(new Error('storage down'));
 		await renderLoaded([phone], [alice]);
 
-		expect(screen.getByTestId('device-device-1')).not.toHaveTextContent(/Cet appareil/);
+		expect(screen.getByTestId('device-device-1')).not.toHaveTextContent(/Cet appareil/u);
 		expect(toggle('alice sur Phone').props.value).toBe(true);
 	});
 
@@ -396,8 +408,10 @@ describe('MyDevicesScreen', () => {
 				authorization: 'Bearer access',
 				body: { name: 'Salon' },
 			});
-			expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2$/);
-			await waitFor(() => expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Salon/));
+			expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2$/u);
+			await waitFor(() =>
+				expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Salon/u)
+			);
 			expect(screen.queryByText("Renommer l'appareil")).toBeNull();
 		});
 
@@ -412,7 +426,7 @@ describe('MyDevicesScreen', () => {
 			await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
 			expect(requests()[1]).toMatchObject({ method: 'PATCH', body: { name: null } });
 			await waitFor(() =>
-				expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Tablet/)
+				expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Tablet/u)
 			);
 		});
 

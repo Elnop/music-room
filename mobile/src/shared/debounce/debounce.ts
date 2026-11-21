@@ -9,13 +9,13 @@ export function debounce<A extends unknown[]>(
 ): Debounced<A> {
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
-	const debounced = (...args: A) => {
+	function debounced(...args: A) {
 		if (timer !== undefined) clearTimeout(timer);
 		timer = setTimeout(() => {
 			timer = undefined;
 			fn(...args);
 		}, waitMs);
-	};
+	}
 	debounced.cancel = () => {
 		if (timer !== undefined) clearTimeout(timer);
 		timer = undefined;

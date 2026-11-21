@@ -3,10 +3,14 @@ import { View } from 'react-native';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { GenreChip } from '@/shared/theme/components/GenreChip';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { FilteredProfile, FollowStatus, MusicGenre } from '@/features/user/features/friends/types';
+import type {
+	FilteredProfile,
+	FollowStatus,
+	MusicGenre,
+} from '@/features/user/features/friends/types';
 import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
-import { HiddenFieldNote } from './HiddenFieldNote';
-import { UserProfileBadges } from './UserProfileBadges';
+import { HiddenFieldNote } from '@/features/user/features/friends/features/user-profile/components/presenters/HiddenFieldNote';
+import { UserProfileBadges } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileBadges';
 import { Text } from '@/shared/theme/components/Text';
 
 interface UserProfileInfoProps {

@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
-import { useTheme } from './ThemeContext';
+import type { ViewStyle } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Pressable } from './Pressable';
-import { Text } from './Text';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
 import { displayText, keycap } from '@/shared/theme/lib/pixelFrame';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
@@ -79,8 +80,8 @@ export function Button({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			...keycap(theme),
 			height: 52,
@@ -134,3 +135,4 @@ const createStyles = (theme: Theme) =>
 			opacity: 0.7,
 		},
 	});
+}

@@ -1,10 +1,10 @@
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { ProfileHeader } from './ProfileHeader';
-import { ProfileInfoSection } from './ProfileInfoSection';
-import { ProfileMenuItems } from './ProfileMenuItems';
-import { ProfilePreferencesSection } from './ProfilePreferencesSection';
-import { ProfileWideHeader } from './ProfileWideHeader';
+import { ProfileHeader } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileHeader';
+import { ProfileInfoSection } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileInfoSection';
+import { ProfileMenuItems } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileMenuItems';
+import { ProfilePreferencesSection } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfilePreferencesSection';
+import { ProfileWideHeader } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileWideHeader';
 import type { UserStats } from '@/features/user/features/profile/types';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
@@ -117,8 +117,8 @@ export function ProfileView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		screenWrapper: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -150,3 +150,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.xl,
 		},
 	});
+}

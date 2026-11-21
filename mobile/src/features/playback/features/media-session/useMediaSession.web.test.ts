@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
 import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
-import { useMediaSession } from './useMediaSession.web';
+import { useMediaSession } from '@/features/playback/features/media-session/useMediaSession.web';
 
 jest.mock('expo-media-control', () => {
 	throw new Error('the web variant must not load expo-media-control');

@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
@@ -23,8 +24,8 @@ export function PlaylistCover({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		cover: {
 			backgroundColor: theme.colors.surfaceAlt,
 			borderWidth: theme.borders.thick,
@@ -32,3 +33,4 @@ const createStyles = (theme: Theme) =>
 			...theme.shadows.large,
 		},
 	});
+}

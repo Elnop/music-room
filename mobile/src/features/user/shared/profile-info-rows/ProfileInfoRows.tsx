@@ -33,8 +33,8 @@ export function memberSinceLabel(createdAt: string): string {
 	return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		infoItem: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
@@ -55,3 +55,4 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.border,
 		},
 	});
+}

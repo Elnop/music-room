@@ -16,8 +16,8 @@ export function MyDevicesHeader() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		headerBlock: {
 			marginBottom: theme.spacing.lg,
 		},
@@ -27,3 +27,4 @@ const createStyles = (theme: Theme) =>
 			lineHeight: 20,
 		},
 	});
+}

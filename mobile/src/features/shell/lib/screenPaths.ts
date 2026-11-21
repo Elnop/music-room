@@ -19,23 +19,23 @@ interface ScreenPath {
 	isShareLink?: true;
 }
 
-const PLAYLIST = (id: string): StackRoute[] => [
-	{ name: 'Playlists' },
-	{ name: 'PlaylistDetail', params: { id } },
-];
-const EVENT = (id: string): StackRoute[] => [
-	{ name: 'Home' },
-	{ name: 'EventDetail', params: { id } },
-];
+function PLAYLIST(id: string): StackRoute[] {
+	return [{ name: 'Playlists' }, { name: 'PlaylistDetail', params: { id } }];
+}
+function EVENT(id: string): StackRoute[] {
+	return [{ name: 'Home' }, { name: 'EventDetail', params: { id } }];
+}
 const LOGIN: StackRoute[] = [{ name: 'Welcome' }, { name: 'Login' }];
 const PROFILE: StackRoute[] = [{ name: 'Profile' }];
 
-const profileScreen = (screen: string, path: string): ScreenPath => ({
-	screen,
-	path,
-	tab: 'ProfileTab',
-	routes: () => [...PROFILE, { name: screen }],
-});
+function profileScreen(screen: string, path: string): ScreenPath {
+	return {
+		screen,
+		path,
+		tab: 'ProfileTab',
+		routes: () => [...PROFILE, { name: screen }],
+	};
+}
 
 const SCREEN_PATHS: readonly ScreenPath[] = [
 	{ screen: 'Welcome', path: '', routes: () => [{ name: 'Welcome' }] },
@@ -145,7 +145,7 @@ const TAB_SCREENS: Record<AppTab, string> = {
 
 const MATCHERS = SCREEN_PATHS.map(entry => ({
 	entry,
-	regex: new RegExp(`^${entry.path.replace(':id', `(${UUID})`)}$`, 'i'),
+	regex: new RegExp(`^${entry.path.replace(':id', `(${UUID})`)}$`, 'iu'),
 }));
 
 export interface ScreenPathMatch {
@@ -154,7 +154,7 @@ export interface ScreenPathMatch {
 }
 
 export function matchScreenPath(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
-	const bare = path.split(/[?#]/)[0].replace(/^\/+|\/+$/g, '');
+	const bare = path.split(/[?#]/u)[0].replaceAll(/^\/+|\/+$/gu, '');
 	let otherSession: ScreenPathMatch | undefined;
 	for (const { entry, regex } of MATCHERS) {
 		const found = regex.exec(bare);
@@ -191,9 +191,9 @@ interface NestedParams {
 function focusedRoute(state: StateNode): RouteNode | undefined {
 	let route = state.routes[state.index ?? state.routes.length - 1];
 	for (;;) {
-		if (route?.state)
+		if (route?.state) {
 			route = route.state.routes[route.state.index ?? route.state.routes.length - 1];
-		else if (route && (route.params as NestedParams | undefined)?.screen) {
+		} else if (route && (route.params as NestedParams | undefined)?.screen) {
 			const nested = route.params as NestedParams;
 			route = { name: nested.screen as string, params: nested.params };
 		} else return route;

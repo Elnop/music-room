@@ -63,8 +63,8 @@ export function SocialSignInButtons({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		divider: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -137,3 +137,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.onFacebook,
 		},
 	});
+}

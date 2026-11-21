@@ -42,8 +42,8 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		heroContent: {
 			alignItems: 'center',
 			paddingHorizontal: theme.spacing.lg,
@@ -96,3 +96,4 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.border,
 		},
 	});
+}

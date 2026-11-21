@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react-native';
 import type { View } from 'react-native';
-import { useIconTooltip } from './useIconTooltip.web';
+import { useIconTooltip } from '@/shared/theme/hooks/useIconTooltip.web';
 
-const fakeElement = (textContent: string) => {
+function fakeElement(textContent: string) {
 	const attributes = new Map<string, string>();
 	return {
 		textContent,
@@ -10,7 +10,7 @@ const fakeElement = (textContent: string) => {
 		setAttribute: (name: string, value: string) => attributes.set(name, value),
 		removeAttribute: (name: string) => attributes.delete(name),
 	};
-};
+}
 
 function renderOn(element: ReturnType<typeof fakeElement>, label: string | undefined) {
 	const { result, rerender } = renderHook(

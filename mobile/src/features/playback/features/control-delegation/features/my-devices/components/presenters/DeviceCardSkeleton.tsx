@@ -31,8 +31,8 @@ export function DeviceCardSkeleton() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		skeletonCard: {
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.lg,
@@ -67,3 +67,4 @@ const createStyles = (theme: Theme) =>
 			gap: theme.spacing.md,
 		},
 	});
+}

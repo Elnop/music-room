@@ -1,4 +1,4 @@
-const SOUNDCLOUD_LARGE = /^(https?:\/\/(?:[^/.]+\.)*sndcdn\.com\/.+)-large(\.\w+)(\?.*)?$/;
+const SOUNDCLOUD_LARGE = /^(https?:\/\/(?:[^/.]+\.)*sndcdn\.com\/.+)-large(\.\w+)(\?.*)?$/u;
 
 export function largeArtwork(url: string | null | undefined): string | null {
 	if (!url) return null;

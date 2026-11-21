@@ -9,7 +9,7 @@ import type {
 	RevokeDeviceLicenseResponse,
 	UserDevice,
 	UserDeviceWithLicenses,
-} from './device.types';
+} from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
 
 export type {
 	ControllableDevicesResponse,

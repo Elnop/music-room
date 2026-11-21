@@ -3,13 +3,13 @@ import { RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import { ReorderableList } from '@/shared/theme/components/ReorderableList';
-import { SwipeableTrackItem } from './SwipeableTrackItem';
-import { TrackTableHeader } from './TrackTableHeader';
+import { SwipeableTrackItem } from '@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem';
+import { TrackTableHeader } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackTableHeader';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { PlaylistTracks } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistTracks';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
-import { createDetailStyles } from './detailStyles';
+import { createDetailStyles } from '@/features/playlists/features/editor/features/detail/components/presenters/detailStyles';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface PlaylistDetailViewProps {

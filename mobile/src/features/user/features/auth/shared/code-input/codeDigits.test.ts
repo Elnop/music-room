@@ -1,4 +1,4 @@
-import { fillCodeDigits } from './codeDigits';
+import { fillCodeDigits } from '@/features/user/features/auth/shared/code-input/codeDigits';
 
 const empty = ['', '', '', '', '', ''];
 

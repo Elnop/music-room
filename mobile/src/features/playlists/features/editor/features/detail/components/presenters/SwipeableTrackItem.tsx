@@ -7,7 +7,7 @@ import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
-import { TrackTableRow } from './TrackTableRow';
+import { TrackTableRow } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackTableRow';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { Track } from '@/shared/tracks/lib/track.types';
 import { Text } from '@/shared/theme/components/Text';
@@ -56,16 +56,18 @@ export function SwipeableTrackItem({
 	const dragStart = !disabled ? onDragStart : undefined;
 	const contextMenu = useContextMenu(actions);
 
-	const renderRightActions = () => (
-		<Pressable
-			style={styles.deleteButton}
-			onPress={() => onDelete(track.id)}
-			accessibilityLabel={`Supprimer ${track.title}`}
-		>
-			<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
-			<Text style={styles.deleteText}>Supprimer</Text>
-		</Pressable>
-	);
+	function renderRightActions() {
+		return (
+			<Pressable
+				style={styles.deleteButton}
+				onPress={() => onDelete(track.id)}
+				accessibilityLabel={`Supprimer ${track.title}`}
+			>
+				<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
+				<Text style={styles.deleteText}>Supprimer</Text>
+			</Pressable>
+		);
+	}
 
 	return (
 		<QueueSwipe
@@ -172,8 +174,8 @@ export function SwipeableTrackItem({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		trackContainer: pixelRow(theme),
 		trackPressable: {
 			flex: 1,
@@ -241,3 +243,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 4,
 		},
 	});
+}

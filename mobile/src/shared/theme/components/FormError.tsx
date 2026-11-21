@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from './ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface FormErrorProps {
 	message: string;
@@ -22,8 +22,8 @@ export function FormError({ message }: FormErrorProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			...pixelFrame(theme),
 			borderColor: theme.colors.error,
@@ -37,3 +37,4 @@ const createStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.semibold,
 		},
 	});
+}

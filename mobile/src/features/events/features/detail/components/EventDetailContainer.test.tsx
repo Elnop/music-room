@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { EventDetailContainer } from './EventDetailContainer';
+import { EventDetailContainer } from '@/features/events/features/detail/components/EventDetailContainer';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
@@ -12,8 +12,12 @@ import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { musicEvent } from '@test-utils/eventFixtures';
-import { startEventBeacon, stopEventBeacon } from '@/features/events/features/detail/beaconAdvertiser';
+import {
+	startEventBeacon,
+	stopEventBeacon,
+} from '@/features/events/features/detail/beaconAdvertiser';
 import { useBeaconStore } from '@/features/events/features/detail/beaconStore';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -43,7 +47,7 @@ type Props = NativeStackScreenProps<EventStackParamList, 'EventDetail'>;
 
 const navigation = { navigate: jest.fn(), goBack: jest.fn() };
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 async function renderDetail(waitForTitle = true) {
 	const view = renderWithClient(
@@ -122,11 +126,13 @@ describe('EventDetailContainer', () => {
 			event: musicEvent({ organizer: { id: 'me', username: 'me' } }),
 		});
 		await renderDetail();
-		const toggle = () => screen.getByLabelText('Diffuser la balise');
+		function toggle() {
+			return screen.getByLabelText('Diffuser la balise');
+		}
 
 		await act(async () => fireEvent(toggle(), 'valueChange', true));
 		expect(startEventBeacon).toHaveBeenCalledWith(42);
-		expect(screen.getByText(/Les téléphones proches voient votre événement/)).toBeTruthy();
+		expect(screen.getByText(/Les téléphones proches voient votre événement/u)).toBeTruthy();
 
 		await act(async () => fireEvent(toggle(), 'valueChange', false));
 		expect(stopEventBeacon).toHaveBeenCalled();
@@ -134,7 +140,9 @@ describe('EventDetailContainer', () => {
 	});
 
 	it('offers the beacon only while the event is on', async () => {
-		const later = (hours: number) => new Date(Date.now() + hours * 3_600_000).toISOString();
+		function later(hours: number) {
+			return new Date(Date.now() + hours * 3_600_000).toISOString();
+		}
 		routes.routes['GET /api/events/e1'] = ok({
 			event: musicEvent({
 				organizer: { id: 'me', username: 'me' },
@@ -154,7 +162,7 @@ describe('EventDetailContainer', () => {
 		});
 		await renderDetail();
 
-		expect(screen.getByText(/Disponible depuis l'app Android/)).toBeTruthy();
+		expect(screen.getByText(/Disponible depuis l'app Android/u)).toBeTruthy();
 		expect(screen.queryByLabelText('Diffuser la balise')).toBeNull();
 		expect(screen.getByText('Modifier')).toBeTruthy();
 	});

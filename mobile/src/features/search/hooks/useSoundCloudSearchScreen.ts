@@ -5,7 +5,7 @@ import { showError } from '@/shared/theme/lib/toast';
 import { toTrackInput } from '@/shared/tracks/lib/trackInput';
 import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { useSoundCloudSearch } from './useSoundCloudSearch';
+import { useSoundCloudSearch } from '@/features/search/hooks/useSoundCloudSearch';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';

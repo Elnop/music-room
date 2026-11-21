@@ -1,4 +1,4 @@
-import { FONT_FAMILIES } from './fonts';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 export const PIXEL = 3;
 

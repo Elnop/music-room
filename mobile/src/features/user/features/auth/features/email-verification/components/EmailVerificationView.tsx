@@ -90,8 +90,8 @@ export function EmailVerificationView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: { flex: 1, backgroundColor: theme.colors.background },
 		content: { flex: 1, paddingHorizontal: 24, paddingTop: 60, alignItems: 'center' },
 		title: {
@@ -148,3 +148,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
-import { createFriendsListStyles } from './friendsListStyles';
+import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 
 interface ControlSwitchProps {
 	canControl: boolean;

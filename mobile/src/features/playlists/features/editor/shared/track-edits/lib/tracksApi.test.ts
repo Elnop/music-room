@@ -1,4 +1,4 @@
-import * as tracksApi from './tracksApi';
+import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
 import * as usersApi from '@/features/playlists/shared/playlist/lib/usersApi';
 import { apiRequest } from '@/shared/backend/lib/api';

@@ -55,8 +55,8 @@ export function VisibilityToggle({ label, description, value, onChange }: Visibi
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		toggleGroup: {
 			marginBottom: theme.spacing.lg,
 		},
@@ -100,3 +100,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textInverse,
 		},
 	});
+}

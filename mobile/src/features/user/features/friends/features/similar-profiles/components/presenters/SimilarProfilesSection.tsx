@@ -5,8 +5,11 @@ import { SectionHeader } from '@/shared/theme/components/SectionHeader';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { SimilarProfilesSection as Section } from '@/features/user/features/friends/features/similar-profiles/useSimilarProfilesSection';
-import { SimilarProfileCard } from './SimilarProfileCard';
-import { createSimilarProfilesStyles, SIMILAR_CARD_WIDTH } from './similarProfilesStyles';
+import { SimilarProfileCard } from '@/features/user/features/friends/features/similar-profiles/components/presenters/SimilarProfileCard';
+import {
+	createSimilarProfilesStyles,
+	SIMILAR_CARD_WIDTH,
+} from '@/features/user/features/friends/features/similar-profiles/components/presenters/similarProfilesStyles';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
@@ -17,7 +20,7 @@ interface SimilarProfilesSectionProps {
 export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps) {
 	const { styles } = useThemedStyles(createSimilarProfilesStyles);
 
-	const body = () => {
+	function body() {
 		switch (section.status) {
 			case 'loading':
 				return null;
@@ -56,7 +59,7 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 					</ScrollView>
 				);
 		}
-	};
+	}
 
 	return (
 		<View>

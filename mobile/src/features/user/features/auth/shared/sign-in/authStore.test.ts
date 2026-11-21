@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Socket } from 'socket.io-client';
-import { useAuthStore } from './authStore';
+import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { useSocketStore } from '@/shared/backend/socketStore';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { storedSession } from '@/features/user/features/auth/shared/sign-in/lib/sessionStorage';
@@ -120,7 +120,7 @@ describe('refreshAccessToken', () => {
 		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBeNull();
 		expect(await AsyncStorage.getItem('@zumik/is_authenticated')).toBeNull();
 		expect(calledUrls()).toHaveLength(1);
-		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/);
+		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/u);
 		expect(calledUrls().some(url => url.endsWith('/api/auth/logout'))).toBe(false);
 		expect(socketDisconnect).toHaveBeenCalledTimes(1);
 	});
@@ -229,7 +229,7 @@ describe('logout', () => {
 		await useAuthStore.getState().logout();
 
 		expect(calledUrls()).toHaveLength(1);
-		expect(calledUrls()[0]).toMatch(/\/api\/auth\/logout$/);
+		expect(calledUrls()[0]).toMatch(/\/api\/auth\/logout$/u);
 		const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
 		expect((init.headers as Record<string, string>).Authorization).toBe('Bearer old-access');
 		await expectSignedOut();
@@ -329,7 +329,7 @@ describe('refresh during use', () => {
 
 		expect(results).toEqual([true, true]);
 		expect(calledUrls()).toHaveLength(1);
-		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/);
+		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/u);
 		expectAuthenticated();
 		await expectPersisted();
 	});

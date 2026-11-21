@@ -1,5 +1,5 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { signInWithGoogle } from './googleSignIn';
+import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
 import { logger } from '@/shared/logging/logger';
 
 jest.mock('expo-constants', () => ({
@@ -12,7 +12,9 @@ jest.mock('expo-constants', () => ({
 }));
 
 jest.mock('@react-native-google-signin/google-signin', () => {
-	const isCancelledResponse = (response: { type: string }) => response.type === 'cancelled';
+	function isCancelledResponse(response: { type: string }) {
+		return response.type === 'cancelled';
+	}
 	return {
 		GoogleSignin: {
 			configure: jest.fn(),
@@ -50,7 +52,7 @@ describe('signInWithGoogle', () => {
 	it('rejects with SIGN_IN_CANCELLED when the user cancels', async () => {
 		signIn.mockResolvedValue({ type: 'cancelled', data: null });
 
-		await expect(signInWithGoogle()).rejects.toThrow(new Error('SIGN_IN_CANCELLED'));
+		await expect(signInWithGoogle()).rejects.toThrow('SIGN_IN_CANCELLED');
 	});
 
 	it('returns the ID token on success', async () => {

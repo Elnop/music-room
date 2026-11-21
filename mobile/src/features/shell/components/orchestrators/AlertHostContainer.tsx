@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, StyleSheet, View, type AlertButton } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
+import type { AlertButton } from 'react-native';
 import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
 import { dialogStyles } from '@/features/shell/lib/dialogStyles';
 import { Button } from '@/shared/theme/components/Button';
@@ -18,11 +19,13 @@ export function AlertHostContainer() {
 	if (!alert) return null;
 
 	const buttons = alert.buttons.length > 0 ? alert.buttons : [OK_BUTTON];
-	const choose = (button?: AlertButton) => {
+	function choose(button?: AlertButton) {
 		dismiss();
 		button?.onPress?.();
-	};
-	const cancel = () => choose(buttons.find(button => button.style === 'cancel'));
+	}
+	function cancel() {
+		return choose(buttons.find(button => button.style === 'cancel'));
+	}
 
 	return (
 		<Modal visible transparent animationType="fade" onRequestClose={cancel}>
@@ -47,8 +50,8 @@ export function AlertHostContainer() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		...dialogStyles(theme),
 		message: {
 			marginTop: theme.spacing.sm,
@@ -64,3 +67,4 @@ const createStyles = (theme: Theme) =>
 		},
 		destructive: { backgroundColor: theme.colors.error },
 	});
+}

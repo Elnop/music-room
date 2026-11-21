@@ -1,4 +1,4 @@
-import { sizedAvatarUri } from './avatarUri';
+import { sizedAvatarUri } from '@/shared/theme/lib/avatarUri';
 
 const GOOGLE = 'https://lh3.googleusercontent.com/a/ACg8ocIez2Qe';
 

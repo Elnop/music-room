@@ -2,14 +2,14 @@ import { ApiError } from '@/shared/backend/lib/api';
 import { getSession } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { showError } from '@/shared/theme/lib/toast';
-import type { ActionScope } from './queue.types';
+import type { ActionScope } from '@/features/playback/shared/player/lib/queue.types';
 
 export interface StepOptions {
 	errorMessage?: string | ((error: unknown) => string);
 	stopWhenEmpty?: boolean;
 }
 
-export const actionScope = (): ActionScope => {
+export function actionScope(): ActionScope {
 	const { target } = useConnectStore.getState();
 	const me = getSession().user?.id ?? null;
 	if (target.kind === 'local') return { ownerId: me, remote: false, call: {} };
@@ -21,9 +21,9 @@ export const actionScope = (): ActionScope => {
 			deviceId: target.deviceId,
 		},
 	};
-};
+}
 
-export const handleRemoteRefusal = (scope: ActionScope, error: unknown): boolean => {
+export function handleRemoteRefusal(scope: ActionScope, error: unknown): boolean {
 	if (!scope.remote || !(error instanceof ApiError)) return false;
 	if (error.code === 'DEVICE_OFFLINE') {
 		showError("Cet appareil n'est plus en ligne");
@@ -34,4 +34,4 @@ export const handleRemoteRefusal = (scope: ActionScope, error: unknown): boolean
 	}
 	useConnectStore.getState().setLocal();
 	return true;
-};
+}

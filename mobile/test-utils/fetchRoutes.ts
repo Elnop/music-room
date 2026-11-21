@@ -1,4 +1,6 @@
-const pathOf = (url: string) => url.replace(/^[a-z]+:\/\/[^/]+/i, '');
+function pathOf(url: string) {
+	return url.replace(/^[a-z]+:\/\/[^/]+/iu, '');
+}
 
 type Route = Response | ((body: unknown) => Response | Promise<Response>);
 
@@ -11,7 +13,8 @@ export function mockFetchRoutes(routes: Record<string, Route>) {
 		return typeof route === 'function' ? route(body) : route;
 	});
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
-	const calls = () =>
-		fetchMock.mock.calls.map(([url, init]) => `${init?.method ?? 'GET'} ${pathOf(url)}`);
+	function calls() {
+		return fetchMock.mock.calls.map(([url, init]) => `${init?.method ?? 'GET'} ${pathOf(url)}`);
+	}
 	return { fetchMock, routes, calls };
 }

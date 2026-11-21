@@ -1,4 +1,4 @@
-import * as beaconScanner from './beaconScanner.web';
+import * as beaconScanner from '@/features/events/features/nearby/lib/beaconScanner.web';
 
 jest.mock('react-native-ble-plx', () => {
 	throw new Error('the web variant must not load the BLE library');

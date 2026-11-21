@@ -1,9 +1,11 @@
-import { AVATAR_COLORS } from './tokens';
+import { AVATAR_COLORS } from '@/shared/theme/lib/tokens';
 
 export function avatarInitials(name?: string): string {
-	const words = name?.trim().split(/\s+/).filter(Boolean) ?? [];
+	const words = name?.trim().split(/\s+/u).filter(Boolean) ?? [];
 	if (words.length === 0) return '?';
-	const first = (word: string) => Array.from(word)[0].toUpperCase();
+	function first(word: string) {
+		return Array.from(word)[0].toUpperCase();
+	}
 	return words.length >= 2 ? first(words[0]) + first(words[1]) : first(words[0]);
 }
 

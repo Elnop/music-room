@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { AddQueueItemBody } from './playback';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 
 export type TrackActionsStart = 'actions' | 'playlists';
 

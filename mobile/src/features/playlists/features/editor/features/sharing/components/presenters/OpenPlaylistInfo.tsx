@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { createSharingStyles } from './sharingStyles';
+import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
 import { Text } from '@/shared/theme/components/Text';
 import InfoCircleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/info-circle-solid.svg';
 
@@ -24,8 +24,8 @@ export function OpenPlaylistInfo() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		card: {
 			flexDirection: 'row',
 			padding: theme.spacing.lg,
@@ -45,3 +45,4 @@ const createStyles = (theme: Theme) =>
 			lineHeight: 20,
 		},
 	});
+}

@@ -3,8 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { SkeletonList } from '@/shared/theme/components/Skeleton';
-import { DeviceCardSkeleton } from './DeviceCardSkeleton';
-import { MyDevicesHeader } from './MyDevicesHeader';
+import { DeviceCardSkeleton } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceCardSkeleton';
+import { MyDevicesHeader } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesHeader';
 
 export function MyDevicesLoadingView() {
 	const { theme } = useTheme();
@@ -17,8 +17,8 @@ export function MyDevicesLoadingView() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		loadingScreen: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -26,3 +26,4 @@ const createStyles = (theme: Theme) =>
 			paddingTop: theme.spacing.lg,
 		},
 	});
+}

@@ -4,7 +4,7 @@ import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { useForgotPasswordMutation } from '@/features/user/features/auth/shared/password-reset/usePasswordResetMutations';
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 
 export interface ForgotPassword {
 	email: string;
@@ -24,7 +24,7 @@ export function useForgotPassword(
 	const [emailError, setEmailError] = useState<string | null>(null);
 	const mutation = useForgotPasswordMutation();
 
-	const validate = (): boolean => {
+	function validate(): boolean {
 		if (!email) setEmailError("L'email est requis");
 		else if (!EMAIL_PATTERN.test(email)) setEmailError('Saisissez un email valide');
 		else {
@@ -32,14 +32,14 @@ export function useForgotPassword(
 			return true;
 		}
 		return false;
-	};
+	}
 
-	const sendCode = () => {
+	function sendCode() {
 		if (!validate()) return;
 		mutation.mutate(email, {
 			onSuccess: () => navigation.navigate('ResetPassword', { email }),
 		});
-	};
+	}
 
 	return {
 		email,

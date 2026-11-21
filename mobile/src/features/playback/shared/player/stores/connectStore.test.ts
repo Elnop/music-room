@@ -1,11 +1,11 @@
 import { createStore } from 'zustand';
-import { activeOwnerId, useConnectStore } from './connectStore';
 import {
-	registerAuthSession,
-	notifySessionEnd,
-	type SessionView,
-} from '@/shared/backend/lib/authSession';
-import { usePlayerStore } from './playerStore';
+	activeOwnerId,
+	useConnectStore,
+} from '@/features/playback/shared/player/stores/connectStore';
+import { registerAuthSession, notifySessionEnd } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
+import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { showInfo } from '@/shared/theme/lib/toast';
 import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
 import type { UserProfile } from '@/shared/users/user.types';
@@ -47,7 +47,9 @@ registerAuthSession({
 
 const mockStop = jest.fn();
 
-const connect = () => useConnectStore.getState();
+function connect() {
+	return useConnectStore.getState();
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

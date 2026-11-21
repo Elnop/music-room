@@ -1,13 +1,13 @@
-import { queueApi } from './queueApi';
+import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { actionScope, handleRemoteRefusal } from './queueScope';
-import { asStep, mutate, runStep } from './queueStepRunner';
+import { actionScope, handleRemoteRefusal } from '@/features/playback/shared/player/lib/queueScope';
+import { asStep, mutate, runStep } from '@/features/playback/shared/player/lib/queueStepRunner';
 import { toTrackInput } from '@/shared/tracks/lib/trackInput';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
 import { logger } from '@/shared/logging/logger';
-import type { QueueState } from './queue.types';
+import type { QueueState } from '@/features/playback/shared/player/lib/queue.types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import {
@@ -88,7 +88,8 @@ export async function playListTrackAction(
 		if (result.queue) applyState(result.queue);
 	} catch (error) {
 		logger.error('[queueStore] Play list track on remote device failed:', error);
-		if (!handleRemoteRefusal(scope, error))
+		if (!handleRemoteRefusal(scope, error)) {
 			showError(apiErrorMessage(error, 'Impossible de lire ce titre'));
+		}
 	}
 }

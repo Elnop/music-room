@@ -1,9 +1,14 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { HOVERED_OPACITY, PRESSED_OPACITY, Pressable, pressableStyle } from './Pressable';
+import {
+	HOVERED_OPACITY,
+	PRESSED_OPACITY,
+	Pressable,
+	pressableStyle,
+} from '@/shared/theme/components/Pressable';
 import { hapticSelection, hapticTap } from '@/shared/theme/lib/haptics';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('@/shared/theme/lib/haptics', () => ({
 	hapticTap: jest.fn(),
@@ -59,7 +64,9 @@ describe('Pressable', () => {
 		const { rerender } = render(
 			<Pressable accessibilityLabel="Hold" onPress={jest.fn()} style={{ margin: 4 }} />
 		);
-		const style = () => StyleSheet.flatten(screen.getByRole('button').props.style);
+		function style() {
+			return StyleSheet.flatten(screen.getByRole('button').props.style);
+		}
 		expect(style().opacity).toBeUndefined();
 
 		rerender(
@@ -74,8 +81,10 @@ describe('Pressable', () => {
 	});
 
 	it('lightens under the mouse pointer, unless disabled or pressed', () => {
-		const opacity = (pressed: boolean, hovered: boolean, disabled = false) =>
-			StyleSheet.flatten(pressableStyle({ margin: 4 }, { pressed, hovered }, disabled)).opacity;
+		function opacity(pressed: boolean, hovered: boolean, disabled = false) {
+			return StyleSheet.flatten(pressableStyle({ margin: 4 }, { pressed, hovered }, disabled))
+				.opacity;
+		}
 
 		expect(opacity(false, true)).toBe(HOVERED_OPACITY);
 		expect(opacity(true, true)).toBe(PRESSED_OPACITY);

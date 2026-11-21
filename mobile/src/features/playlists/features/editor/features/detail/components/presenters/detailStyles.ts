@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native';
 import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
 import type { Theme } from '@/shared/theme/lib/types';
 
-export const createDetailStyles = (theme: Theme, topInset: number) =>
-	StyleSheet.create({
+export function createDetailStyles(theme: Theme, topInset: number) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -19,3 +19,4 @@ export const createDetailStyles = (theme: Theme, topInset: number) =>
 			alignSelf: 'center',
 		},
 	});
+}

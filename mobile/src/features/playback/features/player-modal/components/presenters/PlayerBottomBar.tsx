@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { KeyButton } from '@/shared/theme/components/KeyButton';
 import { Text } from '@/shared/theme/components/Text';
-import type { createStyles } from './playerModalStyles';
+import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 

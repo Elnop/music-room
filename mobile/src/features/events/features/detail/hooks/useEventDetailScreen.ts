@@ -38,7 +38,7 @@ export function useEventDetailScreen(navigation: Navigation, id: string): EventD
 		navigation.goBack();
 	}, [gone, navigation]);
 
-	const confirmDelete = async () => {
+	async function confirmDelete() {
 		deletingRef.current = true;
 		try {
 			await deleteEvent.mutateAsync(id);
@@ -50,7 +50,7 @@ export function useEventDetailScreen(navigation: Navigation, id: string): EventD
 			logger.error('[EventDetail] Delete failed:', error);
 			showError(apiErrorMessage(error, "Impossible de supprimer l'événement"));
 		}
-	};
+	}
 
 	return {
 		event,

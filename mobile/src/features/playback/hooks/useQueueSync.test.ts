@@ -1,7 +1,8 @@
 import { renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { useQueueSync } from './useQueueSync';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { useQueueSync } from '@/features/playback/hooks/useQueueSync';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import type { QueueState } from '@/features/playback/shared/player/lib/queue.types';
 import type { UserProfile } from '@/shared/users/user.types';
 

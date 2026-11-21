@@ -1,4 +1,6 @@
-type GoogleWeb = typeof import('./googleSignIn.web');
+import type * as GoogleWebModule from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn.web';
+
+type GoogleWeb = typeof GoogleWebModule;
 
 interface ButtonConfig {
 	size: string;
@@ -9,7 +11,7 @@ interface ButtonConfig {
 const mockLoadScript = jest.fn();
 let mockClientId: string | undefined;
 
-jest.mock('./loadScript', () => ({
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/loadScript', () => ({
 	loadScript: (src: string) => mockLoadScript(src),
 }));
 jest.mock('expo-constants', () => ({

@@ -1,10 +1,8 @@
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import {
-	useNowPlaying,
-	type NowPlayingTrack,
-} from '@/features/playback/shared/player/hooks/useNowPlaying';
+import { useNowPlaying } from '@/features/playback/shared/player/hooks/useNowPlaying';
+import type { NowPlayingTrack } from '@/features/playback/shared/player/hooks/useNowPlaying';
 import { RESTART_THRESHOLD_S } from '@/features/playback/shared/player/lib/queueNavigation';
 import { hapticTap } from '@/shared/theme/lib/haptics';
 import {
@@ -55,23 +53,23 @@ export function useMiniPlayer(): MiniPlayerData {
 	const canGoPrevious =
 		canToggle && (hasPrevious || (!isRemote && positionMs / 1000 > RESTART_THRESHOLD_S));
 
-	const handleToggle = () => {
+	function handleToggle() {
 		if (!canToggle) return;
 		hapticTap();
 		toggle();
-	};
+	}
 
-	const handleNext = () => {
+	function handleNext() {
 		if (!canGoNext) return;
 		hapticTap();
 		next();
-	};
+	}
 
-	const handlePrevious = () => {
+	function handlePrevious() {
 		if (!canGoPrevious) return;
 		hapticTap();
 		previous();
-	};
+	}
 
 	const translateX = useSharedValue(0);
 	const panGesture = Gesture.Pan()

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
-import { useKeyboardShortcuts } from './useKeyboardShortcuts.web';
+import { useKeyboardShortcuts } from '@/features/shell/hooks/useKeyboardShortcuts.web';
 
 type Listener = (event: object) => void;
 
@@ -12,7 +12,7 @@ const fakeDocument = {
 	querySelector: () => openDialog,
 };
 
-const keydown = (key: string) => {
+function keydown(key: string) {
 	const event = {
 		key,
 		shiftKey: false,
@@ -25,9 +25,11 @@ const keydown = (key: string) => {
 	};
 	listeners.forEach(listener => listener(event));
 	return event;
-};
+}
 
-const help = (): KeyboardShortcut => ({ key: '?', keys: '?', description: 'Aide', run: jest.fn() });
+function help(): KeyboardShortcut {
+	return { key: '?', keys: '?', description: 'Aide', run: jest.fn() };
+}
 
 describe('useKeyboardShortcuts (web)', () => {
 	beforeEach(() => {

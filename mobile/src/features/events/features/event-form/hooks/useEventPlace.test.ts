@@ -3,7 +3,7 @@ import * as Location from 'expo-location';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
 import { geocode } from '@/features/events/shared/events/lib/eventsApi';
-import { useEventPlace } from './useEventPlace';
+import { useEventPlace } from '@/features/events/features/event-form/hooks/useEventPlace';
 
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn() }));
 jest.mock('expo-location', () => ({

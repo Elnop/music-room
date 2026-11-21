@@ -27,8 +27,12 @@ export function useRemoteNowPlaying(): NowPlaying | null {
 	const remoteStatus = useConnectStore(state => state.remoteStatus);
 	const userId = useSession(session => session?.user?.id ?? null);
 	const queue = useActiveQueue();
-	const queueNext = () => useQueueStore.getState().next();
-	const queuePrevious = () => useQueueStore.getState().previous();
+	function queueNext() {
+		return useQueueStore.getState().next();
+	}
+	function queuePrevious() {
+		return useQueueStore.getState().previous();
+	}
 
 	const isRemote = target.kind === 'remote';
 	const remotePlaying = isRemote && (remoteStatus?.isPlaying ?? false);
@@ -41,6 +45,7 @@ export function useRemoteNowPlaying(): NowPlaying | null {
 	}, [remotePlaying]);
 
 	if (target.kind !== 'remote') return null;
+	const remoteTarget = target;
 
 	const track = remoteStatus?.track ?? null;
 	const durationMs = remoteDurationMs(queue, track?.id);
@@ -50,17 +55,17 @@ export function useRemoteNowPlaying(): NowPlaying | null {
 			? `${deviceName} de ${target.ownerUsername}`
 			: deviceName;
 
-	const toggle = () => {
+	function toggle() {
 		if (!track) return;
 		const socket = useSocketStore.getState().socket;
 		if (!socket) return;
 		useConnectStore.getState().setControlPending(true);
 		socket.emit('control:action', {
-			targetUserId: target.ownerId,
-			targetDeviceId: target.deviceId,
+			targetUserId: remoteTarget.ownerId,
+			targetDeviceId: remoteTarget.deviceId,
 			action: remotePlaying ? 'pause' : 'play',
 		});
-	};
+	}
 
 	return {
 		isRemote: true,

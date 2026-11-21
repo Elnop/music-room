@@ -1,27 +1,31 @@
 import type { OwnerQueue, QueueItem } from '@/shared/playback/lib/playback';
-import { upNext } from './upNext';
+import { upNext } from '@/features/playback/features/now-playing-panel/upNext';
 
-const item = (id: string): QueueItem => ({
-	id,
-	rank: id,
-	track: {
-		trackUri: `https://soundcloud.com/a/${id}`,
-		title: id,
-		artist: 'Artist',
-		album: null,
-		albumArt: null,
-		durationMs: 1000,
-	},
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-});
+function item(id: string): QueueItem {
+	return {
+		id,
+		rank: id,
+		track: {
+			trackUri: `https://soundcloud.com/a/${id}`,
+			title: id,
+			artist: 'Artist',
+			album: null,
+			albumArt: null,
+			durationMs: 1000,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	};
+}
 
-const queue = (currentItemId: string | null, ids: string[]): OwnerQueue => ({
-	currentItemId,
-	items: ids.map(item),
-	version: 1,
-});
+function queue(currentItemId: string | null, ids: string[]): OwnerQueue {
+	return {
+		currentItemId,
+		items: ids.map(item),
+		version: 1,
+	};
+}
 
 describe('upNext', () => {
 	it('takes the first items after the current one and counts the rest', () => {

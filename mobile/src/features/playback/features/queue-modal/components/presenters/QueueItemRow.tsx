@@ -7,8 +7,11 @@ import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
-import { QueueTrackDetails } from './QueueTrackDetails';
-import { createRowStyles, formatDuration } from './queueModalStyles';
+import { QueueTrackDetails } from '@/features/playback/features/queue-modal/components/presenters/QueueTrackDetails';
+import {
+	createRowStyles,
+	formatDuration,
+} from '@/features/playback/features/queue-modal/components/presenters/queueModalStyles';
 import type { QueueItem } from '@/features/playback/shared/player/lib/queue.types';
 import { Text } from '@/shared/theme/components/Text';
 import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
@@ -41,22 +44,24 @@ export function QueueItemRow({
 	const { track } = item;
 	const contextMenu = useContextMenu(onShowActions ? () => onShowActions(item) : undefined);
 
-	const handleRemove = async () => {
+	async function handleRemove() {
 		const removed = await onRemove(item.id);
 		if (!removed) swipeableRef.current?.close();
-	};
+	}
 
-	const renderRightActions = () => (
-		<Pressable
-			style={styles.deleteButton}
-			onPress={handleRemove}
-			accessibilityRole="button"
-			accessibilityLabel={`Retirer ${track.title}`}
-		>
-			<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
-			<Text style={styles.deleteText}>Retirer</Text>
-		</Pressable>
-	);
+	function renderRightActions() {
+		return (
+			<Pressable
+				style={styles.deleteButton}
+				onPress={handleRemove}
+				accessibilityRole="button"
+				accessibilityLabel={`Retirer ${track.title}`}
+			>
+				<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
+				<Text style={styles.deleteText}>Retirer</Text>
+			</Pressable>
+		);
+	}
 
 	return (
 		<Swipeable

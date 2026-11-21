@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/lib/types';
 
-export const createBeaconCardStyles = (theme: Theme) =>
-	StyleSheet.create({
+export function createBeaconCardStyles(theme: Theme) {
+	return StyleSheet.create({
 		card: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -24,3 +24,4 @@ export const createBeaconCardStyles = (theme: Theme) =>
 			marginTop: 2,
 		},
 	});
+}

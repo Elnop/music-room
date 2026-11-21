@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
-import {
-	View,
-	StyleSheet,
-	TextInputProps,
-	ViewStyle,
-	StyleProp,
-	TextStyle,
-	Platform,
-} from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import { useTheme } from './ThemeContext';
+import type { TextInputProps, ViewStyle, StyleProp, TextStyle } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';
 import { useFieldFocus } from '@/shared/theme/hooks/useFieldFocus';
-import { Pressable } from './Pressable';
-import { Text } from './Text';
-import { TextInput } from './TextInput';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
+import { TextInput } from '@/shared/theme/components/TextInput';
 import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
 import EyeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-solid.svg';
 
@@ -94,8 +87,8 @@ export function Input({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			marginBottom: theme.spacing.md,
 		},
@@ -154,3 +147,4 @@ const createStyles = (theme: Theme) =>
 			marginLeft: theme.spacing.xs,
 		},
 	});
+}

@@ -4,7 +4,7 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { deviceService } from '@/shared/backend/deviceService';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { transferTo } from './transferPlayback';
+import { transferTo } from '@/features/playback/features/control-delegation/features/device-picker/transferPlayback';
 import { logger } from '@/shared/logging/logger';
 import { createPickerStyles } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/devicePickerStyles';
 import type { DevicePickerOwner } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';

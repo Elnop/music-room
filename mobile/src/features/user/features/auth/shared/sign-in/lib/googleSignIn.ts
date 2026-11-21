@@ -6,8 +6,8 @@ import {
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { logger } from '@/shared/logging/logger';
-import { googleIosClientId } from './googleIosClientId';
-import { SIGN_IN_CANCELLED } from './signInCancelled';
+import { googleIosClientId } from '@/features/user/features/auth/shared/sign-in/lib/googleIosClientId';
+import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
 
 const NO_ID_TOKEN = 'No ID token received from Google Sign-In. Please try again.';
 
@@ -61,13 +61,13 @@ export async function signInWithGoogle(): Promise<string> {
 			googleError.code === statusCodes.SIGN_IN_CANCELLED ||
 			googleError.message === SIGN_IN_CANCELLED
 		) {
-			throw new Error(SIGN_IN_CANCELLED);
+			throw new Error(SIGN_IN_CANCELLED, { cause: error });
 		}
 		if (googleError.code === statusCodes.IN_PROGRESS) {
-			throw new Error('Sign-in already in progress');
+			throw new Error('Sign-in already in progress', { cause: error });
 		}
 		if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-			throw new Error('Google Play Services not available');
+			throw new Error('Google Play Services not available', { cause: error });
 		}
 		logger.error('[OAuth] Google Sign-In failed:', {
 			errorCode: googleError.code,

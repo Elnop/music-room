@@ -10,13 +10,15 @@ import type {
 } from '@/features/playlists/shared/playlist/lib/types';
 import { applyPlaylistEvent } from '@/features/playlists/shared/playlist/lib/playlistSync';
 
-const detailsPatch = (details: PlaylistDetailsEvent) => ({
-	name: details.name,
-	description: details.description,
-	visibility: details.visibility,
-	editMode: details.editMode,
-	coverUrl: details.coverUrl,
-});
+function detailsPatch(details: PlaylistDetailsEvent) {
+	return {
+		name: details.name,
+		description: details.description,
+		visibility: details.visibility,
+		editMode: details.editMode,
+		coverUrl: details.coverUrl,
+	};
+}
 
 function applyTracksAvailability(
 	playlist: PlaylistWithTracks,

@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import { Pressable } from './Pressable';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { MusicGenre } from '@/shared/users/user.types';
 import { GENRE_INFO } from '@/shared/theme/lib/genres';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 
 const SIZES = {
 	sm: { padding: 6, fontSize: 12, icon: 12 },
@@ -60,8 +60,8 @@ export function GenreChip({
 	return content;
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		chip: {
 			...pixelFrame(theme),
 			flexDirection: 'row',
@@ -73,3 +73,4 @@ const createStyles = (theme: Theme) =>
 		label: { color: theme.colors.text, fontFamily: theme.typography.families.medium },
 		labelSelected: { color: theme.colors.onColor, fontFamily: theme.typography.families.semibold },
 	});
+}

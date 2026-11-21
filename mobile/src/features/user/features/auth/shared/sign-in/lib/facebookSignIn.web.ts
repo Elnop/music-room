@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { logger } from '@/shared/logging/logger';
-import { loadScript } from './loadScript';
-import { SIGN_IN_CANCELLED } from './signInCancelled';
+import { loadScript } from '@/features/user/features/auth/shared/sign-in/lib/loadScript';
+import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
 
 const SDK_SCRIPT = 'https://connect.facebook.net/en_US/sdk.js';
 const GRAPH_VERSION = 'v21.0';

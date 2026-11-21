@@ -1,7 +1,9 @@
 import type { QueueItem } from '@/shared/playback/lib/playback';
 import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 
-const queueTrackKey = (item: QueueItem) => hashStringToNumber(item.track.trackUri);
+function queueTrackKey(item: QueueItem) {
+	return hashStringToNumber(item.track.trackUri);
+}
 
 export function displayedQueueIndex(
 	items: QueueItem[],

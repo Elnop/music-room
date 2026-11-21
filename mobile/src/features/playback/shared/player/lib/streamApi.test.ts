@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import { fetchStreamUrl } from './streamApi';
+import { fetchStreamUrl } from '@/features/playback/shared/player/lib/streamApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
 

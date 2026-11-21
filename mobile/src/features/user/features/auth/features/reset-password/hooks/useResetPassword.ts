@@ -4,15 +4,13 @@ import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showSuccess } from '@/shared/theme/lib/toast';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { newPasswordError } from '@/features/user/features/auth/features/reset-password/passwordRules';
-import {
-	useCodeInput,
-	type CodeInput,
-} from '@/features/user/features/auth/shared/code-input/useCodeInput';
+import { useCodeInput } from '@/features/user/features/auth/shared/code-input/useCodeInput';
+import type { CodeInput } from '@/features/user/features/auth/shared/code-input/useCodeInput';
 import {
 	useForgotPasswordMutation,
 	useResetPasswordMutation,
 } from '@/features/user/features/auth/shared/password-reset/usePasswordResetMutations';
-import { useResendResetCode } from './useResendResetCode';
+import { useResendResetCode } from '@/features/user/features/auth/features/reset-password/hooks/useResendResetCode';
 
 const BACK_TO_LOGIN_DELAY_MS = 1500;
 
@@ -45,7 +43,7 @@ export function useResetPassword(
 	const { focusFirst } = code;
 	useEffect(() => focusFirst(), [focusFirst]);
 
-	const submit = () => {
+	function submit() {
 		const fullCode = code.digits.join('');
 		if (fullCode.length !== 6) return;
 		const invalid = newPasswordError(newPassword, confirmation);
@@ -62,7 +60,7 @@ export function useResetPassword(
 				},
 			}
 		);
-	};
+	}
 
 	const failure = reset.error
 		? apiErrorMessage(reset.error, 'Impossible de réinitialiser le mot de passe')

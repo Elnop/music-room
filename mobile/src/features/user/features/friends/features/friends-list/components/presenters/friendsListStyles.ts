@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native';
 import { pixelFrame, pixelRow } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 
-export const createFriendsListStyles = (theme: Theme) =>
-	StyleSheet.create({
+export function createFriendsListStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -120,3 +120,4 @@ export const createFriendsListStyles = (theme: Theme) =>
 			paddingTop: theme.spacing.xxl,
 		},
 	});
+}

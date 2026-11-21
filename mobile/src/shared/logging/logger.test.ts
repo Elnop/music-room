@@ -1,8 +1,8 @@
-import { logger } from './logger';
+import { logger } from '@/shared/logging/logger';
 
-const setDev = (value: boolean) => {
+function setDev(value: boolean) {
 	(globalThis as unknown as { __DEV__: boolean }).__DEV__ = value;
-};
+}
 
 describe('logger', () => {
 	const dev = __DEV__;

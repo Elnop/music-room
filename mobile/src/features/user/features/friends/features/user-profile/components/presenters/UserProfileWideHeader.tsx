@@ -11,8 +11,8 @@ import { userLink } from '@/shared/share-links/shareLinks';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { UserProfileHeaderProps } from '@/features/user/features/friends/types';
-import { HiddenFieldNote } from './HiddenFieldNote';
-import { UserProfileBadges } from './UserProfileBadges';
+import { HiddenFieldNote } from '@/features/user/features/friends/features/user-profile/components/presenters/HiddenFieldNote';
+import { UserProfileBadges } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileBadges';
 import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
 import { Text } from '@/shared/theme/components/Text';
 import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
@@ -101,4 +101,6 @@ export function UserProfileWideHeader({
 	);
 }
 
-const createStyles = (theme: Theme) => StyleSheet.create({ action: wideProfileActionStyle(theme) });
+function createStyles(theme: Theme) {
+	return StyleSheet.create({ action: wideProfileActionStyle(theme) });
+}

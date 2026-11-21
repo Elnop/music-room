@@ -1,8 +1,8 @@
 import { Platform } from 'react-native';
 import { getAppVersion } from '@/shared/backend/deviceService';
-import { getDeviceName, getModelName } from './deviceIdentity';
-import { getBackendUrl } from './backendUrl';
-import { getAuthSession, getSession } from './authSession';
+import { getDeviceName, getModelName } from '@/shared/backend/lib/deviceIdentity';
+import { getBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { getAuthSession, getSession } from '@/shared/backend/lib/authSession';
 
 interface ApiResponse<T> {
 	success: boolean;
@@ -59,7 +59,7 @@ function getClientHeaders(): Record<string, string> {
 export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
 	const url = `${getBackendUrl()}${endpoint}`;
 
-	const makeRequest = async (authToken?: string): Promise<Response> => {
+	async function makeRequest(authToken?: string): Promise<Response> {
 		const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
 		const headers: Record<string, string> = {
 			...(isFormData ? {} : { 'Content-Type': 'application/json' }),
@@ -75,7 +75,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 			...options,
 			headers,
 		});
-	};
+	}
 
 	try {
 		const authSession = getAuthSession();
@@ -84,7 +84,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 		}
 
 		const { isTokenExpiringSoon, refreshAccessToken } = authSession;
-		const getAccessToken = () => getSession().accessToken || undefined;
+		function getAccessToken() {
+			return getSession().accessToken || undefined;
+		}
 		const accessToken = getAccessToken();
 
 		if (accessToken && isTokenExpiringSoon()) {
@@ -173,7 +175,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 	return data.data;
 }
 
-const LOCAL_URI = /^(blob|data):/i;
+const LOCAL_URI = /^(blob|data):/iu;
 
 export async function readLocalBlob(uri: string): Promise<Blob> {
 	if (!LOCAL_URI.test(uri)) {

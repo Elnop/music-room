@@ -1,8 +1,8 @@
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/keys';
-import type { MusicEvent } from './types';
+import type { MusicEvent } from '@/features/events/lib/types';
 import { musicEvent } from '@test-utils/eventFixtures';
-import { EVENT_SOCKET_RULES } from './eventSocketRules';
+import { EVENT_SOCKET_RULES } from '@/features/events/lib/eventSocketRules';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -12,11 +12,14 @@ jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3
 const client = createQueryClient();
 const list = queryKeys.events.list();
 
-const emit = (event: string, payload: unknown) =>
-	EVENT_SOCKET_RULES.filter(rule => rule.event === event).forEach(rule =>
+function emit(event: string, payload: unknown) {
+	return EVENT_SOCKET_RULES.filter(rule => rule.event === event).forEach(rule =>
 		rule.apply(client, payload)
 	);
-const shown = () => client.getQueryData<MusicEvent[]>(list)?.map(event => event.name);
+}
+function shown() {
+	return client.getQueryData<MusicEvent[]>(list)?.map(event => event.name);
+}
 
 beforeEach(() => {
 	client.clear();

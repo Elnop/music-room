@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { View, type DimensionValue } from 'react-native';
-import { useTheme } from './ThemeContext';
-import { SkeletonBlock } from './SkeletonBlock';
+import { View } from 'react-native';
+import type { DimensionValue } from 'react-native';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { SkeletonBlock } from '@/shared/theme/components/SkeletonBlock';
 import { createRowSkeletonStyles } from '@/shared/theme/lib/skeletonStyles';
 
 interface RowSkeletonLayoutProps {

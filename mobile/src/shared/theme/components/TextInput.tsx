@@ -1,5 +1,6 @@
 import React from 'react';
-import { TextInput as NativeTextInput, type StyleProp, type TextStyle } from 'react-native';
+import { TextInput as NativeTextInput } from 'react-native';
+import type { StyleProp, TextStyle } from 'react-native';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 import { useFieldFocus } from '@/shared/theme/hooks/useFieldFocus';
 

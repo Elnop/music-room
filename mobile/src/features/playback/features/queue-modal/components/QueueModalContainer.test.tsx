@@ -1,10 +1,11 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { QueueModalContainer } from './QueueModalContainer';
+import { QueueModalContainer } from '@/features/playback/features/queue-modal/components/QueueModalContainer';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import type { UserProfile } from '@/shared/users/user.types';
 import type { QueueItem, QueueState } from '@/features/playback/shared/player/lib/queue.types';
 
@@ -72,32 +73,37 @@ jest.mock('react-native-reorderable-list', () => {
 	};
 });
 
-const item = (id: string): QueueItem => ({
-	id,
-	rank: id,
-	track: {
-		trackUri: `https://soundcloud.com/artist/${id}`,
-		title: `Title ${id}`,
-		artist: 'Artist',
-		album: null,
-		albumArt: null,
-		durationMs: 61000,
-	},
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-});
+function item(id: string): QueueItem {
+	return {
+		id,
+		rank: id,
+		track: {
+			trackUri: `https://soundcloud.com/artist/${id}`,
+			title: `Title ${id}`,
+			artist: 'Artist',
+			album: null,
+			albumArt: null,
+			durationMs: 61000,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	};
+}
 
 let nextVersion = 0;
-const setQueue = (state: Pick<QueueState, 'currentItemId' | 'items'>, ownerId = 'owner') =>
-	useQueueStore.getState().applyState({ ownerId, version: ++nextVersion, ...state });
+function setQueue(state: Pick<QueueState, 'currentItemId' | 'items'>, ownerId = 'owner') {
+	return useQueueStore.getState().applyState({ ownerId, version: ++nextVersion, ...state });
+}
 
-const titles = () => screen.queryAllByText(/^Title /).map(node => node.props.children);
+function titles() {
+	return screen.queryAllByText(/^Title /u).map(node => node.props.children);
+}
 
-const renderModal = async () => {
+async function renderModal() {
 	render(<QueueModalContainer visible onClose={jest.fn()} TrackActionsSheet={() => null} />);
 	await act(async () => {});
-};
+}
 
 const initialQueue = useQueueStore.getState();
 

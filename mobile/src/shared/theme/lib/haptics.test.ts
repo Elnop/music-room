@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics';
-import { hapticSelection, hapticSuccess, hapticTap } from './haptics';
+import { hapticSelection, hapticSuccess, hapticTap } from '@/shared/theme/lib/haptics';
 
 jest.mock('expo-haptics', () => ({
 	impactAsync: jest.fn(() => Promise.resolve()),
@@ -9,7 +9,9 @@ jest.mock('expo-haptics', () => ({
 	NotificationFeedbackType: { Success: 'success' },
 }));
 
-const flush = () => new Promise<void>(resolve => setImmediate(() => resolve()));
+function flush() {
+	return new Promise<void>(resolve => setImmediate(() => resolve()));
+}
 
 describe('haptics', () => {
 	beforeEach(() => jest.clearAllMocks());

@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen } from '@testing-library/react-native';
-import { RootNavigator } from './RootNavigator';
+import { RootNavigator } from '@/app/RootNavigator';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { clearPendingLink } from '@/features/shell/lib/linking';
 import { silenceLogger } from '@test-utils/logger';
@@ -40,30 +40,34 @@ jest.mock('@/shared/theme/components/LoadingSpinner', () => ({
 	LoadingSpinner: () => null,
 }));
 
-jest.mock('./AppNavigator', () => {
+jest.mock('@/app/AppNavigator', () => {
 	const { Text } = jest.requireActual('react-native');
 	const { createNativeStackNavigator } = jest.requireActual('@react-navigation/native-stack');
 	const { createBottomTabNavigator } = jest.requireActual('@react-navigation/bottom-tabs');
 	const Tab = createBottomTabNavigator();
 	const Playlists = createNativeStackNavigator();
 	const Friends = createNativeStackNavigator();
-	const show =
-		(label: string) =>
-		({ route }: { route: { params?: Record<string, string> } }) => (
+	function show(label: string) {
+		return ({ route }: { route: { params?: Record<string, string> } }) => (
 			<Text>{`${label} ${JSON.stringify(route.params ?? {})}`}</Text>
 		);
-	const PlaylistsNavigator = () => (
-		<Playlists.Navigator>
-			<Playlists.Screen name="Playlists" component={show('playlists')} />
-			<Playlists.Screen name="PlaylistDetail" component={show('playlist-detail')} />
-		</Playlists.Navigator>
-	);
-	const FriendsNavigator = () => (
-		<Friends.Navigator>
-			<Friends.Screen name="Friends" component={show('friends')} />
-			<Friends.Screen name="UserProfile" component={show('user-profile')} />
-		</Friends.Navigator>
-	);
+	}
+	function PlaylistsNavigator() {
+		return (
+			<Playlists.Navigator>
+				<Playlists.Screen name="Playlists" component={show('playlists')} />
+				<Playlists.Screen name="PlaylistDetail" component={show('playlist-detail')} />
+			</Playlists.Navigator>
+		);
+	}
+	function FriendsNavigator() {
+		return (
+			<Friends.Navigator>
+				<Friends.Screen name="Friends" component={show('friends')} />
+				<Friends.Screen name="UserProfile" component={show('user-profile')} />
+			</Friends.Navigator>
+		);
+	}
 	return {
 		AppNavigator: () => (
 			<Tab.Navigator>
@@ -76,7 +80,7 @@ jest.mock('./AppNavigator', () => {
 	};
 });
 
-jest.mock('./AuthNavigator', () => {
+jest.mock('@/app/AuthNavigator', () => {
 	const { Text } = jest.requireActual('react-native');
 	return { AuthNavigator: () => <Text>sign-in</Text> };
 });
@@ -94,12 +98,13 @@ jest.mock('react-native-safe-area-context', () => {
 
 const { loadFromStorage, isTokenExpiringSoon } = useAuthStore.getState();
 
-const signIn = () =>
-	act(() => {
+function signIn() {
+	return act(() => {
 		useAuthStore.setState({ isAuthenticated: true });
 	});
+}
 
-const renderWithUrl = async (url: string | null, signedIn: boolean) => {
+async function renderWithUrl(url: string | null, signedIn: boolean) {
 	jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(url as string);
 	useAuthStore.setState({
 		isAuthenticated: signedIn,
@@ -108,7 +113,7 @@ const renderWithUrl = async (url: string | null, signedIn: boolean) => {
 	});
 	render(<RootNavigator />);
 	await act(async () => {});
-};
+}
 
 beforeEach(() => {
 	jest.restoreAllMocks();

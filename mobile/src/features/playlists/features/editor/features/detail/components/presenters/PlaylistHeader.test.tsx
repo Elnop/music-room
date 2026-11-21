@@ -1,7 +1,7 @@
 import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { PlaylistHeader } from './PlaylistHeader';
+import { PlaylistHeader } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistHeader';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import type { UserProfile } from '@/shared/users/user.types';
 

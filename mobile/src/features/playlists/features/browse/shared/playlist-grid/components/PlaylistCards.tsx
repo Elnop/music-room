@@ -7,7 +7,7 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import { playlistCardLabel } from '@/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels';
-import { PlaylistCassette } from './PlaylistCassette';
+import { PlaylistCassette } from '@/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCassette';
 
 interface PlaylistGridCardProps {
 	playlist: Playlist;
@@ -33,7 +33,8 @@ export function PlaylistGridCard({ playlist, onPress, onShowActions }: PlaylistG
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		tile: { marginBottom: theme.spacing.lg },
 	});
+}

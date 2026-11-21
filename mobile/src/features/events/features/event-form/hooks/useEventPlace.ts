@@ -4,8 +4,8 @@ import { showError } from '@/shared/theme/lib/toast';
 import {
 	currentPlace,
 	requestLocationPermission,
-	type Coordinates,
 } from '@/features/events/shared/events/lib/eventLocation';
+import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
 import {
 	geocodeAddress,
 	geocoderNeedsLocationPermission,
@@ -37,7 +37,7 @@ export function useEventPlace(
 	);
 	const [isLocating, setIsLocating] = useState(false);
 
-	const locateHere = async () => {
+	async function locateHere() {
 		setIsLocating(true);
 		try {
 			if (!(await requestLocationPermission())) {
@@ -53,9 +53,9 @@ export function useEventPlace(
 		} finally {
 			setIsLocating(false);
 		}
-	};
+	}
 
-	const resolve = async (address: string): Promise<Coordinates | null> => {
+	async function resolve(address: string): Promise<Coordinates | null> {
 		if (located && located.address.trim() === address.trim()) {
 			return { latitude: located.latitude, longitude: located.longitude };
 		}
@@ -72,7 +72,7 @@ export function useEventPlace(
 			showError("Impossible de situer l'adresse pour le moment");
 			return null;
 		}
-	};
+	}
 
 	return {
 		isLocating,

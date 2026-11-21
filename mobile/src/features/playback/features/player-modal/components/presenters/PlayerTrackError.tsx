@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { createStyles } from './playerModalStyles';
+import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
 import { Text } from '@/shared/theme/components/Text';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 

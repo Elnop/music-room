@@ -7,14 +7,14 @@ import {
 	withSequence,
 	withSpring,
 	withTiming,
-	type SharedValue,
 } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
 import type { QueueItem } from '@/shared/playback/lib/playback';
 import { hapticTap } from '@/shared/theme/lib/haptics';
 import { trackSwipeDirection } from '@/features/playback/shared/track-swipe/trackSwipe';
 import { displayedQueueIndex } from '@/features/playback/features/player-modal/displayedQueueIndex';
-import { useArtworkSize } from './useArtworkSize';
+import { useArtworkSize } from '@/features/playback/features/player-modal/hooks/useArtworkSize';
 import type { NowPlayingTrack } from '@/features/playback/shared/player/lib/types';
 import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 
@@ -43,7 +43,7 @@ export interface ArtworkCarousel {
 	artworkStep: number;
 }
 
-const queueSlots = (items: QueueItem[], shown: number): CarouselSlot[] => {
+function queueSlots(items: QueueItem[], shown: number): CarouselSlot[] {
 	const first = Math.max(0, shown - WINDOW);
 	return items.slice(first, shown + WINDOW + 1).map((item, offset) => ({
 		key: item.id,
@@ -52,7 +52,7 @@ const queueSlots = (items: QueueItem[], shown: number): CarouselSlot[] => {
 		title: item.track.title,
 		artist: item.track.artist,
 	}));
-};
+}
 
 export function useArtworkCarousel(
 	track: NowPlayingTrack | null,
@@ -81,18 +81,18 @@ export function useArtworkCarousel(
 				: withTiming(anchor, { duration: TRACK_CHANGE_MS });
 	}, [anchor, track?.id, center]);
 
-	const step = (direction: 'next' | 'previous') => {
+	function step(direction: 'next' | 'previous') {
 		hapticTap();
 		void (direction === 'next'
 			? useQueueStore.getState().next()
 			: useQueueStore.getState().previous());
-	};
+	}
 
-	const settleFromDrag = () => {
+	function settleFromDrag() {
 		'worklet';
 		center.value = center.value - drag.value / artworkStep;
 		drag.value = 0;
-	};
+	}
 
 	const panGesture = Gesture.Pan()
 		.withTestId('player-artwork-pan')

@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { PlayerBarContainer } from './PlayerBarContainer';
+import { PlayerBarContainer } from '@/features/playback/features/player-bar/components/PlayerBarContainer';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useVolumeStore } from '@/features/playback/shared/volume/volumeStore';
 import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
@@ -42,30 +42,36 @@ jest.mock('@react-native-community/slider', () => {
 	};
 });
 
-const playing = (overrides: Partial<NowPlaying> = {}): NowPlaying => ({
-	isRemote: false,
-	track: { id: 1, title: 'Goofy Goober Rock', artist: 'Matthew', artworkUrl: null },
-	isPlaying: true,
-	isLoading: false,
-	canToggle: true,
-	positionMs: 30_000,
-	durationMs: 200_000,
-	deviceLabel: null,
-	toggle: mockToggle,
-	next: mockNext,
-	previous: mockPrevious,
-	hasNext: true,
-	hasPrevious: true,
-	...overrides,
-});
+function playing(overrides: Partial<NowPlaying> = {}): NowPlaying {
+	return {
+		isRemote: false,
+		track: { id: 1, title: 'Goofy Goober Rock', artist: 'Matthew', artworkUrl: null },
+		isPlaying: true,
+		isLoading: false,
+		canToggle: true,
+		positionMs: 30_000,
+		durationMs: 200_000,
+		deviceLabel: null,
+		toggle: mockToggle,
+		next: mockNext,
+		previous: mockPrevious,
+		hasNext: true,
+		hasPrevious: true,
+		...overrides,
+	};
+}
 
 const sheets: PlayerSheets = {
 	QueueModal: ({ visible }) => (visible ? <Text>queue-sheet</Text> : null),
 	DevicePicker: ({ visible }) => (visible ? <Text>devices-sheet</Text> : null),
 };
 
-const seekSlider = () => screen.getAllByTestId('slider', { includeHiddenElements: true })[0];
-const volumeSlider = () => screen.getByLabelText('Volume');
+function seekSlider() {
+	return screen.getAllByTestId('slider', { includeHiddenElements: true })[0];
+}
+function volumeSlider() {
+	return screen.getByLabelText('Volume');
+}
 
 describe('PlayerBarContainer', () => {
 	beforeEach(() => {
@@ -130,7 +136,7 @@ describe('PlayerBarContainer', () => {
 
 	it('shows and hides the now playing panel from the track and from its button', () => {
 		render(<PlayerBarContainer {...sheets} />);
-		fireEvent.press(screen.getByLabelText(/^Afficher « En cours de lecture », Goofy Goober Rock/));
+		fireEvent.press(screen.getByLabelText(/^Afficher « En cours de lecture », Goofy Goober Rock/u));
 		expect(useNowPlayingPanelStore.getState().isOpen).toBe(true);
 		expect(usePlayerStore.getState().isModalOpen).toBe(false);
 		expect(screen.getByLabelText('Masquer « En cours de lecture »')).toBeSelected();

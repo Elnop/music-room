@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
-import { useMenuAnchor } from './useMenuAnchor';
+import { useMenuAnchor } from '@/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchor';
 
 const anchor = { x: 10, y: 20, width: 30, height: 40 };
 

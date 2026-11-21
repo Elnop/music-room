@@ -3,9 +3,12 @@ import { useCachedPlaylist } from '@/features/playlists/shared/playlist/usePlayl
 import { useRefetchOnFocus } from '@/features/playlists/shared/refetch-on-focus/useRefetchOnFocus';
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 import type { SharingMode } from '@/features/playlists/features/editor/features/sharing/lib/sharingTexts';
-import { useSharingMembers, type SharingMembers } from './useSharingMembers';
-import { useSharingSettings, type SharingSettings } from './useSharingSettings';
-import { useUserSearch, type UserSearch } from './useUserSearch';
+import { useSharingMembers } from '@/features/playlists/features/editor/features/sharing/hooks/useSharingMembers';
+import type { SharingMembers } from '@/features/playlists/features/editor/features/sharing/hooks/useSharingMembers';
+import { useSharingSettings } from '@/features/playlists/features/editor/features/sharing/hooks/useSharingSettings';
+import type { SharingSettings } from '@/features/playlists/features/editor/features/sharing/hooks/useSharingSettings';
+import { useUserSearch } from '@/features/playlists/features/editor/features/sharing/hooks/useUserSearch';
+import type { UserSearch } from '@/features/playlists/features/editor/features/sharing/hooks/useUserSearch';
 
 export interface PlaylistSharing {
 	mode: SharingMode;

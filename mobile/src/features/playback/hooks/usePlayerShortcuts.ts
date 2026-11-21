@@ -4,9 +4,9 @@ import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShort
 
 export function usePlayerShortcuts(): KeyboardShortcut[] {
 	const controls = usePlaybackControls();
-	const seek = (action: 'increment' | 'decrement') => {
+	function seek(action: 'increment' | 'decrement') {
 		if (!controls.sliderDisabled) controls.handleSliderAction(action);
-	};
+	}
 
 	return [
 		{

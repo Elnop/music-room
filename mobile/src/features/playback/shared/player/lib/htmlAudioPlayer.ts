@@ -1,7 +1,11 @@
-import type { AudioPlayer, AudioPlayerStatus } from './types';
+import type { AudioPlayer, AudioPlayerStatus } from '@/features/playback/shared/player/lib/types';
 import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
-import { mediaElement, setMediaEventHandler, type MediaElement } from './mediaElement';
-import { attachStream } from './streamSource';
+import {
+	mediaElement,
+	setMediaEventHandler,
+} from '@/features/playback/shared/player/lib/mediaElement';
+import type { MediaElement } from '@/features/playback/shared/player/lib/mediaElement';
+import { attachStream } from '@/features/playback/shared/player/lib/streamSource';
 
 export interface PlaybackEvents {
 	onPlayBlocked: () => void;
@@ -15,8 +19,9 @@ let ownerId: number | null = null;
 let detachOwner: (() => void) | null = null;
 let nextId = 1;
 
-const isAutoplayRefusal = (error: unknown) =>
-	(error as { name?: unknown } | null)?.name === 'NotAllowedError';
+function isAutoplayRefusal(error: unknown) {
+	return (error as { name?: unknown } | null)?.name === 'NotAllowedError';
+}
 
 export class HtmlAudioPlayer implements AudioPlayer {
 	readonly id = nextId++;
@@ -42,8 +47,9 @@ export class HtmlAudioPlayer implements AudioPlayer {
 		detachOwner = () => this.detach();
 		setMediaEventHandler(type => this.handleMediaEvent(type));
 		this.failed = false;
-		if (this.source)
+		if (this.source) {
 			this.releaseStream = attachStream(mediaElement(), this.source, this.protocol, this.onFatal);
+		}
 		this.publish();
 	}
 

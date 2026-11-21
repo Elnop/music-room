@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { FullScreenSheet } from './FullScreenSheet';
+import { FullScreenSheet } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
 import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
@@ -14,17 +14,20 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	return { useTheme: () => ({ theme }) };
 });
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
-const renderSheet = (onClose = jest.fn()) => {
+function renderSheet(onClose = jest.fn()) {
 	render(
 		<FullScreenSheet visible onClose={onClose}>
 			<Text>queue</Text>
 		</FullScreenSheet>
 	);
 	return onClose;
-};
+}
 
 describe('FullScreenSheet', () => {
 	it('slides the sheet over the whole phone screen', () => {

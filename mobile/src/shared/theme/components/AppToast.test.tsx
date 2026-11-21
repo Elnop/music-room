@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
 import Toast from 'react-native-toast-message';
-import { AppToast } from './AppToast';
+import { AppToast } from '@/shared/theme/components/AppToast';
 import { originalTheme } from '@/shared/theme/lib/original.theme';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme: theme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme }) };
 });

@@ -1,8 +1,7 @@
-import React, { type ReactNode } from 'react';
-import {
-	usePlaylistCardMenu,
-	type PlaylistCardMenu,
-} from '@/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu';
+import React from 'react';
+import type { ReactNode } from 'react';
+import { usePlaylistCardMenu } from '@/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu';
+import type { PlaylistCardMenu } from '@/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu';
 import { PlaylistActionsSheetContainer } from '@/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheetContainer';
 import type { PlanState } from '@/features/subscription/lib/subscription';
 
@@ -29,7 +28,7 @@ export function PlaylistCardMenuContainer({
 					onEdit={menu.edit}
 					onSharing={menu.sharing}
 					onDelete={menu.remove}
-					hasCover={!!menu.playlist.coverUrl}
+					hasCover={Boolean(menu.playlist.coverUrl)}
 					coverLocked={menu.coverLocked}
 					onChangeCover={menu.changeCover}
 					onRemoveCover={menu.removeCover}

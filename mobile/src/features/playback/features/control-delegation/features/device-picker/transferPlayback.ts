@@ -22,14 +22,16 @@ interface Playback {
 	source?: TransferRequest['source'];
 }
 
-const fromQueueTrack = (track: QueueTrack): AddQueueItemBody => ({
-	trackUri: track.trackUri,
-	title: track.title,
-	artist: track.artist,
-	album: track.album ?? undefined,
-	albumArt: track.albumArt ?? undefined,
-	durationMs: track.durationMs,
-});
+function fromQueueTrack(track: QueueTrack): AddQueueItemBody {
+	return {
+		trackUri: track.trackUri,
+		title: track.title,
+		artist: track.artist,
+		album: track.album ?? undefined,
+		albumArt: track.albumArt ?? undefined,
+		durationMs: track.durationMs,
+	};
+}
 
 function localPlayback(): Playback | null {
 	const player = getPlayerState();
@@ -76,7 +78,7 @@ export async function transferTo(owner: DevicePickerOwner, deviceId: string): Pr
 		return true;
 	}
 
-	const switchTarget = () => {
+	function switchTarget() {
 		if (toPhone) {
 			useConnectStore.getState().setLocal();
 		} else {
@@ -86,7 +88,7 @@ export async function transferTo(owner: DevicePickerOwner, deviceId: string): Pr
 				ownerUsername: owner.username,
 			});
 		}
-	};
+	}
 
 	const playback =
 		target.kind === 'remote'

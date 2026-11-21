@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
-import { usePlayerProgress } from './usePlayerProgress';
+import { usePlayerProgress } from '@/features/playback/shared/player/hooks/usePlayerProgress';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import {
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
 } from '@/features/playback/shared/player/lib/queueNavigation';
-import { useRemoteNowPlaying } from './useRemoteNowPlaying';
+import { useRemoteNowPlaying } from '@/features/playback/shared/player/hooks/useRemoteNowPlaying';
 
 import type { NowPlaying, NowPlayingTrack } from '@/features/playback/shared/player/lib/types';
 import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
@@ -57,14 +57,14 @@ export function useNowPlaying(): NowPlaying {
 	}, [queueNext]);
 
 	const isPlaying = playbackState === 'playing';
-	const canToggle = !!currentTrack && (isPlaying || playbackState === 'paused');
+	const canToggle = Boolean(currentTrack) && (isPlaying || playbackState === 'paused');
 
-	const toggle = () => {
+	function toggle() {
 		if (!canToggle || !player) return;
 		const { pause, resume } = usePlayerStore.getState();
 		if (isPlaying) pause();
 		else resume();
-	};
+	}
 
 	if (remote) return remote;
 

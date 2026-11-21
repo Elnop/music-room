@@ -1,12 +1,13 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useSeekPosition } from './useSeekPosition';
+import { useSeekPosition } from '@/features/playback/shared/seek-bar/useSeekPosition';
 
 describe('useSeekPosition', () => {
 	const onSeek = jest.fn();
-	const render = (currentTime = 30) =>
-		renderHook(({ time }: { time: number }) => useSeekPosition(time, onSeek), {
+	function render(currentTime = 30) {
+		return renderHook(({ time }: { time: number }) => useSeekPosition(time, onSeek), {
 			initialProps: { time: currentTime },
 		});
+	}
 
 	beforeEach(() => {
 		jest.useFakeTimers();

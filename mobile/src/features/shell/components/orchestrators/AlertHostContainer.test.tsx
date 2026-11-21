@@ -2,19 +2,20 @@ import React from 'react';
 import { Modal } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { useAlertStore } from '@/shared/alerts/alertStore';
-import { AlertHostContainer } from './AlertHostContainer';
+import { AlertHostContainer } from '@/features/shell/components/orchestrators/AlertHostContainer';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme: theme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme }) };
 });
 
-const push = (
+function push(
 	buttons: Parameters<ReturnType<typeof useAlertStore.getState>['push']>[0]['buttons']
-) =>
-	act(() =>
+) {
+	return act(() =>
 		useAlertStore.getState().push({ title: 'Supprimer ?', message: 'Définitif.', buttons })
 	);
+}
 
 beforeEach(() => useAlertStore.setState({ queue: [] }));
 

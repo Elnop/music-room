@@ -18,8 +18,8 @@ import type { Theme } from '@/shared/theme/lib/types';
 import type { FloatingIconMotion } from '@/features/user/features/auth/features/welcome/useFloatingIcons';
 import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
 import { LANDING_INTRO } from '@/features/user/features/auth/features/welcome/landingContent';
-import { FloatingIcon } from './FloatingIcon';
-import { LandingSections } from './LandingSections';
+import { FloatingIcon } from '@/features/user/features/auth/features/welcome/components/presenters/FloatingIcon';
+import { LandingSections } from '@/features/user/features/auth/features/welcome/components/presenters/LandingSections';
 import { Text } from '@/shared/theme/components/Text';
 import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 
@@ -117,8 +117,8 @@ export function WelcomeView({
 
 const LANDING_PEEK = 96;
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -180,3 +180,4 @@ const createStyles = (theme: Theme) =>
 			borderColor: theme.colors.border,
 		},
 	});
+}

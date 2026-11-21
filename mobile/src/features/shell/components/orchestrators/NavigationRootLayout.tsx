@@ -1,11 +1,10 @@
-import React, { useMemo, type ReactNode } from 'react';
-import {
-	DarkTheme,
-	DefaultTheme,
-	NavigationContainer,
-	type LinkingOptions,
-	type NavigationContainerRefWithCurrent,
-	type ParamListBase,
+import React, { useMemo } from 'react';
+import type { ReactNode } from 'react';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import type {
+	LinkingOptions,
+	NavigationContainerRefWithCurrent,
+	ParamListBase,
 } from '@react-navigation/native';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { NAVIGATION_FONTS } from '@/features/shell/lib/navigationFonts';

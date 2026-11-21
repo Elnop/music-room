@@ -5,7 +5,7 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistChoice } from '@/features/events/lib/types';
-import { FieldLabel } from './FieldLabel';
+import { FieldLabel } from '@/features/events/features/event-form/components/presenters/FieldLabel';
 import { Text } from '@/shared/theme/components/Text';
 import BracketSquareOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/bracket-square.svg';
 import CheckBoxSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-box-solid.svg';
@@ -55,8 +55,8 @@ export function PlaylistSelector({ playlists, selectedId, onSelect }: PlaylistSe
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		hint: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
@@ -74,3 +74,4 @@ const createStyles = (theme: Theme) =>
 		selected: { backgroundColor: theme.colors.surfaceAlt },
 		name: { flex: 1, fontSize: theme.typography.sizes.md, color: theme.colors.text },
 	});
+}

@@ -1,13 +1,16 @@
-import { canEditPlaylist, type PlaylistEditFields } from './playlistPermissions';
+import { canEditPlaylist } from '@/features/playlists/features/editor/shared/permissions/playlistPermissions';
+import type { PlaylistEditFields } from '@/features/playlists/features/editor/shared/permissions/playlistPermissions';
 
-const playlist = (overrides: Partial<PlaylistEditFields> = {}): PlaylistEditFields => ({
-	ownerId: 'owner',
-	collaboratorIds: [],
-	viewerIds: [],
-	visibility: 'private',
-	editMode: 'restricted',
-	...overrides,
-});
+function playlist(overrides: Partial<PlaylistEditFields> = {}): PlaylistEditFields {
+	return {
+		ownerId: 'owner',
+		collaboratorIds: [],
+		viewerIds: [],
+		visibility: 'private',
+		editMode: 'restricted',
+		...overrides,
+	};
+}
 
 describe('canEditPlaylist', () => {
 	it('refuses without a user or a playlist', () => {

@@ -50,7 +50,7 @@ export function PlaylistDetailContainer({
 	const owner = useOwnerActions(navigation, screen);
 	const play = usePlayPlaylist(id, playback);
 	const gradient = useCoverGradient(playlist);
-	const isOwner = !!userId && playlist?.ownerId === userId;
+	const isOwner = Boolean(userId) && playlist?.ownerId === userId;
 	const cover = useCoverActions(navigation, id, premium);
 	const Header = useBreakpoint().isWide ? PlaylistWideHeader : PlaylistHeader;
 	const sheetButtonRef = React.useRef<View>(null);
@@ -113,7 +113,7 @@ export function PlaylistDetailContainer({
 					onEdit={owner.edit}
 					onSharing={owner.sharing}
 					onDelete={owner.remove}
-					hasCover={!!playlist.coverUrl}
+					hasCover={Boolean(playlist.coverUrl)}
 					coverLocked={!cover.isPremium}
 					onChangeCover={cover.change}
 					onRemoveCover={cover.remove}

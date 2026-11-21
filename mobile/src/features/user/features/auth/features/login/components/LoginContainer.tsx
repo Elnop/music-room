@@ -4,7 +4,7 @@ import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { useLoginForm } from '@/features/user/features/auth/features/login/hooks/useLoginForm';
 import { useProviderSignIn } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderSignIn';
 import { useProviderButtons } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons';
-import { LoginView } from './LoginView';
+import { LoginView } from '@/features/user/features/auth/features/login/components/LoginView';
 
 type LoginOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 

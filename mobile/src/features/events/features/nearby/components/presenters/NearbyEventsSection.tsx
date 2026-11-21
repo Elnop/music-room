@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GENRE_INFO } from '@/shared/theme/lib/genres';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { RadarScope } from './RadarScope';
+import { RadarScope } from '@/features/events/features/nearby/components/presenters/RadarScope';
 import { Button } from '@/shared/theme/components/Button';
 import { KeyButton } from '@/shared/theme/components/KeyButton';
 import { Pressable } from '@/shared/theme/components/Pressable';
@@ -13,8 +13,8 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/features/nearby/hooks/useNearbyEvents';
 import { radarSpot } from '@/features/events/features/nearby/lib/radarBlips';
-import { BeaconStatusLine } from './BeaconStatusLine';
-import { EventRow } from './EventRow';
+import { BeaconStatusLine } from '@/features/events/features/nearby/components/presenters/BeaconStatusLine';
+import { EventRow } from '@/features/events/features/nearby/components/presenters/EventRow';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
@@ -105,8 +105,8 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		blip: {
 			position: 'absolute',
 			flexDirection: 'row',
@@ -175,3 +175,4 @@ const createStyles = (theme: Theme) =>
 		},
 		mineList: { flex: 1, gap: theme.spacing.md },
 	});
+}

@@ -1,4 +1,4 @@
-import { useQueueStore } from './queueStore';
+import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import {
 	EMPTY_QUEUE,
 	nextItem,
@@ -8,9 +8,10 @@ import {
 	selectPlaysPlaylist,
 } from '@/features/playback/shared/player/lib/queueSelectors';
 import { createStore } from 'zustand';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { deferred } from '@test-utils/deferred';
-import { useConnectStore } from './connectStore';
+import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import type { UserProfile } from '@/shared/users/user.types';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { ApiError } from '@/shared/backend/lib/api';
@@ -57,35 +58,39 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 
 const api = queueApi as jest.Mocked<typeof queueApi>;
 
-const item = (id: string): QueueItem => ({
-	id,
-	rank: id,
-	track: {
-		trackUri: `https://soundcloud.com/artist/${id}`,
-		title: `Title ${id}`,
-		artist: 'Artist',
-		album: null,
-		albumArt: null,
-		durationMs: 1000,
-	},
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-});
+function item(id: string): QueueItem {
+	return {
+		id,
+		rank: id,
+		track: {
+			trackUri: `https://soundcloud.com/artist/${id}`,
+			title: `Title ${id}`,
+			artist: 'Artist',
+			album: null,
+			albumArt: null,
+			durationMs: 1000,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	};
+}
 
 let nextVersion = 0;
 
-const queue = (currentItemId: string | null, ids = ['a', 'b', 'c']): QueueState => ({
-	ownerId: 'owner',
-	version: ++nextVersion,
-	currentItemId,
-	items: ids.map(item),
-});
+function queue(currentItemId: string | null, ids = ['a', 'b', 'c']): QueueState {
+	return {
+		ownerId: 'owner',
+		version: ++nextVersion,
+		currentItemId,
+		items: ids.map(item),
+	};
+}
 
-const body = (id: string) => {
+function body(id: string) {
 	const { trackUri, title, artist, durationMs } = item(id).track;
 	return { trackUri, title, artist, durationMs };
-};
+}
 
 const listTrack: SoundCloudTrack = {
 	id: 99,
@@ -112,7 +117,7 @@ interface MockPlayerState {
 
 let mockPlayer: MockPlayerState;
 
-const resetMockPlayer = () => {
+function resetMockPlayer() {
 	mockPlayer = {
 		currentTrack: null,
 		queueItemId: null,
@@ -135,7 +140,7 @@ const resetMockPlayer = () => {
 			mockPlayer.error = null;
 		}),
 	};
-};
+}
 
 resetMockPlayer();
 
@@ -152,13 +157,19 @@ registerAuthSession({
 });
 
 const initialPlayer = { loadCounter: 0 };
-const player = () => mockPlayer;
-const setAuthUser = (user: UserProfile | null) => {
+function player() {
+	return mockPlayer;
+}
+function setAuthUser(user: UserProfile | null) {
 	authSessionStore.setState({ user, isAuthenticated: user !== null });
-};
+}
 
-const store = () => useQueueStore.getState();
-const mine = () => store().queues.owner ?? EMPTY_QUEUE;
+function store() {
+	return useQueueStore.getState();
+}
+function mine() {
+	return store().queues.owner ?? EMPTY_QUEUE;
+}
 
 beforeEach(() => {
 	jest.resetAllMocks();
@@ -572,12 +583,17 @@ describe('queueStore moveItem', () => {
 });
 
 describe('queueStore playPlaylist', () => {
-	const withBlock = (currentItemId: string | null, ids: string[]): QueueState => ({
-		ownerId: 'owner',
-		version: ++nextVersion,
-		currentItemId,
-		items: [item('x'), ...ids.map(id => ({ ...item(id), sourcePlaylistId: 'p1', blockId: 'blk' }))],
-	});
+	function withBlock(currentItemId: string | null, ids: string[]): QueueState {
+		return {
+			ownerId: 'owner',
+			version: ++nextVersion,
+			currentItemId,
+			items: [
+				item('x'),
+				...ids.map(id => ({ ...item(id), sourcePlaylistId: 'p1', blockId: 'blk' })),
+			],
+		};
+	}
 
 	it('plays the first item of the block on this device', async () => {
 		store().applyState(queue('a'));
@@ -720,15 +736,21 @@ describe('queueStore versions (#285)', () => {
 });
 
 describe('queueStore owners (#297)', () => {
-	const ownedBy = (ownerId: string, version: number, currentItemId: string | null): QueueState => ({
-		ownerId,
-		version,
-		currentItemId,
-		items: ['a', 'b', 'c'].map(item),
-	});
+	function ownedBy(ownerId: string, version: number, currentItemId: string | null): QueueState {
+		return {
+			ownerId,
+			version,
+			currentItemId,
+			items: ['a', 'b', 'c'].map(item),
+		};
+	}
 
-	const goRemote = (ownerId: string, deviceId = 'tablet') =>
-		useConnectStore.setState({ target: { kind: 'remote', ownerId, deviceId }, remoteStatus: null });
+	function goRemote(ownerId: string, deviceId = 'tablet') {
+		return useConnectStore.setState({
+			target: { kind: 'remote', ownerId, deviceId },
+			remoteStatus: null,
+		});
+	}
 
 	it('compares versions per owner and never touches another owner', () => {
 		goRemote('friend');

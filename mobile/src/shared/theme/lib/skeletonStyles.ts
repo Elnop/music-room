@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
-import type { Theme } from './types';
+import type { Theme } from '@/shared/theme/lib/types';
 
-export const createRowSkeletonStyles = (theme: Theme) =>
-	StyleSheet.create({
+export function createRowSkeletonStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -17,3 +17,4 @@ export const createRowSkeletonStyles = (theme: Theme) =>
 			marginTop: 6,
 		},
 	});
+}

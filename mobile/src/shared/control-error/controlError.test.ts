@@ -1,4 +1,4 @@
-import { controlErrorMessage } from './controlError';
+import { controlErrorMessage } from '@/shared/control-error/controlError';
 
 describe('controlErrorMessage', () => {
 	it('translates NOT_AUTHORIZED', () => {
