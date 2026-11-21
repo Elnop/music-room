@@ -3,7 +3,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import * as eventsApi from '@/features/events/shared/events/lib/eventsApi';
 import { removeEvent, upsertEvent } from '@/features/events/shared/events/lib/eventCache';
-import type { EventInput, MusicEvent } from '@/features/events/lib/types';
+import type { EventInput, MusicEvent } from '@/features/events/eventTypes';
 
 function storeEvent(client: QueryClient, event: MusicEvent): void {
 	client.setQueryData(queryKeys.events.detail(event.id), event);

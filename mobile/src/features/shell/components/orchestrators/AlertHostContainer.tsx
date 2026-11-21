@@ -1,18 +1,11 @@
 import React from 'react';
-import { Modal, StyleSheet, View } from 'react-native';
 import type { AlertButton } from 'react-native';
-import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
-import { dialogStyles } from '@/features/shell/lib/dialogStyles';
-import { Button } from '@/shared/theme/components/Button';
 import { useAlertState } from '@/features/shell/hooks/useAlertState';
-import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/types/themeTypes';
-import { Text } from '@/shared/theme/components/Text';
+import { AlertDialog } from '@/features/shell/components/presenters/AlertDialog';
 
 const OK_BUTTON: AlertButton = { text: 'OK' };
 
 export function AlertHostContainer() {
-	const { styles } = useThemedStyles(createStyles);
 	const alert = useAlertState(state => state.queue[0]);
 	const dismiss = useAlertState(state => state.dismiss);
 
@@ -28,44 +21,12 @@ export function AlertHostContainer() {
 	}
 
 	return (
-		<Modal visible transparent animationType="fade" onRequestClose={cancel}>
-			<CenteredDialog onClose={cancel}>
-				<View style={styles.body} accessibilityRole="alert">
-					<Text style={styles.title}>{alert.title}</Text>
-					{alert.message !== '' && <Text style={styles.message}>{alert.message}</Text>}
-					<View style={styles.buttons}>
-						{buttons.map((button, index) => (
-							<Button
-								key={`${button.text ?? ''}-${index}`}
-								title={button.text ?? 'OK'}
-								variant={button.style === 'cancel' ? 'secondary' : 'primary'}
-								style={button.style === 'destructive' ? styles.destructive : undefined}
-								onPress={() => choose(button)}
-							/>
-						))}
-					</View>
-				</View>
-			</CenteredDialog>
-		</Modal>
+		<AlertDialog
+			title={alert.title}
+			message={alert.message}
+			buttons={buttons}
+			onChoose={choose}
+			onCancel={cancel}
+		/>
 	);
-}
-
-function createStyles(theme: Theme) {
-	const styles = StyleSheet.create({
-		...dialogStyles(theme),
-		message: {
-			marginTop: theme.spacing.sm,
-			fontSize: theme.typography.sizes.lg,
-			color: theme.colors.textSecondary,
-		},
-		buttons: {
-			flexDirection: 'row',
-			flexWrap: 'wrap',
-			justifyContent: 'flex-end',
-			gap: theme.spacing.sm,
-			marginTop: theme.spacing.lg,
-		},
-		destructive: { backgroundColor: theme.colors.error },
-	});
-	return styles;
 }

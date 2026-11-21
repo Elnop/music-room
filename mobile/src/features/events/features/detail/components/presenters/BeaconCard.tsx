@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { createBeaconCardStyles } from '@/features/events/features/detail/components/presenters/beaconCardStyles';
-import type { BeaconBroadcast } from '@/features/events/features/detail/hooks/useBeaconBroadcast';
+import { createBeaconCardStyles } from '@/features/events/features/detail/components/presenters/createBeaconCardStyles';
+import type { BeaconBroadcast } from '@/features/events/features/detail/eventDetailTypes';
 import { Text } from '@/shared/theme/components/Text';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
@@ -15,7 +15,11 @@ function description(beacon: BeaconBroadcast): string {
 	return 'Annoncez votre événement en Bluetooth aux téléphones proches';
 }
 
-export function BeaconCard({ beacon }: { beacon: BeaconBroadcast }) {
+type BeaconCardProps = {
+	beacon: BeaconBroadcast;
+};
+
+export function BeaconCard({ beacon }: BeaconCardProps) {
 	const { styles, theme } = useThemedStyles(createBeaconCardStyles);
 
 	return (

@@ -7,10 +7,11 @@ import { Text } from '@/shared/theme/components/Text';
 
 const mockNavigate = jest.fn();
 
-jest.mock('@react-navigation/bottom-tabs', () => {
-	const { Text: MockText } = jest.requireActual('@/shared/theme/components/Text');
-	return { BottomTabBar: () => <MockText>tab-bar</MockText> };
-});
+jest.mock('@react-navigation/bottom-tabs', () => ({ BottomTabBar: mockTabBar }));
+
+function mockTabBar() {
+	return <Text>tab-bar</Text>;
+}
 
 jest.mock('react-native-safe-area-context', () => ({
 	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
