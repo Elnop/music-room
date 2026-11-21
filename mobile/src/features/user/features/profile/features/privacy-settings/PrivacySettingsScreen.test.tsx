@@ -128,7 +128,7 @@ describe('PrivacySettingsScreen leave guard', () => {
 
 		fireEvent.press(screen.getByText('Enregistrer'));
 
-		await waitFor(() => expect(mockGoBack).toHaveBeenCalled());
+		await waitFor(() => expect(mockGoBack).toHaveBeenCalledWith());
 		expect(privacyApi.updatePrivacySettings).toHaveBeenCalledWith(
 			expect.objectContaining({ avatarVisibility: 'private' })
 		);
@@ -153,7 +153,9 @@ describe('PrivacySettingsScreen leave guard', () => {
 		await act(async () => {
 			failSave(new Error('network'));
 		});
-		expect(showError).toHaveBeenCalled();
+		expect(showError).toHaveBeenCalledWith(
+			"Impossible d'enregistrer les paramètres de confidentialité"
+		);
 
 		pressBack();
 		expect(Alert.alert).toHaveBeenCalledTimes(2);

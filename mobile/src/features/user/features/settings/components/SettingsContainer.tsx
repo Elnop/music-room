@@ -9,12 +9,11 @@ type SettingsContainerProps = {
 };
 
 export function SettingsContainer({ subscription, backendUrlField }: SettingsContainerProps) {
-	const { theme, bottomPadding, plan, isChangingPlan, handleTogglePremium, openPrivacyPolicy } =
+	const { bottomPadding, plan, isChangingPlan, handleTogglePremium, openPrivacyPolicy } =
 		useSettingsScreen(subscription);
 
 	return (
 		<SettingsView
-			theme={theme}
 			bottomPadding={bottomPadding}
 			plan={plan}
 			isChangingPlan={isChangingPlan}

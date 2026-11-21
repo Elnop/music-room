@@ -5,7 +5,7 @@ import { PlaylistDetailScreen } from '@/app/screens/PlaylistDetailScreen';
 import { playbackActions } from '@/features/playback/lib/playbackActions';
 import { SearchTracksScreen } from '@/app/screens/SearchTracksScreen';
 import { UserProfileScreen } from '@/app/screens/UserProfileScreen';
-import type { FriendsStackParamList } from '@/features/user/features/friends/types';
+import type { FriendsStackParamList } from '@/features/user/features/friends/friendsTypes';
 import { screenLayout } from '@/features/shell/screenLayout';
 import { useStackOptions } from '@/features/shell/hooks/useStackOptions';
 

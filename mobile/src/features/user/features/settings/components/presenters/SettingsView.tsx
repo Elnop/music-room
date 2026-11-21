@@ -1,102 +1,52 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
+import { bottomPaddingStyle } from '@/features/user/shared/profile-layout/bottomPaddingStyle';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { Plan } from '@/features/subscription/lib/subscription';
-import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/types/themeTypes';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { SubscriptionSection } from '@/features/user/features/settings/components/presenters/SubscriptionSection';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { Text } from '@/shared/theme/components/Text';
-import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
+import { SettingsSection } from '@/features/user/features/settings/components/presenters/SettingsSection';
+import { AboutSection } from '@/features/user/features/settings/components/presenters/AboutSection';
 
-interface SettingsViewProps {
-	theme: Theme;
+type SettingsViewProps = {
 	bottomPadding: number;
 	plan: Plan | undefined;
 	isChangingPlan: boolean;
 	onTogglePremium: (premium: boolean) => void;
 	onOpenPrivacyPolicy: () => void;
 	backendUrlField: React.ReactNode;
-}
+};
 
-export function SettingsView({
-	theme,
-	bottomPadding,
-	plan,
-	isChangingPlan,
-	onTogglePremium,
-	onOpenPrivacyPolicy,
-	backendUrlField,
-}: SettingsViewProps) {
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function SettingsView(props: SettingsViewProps) {
+	const { styles } = useThemedStyles(createStyles);
 	const column = useContentColumn();
 
 	return (
 		<ScrollView
 			style={styles.container}
 			keyboardShouldPersistTaps="handled"
-			contentContainerStyle={[{ paddingBottom: bottomPadding }, column]}
+			contentContainerStyle={[bottomPaddingStyle(props.bottomPadding), column]}
 		>
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Abonnement</Text>
+			<SettingsSection title="Abonnement">
 				<SubscriptionSection
-					theme={theme}
-					plan={plan}
-					disabled={plan === undefined || isChangingPlan}
-					onTogglePremium={onTogglePremium}
+					plan={props.plan}
+					disabled={props.plan === undefined || props.isChangingPlan}
+					onTogglePremium={props.onTogglePremium}
 				/>
-			</View>
-
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Serveur</Text>
-				{backendUrlField}
-			</View>
-
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>À propos</Text>
-				<Pressable
-					onPress={onOpenPrivacyPolicy}
-					accessibilityLabel="Politique de confidentialité"
-					style={styles.row}
-				>
-					<Text style={styles.rowLabel}>Politique de confidentialité</Text>
-					<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
-				</Pressable>
-			</View>
+			</SettingsSection>
+			<SettingsSection title="Serveur">{props.backendUrlField}</SettingsSection>
+			<AboutSection onOpenPrivacyPolicy={props.onOpenPrivacyPolicy} />
 		</ScrollView>
 	);
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
 		},
-		section: {
-			...pixelFrame(theme),
-			backgroundColor: theme.colors.surface,
-			padding: theme.spacing.md,
-			margin: theme.spacing.md,
-			marginBottom: 0,
-		},
-		sectionTitle: {
-			fontSize: theme.typography.sizes.xl,
-			fontFamily: theme.typography.families.bold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.md,
-		},
-		row: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			justifyContent: 'space-between',
-			gap: theme.spacing.md,
-		},
-		rowLabel: {
-			fontSize: theme.typography.sizes.lg,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-		},
 	});
+	return styles;
 }

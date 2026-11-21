@@ -10,6 +10,7 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
 import { Text } from '@/shared/theme/components/Text';
+import { UserNameLines } from '@/shared/theme/components/UserNameLines';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
 
@@ -44,8 +45,7 @@ export function UserResults({ results, isSearching, busy, onAdd }: UserResultsPr
 						>
 							<Avatar size="md" name={item.displayName || item.username} uri={item.avatarUrl} />
 							<View style={styles.info}>
-								<Text style={styles.username}>{item.username}</Text>
-								{item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
+								<UserNameLines username={item.username} displayName={item.displayName} />
 							</View>
 							<View style={styles.addButton}>
 								<PixelIcon icon={PlusSolid} size={24} color={theme.colors.onColor} />
@@ -75,16 +75,6 @@ function createStyles(theme: Theme) {
 		info: {
 			flex: 1,
 			marginLeft: theme.spacing.md,
-		},
-		username: {
-			fontSize: theme.typography.sizes.md,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-		},
-		displayName: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			marginTop: 2,
 		},
 		addButton: {
 			width: 36,

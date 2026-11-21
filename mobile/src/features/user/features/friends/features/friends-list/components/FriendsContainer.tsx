@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { FriendsStackParamList } from '@/features/user/features/friends/types';
+import type { FriendsStackParamList } from '@/features/user/features/friends/friendsTypes';
 import { useFriendsListScreen } from '@/features/user/features/friends/features/friends-list/hooks/useFriendsListScreen';
 import { FriendsListView } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendsListView';
 

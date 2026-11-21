@@ -1,12 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { VisibilityOptions } from '@/features/user/features/profile/features/privacy-settings/components/presenters/VisibilityOptions';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { VisibilityLevel } from '@/shared/users/userTypes';
-import { VISIBILITY_LABELS } from '@/shared/users/userConfig';
-import { VISIBILITY_ICONS } from '@/shared/theme/configs/genresConfig';
 import { Text } from '@/shared/theme/components/Text';
 
 type VisibilityToggleProps = {
@@ -16,11 +13,8 @@ type VisibilityToggleProps = {
 	onChange: (value: VisibilityLevel) => void;
 };
 
-const VISIBILITY_OPTIONS: VisibilityLevel[] = ['public', 'friends_only', 'private'];
-
 export function VisibilityToggle({ label, description, value, onChange }: VisibilityToggleProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.toggleGroup}>
@@ -29,28 +23,7 @@ export function VisibilityToggle({ label, description, value, onChange }: Visibi
 				{description && <Text style={styles.description}>{description}</Text>}
 			</View>
 
-			<View style={styles.options}>
-				{VISIBILITY_OPTIONS.map(option => {
-					const isSelected = value === option;
-					return (
-						<Pressable
-							key={option}
-							style={[styles.option, isSelected && styles.optionSelected]}
-							onPress={() => onChange(option)}
-							accessibilityLabel={VISIBILITY_LABELS[option]}
-						>
-							<PixelIcon
-								icon={VISIBILITY_ICONS[option]}
-								size={14}
-								color={isSelected ? theme.colors.textInverse : theme.colors.textSecondary}
-							/>
-							<Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
-								{VISIBILITY_LABELS[option]}
-							</Text>
-						</Pressable>
-					);
-				})}
-			</View>
+			<VisibilityOptions value={value} onChange={onChange} />
 		</View>
 	);
 }
@@ -64,40 +37,14 @@ function createStyles(theme: Theme) {
 			marginBottom: theme.spacing.sm,
 		},
 		label: {
-			fontSize: 16,
+			fontSize: theme.typography.sizes.lg,
 			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		description: {
-			fontSize: 13,
+			fontSize: theme.typography.sizes.smd,
 			color: theme.colors.textSecondary,
-			marginTop: 2,
-		},
-		options: {
-			flexDirection: 'row',
-			backgroundColor: theme.colors.surface,
-			padding: 4,
-			gap: 4,
-		},
-		option: {
-			flex: 1,
-			flexDirection: 'row',
-			alignItems: 'center',
-			justifyContent: 'center',
-			paddingVertical: 10,
-			paddingHorizontal: 8,
-			gap: 4,
-		},
-		optionSelected: {
-			backgroundColor: theme.colors.primary,
-		},
-		optionLabel: {
-			fontSize: 12,
-			fontFamily: theme.typography.families.medium,
-			color: theme.colors.textSecondary,
-		},
-		optionLabelSelected: {
-			color: theme.colors.textInverse,
+			marginTop: theme.spacing.xxs,
 		},
 	});
 	return styles;

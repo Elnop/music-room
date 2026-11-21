@@ -1,9 +1,7 @@
 import React from 'react';
 import { ProfileSection } from '@/features/user/shared/profile-section/ProfileSection';
-import {
-	ProfileInfoRows,
-	memberSinceLabel,
-} from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
+import { ProfileInfoRows } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
+import { memberSinceLabel } from '@/features/user/shared/member-since/memberSinceLabel';
 import type { UserProfile } from '@/shared/users/userTypes';
 
 type ProfileInfoSectionProps = {

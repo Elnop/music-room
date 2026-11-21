@@ -3,13 +3,13 @@ import { StyleSheet, View } from 'react-native';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Text } from '@/shared/theme/components/Text';
+import type { ProfileInfoRow } from '@/features/user/shared/profile-info-rows/profileInfoRowsTypes';
 
-export type ProfileInfoRow = {
-	label: string;
-	value: string;
+type ProfileInfoRowsProps = {
+	rows: ProfileInfoRow[];
 };
 
-export function ProfileInfoRows({ rows }: { rows: ProfileInfoRow[] }) {
+export function ProfileInfoRows({ rows }: ProfileInfoRowsProps) {
 	const { styles } = useThemedStyles(createStyles);
 
 	return (
@@ -27,12 +27,6 @@ export function ProfileInfoRows({ rows }: { rows: ProfileInfoRow[] }) {
 	);
 }
 
-export function memberSinceLabel(createdAt: string): string {
-	const date = new Date(createdAt);
-	if (Number.isNaN(date.getTime())) return '';
-	return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-}
-
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		infoItem: {
@@ -42,16 +36,16 @@ function createStyles(theme: Theme) {
 			paddingVertical: theme.spacing.sm,
 		},
 		infoLabel: {
-			fontSize: 15,
+			fontSize: theme.typography.sizes.mdlg,
 			color: theme.colors.textSecondary,
 		},
 		infoValue: {
-			fontSize: 15,
+			fontSize: theme.typography.sizes.mdlg,
 			color: theme.colors.text,
 			fontFamily: theme.typography.families.medium,
 		},
 		divider: {
-			height: 1,
+			height: theme.borders.hairline,
 			backgroundColor: theme.colors.border,
 		},
 	});

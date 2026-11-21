@@ -1,24 +1,32 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { UserProfileHeaderProps } from '@/features/user/features/friends/types';
+import { StyleSheet, View } from 'react-native';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { ViewedProfile } from '@/features/user/features/friends/features/user-profile/userProfileTypes';
 import { UserProfileInfo } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileInfo';
 import { UserProfileActions } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileActions';
-import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
 
-export function UserProfileHeader(props: UserProfileHeaderProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createUserProfileStyles(theme), [theme]);
+type UserProfileHeaderProps = {
+	viewed: ViewedProfile;
+};
+
+export function UserProfileHeader({ viewed }: UserProfileHeaderProps) {
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.header}>
-			<UserProfileInfo
-				profile={props.profile}
-				followStatus={props.followStatus}
-				canControlMusic={props.canControlMusic}
-				hasDevicesOnline={props.devices.length > 0}
-			/>
-			<UserProfileActions {...props} />
+			<UserProfileInfo viewed={viewed} />
+			<UserProfileActions viewed={viewed} />
 		</View>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		header: {
+			paddingHorizontal: theme.spacing.lg,
+			paddingTop: theme.spacing.md,
+		},
+	});
+	return styles;
 }

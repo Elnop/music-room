@@ -23,12 +23,23 @@ export const PIXEL_TYPOGRAPHY = {
 	families: FONT_FAMILIES,
 	sizes: {
 		xs: 10,
+		xsm: 11,
 		sm: 12,
+		smd: 13,
 		md: 14,
+		mdlg: 15,
 		lg: 16,
+		lgxl: 18,
 		xl: 20,
 		xxl: 24,
 		xxxl: 32,
+	},
+	lineHeights: {
+		body: 20,
+		relaxed: 22,
+	},
+	letterSpacings: {
+		caption: 0.5,
 	},
 	displayScale: {
 		title: 1.5,
@@ -81,7 +92,9 @@ export const GENRE_COLORS = {
 } as const;
 
 export const SPACING = {
+	hairline: 1,
 	xxs: 2,
+	pixel: PIXEL,
 	xs: 4,
 	xsm: 6,
 	sm: 8,
@@ -98,4 +111,12 @@ export const CONTROL_SIZES = {
 	searchBar: 44,
 	button: 52,
 	toast: 56,
+	statusDot: 6,
+	statDivider: 30,
+	headerButton: 36,
+	buttonMedium: 40,
+	thumbnail: 40,
+	switchHeight: 31,
+	switchWidth: 51,
+	textArea: 100,
 } as const;

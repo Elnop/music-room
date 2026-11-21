@@ -1,28 +1,22 @@
 import React from 'react';
 import { NowPlayingInline } from '@/features/user/features/friends/features/user-profile/components/presenters/NowPlayingInline';
-import type { FriendListeningDevice } from '@/features/user/features/friends/types';
+import type { ProfileListening } from '@/features/user/features/friends/features/user-profile/userProfileTypes';
 
 type UserProfileListeningProps = {
-	devices: FriendListeningDevice[];
-	onRemotePlay: (deviceId: string) => void;
-	onRemotePause: (deviceId: string) => void;
+	listening: ProfileListening;
 };
 
-export function UserProfileListening({
-	devices,
-	onRemotePlay,
-	onRemotePause,
-}: UserProfileListeningProps) {
+export function UserProfileListening({ listening }: UserProfileListeningProps) {
 	return (
 		<>
-			{devices.map(({ device, track, isPlaying, controllable }) =>
+			{listening.devices.map(({ device, track, isPlaying, controllable }) =>
 				track ? (
 					<NowPlayingInline
 						key={device.deviceId}
 						track={track}
 						isPlaying={isPlaying}
-						onPlay={() => onRemotePlay(device.deviceId)}
-						onPause={() => onRemotePause(device.deviceId)}
+						onPlay={() => listening.onRemotePlay(device.deviceId)}
+						onPause={() => listening.onRemotePause(device.deviceId)}
 						controllable={controllable}
 					/>
 				) : null

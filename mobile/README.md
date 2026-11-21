@@ -169,7 +169,7 @@ mobile/src/
 │   │   ├── features/profile/   # profile-screen, edit-profile, music-preferences, privacy-settings; shared/profile
 │   │   ├── features/friends/   # friends-list, user-profile, similar-profiles; shared/follows
 │   │   ├── features/settings/
-│   │   └── shared/             # profile-layout, profile-section, profile-info-rows, wide-profile-header
+│   │   └── shared/             # profile-layout, profile-section, profile-info-rows, member-since, wide-profile-header
 │   ├── playlists/
 │   │   ├── features/browse/    # home, library; shared/playlist-grid
 │   │   ├── features/editor/    # IV.2.3: detail, playlist-form, search-tracks, sharing, track-actions, card-menu;

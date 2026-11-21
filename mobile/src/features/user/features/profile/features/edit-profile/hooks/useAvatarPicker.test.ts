@@ -84,17 +84,19 @@ describe('useAvatarPicker', () => {
 		expect(mockPrepareAvatar).toHaveBeenCalledWith(ASSET);
 		expect(mockUploadAvatar).toHaveBeenCalledWith('token', 'file:///cache/avatar-512.jpg');
 		expect(mockSetAvatarUrl).toHaveBeenCalledWith(NEW_URL);
-		expect(mockShowSuccess).toHaveBeenCalled();
+		expect(mockShowSuccess).toHaveBeenCalledWith('Photo de profil mise à jour');
 		expect(result.current.isUploading).toBe(false);
 	});
 
 	it('uses the camera when asked', async () => {
 		await run(hook => hook.pickAndUpload('camera'));
 
-		expect(mockPicker.requestCameraPermissionsAsync).toHaveBeenCalled();
-		expect(mockPicker.launchCameraAsync).toHaveBeenCalled();
+		expect(mockPicker.requestCameraPermissionsAsync).toHaveBeenCalledWith();
+		expect(mockPicker.launchCameraAsync).toHaveBeenCalledWith(
+			expect.objectContaining({ mediaTypes: ['images'] })
+		);
 		expect(mockPicker.launchImageLibraryAsync).not.toHaveBeenCalled();
-		expect(mockUploadAvatar).toHaveBeenCalled();
+		expect(mockUploadAvatar).toHaveBeenCalledWith('token', 'file:///cache/avatar-512.jpg');
 	});
 
 	it('sends nothing when the picker is cancelled', async () => {

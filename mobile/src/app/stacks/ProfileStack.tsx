@@ -8,7 +8,7 @@ import { LinkedAccountsContainer } from '@/features/user/features/auth/features/
 import { MusicPreferencesContainer } from '@/features/user/features/profile/features/music-preferences/components/MusicPreferencesContainer';
 import { MyDevicesContainer } from '@/features/playback/features/control-delegation/features/my-devices/components/orchestrators/MyDevicesContainer';
 import { PrivacyPolicyContainer } from '@/features/legal/components/PrivacyPolicyContainer';
-import type { ProfileStackParamList } from '@/features/user/features/profile/types';
+import type { ProfileStackParamList } from '@/features/user/features/profile/profileTypes';
 import { screenLayout } from '@/features/shell/screenLayout';
 import { useStackOptions } from '@/features/shell/hooks/useStackOptions';
 import { useShellLayout } from '@/features/shell/hooks/useShellLayout';

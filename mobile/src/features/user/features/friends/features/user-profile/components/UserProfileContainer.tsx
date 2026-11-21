@@ -1,16 +1,14 @@
-import React, { useCallback } from 'react';
-import { View } from 'react-native';
+import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { FriendsStackParamList } from '@/features/user/features/friends/types';
-import { useUserProfileScreen } from '@/features/user/features/friends/features/user-profile/useUserProfileScreen';
-import { UserProfileView } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileView';
-import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
-import { Text } from '@/shared/theme/components/Text';
+import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
+import type { FriendsStackParamList } from '@/features/user/features/friends/friendsTypes';
 import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import { useUserProfileScreen } from '@/features/user/features/friends/features/user-profile/hooks/useUserProfileScreen';
+import { usePlaylistNavigation } from '@/features/user/features/friends/features/user-profile/hooks/usePlaylistNavigation';
+import { UserProfileView } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileView';
 
-type UserProfileOrchestratorProps = Partial<
+type UserProfileContainerProps = Partial<
 	NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>
 > & {
 	userId?: string;
@@ -18,28 +16,10 @@ type UserProfileOrchestratorProps = Partial<
 	onNavigateToPlaylist?: (playlistId: string) => void;
 };
 
-export function UserProfileContainer({
-	route,
-	navigation,
-	userId: propUserId,
-	listening,
-	onNavigateToPlaylist,
-}: UserProfileOrchestratorProps) {
-	const userId = propUserId || route?.params?.userId || '';
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createUserProfileStyles(theme), [theme]);
-	const screen = useUserProfileScreen(userId, listening);
-
-	const handleSelectPlaylist = useCallback(
-		(playlistId: string) => {
-			if (onNavigateToPlaylist) {
-				onNavigateToPlaylist(playlistId);
-			} else if (navigation) {
-				navigation.navigate('PlaylistDetail', { id: playlistId });
-			}
-		},
-		[navigation, onNavigateToPlaylist]
-	);
+export function UserProfileContainer(props: UserProfileContainerProps) {
+	const userId = props.userId || props.route?.params?.userId || '';
+	const screen = useUserProfileScreen(userId, props.listening);
+	const onSelectPlaylist = usePlaylistNavigation(props.navigation, props.onNavigateToPlaylist);
 
 	if (screen.isLoading) {
 		return <LoadingSpinner fullScreen message="Chargement du profil…" />;
@@ -47,15 +27,20 @@ export function UserProfileContainer({
 
 	if (screen.error || !screen.profile) {
 		return (
-			<View style={styles.container}>
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{screen.error || 'Profil introuvable'}</Text>
-				</View>
-			</View>
+			<ProfileScreenFrame bottomPadding={0} errorMessage={screen.error || 'Profil introuvable'} />
 		);
 	}
 
 	return (
-		<UserProfileView {...screen} profile={screen.profile} onSelectPlaylist={handleSelectPlaylist} />
+		<UserProfileView
+			viewed={{
+				userId: screen.userId,
+				profile: screen.profile,
+				playlists: { items: screen.playlists, onSelect: onSelectPlaylist },
+				follow: screen.follow,
+				listening: screen.listening,
+			}}
+			bottomPadding={screen.bottomPadding}
+		/>
 	);
 }

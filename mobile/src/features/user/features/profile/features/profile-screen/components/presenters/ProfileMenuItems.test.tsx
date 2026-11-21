@@ -12,11 +12,16 @@ describe('ProfileMenuItems', () => {
 		const onLinkedAccounts = jest.fn();
 		render(
 			<ProfileMenuItems
-				isLoading={false}
-				onPrivacySettings={jest.fn()}
-				onLinkedAccounts={onLinkedAccounts}
-				onMyDevices={jest.fn()}
-				onConfirmLogout={jest.fn()}
+				actions={{
+					isLoggingOut: false,
+					onEditProfile: jest.fn(),
+					onSettings: jest.fn(),
+					onMusicPreferences: jest.fn(),
+					onPrivacySettings: jest.fn(),
+					onLinkedAccounts,
+					onMyDevices: jest.fn(),
+					onConfirmLogout: jest.fn(),
+				}}
 			/>
 		);
 

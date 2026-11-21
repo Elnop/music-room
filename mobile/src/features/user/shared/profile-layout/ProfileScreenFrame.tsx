@@ -1,11 +1,12 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { bottomPaddingStyle } from '@/features/user/shared/profile-layout/bottomPaddingStyle';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
-type ProfileScreenLayoutProps = {
+type ProfileScreenFrameProps = {
 	subtitle?: string;
 	bottomPadding: number;
 	isLoading?: boolean;
@@ -13,26 +14,18 @@ type ProfileScreenLayoutProps = {
 	children?: React.ReactNode;
 };
 
-export function ProfileScreenFrame({
-	subtitle,
-	bottomPadding,
-	isLoading,
-	errorMessage,
-	children,
-}: ProfileScreenLayoutProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function ProfileScreenFrame(props: ProfileScreenFrameProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const { styles: errorStyles } = useThemedStyles(createErrorStyles);
 
-	if (isLoading) {
+	if (props.isLoading) {
 		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}
 
-	if (errorMessage) {
+	if (props.errorMessage) {
 		return (
-			<View style={styles.container}>
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{errorMessage}</Text>
-				</View>
+			<View style={[styles.container, errorStyles.errorContainer]}>
+				<Text style={errorStyles.errorText}>{props.errorMessage}</Text>
 			</View>
 		);
 	}
@@ -41,14 +34,10 @@ export function ProfileScreenFrame({
 		<View style={styles.container}>
 			<ScrollView
 				style={styles.scrollView}
-				contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
+				contentContainerStyle={[styles.content, bottomPaddingStyle(props.bottomPadding)]}
 			>
-				{subtitle && (
-					<View style={styles.header}>
-						<Text style={styles.subtitle}>{subtitle}</Text>
-					</View>
-				)}
-				{children}
+				{props.subtitle && <Text style={styles.subtitle}>{props.subtitle}</Text>}
+				{props.children}
 			</ScrollView>
 		</View>
 	);
@@ -66,24 +55,27 @@ function createStyles(theme: Theme) {
 		content: {
 			padding: theme.spacing.lg,
 		},
-		header: {
-			marginBottom: theme.spacing.xl,
-		},
 		subtitle: {
-			fontSize: 16,
+			marginBottom: theme.spacing.xl,
+			fontSize: theme.typography.sizes.lg,
 			color: theme.colors.textSecondary,
 		},
+	});
+	return styles;
+}
+
+function createErrorStyles(theme: Theme) {
+	const errorStyles = StyleSheet.create({
 		errorContainer: {
-			flex: 1,
 			justifyContent: 'center',
 			alignItems: 'center',
 			padding: theme.spacing.xl,
 		},
 		errorText: {
-			fontSize: 16,
+			fontSize: theme.typography.sizes.lg,
 			color: theme.colors.error,
 			textAlign: 'center',
 		},
 	});
-	return styles;
+	return errorStyles;
 }
