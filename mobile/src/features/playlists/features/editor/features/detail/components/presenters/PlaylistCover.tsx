@@ -4,17 +4,15 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 
-export function PlaylistCover({
-	playlist,
-	size = 200,
-	style,
-}: {
+type PlaylistCoverProps = {
 	playlist: PlaylistWithTracks;
 	size?: number;
 	style?: StyleProp<ViewStyle>;
-}) {
+};
+
+export function PlaylistCover({ playlist, size = 200, style }: PlaylistCoverProps) {
 	const { styles } = useThemedStyles(createStyles);
 
 	return (

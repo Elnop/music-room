@@ -1,139 +1,57 @@
 import React from 'react';
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
-import { useHover } from '@/features/playlists/features/editor/features/detail/hooks/useHover';
+import { StyleSheet, View } from 'react-native';
+import { useTableRowPointer } from '@/features/playlists/features/editor/features/detail/hooks/useTableRowPointer';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { TrackTableButton } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackTableButton';
+import { TrackTableTrailing } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackTableTrailing';
+import { tableRowFrame } from '@/features/playlists/features/editor/features/detail/lib/tableRowFrame';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import { formatDuration } from '@/shared/formatting/formatters';
 import type { Track } from '@/shared/tracks/types/trackTypes';
-import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
-import { trackTableColumns as columns } from '@/features/playlists/features/editor/features/detail/lib/trackTableLayout';
-import { Text } from '@/shared/theme/components/Text';
-import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
-import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
-import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
-import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
+import type {
+	TrackRowActions,
+	TrackRowState,
+} from '@/features/playlists/features/editor/features/detail/types/trackRowTypes';
 
-interface TrackTableRowProps {
+type TrackTableRowProps = {
 	track: Track;
 	position: number;
-	isCurrent: boolean;
-	isPending: boolean;
-	unavailable: boolean;
-	isDragActive: boolean;
-	onPress?: () => void;
-	onShowActions?: (anchor?: MenuAnchor) => void;
-	onDragStart?: () => void;
-}
+	state: TrackRowState;
+	actions: TrackRowActions;
+};
 
-export function TrackTableRow({
-	track,
-	position,
-	isCurrent,
-	isPending,
-	unavailable,
-	isDragActive,
-	onPress,
-	onShowActions,
-	onDragStart,
-}: TrackTableRowProps) {
+export function TrackTableRow({ track, position, state, actions }: TrackTableRowProps) {
 	const { theme } = useTheme();
 	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
-	const { hovered, hoverProps } = useHover();
-	const showPlay = hovered && !unavailable && !isPending && Boolean(onPress);
-	const contextMenu = useContextMenu(onShowActions);
+	const hover = useTableRowPointer(actions.onShowActions);
 
 	return (
 		<View
-			{...hoverProps}
-			{...contextMenu}
+			{...hover.pointerProps}
 			style={[
 				styles.row,
-				(hovered || isCurrent) && styles.rowHighlighted,
-				isDragActive && styles.rowActive,
+				(hover.hovered || state.isCurrent) && styles.rowHighlighted,
+				state.isDragActive && styles.rowActive,
 			]}
 		>
-			<Pressable
-				onPress={onPress}
-				onLongPress={onShowActions ? () => onShowActions() : undefined}
-				accessibilityLabel={`${position}. ${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
-				accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
-				style={styles.pressable}
-			>
-				<View style={columns.position}>
-					{isPending ? (
-						<ActivityIndicator
-							size="small"
-							color={theme.colors.primary}
-							accessibilityLabel="Lancement"
-						/>
-					) : showPlay ? (
-						<PixelIcon icon={PlaySolid} size={16} color={theme.colors.text} />
-					) : isCurrent ? (
-						<PixelIcon
-							icon={SoundOnSolid}
-							size={16}
-							color={theme.colors.primary}
-							accessibilityLabel="En cours de lecture"
-						/>
-					) : (
-						<Text style={styles.position}>{position}</Text>
-					)}
-				</View>
-				<View style={[columns.title, unavailable && styles.unavailable]}>
-					{track.albumArt ? (
-						<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
-					) : (
-						<View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-							<PixelIcon icon={MusicSolid} size={18} color={theme.colors.textSecondary} />
-						</View>
-					)}
-					<Text style={[styles.title, isCurrent && styles.titleCurrent]} numberOfLines={1}>
-						{track.title}
-					</Text>
-				</View>
-				<View style={[columns.artist, unavailable && styles.unavailable]}>
-					<Text style={styles.secondary} numberOfLines={1}>
-						{unavailable ? `Indisponible · ${track.artist}` : track.artist}
-					</Text>
-				</View>
-				<View style={columns.duration}>
-					{track.durationMs ? (
-						<Text style={styles.secondary}>{formatDuration(track.durationMs)}</Text>
-					) : null}
-				</View>
-			</Pressable>
-			<View style={[columns.trailing, styles.trailing]}>
-				{onShowActions && <TrackActionsButton onPress={onShowActions} />}
-				{onDragStart && (
-					<Pressable
-						onPressIn={onDragStart}
-						hitSlop={10}
-						style={[styles.dragHandle, !hovered && !isDragActive && styles.dragHandleIdle]}
-						accessibilityLabel="Réordonner"
-					>
-						<PixelIcon icon={BarsSolid} size={22} color={theme.colors.textSecondary} />
-					</Pressable>
-				)}
-			</View>
+			<TrackTableButton
+				track={track}
+				position={position}
+				state={state}
+				actions={actions}
+				hovered={hover.hovered}
+			/>
+			<TrackTableTrailing actions={actions} faded={!hover.hovered && !state.isDragActive} />
 		</View>
 	);
 }
 
 function createStyles(theme: Theme, separator: string) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingHorizontal: 12,
-			paddingVertical: 6,
-			borderBottomWidth: 1,
-			borderBottomColor: separator,
+			...tableRowFrame(theme, separator),
+			paddingVertical: theme.spacing.xsm,
 			backgroundColor: theme.colors.background,
 		},
 		rowHighlighted: { backgroundColor: theme.colors.surface },
@@ -141,25 +59,6 @@ function createStyles(theme: Theme, separator: string) {
 			backgroundColor: theme.colors.surfaceAlt,
 			...theme.shadows.large,
 		},
-		pressable: { flex: 1, flexDirection: 'row', alignItems: 'center' },
-		position: { fontSize: theme.typography.sizes.md, color: theme.colors.textSecondary },
-		albumArt: { width: 40, height: 40, marginRight: 12 },
-		albumArtPlaceholder: {
-			backgroundColor: theme.colors.surfaceAlt,
-			justifyContent: 'center',
-			alignItems: 'center',
-		},
-		title: {
-			flex: 1,
-			fontSize: 15,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-		},
-		titleCurrent: { color: theme.colors.primary },
-		secondary: { fontSize: 13, color: theme.colors.textSecondary },
-		unavailable: { opacity: 0.4 },
-		trailing: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' },
-		dragHandle: { marginLeft: theme.spacing.xs, padding: theme.spacing.xs },
-		dragHandleIdle: { opacity: 0.3 },
 	});
+	return styles;
 }

@@ -4,8 +4,8 @@ import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Input } from '@/shared/theme/components/Input';
 import { Button } from '@/shared/theme/components/Button';
-import type { NewPlaylistDraft } from '@/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack';
-import { PLAYLIST_NAME_MAX } from '@/features/playlists/features/editor/features/track-actions/playlistName';
+import type { NewPlaylistDraft } from '@/features/playlists/features/editor/features/track-actions/trackActionsTypes';
+import { PLAYLIST_NAME_MAX } from '@/features/playlists/features/editor/features/track-actions/playlistNameConfig';
 
 type NewPlaylistFormProps = {
 	draft: NewPlaylistDraft;

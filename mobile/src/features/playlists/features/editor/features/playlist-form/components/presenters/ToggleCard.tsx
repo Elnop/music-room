@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { Text } from '@/shared/theme/components/Text';
+import { ToggleCardText } from '@/features/playlists/features/editor/features/playlist-form/components/presenters/ToggleCardText';
 
 type ToggleCardProps = {
 	label: string;
@@ -18,10 +18,7 @@ export function ToggleCard({ label, description, value, onValueChange }: ToggleC
 	return (
 		<View style={styles.card}>
 			<View style={styles.row}>
-				<View style={styles.info}>
-					<Text style={styles.label}>{label}</Text>
-					<Text style={styles.description}>{description}</Text>
-				</View>
+				<ToggleCardText label={label} description={description} />
 				<ThemedSwitch value={value} onValueChange={onValueChange} />
 			</View>
 		</View>
@@ -40,20 +37,6 @@ function createStyles(theme: Theme) {
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
-		},
-		info: {
-			flex: 1,
-			marginRight: theme.spacing.md,
-		},
-		label: {
-			fontSize: theme.typography.sizes.md,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xs,
-		},
-		description: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
 		},
 	});
 	return styles;

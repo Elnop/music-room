@@ -1,11 +1,9 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { CappedInput } from '@/shared/theme/components/CappedInput';
-import { Button } from '@/shared/theme/components/Button';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { PlaylistForm } from '@/features/playlists/features/editor/features/playlist-form/usePlaylistForm';
-import { ToggleCard } from '@/features/playlists/features/editor/features/playlist-form/components/presenters/ToggleCard';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { PlaylistForm } from '@/features/playlists/features/editor/features/playlist-form/playlistFormTypes';
+import { PlaylistFormFields } from '@/features/playlists/features/editor/features/playlist-form/components/presenters/PlaylistFormFields';
 
 type PlaylistFormViewProps = {
 	form: PlaylistForm;
@@ -13,7 +11,8 @@ type PlaylistFormViewProps = {
 };
 
 export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps) {
-	const { styles } = useThemedStyles(createStyles);
+	const { theme } = useTheme();
+	const styles = React.useMemo(() => createStyles(theme, bottomPadding), [theme, bottomPadding]);
 
 	return (
 		<View style={styles.screen}>
@@ -21,57 +20,9 @@ export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps)
 				style={styles.keyboard}
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			>
-				<ScrollView
-					contentContainerStyle={[styles.scroll, { paddingBottom: bottomPadding }]}
-					keyboardShouldPersistTaps="handled"
-				>
+				<ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
 					<View style={styles.body}>
-						<View style={styles.form}>
-							<CappedInput
-								field={form.name}
-								label="Nom de la playlist"
-								placeholder="Ma super playlist"
-								autoFocus
-								onEnter={form.isSubmitting ? undefined : form.submit}
-							/>
-							<CappedInput
-								field={form.description}
-								label="Description (facultative)"
-								placeholder="Décrivez votre playlist…"
-								multiline
-							/>
-
-							{!form.isEditing && (
-								<>
-									<ToggleCard
-										label="Playlist privée"
-										description={
-											form.isPrivate ? 'Visible uniquement par les invités' : 'Visible par tous'
-										}
-										value={form.isPrivate}
-										onValueChange={form.setIsPrivate}
-									/>
-									<ToggleCard
-										label="Modification restreinte"
-										description={
-											form.isEditRestricted
-												? 'Seules les personnes autorisées peuvent la modifier'
-												: 'Tout le monde peut ajouter ou retirer des titres'
-										}
-										value={form.isEditRestricted}
-										onValueChange={form.setIsEditRestricted}
-									/>
-								</>
-							)}
-
-							<Button
-								title={form.isEditing ? 'Enregistrer' : 'Créer la playlist'}
-								onPress={form.submit}
-								loading={form.isSubmitting}
-								fullWidth
-								variant="primary"
-							/>
-						</View>
+						<PlaylistFormFields form={form} />
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
@@ -79,13 +30,12 @@ export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps)
 	);
 }
 
-function createStyles(theme: Theme) {
+function createStyles(theme: Theme, bottomPadding: number) {
 	const styles = StyleSheet.create({
 		screen: { flex: 1, backgroundColor: theme.colors.background },
 		keyboard: { flex: 1 },
-		scroll: { flexGrow: 1, paddingTop: theme.spacing.md },
+		scroll: { flexGrow: 1, paddingTop: theme.spacing.md, paddingBottom: bottomPadding },
 		body: { flex: 1, padding: theme.spacing.lg },
-		form: { gap: theme.spacing.md },
 	});
 	return styles;
 }

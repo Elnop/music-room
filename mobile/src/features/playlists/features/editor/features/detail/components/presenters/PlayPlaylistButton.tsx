@@ -1,10 +1,14 @@
 import React from 'react';
 import { KeyButton } from '@/shared/theme/components/KeyButton';
-import type { PlayPlaylist } from '@/features/playlists/features/editor/features/detail/hooks/usePlayPlaylist';
+import type { PlayPlaylist } from '@/features/playlists/features/editor/features/detail/types/playPlaylistTypes';
 import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-solid.svg';
 import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
 
-export function PlayPlaylistButton({ play }: { play: PlayPlaylist }) {
+type PlayPlaylistButtonProps = {
+	play: PlayPlaylist;
+};
+
+export function PlayPlaylistButton({ play }: PlayPlaylistButtonProps) {
 	return (
 		<KeyButton
 			icon={play.playing ? PauseSolid : PlaySolid}

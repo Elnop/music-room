@@ -173,7 +173,7 @@ mobile/src/
 │   ├── playlists/
 │   │   ├── features/browse/    # home, library; shared/playlist-grid
 │   │   ├── features/editor/    # IV.2.3: detail, playlist-form, search-tracks, sharing, track-actions, card-menu;
-│   │   │                       # shared/track-edits, action-sheet, cover-actions, permissions…
+│   │   │                       # shared/track-edits, action-sheet, playlist-mutations, permissions…
 │   │   └── shared/             # playlist (API, cache, real-time sync, types), header-button, refetch-on-focus
 │   ├── playback/
 │   │   ├── components/ hooks/ lib/   # PlayerProvider, PlaylistPlaybackContainer, playbackActions, what the provider mounts
@@ -251,7 +251,7 @@ Expo supports hot reload: change any file and the app updates within 1-2 seconds
 Types, validators and versions match the backend:
 
 - **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their slice, such as `src/shared/tracks/types/trackTypes.ts`) match the backend's schemas.
-- **Zod validators** (`src/features/playlists/shared/playlist/lib/validators.ts`, `src/features/user/features/auth/shared/sign-in/lib/validators.ts`) use the same rules.
+- **Zod validators** (`src/features/playlists/features/editor/shared/playlist-mutations/playlistSchemas.ts`, `src/features/user/features/auth/shared/sign-in/lib/validators.ts`) use the same rules.
 - **Versions**: Socket.io and Zod are the same as the backend's.
 
 ## Tests

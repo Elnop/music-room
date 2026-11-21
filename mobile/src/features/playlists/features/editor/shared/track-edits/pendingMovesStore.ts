@@ -1,11 +1,13 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand/vanilla';
 
 type PendingMovesState = {
 	count: number;
-	change: (delta: 1 | -1) => void;
 };
 
-export const usePendingMovesStore = create<PendingMovesState>(set => ({
+export const pendingMovesStore = createStore<PendingMovesState>(() => ({
 	count: 0,
-	change: delta => set(state => ({ count: state.count + delta })),
 }));
+
+export const pendingMovesActions = {
+	change: (delta: 1 | -1) => pendingMovesStore.setState(state => ({ count: state.count + delta })),
+};

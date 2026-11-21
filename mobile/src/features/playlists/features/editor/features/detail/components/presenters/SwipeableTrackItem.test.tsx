@@ -3,38 +3,59 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react-n
 import { Swipeable } from 'react-native-gesture-handler';
 import { SwipeableTrackItem } from '@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem';
 import type { Track } from '@/shared/tracks/types/trackTypes';
+import type {
+	TrackItemHandlers,
+	TrackItemState,
+} from '@/features/playlists/features/editor/features/detail/types/trackRowTypes';
 
 jest.mock('@/shared/theme/hooks/useTheme', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
+type TrackItemProps = TrackItemHandlers &
+	TrackItemState & {
+		track: Track;
+		position?: number;
+	};
+
+function TrackItem({
+	track,
+	position,
+	onDelete,
+	onAddToQueue,
+	onDragStart,
+	onShowActions,
+	onPress,
+	...state
+}: TrackItemProps) {
+	return (
+		<SwipeableTrackItem
+			track={track}
+			position={position}
+			state={state}
+			handlers={{ onDelete, onAddToQueue, onDragStart, onShowActions, onPress }}
+		/>
+	);
+}
+
 const track = { id: 't1', title: 'Song', artist: 'Artist' } as Track;
 const onDelete = jest.fn().mockResolvedValue(undefined);
 
 describe('SwipeableTrackItem', () => {
 	it('shows no drag handle without onDragStart', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
+		render(<TrackItem track={track} onDelete={onDelete} />);
 		expect(screen.queryByLabelText('Réordonner')).toBeNull();
 	});
 
 	it('hides the drag handle when disabled', async () => {
-		render(
-			<SwipeableTrackItem track={track} onDelete={onDelete} onDragStart={jest.fn()} disabled />
-		);
+		render(<TrackItem track={track} onDelete={onDelete} onDragStart={jest.fn()} disabled />);
 		expect(screen.queryByLabelText('Réordonner')).toBeNull();
 	});
 
 	it('opens the quick actions on a long press or the ⋯ button, even for a viewer', async () => {
 		const onShowActions = jest.fn();
-		render(
-			<SwipeableTrackItem
-				track={track}
-				onDelete={onDelete}
-				onShowActions={onShowActions}
-				disabled
-			/>
-		);
+		render(<TrackItem track={track} onDelete={onDelete} onShowActions={onShowActions} disabled />);
 		await act(async () => {});
 		fireEvent(screen.getByText('Song'), 'longPress');
 		fireEvent.press(screen.getByLabelText('Actions'));
@@ -42,7 +63,7 @@ describe('SwipeableTrackItem', () => {
 	});
 
 	it('names the row after the track for a screen reader', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} onShowActions={jest.fn()} />);
+		render(<TrackItem track={track} onDelete={onDelete} onShowActions={jest.fn()} />);
 		await act(async () => {});
 		expect(screen.getByLabelText('Song, Artist').props.accessibilityHint).toBe(
 			'Appui long pour les actions du titre'
@@ -51,7 +72,7 @@ describe('SwipeableTrackItem', () => {
 
 	it('keeps the ⋯ button and the drag handle out of the row button', async () => {
 		render(
-			<SwipeableTrackItem
+			<TrackItem
 				track={track}
 				onDelete={onDelete}
 				onShowActions={jest.fn()}
@@ -66,22 +87,20 @@ describe('SwipeableTrackItem', () => {
 	});
 
 	it('shows no ⋯ button without onShowActions', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
+		render(<TrackItem track={track} onDelete={onDelete} />);
 		await act(async () => {});
 		expect(screen.queryByLabelText('Actions')).toBeNull();
 	});
 
 	it('starts the drag when the handle is pressed', async () => {
 		const onDragStart = jest.fn();
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} onDragStart={onDragStart} />);
+		render(<TrackItem track={track} onDelete={onDelete} onDragStart={onDragStart} />);
 		fireEvent(screen.getByLabelText('Réordonner'), 'pressIn');
 		expect(onDragStart).toHaveBeenCalledTimes(1);
 	});
 
 	it('offers the queue swipe but no delete to a viewer who cannot edit', async () => {
-		render(
-			<SwipeableTrackItem track={track} onDelete={onDelete} onAddToQueue={jest.fn()} disabled />
-		);
+		render(<TrackItem track={track} onDelete={onDelete} onAddToQueue={jest.fn()} disabled />);
 		await act(async () => {});
 		const swipeable = screen.UNSAFE_getByType(Swipeable);
 		expect(swipeable.props.enabled).toBe(true);
@@ -91,7 +110,7 @@ describe('SwipeableTrackItem', () => {
 	});
 
 	it('keeps the delete action for an editor', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} onAddToQueue={jest.fn()} />);
+		render(<TrackItem track={track} onDelete={onDelete} onAddToQueue={jest.fn()} />);
 		await act(async () => {});
 		expect(screen.getByLabelText("Ajouter à la file d'attente")).toBeTruthy();
 		fireEvent.press(screen.getByText('Supprimer'));
@@ -100,7 +119,7 @@ describe('SwipeableTrackItem', () => {
 
 	it('adds to the queue once the right swipe opens, then closes the row', async () => {
 		const onAddToQueue = jest.fn();
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} onAddToQueue={onAddToQueue} />);
+		render(<TrackItem track={track} onDelete={onDelete} onAddToQueue={onAddToQueue} />);
 		await act(async () => {});
 		const swipeable = screen.UNSAFE_getByType(Swipeable);
 		const close = jest.fn();
@@ -114,13 +133,13 @@ describe('SwipeableTrackItem', () => {
 	});
 
 	it('disables every swipe for a viewer without a queue action', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} disabled />);
+		render(<TrackItem track={track} onDelete={onDelete} disabled />);
 		await act(async () => {});
 		expect(screen.UNSAFE_getByType(Swipeable).props.enabled).toBe(false);
 	});
 
 	it('highlights the track playing now with a speaker icon (#307)', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} isCurrent />);
+		render(<TrackItem track={track} onDelete={onDelete} isCurrent />);
 		await act(async () => {});
 		expect(screen.getByLabelText('Song, Artist').props.accessibilityState).toMatchObject({
 			selected: true,
@@ -129,7 +148,7 @@ describe('SwipeableTrackItem', () => {
 	});
 
 	it('shows no speaker icon on another track', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
+		render(<TrackItem track={track} onDelete={onDelete} />);
 		await act(async () => {});
 		expect(screen.queryByLabelText('En cours de lecture')).toBeNull();
 	});
@@ -138,7 +157,7 @@ describe('SwipeableTrackItem', () => {
 		const onPress = jest.fn();
 		const onShowActions = jest.fn();
 		render(
-			<SwipeableTrackItem
+			<TrackItem
 				track={track}
 				onDelete={onDelete}
 				onPress={onPress}
@@ -155,7 +174,7 @@ describe('SwipeableTrackItem', () => {
 	});
 
 	it('shows a spinner while the tap starts playing', async () => {
-		render(<SwipeableTrackItem track={track} onDelete={onDelete} onPress={jest.fn()} isPending />);
+		render(<TrackItem track={track} onDelete={onDelete} onPress={jest.fn()} isPending />);
 		await act(async () => {});
 		expect(screen.getByLabelText('Lancement')).toBeTruthy();
 	});
@@ -164,7 +183,7 @@ describe('SwipeableTrackItem', () => {
 		const onShowActions = jest.fn();
 		const onPress = jest.fn();
 		render(
-			<SwipeableTrackItem
+			<TrackItem
 				track={track}
 				onDelete={onDelete}
 				onAddToQueue={jest.fn()}

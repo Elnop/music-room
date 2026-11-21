@@ -1,23 +1,15 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Avatar } from '@/shared/theme/components/Avatar';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
-import { KeyButton } from '@/shared/theme/components/KeyButton';
 import { Text } from '@/shared/theme/components/Text';
-import { displayText, pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import { displayText } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { playlistLink } from '@/shared/share-links/shareLinks';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 import { headerFacts } from '@/features/playlists/features/editor/features/detail/lib/headerFacts';
 import { PlaylistCover } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistCover';
-import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
-import EyeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-solid.svg';
-import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
-import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
-import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
-import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
+import { PlaylistBadges } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistBadges';
+import { PlaylistPeople } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistPeople';
+import { PlaylistHeaderActions } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistHeaderActions';
 
 type PlaylistHeaderProps = {
 	playlist: PlaylistWithTracks;
@@ -27,11 +19,8 @@ type PlaylistHeaderProps = {
 };
 
 export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: PlaylistHeaderProps) {
-	const { styles, theme } = useThemedStyles(createStyles);
-	const { trackCount, trackLabel, duration, ownerName, collaborators, collaboratorLabel } =
-		headerFacts(playlist);
-	const isPublic = playlist.visibility === 'public';
-	const isOpen = playlist.editMode === 'open';
+	const { styles } = useThemedStyles(createStyles);
+	const facts = headerFacts(playlist);
 
 	return (
 		<View style={styles.container}>
@@ -39,50 +28,19 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 				<PlaylistCover playlist={playlist} size={128} />
 				<View style={styles.side}>
 					<Text style={styles.name}>{playlist.name}</Text>
-					<View style={styles.row}>
-						<View
-							style={[styles.badge, styles.visibility]}
-							accessible
-							accessibilityLabel={isPublic ? 'Publique' : 'Privée'}
-						>
-							<PixelIcon icon={isPublic ? EyeSolid : EyeCrossSolid} color={theme.colors.onColor} />
-						</View>
-						<View
-							style={[styles.badge, styles.editing]}
-							accessible
-							accessibilityLabel={isOpen ? 'Ouverte à tous en édition' : 'Édition sur invitation'}
-						>
-							<PixelIcon icon={isOpen ? PencilSolid : LockSolid} color={theme.colors.onColor} />
-						</View>
-					</View>
-					<View style={styles.row}>
-						<View accessible accessibilityLabel={ownerName}>
-							<Avatar uri={playlist.owner.avatarUrl} name={ownerName} size="sm" />
-						</View>
-						{collaboratorLabel && (
-							<View style={styles.collaborators} accessible accessibilityLabel={collaboratorLabel}>
-								<PixelIcon icon={UsersSolid} size={12} color={theme.colors.people} />
-								<Text style={styles.collaboratorCount}>{collaborators}</Text>
-							</View>
-						)}
-					</View>
+					<PlaylistBadges playlist={playlist} />
+					<PlaylistPeople playlist={playlist} facts={facts} />
 				</View>
 			</View>
-
 			{Boolean(playlist.description) && (
 				<Text style={styles.description}>{playlist.description}</Text>
 			)}
-
-			<View style={styles.actions}>
-				{trackCount > 0 && playButton}
-				{canEdit && (
-					<KeyButton icon={PlusSolid} onPress={onAddTrack} accessibilityLabel="Ajouter un titre" />
-				)}
-				<ShareLinkButton url={playlistLink(playlist.id)} title={playlist.name} />
-				<Text style={styles.count} accessibilityLabel={trackLabel}>
-					{trackCount} · {duration}
-				</Text>
-			</View>
+			<PlaylistHeaderActions
+				playlist={playlist}
+				facts={facts}
+				playButton={playButton}
+				onAddTrack={canEdit ? onAddTrack : undefined}
+			/>
 		</View>
 	);
 }
@@ -99,31 +57,7 @@ function createStyles(theme: Theme) {
 			textShadowOffset: { width: theme.borders.thick, height: theme.borders.thick },
 			textShadowRadius: 0,
 		},
-		row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
-		badge: {
-			...pixelFrame(theme),
-			width: 30,
-			height: 30,
-			alignItems: 'center',
-			justifyContent: 'center',
-		},
-		visibility: { backgroundColor: theme.colors.primary },
-		editing: { backgroundColor: theme.colors.people },
-		collaborators: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
-		collaboratorCount: {
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.mono,
-			color: theme.colors.people,
-		},
 		description: { fontSize: theme.typography.sizes.md, color: theme.colors.textSecondary },
-		actions: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md },
-		count: {
-			flex: 1,
-			textAlign: 'right',
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.mono,
-			color: theme.colors.textSecondary,
-		},
 	});
 	return styles;
 }
