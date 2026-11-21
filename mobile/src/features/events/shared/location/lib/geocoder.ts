@@ -1,0 +1,21 @@
+import * as Location from 'expo-location';
+import type { MusicEvent } from '@/features/events/eventTypes';
+
+type Point = Pick<MusicEvent, 'latitude' | 'longitude'>;
+
+function formatPlace(place: Location.LocationGeocodedAddress): string | null {
+	const street = [place.streetNumber, place.street].filter(Boolean).join(' ');
+	const city = [place.postalCode, place.city].filter(Boolean).join(' ');
+	const text = [street || place.name, city].filter(Boolean).join(', ');
+	return text || null;
+}
+
+export async function geocodeAddress(address: string): Promise<Point | null> {
+	const [result] = await Location.geocodeAsync(address);
+	return result ? { latitude: result.latitude, longitude: result.longitude } : null;
+}
+
+export async function placeName(point: Point): Promise<string | null> {
+	const [place] = await Location.reverseGeocodeAsync(point);
+	return (place && formatPlace(place)) ?? null;
+}

@@ -30,6 +30,10 @@ export const PIXEL_TYPOGRAPHY = {
 		xxl: 24,
 		xxxl: 32,
 	},
+	lineHeights: {
+		sm: 20,
+		md: 21,
+	},
 	displayScale: {
 		title: 1.5,
 		button: 1.45,
@@ -96,6 +100,7 @@ export const CONTROL_SIZES = {
 	iconButton: 32,
 	buttonCompact: 28,
 	searchBar: 44,
+	keyRow: 45,
 	button: 52,
 	toast: 56,
 } as const;

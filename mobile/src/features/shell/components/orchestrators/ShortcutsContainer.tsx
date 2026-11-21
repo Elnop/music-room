@@ -3,7 +3,11 @@ import { useKeyboardShortcuts } from '@/features/shell/hooks/useKeyboardShortcut
 import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 import { ShortcutsHelpDialog } from '@/features/shell/components/presenters/ShortcutsHelpDialog';
 
-export function ShortcutsContainer({ shortcuts }: { shortcuts: KeyboardShortcut[] }) {
+type ShortcutsContainerProps = {
+	shortcuts: KeyboardShortcut[];
+};
+
+export function ShortcutsContainer({ shortcuts }: ShortcutsContainerProps) {
 	const [helpVisible, setHelpVisible] = useState(false);
 	const all: KeyboardShortcut[] = [
 		...shortcuts,

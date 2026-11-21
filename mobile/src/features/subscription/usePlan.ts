@@ -18,20 +18,26 @@ export function usePlan({ enabled = true }: { enabled?: boolean } = {}) {
 
 export function useChangePlan() {
 	const queryClient = useQueryClient();
-	const key = queryKeys.subscription.plan();
 	return useMutation({
 		mutationFn: (plan: Plan) => subscriptionApi.changePlan(plan),
 		onMutate: async plan => {
-			await queryClient.cancelQueries({ queryKey: key });
-			const previous = queryClient.getQueryData<Subscription>(key);
-			if (previous) queryClient.setQueryData<Subscription>(key, { ...previous, plan });
+			await queryClient.cancelQueries({ queryKey: queryKeys.subscription.plan() });
+			const previous = queryClient.getQueryData<Subscription>(queryKeys.subscription.plan());
+			if (previous) {
+				queryClient.setQueryData<Subscription>(queryKeys.subscription.plan(), {
+					...previous,
+					plan,
+				});
+			}
 			return { previous };
 		},
 		onError: (_error, _plan, context) => {
-			if (context?.previous) queryClient.setQueryData(key, context.previous);
+			if (context?.previous) {
+				queryClient.setQueryData(queryKeys.subscription.plan(), context.previous);
+			}
 		},
 		onSuccess: data => {
-			queryClient.setQueryData(key, data);
+			queryClient.setQueryData(queryKeys.subscription.plan(), data);
 		},
 	});
 }

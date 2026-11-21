@@ -1,52 +1,62 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useIsFocused } from '@react-navigation/native';
 import {
 	BEACON_PRUNE_MS,
 	BEACON_TIMEOUT_MS,
-} from '@/features/events/features/nearby/lib/constants';
-import { useAppActive } from '@/features/events/features/nearby/hooks/useAppActive';
-import * as beaconScanner from '@/features/events/features/nearby/lib/beaconScanner';
+} from '@/features/events/features/nearby/configs/nearbyConfig';
+import { useScreenActive } from '@/features/events/features/nearby/hooks/useScreenActive';
+import {
+	scanEventBeacons,
+	watchBluetoothState,
+} from '@/features/events/features/nearby/lib/beaconScanner';
+import {
+	hasScanPermission,
+	requestScanPermission,
+} from '@/features/events/features/nearby/lib/scanPermission';
 import {
 	pruneSightings,
 	recordSighting,
 } from '@/features/events/features/nearby/lib/beaconDistance';
-import type { BeaconSighting } from '@/features/events/features/nearby/lib/beaconDistance';
-
-export type BeaconScanStatus = 'checking' | 'needs-permission' | 'off' | 'unsupported' | 'scanning';
-
-type BeaconScan = {
-	status: BeaconScanStatus;
-	sightings: ReadonlyMap<number, BeaconSighting>;
-	requestPermission: () => void;
-};
+import type {
+	BeaconScan,
+	BeaconScanStatus,
+	BeaconSighting,
+	ScannerState,
+} from '@/features/events/features/nearby/nearbyTypes';
 
 const NONE: ReadonlyMap<number, BeaconSighting> = new Map();
 
-export function useBeaconScan(): BeaconScan {
-	const isFocused = useIsFocused();
-	const appActive = useAppActive();
-	const running = isFocused && appActive;
+function useScanPermission(running: boolean) {
 	const [permitted, setPermitted] = useState<boolean | null>(null);
-	const [bluetooth, setBluetooth] = useState<beaconScanner.ScannerState | null>(null);
-	const [sightings, setSightings] = useState(NONE);
 
 	useEffect(() => {
 		if (!running) return;
-		void beaconScanner.hasScanPermission().then(setPermitted);
+		void hasScanPermission().then(setPermitted);
 	}, [running]);
 
-	useEffect(() => {
-		if (!running || !permitted) return undefined;
-		return beaconScanner.watchBluetoothState(setBluetooth);
-	}, [running, permitted]);
+	const requestPermission = useCallback(() => {
+		void requestScanPermission().then(setPermitted);
+	}, []);
 
-	const scanning = running && permitted === true && bluetooth === 'on';
+	return { permitted, requestPermission };
+}
+
+function useBluetoothState(watching: boolean): ScannerState | null {
+	const [bluetooth, setBluetooth] = useState<ScannerState | null>(null);
+
 	useEffect(() => {
-		if (!scanning) {
-			setSightings(NONE);
-			return undefined;
-		}
-		const stopScan = beaconScanner.scanEventBeacons(frame =>
+		if (!watching) return undefined;
+		return watchBluetoothState(setBluetooth);
+	}, [watching]);
+
+	return bluetooth;
+}
+
+function useSightings(scanning: boolean): ReadonlyMap<number, BeaconSighting> {
+	const [sightings, setSightings] = useState(NONE);
+
+	useEffect(() => {
+		if (!scanning) return undefined;
+		const stopScan = scanEventBeacons(frame =>
 			setSightings(current => recordSighting(current, frame.minor, frame, Date.now()))
 		);
 		const pruning = setInterval(
@@ -56,17 +66,33 @@ export function useBeaconScan(): BeaconScan {
 		return () => {
 			clearInterval(pruning);
 			stopScan();
+			setSightings(NONE);
 		};
 	}, [scanning]);
 
-	const requestPermission = useCallback(() => {
-		void beaconScanner.requestScanPermission().then(setPermitted);
-	}, []);
+	return sightings;
+}
 
-	let status: BeaconScanStatus = 'checking';
-	if (permitted === false) status = 'needs-permission';
-	else if (bluetooth === 'off' || bluetooth === 'unsupported') status = bluetooth;
-	else if (scanning) status = 'scanning';
+function scanStatus(
+	permitted: boolean | null,
+	bluetooth: ScannerState | null,
+	scanning: boolean
+): BeaconScanStatus {
+	if (permitted === false) return 'needs-permission';
+	if (bluetooth === 'off' || bluetooth === 'unsupported') return bluetooth;
+	return scanning ? 'scanning' : 'checking';
+}
 
-	return { status, sightings, requestPermission };
+export function useBeaconScan(): BeaconScan {
+	const running = useScreenActive();
+	const permission = useScanPermission(running);
+	const bluetooth = useBluetoothState(running && permission.permitted === true);
+	const scanning = running && permission.permitted === true && bluetooth === 'on';
+	const sightings = useSightings(scanning);
+
+	return {
+		status: scanStatus(permission.permitted, bluetooth, scanning),
+		sightings,
+		requestPermission: permission.requestPermission,
+	};
 }

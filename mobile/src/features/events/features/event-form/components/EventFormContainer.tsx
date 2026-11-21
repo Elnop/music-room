@@ -1,7 +1,7 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import type { EventStackParamList } from '@/features/events/lib/types';
+import type { EventStackParamList } from '@/features/events/eventTypes';
 import { useEventForm } from '@/features/events/features/event-form/hooks/useEventForm';
 import { EventFormView } from '@/features/events/features/event-form/components/presenters/EventFormView';
 

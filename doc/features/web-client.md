@@ -23,7 +23,7 @@ Each native module was already isolated in one service or hook. That file gets a
 | `features/playback/lib/audioMode.web.ts` | The audio session setup: a tab has none (no-op) |
 | `features/playback/lib/jsKeepAlive.web.ts` | The Android headless task that keeps JavaScript running in the background: a tab keeps its timers (no-op) |
 | `features/playback/features/media-session/useMediaSession.web.ts` | `expo-media-control`: the browser's Media Session API |
-| `features/events/shared/events/lib/geocoder.web.ts` | `expo-location` `geocodeAsync`, missing on the web: the backend route `GET /api/events/geocode` |
+| `features/events/shared/location/lib/geocoder.web.ts` | `expo-location` `geocodeAsync`, missing on the web: the backend route `GET /api/events/geocode` |
 | `features/events/features/event-form/lib/pickDateTime.web.ts` | The Android date and time pickers: a modal `<dialog>` with a `datetime-local` field |
 | `features/events/features/nearby/lib/beaconScanner.web.ts` | The BLE scan: always reports « unsupported » |
 

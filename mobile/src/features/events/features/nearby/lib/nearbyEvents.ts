@@ -1,10 +1,9 @@
-import { NEARBY_RADIUS_M } from '@/features/events/features/nearby/lib/constants';
+import { NEARBY_RADIUS_M } from '@/features/events/features/nearby/configs/nearbyConfig';
 import { isOngoing } from '@/features/events/shared/event-dates/eventDates';
 import { distanceMeters, formatDistance } from '@/features/events/features/nearby/lib/geo';
 import { estimateDistance } from '@/features/events/features/nearby/lib/beaconDistance';
-import type { BeaconSighting } from '@/features/events/features/nearby/lib/beaconDistance';
-import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
-import type { MusicEvent } from '@/features/events/lib/types';
+import type { BeaconSighting, NearbyItem } from '@/features/events/features/nearby/nearbyTypes';
+import type { Coordinates, MusicEvent } from '@/features/events/eventTypes';
 
 type NearbyEvent = {
 	event: MusicEvent;
@@ -21,13 +20,8 @@ export function nearbyByGps(
 		.filter(event => isOngoing(event, now))
 		.map(event => ({ event, distance: distanceMeters(position, event) }))
 		.filter(nearby => nearby.distance <= radius)
-		.sort((a, b) => a.distance - b.distance);
+		.toSorted((a, b) => a.distance - b.distance);
 }
-
-export type NearbyItem = {
-	event: MusicEvent;
-	proximity: string;
-};
 
 export function mergeNearby(
 	events: MusicEvent[],
@@ -43,7 +37,7 @@ export function mergeNearby(
 				? [{ event, meters: estimateDistance(sighting.rssi, sighting.measuredPower) }]
 				: [];
 		})
-		.sort((a, b) => a.meters - b.meters)
+		.toSorted((a, b) => a.meters - b.meters)
 		.map(({ event }) => ({ event, proximity: 'Tout près' }));
 	const heardIds = new Set(heard.map(item => item.event.id));
 	const located = position

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Alert } from 'react-native';
+import type { AlertButton } from 'react-native';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { EventDetailContainer } from '@/features/events/features/detail/components/EventDetailContainer';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import type { EventStackParamList } from '@/features/events/lib/types';
+import type { EventStackParamList } from '@/features/events/eventTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
@@ -15,8 +16,8 @@ import { musicEvent } from '@test-utils/musicEvent';
 import {
 	startEventBeacon,
 	stopEventBeacon,
-} from '@/features/events/features/detail/beaconAdvertiser';
-import { useBeaconStore } from '@/features/events/features/detail/beaconStore';
+} from '@/features/events/features/detail/lib/beaconAdvertiser';
+import { beaconActions, beaconStore } from '@/features/events/features/detail/beaconStore';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -27,7 +28,7 @@ jest.mock('@/shared/theme/hooks/useTheme', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-jest.mock('@/features/events/features/detail/beaconAdvertiser', () => ({
+jest.mock('@/features/events/features/detail/lib/beaconAdvertiser', () => ({
 	startEventBeacon: jest.fn(() => Promise.resolve()),
 	stopEventBeacon: jest.fn(),
 }));
@@ -42,6 +43,10 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 	showError: jest.fn(),
 	showInfo: jest.fn(),
 }));
+
+function pressDestructive(_title: string, _message?: string, buttons?: AlertButton[]) {
+	buttons?.find(button => button.style === 'destructive')?.onPress?.();
+}
 
 type Props = NativeStackScreenProps<EventStackParamList, 'EventDetail'>;
 
@@ -77,7 +82,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-	useBeaconStore.getState().stop();
+	beaconActions.stop();
 	clear();
 	jest.restoreAllMocks();
 });
@@ -105,18 +110,14 @@ describe('EventDetailContainer', () => {
 		routes.routes['GET /api/events/e1'] = ok({
 			event: musicEvent({ organizer: { id: 'me', username: 'me' } }),
 		});
-		jest
-			.spyOn(Alert, 'alert')
-			.mockImplementation((_title, _message, buttons) =>
-				buttons?.find(button => button.style === 'destructive')?.onPress?.()
-			);
+		jest.spyOn(Alert, 'alert').mockImplementation(pressDestructive);
 		await renderDetail();
 
 		fireEvent.press(screen.getByText('Modifier'));
 		expect(navigation.navigate).toHaveBeenCalledWith('EventForm', { eventId: 'e1' });
 
 		await act(async () => fireEvent.press(screen.getByText('Supprimer')));
-		await waitFor(() => expect(navigation.goBack).toHaveBeenCalled());
+		await waitFor(() => expect(navigation.goBack).toHaveBeenCalledWith());
 		expect(showSuccess).toHaveBeenCalledWith('Événement supprimé');
 		expect(routes.calls()).toContain('DELETE /api/events/e1');
 	});
@@ -135,8 +136,8 @@ describe('EventDetailContainer', () => {
 		expect(screen.getByText(/Les téléphones proches voient votre événement/u)).toBeTruthy();
 
 		await act(async () => fireEvent(toggle(), 'valueChange', false));
-		expect(stopEventBeacon).toHaveBeenCalled();
-		expect(useBeaconStore.getState().status).toBe('idle');
+		expect(stopEventBeacon).toHaveBeenCalledWith();
+		expect(beaconStore.getState().status).toBe('idle');
 	});
 
 	it('offers the beacon only while the event is on', async () => {
@@ -170,7 +171,7 @@ describe('EventDetailContainer', () => {
 	it('leaves an event deleted elsewhere', async () => {
 		routes.routes['GET /api/events/e1'] = fail(404, 'EVENT_NOT_FOUND');
 		await renderDetail(false);
-		await waitFor(() => expect(navigation.goBack).toHaveBeenCalled());
+		await waitFor(() => expect(navigation.goBack).toHaveBeenCalledWith());
 		expect(showInfo).toHaveBeenCalledWith('Cet événement a été supprimé');
 	});
 });

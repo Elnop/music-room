@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
 import HomeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/home-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
@@ -23,23 +25,24 @@ type TabIconProps = {
 	color: string;
 };
 
-function TabIcon({ routeName, focused, color }: TabIconProps) {
-	const { theme } = useTheme();
+export function TabIcon({ routeName, focused, color }: TabIconProps) {
+	const { styles } = useThemedStyles(createStyles);
 	return (
-		<View style={[styles.icon, { gap: theme.spacing.xs }]}>
+		<View style={styles.icon}>
 			<PixelIcon icon={TAB_ICONS[routeName]} color={color} />
-			<View style={[styles.dot, focused && { backgroundColor: color }]} />
+			<View style={[styles.dot, focused && backgroundStyle(color)]} />
 		</View>
 	);
 }
 
-export function tabIconFor(routeName: string) {
-	return ({ focused, color }: { focused: boolean; color: string }) => (
-		<TabIcon routeName={routeName} focused={focused} color={color} />
-	);
+function backgroundStyle(color: string): ViewStyle {
+	return { backgroundColor: color };
 }
 
-const styles = StyleSheet.create({
-	icon: { alignItems: 'center' },
-	dot: { width: 6, height: 6 },
-});
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		icon: { alignItems: 'center', gap: theme.spacing.xs },
+		dot: { width: theme.spacing.xsm, height: theme.spacing.xsm },
+	});
+	return styles;
+}

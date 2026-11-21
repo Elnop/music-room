@@ -1,53 +1,37 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { getHeaderTitle, Header, HeaderBackButton } from '@react-navigation/elements';
+import type { ColorValue, ViewStyle } from 'react-native';
+import { getHeaderTitle, Header } from '@react-navigation/elements';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { CONTENT_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
-import { SCREEN_WIDTHS } from '@/features/shell/lib/screenWidths';
+import { SCREEN_WIDTHS } from '@/features/shell/configs/screenWidthsConfig';
+import { headerLeftFor } from '@/features/shell/lib/headerLeftFor';
+import { headerOptions } from '@/features/shell/lib/headerOptions';
 
 export function AlignedHeader({ options, back, route, navigation }: NativeStackHeaderProps) {
 	const column = SCREEN_WIDTHS[route.name];
-	const {
-		header: _header,
-		headerShown: _headerShown,
-		headerBackIcon: _headerBackIcon,
-		headerBackImageSource: _headerBackImageSource,
-		presentation: _presentation,
-		contentStyle: _contentStyle,
-		headerLeft,
-		headerBackTitle,
-		...rest
-	} = options;
+	const background = StyleSheet.flatten(options.headerStyle)?.backgroundColor;
 
 	return (
-		<View
-			style={[
-				styles.row,
-				{ backgroundColor: StyleSheet.flatten(options.headerStyle)?.backgroundColor },
-			]}
-		>
-			<View style={[styles.column, column && { maxWidth: CONTENT_MAX_WIDTH[column] }]}>
+		<View style={[styles.row, backgroundStyle(background)]}>
+			<View style={[styles.column, column && maxWidthStyle(CONTENT_MAX_WIDTH[column])]}>
 				<Header
-					{...rest}
+					{...headerOptions(options)}
 					back={back}
 					title={getHeaderTitle(options, route.name)}
-					headerLeft={
-						typeof headerLeft === 'function'
-							? ({ label, ...props }) => headerLeft({ ...props, label: headerBackTitle ?? label })
-							: headerLeft === undefined && back
-								? ({ label, ...props }) => (
-										<HeaderBackButton
-											{...props}
-											label={headerBackTitle ?? label}
-											onPress={navigation.goBack}
-										/>
-									)
-								: headerLeft
-					}
+					headerLeft={headerLeftFor(options, back, navigation.goBack)}
 				/>
 			</View>
 		</View>
 	);
+}
+
+function backgroundStyle(backgroundColor: ColorValue | undefined): ViewStyle {
+	return { backgroundColor };
+}
+
+function maxWidthStyle(maxWidth: number): ViewStyle {
+	return { maxWidth };
 }
 
 const styles = StyleSheet.create({

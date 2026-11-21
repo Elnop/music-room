@@ -88,7 +88,7 @@ describe('pickDateTime (web)', () => {
 	it('opens a modal datetime-local field set to the current value', () => {
 		const { dialog, input } = open(new Date(2026, 10, 6, 20, 0));
 
-		expect(dialog.showModal).toHaveBeenCalled();
+		expect(dialog.showModal).toHaveBeenCalledWith();
 		expect(input.attributes.type).toBe('datetime-local');
 		expect(input.value).toBe('2026-11-06T20:00');
 		expect(find(dialog, 'button').map(button => button.textContent)).toStrictEqual([

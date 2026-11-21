@@ -1,15 +1,16 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Pressable } from '@/shared/theme/components/Pressable';
+import type { TextStyle, ViewStyle } from 'react-native';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import RefreshSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/refresh-solid.svg';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { ConnectionStatus } from '@/features/shell/hooks/useConnectionStatus';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { ConnectionStatus } from '@/features/shell/types/connectionTypes';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { textColorOn } from '@/features/shell/lib/textContrast';
 import { Text } from '@/shared/theme/components/Text';
+import { ConnectionRetryButton } from '@/features/shell/components/presenters/ConnectionRetryButton';
 
 type ConnectionBannerProps = {
 	status: ConnectionStatus;
@@ -30,8 +31,7 @@ const ICONS: Record<NonNullable<ConnectionStatus>, PixelIconSource> = {
 };
 
 export function ConnectionBanner({ status, topInset, onRetry }: ConnectionBannerProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme, topInset), [theme, topInset]);
+	const { styles, theme } = useThemedStyles(createStyles);
 
 	if (!status) return null;
 
@@ -41,34 +41,30 @@ export function ConnectionBanner({ status, topInset, onRetry }: ConnectionBanner
 
 	return (
 		<View
-			style={[styles.container, { backgroundColor: background }]}
+			style={bannerStyle(background, topInset)}
 			accessibilityRole="alert"
 			accessibilityLiveRegion="polite"
 			testID="connection-banner"
 		>
 			<View style={styles.row}>
 				<PixelIcon icon={ICONS[status]} size={16} color={color} />
-				<Text style={[styles.text, { color }]}>{COPY[status]}</Text>
-				{failed && (
-					<Pressable
-						onPress={onRetry}
-						accessibilityLabel="Réessayer"
-						hitSlop={8}
-						style={[styles.button, { backgroundColor: color }]}
-					>
-						<Text style={[styles.buttonText, { color: background }]}>Réessayer</Text>
-					</Pressable>
-				)}
+				<Text style={[styles.text, inkStyle(color)]}>{COPY[status]}</Text>
+				{failed && <ConnectionRetryButton fill={color} ink={background} onRetry={onRetry} />}
 			</View>
 		</View>
 	);
 }
 
-function createStyles(theme: Theme, topInset: number) {
+function bannerStyle(backgroundColor: string, paddingTop: number): ViewStyle {
+	return { backgroundColor, paddingTop };
+}
+
+function inkStyle(color: string): TextStyle {
+	return { color };
+}
+
+function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
-		container: {
-			paddingTop: topInset,
-		},
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -80,16 +76,6 @@ function createStyles(theme: Theme, topInset: number) {
 		text: {
 			fontSize: theme.typography.sizes.sm,
 			fontFamily: theme.typography.families.semibold,
-		},
-		button: {
-			marginLeft: theme.spacing.sm,
-			paddingVertical: 2,
-			paddingHorizontal: theme.spacing.sm,
-			borderRadius: theme.borders.round,
-		},
-		buttonText: {
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.bold,
 		},
 	});
 	return styles;

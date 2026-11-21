@@ -1,19 +1,15 @@
 import { logger } from '@/shared/logging/logger';
+import { AdvertiseError } from '@/features/events/features/detail/lib/AdvertiseError';
 import {
-	AdvertiseError,
 	startEventBeacon,
 	stopEventBeacon,
-} from '@/features/events/features/detail/beaconAdvertiser';
-import { useBeaconStore } from '@/features/events/features/detail/beaconStore';
+} from '@/features/events/features/detail/lib/beaconAdvertiser';
+import { beaconActions, beaconStore } from '@/features/events/features/detail/beaconStore';
 
-jest.mock('@/features/events/features/detail/beaconAdvertiser', () => {
-	const actual = jest.requireActual('@/features/events/features/detail/beaconAdvertiser');
-	return {
-		AdvertiseError: actual.AdvertiseError,
-		startEventBeacon: jest.fn(),
-		stopEventBeacon: jest.fn(),
-	};
-});
+jest.mock('@/features/events/features/detail/lib/beaconAdvertiser', () => ({
+	startEventBeacon: jest.fn(),
+	stopEventBeacon: jest.fn(),
+}));
 
 const start = jest.mocked(startEventBeacon);
 function event(endsIn: number) {
@@ -28,7 +24,7 @@ beforeEach(() => {
 	jest.useFakeTimers();
 	jest.clearAllMocks();
 	jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
-	useBeaconStore.setState({ eventId: null, status: 'idle' });
+	beaconStore.setState({ eventId: null, status: 'idle' });
 });
 
 afterEach(() => jest.useRealTimers());
@@ -36,26 +32,26 @@ afterEach(() => jest.useRealTimers());
 describe('beaconStore', () => {
 	it('broadcasts the event minor until the event ends', async () => {
 		start.mockResolvedValue();
-		await expect(useBeaconStore.getState().start(event(60_000))).resolves.toBeNull();
+		await expect(beaconActions.start(event(60_000))).resolves.toBeNull();
 		expect(start).toHaveBeenCalledWith(42);
-		expect(useBeaconStore.getState()).toMatchObject({ eventId: 'e1', status: 'broadcasting' });
+		expect(beaconStore.getState()).toMatchObject({ eventId: 'e1', status: 'broadcasting' });
 
 		jest.advanceTimersByTime(60_000);
-		expect(stopEventBeacon).toHaveBeenCalled();
-		expect(useBeaconStore.getState()).toMatchObject({ eventId: null, status: 'idle' });
+		expect(stopEventBeacon).toHaveBeenCalledWith();
+		expect(beaconStore.getState()).toMatchObject({ eventId: null, status: 'idle' });
 	});
 
 	it('reports why it could not start, and stays idle', async () => {
 		start.mockRejectedValue(new AdvertiseError('bluetooth-off'));
-		await expect(useBeaconStore.getState().start(event(60_000))).resolves.toBe('bluetooth-off');
-		expect(useBeaconStore.getState().status).toBe('idle');
+		await expect(beaconActions.start(event(60_000))).resolves.toBe('bluetooth-off');
+		expect(beaconStore.getState().status).toBe('idle');
 	});
 
 	it('stops when asked', async () => {
 		start.mockResolvedValue();
-		await useBeaconStore.getState().start(event(60_000));
-		useBeaconStore.getState().stop();
-		expect(stopEventBeacon).toHaveBeenCalled();
+		await beaconActions.start(event(60_000));
+		beaconActions.stop();
+		expect(stopEventBeacon).toHaveBeenCalledWith();
 		jest.advanceTimersByTime(60_000);
 		expect(stopEventBeacon).toHaveBeenCalledTimes(1);
 	});

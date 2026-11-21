@@ -9,7 +9,7 @@ import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import type { EventStackParamList } from '@/features/events/lib/types';
+import type { EventStackParamList } from '@/features/events/eventTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { ok } from '@test-utils/fetchResponses';
@@ -207,7 +207,7 @@ describe('EventFormContainer', () => {
 		type('Soirée sur le toit', 'Renamed');
 		await submit('Enregistrer');
 
-		await waitFor(() => expect(navigation.goBack).toHaveBeenCalled());
+		await waitFor(() => expect(navigation.goBack).toHaveBeenCalledWith());
 		expect(location.geocodeAsync).not.toHaveBeenCalled();
 		expect(sent).toMatchObject({
 			name: 'Renamed',

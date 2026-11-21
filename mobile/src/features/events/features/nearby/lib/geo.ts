@@ -1,4 +1,4 @@
-import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
+import type { Coordinates } from '@/features/events/eventTypes';
 
 const EARTH_RADIUS_M = 6_371_000;
 function toRadians(degrees: number) {
