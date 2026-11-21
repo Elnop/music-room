@@ -1,6 +1,6 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import type { AuthStackParamList } from '@/features/user/features/auth/authTypes';
 import { useResetPassword } from '@/features/user/features/auth/features/reset-password/hooks/useResetPassword';
 import { ResetPasswordView } from '@/features/user/features/auth/features/reset-password/components/presenters/ResetPasswordView';
 

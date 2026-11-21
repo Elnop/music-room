@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
+import { authStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { getBackendUrl, resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { logger } from '@/shared/logging/logger';
 import {
@@ -8,9 +8,11 @@ import {
 	signInWithProvider,
 	verifyEmail,
 } from '@/features/user/features/auth/shared/sign-in/lib/signIn';
-import { oauthErrorMessage } from '@/features/user/features/auth/shared/sign-in/lib/oauthErrors';
+import { oauthErrorMessage } from '@/features/user/features/auth/shared/sign-in/lib/oauthErrorMessage';
 import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
 import { signInWithFacebook } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
+import { SIGNED_OUT } from '@/features/user/features/auth/shared/sign-in/configs/sessionConfig';
+import { fail, ok } from '@test-utils/fetchResponses';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -31,16 +33,6 @@ jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
 const fetchMock = jest.fn();
 
-function jsonResponse(status: number, body: object): Response {
-	return {
-		ok: status >= 200 && status < 300,
-		status,
-		statusText: '',
-		json: () => Promise.resolve(body),
-		text: () => Promise.resolve(JSON.stringify(body)),
-	} as unknown as Response;
-}
-
 const user = {
 	id: 'user-a',
 	email: 'a@example.com',
@@ -60,6 +52,7 @@ beforeEach(async () => {
 	fetchMock.mockReset();
 	jest.mocked(signInWithGoogle).mockReset();
 	jest.mocked(signInWithFacebook).mockReset();
+	authStore.setState(SIGNED_OUT);
 	await AsyncStorage.clear();
 	await resetBackendUrl();
 });
@@ -76,23 +69,6 @@ const KEYS = {
 	expiresAt: '@zumik/token_expires_at',
 } as const;
 
-function resetMemory(): void {
-	useAuthStore.setState({
-		user: null,
-		accessToken: null,
-		refreshToken: null,
-		tokenExpiresAt: null,
-		isAuthenticated: false,
-		isLoading: false,
-		isRefreshing: false,
-	});
-}
-
-async function signedOut(): Promise<void> {
-	resetMemory();
-	await AsyncStorage.clear();
-}
-
 const sessionExpiresAt = Math.floor(Date.now() / 1000) + 3600;
 
 const session = {
@@ -102,28 +78,30 @@ const session = {
 	expiresAt: sessionExpiresAt,
 };
 
-function authResponse(withSession: object | null = session, extra: object = {}): Response {
-	return jsonResponse(200, {
-		success: true,
-		data: { user, ...(withSession ? { session: withSession } : {}), ...extra },
-	});
-}
-
 function requestAt(index = 0): { url: string; init: RequestInit; body: unknown } {
 	const [url, init] = fetchMock.mock.calls[index] as [string, RequestInit];
 	return { url, init, body: JSON.parse(init.body as string) };
 }
 
-function expectAuthenticated(): void {
-	expect(useAuthStore.getState()).toMatchObject({
-		user,
-		accessToken: 'new-access',
-		refreshToken: 'new-refresh',
-		tokenExpiresAt: sessionExpiresAt * 1000,
-		isAuthenticated: true,
-		isLoading: false,
-	});
-}
+const AUTHENTICATED = {
+	user,
+	accessToken: 'new-access',
+	refreshToken: 'new-refresh',
+	tokenExpiresAt: sessionExpiresAt * 1000,
+	isAuthenticated: true,
+	isLoading: false,
+};
+
+const SIGNED_OUT_STATE = {
+	user: null,
+	accessToken: null,
+	refreshToken: null,
+	tokenExpiresAt: null,
+	isAuthenticated: false,
+	isLoading: false,
+};
+
+const NOTHING_STORED = Object.values(KEYS).map(key => [key, null]);
 
 async function expectPersisted(): Promise<void> {
 	expect(JSON.parse((await AsyncStorage.getItem(KEYS.user)) as string)).toStrictEqual(user);
@@ -133,25 +111,13 @@ async function expectPersisted(): Promise<void> {
 	expect(await AsyncStorage.getItem(KEYS.expiresAt)).toBe(String(sessionExpiresAt * 1000));
 }
 
-async function expectSignedOutAndNothingStored(): Promise<void> {
-	expect(useAuthStore.getState()).toMatchObject({
-		user: null,
-		accessToken: null,
-		refreshToken: null,
-		tokenExpiresAt: null,
-		isAuthenticated: false,
-		isLoading: false,
-	});
-	expect(await AsyncStorage.multiGet(Object.values(KEYS))).toStrictEqual(
-		Object.values(KEYS).map(key => [key, null])
-	);
+function storedSessionValues(): Promise<readonly (readonly [string, string | null])[]> {
+	return AsyncStorage.multiGet(Object.values(KEYS));
 }
 
 describe('login', () => {
-	beforeEach(signedOut);
-
 	it('authenticates and persists the session', async () => {
-		fetchMock.mockResolvedValue(authResponse());
+		fetchMock.mockResolvedValue(ok({ user, session }));
 
 		await login({ email: 'a@example.com', password: 'Secret1!' });
 
@@ -160,17 +126,12 @@ describe('login', () => {
 		expect(url).toMatch(/\/api\/auth\/login$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toStrictEqual({ email: 'a@example.com', password: 'Secret1!' });
-		expectAuthenticated();
+		expect(authStore.getState()).toMatchObject(AUTHENTICATED);
 		await expectPersisted();
 	});
 
 	it('rejects and stores nothing when the password is wrong', async () => {
-		fetchMock.mockResolvedValue(
-			jsonResponse(401, {
-				success: false,
-				error: { message: 'Invalid email or password', code: 'INVALID_CREDENTIALS' },
-			})
-		);
+		fetchMock.mockResolvedValue(fail(401, 'INVALID_CREDENTIALS', 'Invalid email or password'));
 
 		await expect(login({ email: 'a@example.com', password: 'wrong' })).rejects.toThrow(
 			'Invalid email or password'
@@ -178,13 +139,12 @@ describe('login', () => {
 
 		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/login$/u);
-		await expectSignedOutAndNothingStored();
+		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
+		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
 	});
 });
 
 describe('register', () => {
-	beforeEach(signedOut);
-
 	const input = {
 		email: 'new@example.com',
 		password: 'Secret1!',
@@ -194,10 +154,7 @@ describe('register', () => {
 
 	it('returns the verification step without signing in', async () => {
 		fetchMock.mockResolvedValue(
-			jsonResponse(201, {
-				success: true,
-				data: { user: { ...user, id: 'user-new' }, requiresVerification: true },
-			})
+			ok({ user: { ...user, id: 'user-new' }, requiresVerification: true })
 		);
 
 		await expect(register(input)).resolves.toStrictEqual({
@@ -210,27 +167,24 @@ describe('register', () => {
 		expect(url).toMatch(/\/api\/auth\/register$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toStrictEqual(input);
-		await expectSignedOutAndNothingStored();
+		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
+		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
 	});
 
 	it('authenticates and persists the session when the backend returns one', async () => {
-		fetchMock.mockResolvedValue(
-			jsonResponse(201, { success: true, data: { user, session, requiresVerification: false } })
-		);
+		fetchMock.mockResolvedValue(ok({ user, session, requiresVerification: false }));
 
 		await expect(register(input)).resolves.toStrictEqual({
 			requiresVerification: false,
 		});
 
 		expect(requestAt().url).toMatch(/\/api\/auth\/register$/u);
-		expectAuthenticated();
+		expect(authStore.getState()).toMatchObject(AUTHENTICATED);
 		await expectPersisted();
 	});
 
 	it('calls only the backend register endpoint', async () => {
-		fetchMock.mockResolvedValue(
-			jsonResponse(201, { success: true, data: { user, session, requiresVerification: false } })
-		);
+		fetchMock.mockResolvedValue(ok({ user, session, requiresVerification: false }));
 
 		await register(input);
 
@@ -240,11 +194,9 @@ describe('register', () => {
 });
 
 describe('loginWithGoogle', () => {
-	beforeEach(signedOut);
-
 	it('exchanges the Google ID token for a persisted session', async () => {
 		jest.mocked(signInWithGoogle).mockResolvedValue('google-id-token');
-		fetchMock.mockResolvedValue(authResponse());
+		fetchMock.mockResolvedValue(ok({ user, session }));
 
 		await signInWithProvider('google');
 
@@ -253,7 +205,7 @@ describe('loginWithGoogle', () => {
 		expect(url).toMatch(/\/api\/auth\/google$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toStrictEqual({ idToken: 'google-id-token' });
-		expectAuthenticated();
+		expect(authStore.getState()).toMatchObject(AUTHENTICATED);
 		await expectPersisted();
 	});
 
@@ -263,33 +215,28 @@ describe('loginWithGoogle', () => {
 		await expect(signInWithProvider('google')).rejects.toThrow('SIGN_IN_CANCELLED');
 
 		expect(fetchMock).not.toHaveBeenCalled();
-		await expectSignedOutAndNothingStored();
+		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
+		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
 	});
 
 	it('shows a French message and stores nothing when the backend refuses the token', async () => {
 		jest.mocked(signInWithGoogle).mockResolvedValue('google-id-token');
-		fetchMock.mockResolvedValue(
-			jsonResponse(400, {
-				success: false,
-				error: { message: 'Invalid Google token', code: 'INVALID_TOKEN' },
-			})
-		);
+		fetchMock.mockResolvedValue(fail(400, 'INVALID_TOKEN', 'Invalid Google token'));
 
 		const failure = await signInWithProvider('google').catch((error: unknown) => error);
 
 		expect(oauthErrorMessage('google', failure)).toBe(
 			'La connexion avec Google a échoué. Réessayez.'
 		);
-		await expectSignedOutAndNothingStored();
+		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
+		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
 	});
 });
 
 describe('loginWithFacebook', () => {
-	beforeEach(signedOut);
-
 	it('exchanges the Facebook access token for a persisted session', async () => {
 		jest.mocked(signInWithFacebook).mockResolvedValue('facebook-access-token');
-		fetchMock.mockResolvedValue(authResponse());
+		fetchMock.mockResolvedValue(ok({ user, session }));
 
 		await signInWithProvider('facebook');
 
@@ -298,7 +245,7 @@ describe('loginWithFacebook', () => {
 		expect(url).toMatch(/\/api\/auth\/facebook$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toStrictEqual({ accessToken: 'facebook-access-token' });
-		expectAuthenticated();
+		expect(authStore.getState()).toMatchObject(AUTHENTICATED);
 		await expectPersisted();
 	});
 
@@ -308,32 +255,27 @@ describe('loginWithFacebook', () => {
 		await expect(signInWithProvider('facebook')).rejects.toThrow('SIGN_IN_CANCELLED');
 
 		expect(fetchMock).not.toHaveBeenCalled();
-		await expectSignedOutAndNothingStored();
+		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
+		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
 	});
 
 	it('shows a French message and stores nothing when the backend refuses the token', async () => {
 		jest.mocked(signInWithFacebook).mockResolvedValue('facebook-access-token');
-		fetchMock.mockResolvedValue(
-			jsonResponse(400, {
-				success: false,
-				error: { message: 'Invalid Facebook token', code: 'INVALID_TOKEN' },
-			})
-		);
+		fetchMock.mockResolvedValue(fail(400, 'INVALID_TOKEN', 'Invalid Facebook token'));
 
 		const failure = await signInWithProvider('facebook').catch((error: unknown) => error);
 
 		expect(oauthErrorMessage('facebook', failure)).toBe(
 			'La connexion avec Facebook a échoué. Réessayez.'
 		);
-		await expectSignedOutAndNothingStored();
+		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
+		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
 	});
 });
 
 describe('verifyEmail', () => {
-	beforeEach(signedOut);
-
 	it('exchanges the code for a persisted session through the backend', async () => {
-		fetchMock.mockResolvedValue(authResponse());
+		fetchMock.mockResolvedValue(ok({ user, session }));
 
 		await verifyEmail('user-a', '123456');
 
@@ -342,7 +284,7 @@ describe('verifyEmail', () => {
 		expect(url).toMatch(/\/api\/auth\/verify-email$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toStrictEqual({ userId: 'user-a', code: '123456' });
-		expectAuthenticated();
+		expect(authStore.getState()).toMatchObject(AUTHENTICATED);
 		await expectPersisted();
 	});
 });

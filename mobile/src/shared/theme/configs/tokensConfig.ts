@@ -6,6 +6,7 @@ export const INK = '#07060B';
 
 export const PIXEL_BORDERS = {
 	hairline: 1,
+	double: 2,
 	thin: PIXEL,
 	medium: PIXEL,
 	thick: PIXEL,
@@ -32,12 +33,15 @@ export const PIXEL_TYPOGRAPHY = {
 		lxl: 17,
 		xl: 20,
 		xxl: 24,
+		xxlg: 28,
 		xxxl: 32,
 	},
 	lineHeights: {
+		xxs: 16,
 		xs: 18,
 		sm: 20,
 		md: 21,
+		lg: 24,
 	},
 	letterSpacings: {
 		wide: 1,
@@ -93,6 +97,7 @@ export const GENRE_COLORS = {
 } as const;
 
 export const SPACING = {
+	pullXs: -4,
 	xxs: 2,
 	xxsm: 3,
 	xs: 4,
@@ -104,7 +109,9 @@ export const SPACING = {
 	md: 16,
 	lg: 24,
 	xl: 32,
+	xlg: 40,
 	xxl: 48,
+	xxxl: 60,
 } as const;
 
 export const CONTROL_SIZES = {
@@ -112,9 +119,17 @@ export const CONTROL_SIZES = {
 	headerButton: 36,
 	buttonCompact: 28,
 	searchBar: 44,
+	touchTarget: 44,
+	badge: 40,
 	keyRow: 45,
 	button: 52,
+	largeButton: 56,
 	toast: 56,
+	actionButton: 72,
+	codeBoxWidth: 50,
+	codeBoxHeight: 60,
+	compactCodeBoxWidth: 48,
+	compactCodeBoxHeight: 56,
 	rowIcon: 36,
 	swipeAction: 100,
 	resultsList: 200,

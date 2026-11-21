@@ -1,7 +1,7 @@
 import { LoginManager, AccessToken, Settings } from 'react-native-fbsdk-next';
 import Constants from 'expo-constants';
 import { logger } from '@/shared/logging/logger';
-import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
+import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/configs/signInConfig';
 
 const FACEBOOK_APP_ID =
 	Constants.expoConfig?.extra?.EXPO_PUBLIC_FACEBOOK_APP_ID ||

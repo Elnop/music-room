@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { Text } from '@/shared/theme/components/Text';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 const LINES = [
 	'Le mot de passe doit contenir :',
@@ -12,12 +13,12 @@ const LINES = [
 ];
 
 export function PasswordRequirements() {
-	const { theme } = useTheme();
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.requirements}>
 			{LINES.map(line => (
-				<Text key={line} style={[styles.requirementText, { color: theme.colors.textSecondary }]}>
+				<Text key={line} style={styles.requirementText}>
 					{line}
 				</Text>
 			))}
@@ -25,13 +26,18 @@ export function PasswordRequirements() {
 	);
 }
 
-const styles = StyleSheet.create({
-	requirements: {
-		marginTop: 8,
-		paddingLeft: 8,
-	},
-	requirementText: {
-		fontSize: 12,
-		lineHeight: 18,
-	},
-});
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		requirements: {
+			marginTop: theme.spacing.sm,
+			marginBottom: theme.spacing.md,
+			paddingLeft: theme.spacing.sm,
+		},
+		requirementText: {
+			fontSize: theme.typography.sizes.sm,
+			lineHeight: theme.typography.lineHeights.xs,
+			color: theme.colors.textSecondary,
+		},
+	});
+	return styles;
+}

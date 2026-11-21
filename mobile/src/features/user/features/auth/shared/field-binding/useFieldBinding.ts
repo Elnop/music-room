@@ -1,11 +1,6 @@
 import { useController } from 'react-hook-form';
 import type { Control, FieldValues, Path } from 'react-hook-form';
-
-export type FieldBinding = {
-	value: string;
-	onChangeText: (text: string) => void;
-	error?: string;
-};
+import type { FieldBinding } from '@/features/user/features/auth/shared/field-binding/fieldBindingTypes';
 
 export function useFieldBinding<T extends FieldValues>(
 	control: Control<T>,

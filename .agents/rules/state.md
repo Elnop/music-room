@@ -27,4 +27,4 @@ A Socket.io event that changes server data updates the query cache; the screen n
 
 ## zustand-selectors
 
-A Zustand store hook is always called with a selector: `useAuthStore(state => state.user)`, never `useAuthStore()` (ESLint `guardrails/zustand-selector`). Without a selector the component subscribes to the whole store and re-renders on every change of any field. Select one value per call, or several with `useShallow` from `zustand/shallow`. Outside React, read the store with `useXStore.getState()`.
+A Zustand store hook is always called with a selector: `useAuthState(state => state.user)`, never `useAuthState()` (ESLint `guardrails/zustand-selector`). Without a selector the component subscribes to the whole store and re-renders on every change of any field. Select one value per call, or several with `useShallow` from `zustand/shallow`. Outside React, read the store with `useXStore.getState()`.

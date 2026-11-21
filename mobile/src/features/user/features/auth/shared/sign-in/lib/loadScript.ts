@@ -1,8 +1,7 @@
 type DomScript = {
 	src: string;
 	async: boolean;
-	onload: (() => void) | null;
-	onerror: (() => void) | null;
+	addEventListener: (type: 'load' | 'error', listener: () => void) => void;
 	remove: () => void;
 };
 
@@ -26,11 +25,11 @@ export function loadScript(src: string): Promise<void> {
 		const script = doc.createElement('script');
 		script.src = src;
 		script.async = true;
-		script.onload = () => resolve();
-		script.onerror = () => {
+		script.addEventListener('load', () => resolve());
+		script.addEventListener('error', () => {
 			script.remove();
 			reject(new Error(`Could not load ${src}`));
-		};
+		});
 		doc.head.appendChild(script);
 	});
 	loads.set(src, load);

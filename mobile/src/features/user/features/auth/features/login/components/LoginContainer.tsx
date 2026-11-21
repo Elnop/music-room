@@ -1,29 +1,15 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import type { AuthStackParamList } from '@/features/user/features/auth/authTypes';
 import { useLoginForm } from '@/features/user/features/auth/features/login/hooks/useLoginForm';
-import { useProviderSignIn } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderSignIn';
-import { useProviderButtons } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons';
-import { LoginView } from '@/features/user/features/auth/features/login/components/LoginView';
+import { useSocialSignIn } from '@/features/user/features/auth/shared/sign-in/hooks/useSocialSignIn';
+import { LoginView } from '@/features/user/features/auth/features/login/components/presenters/LoginView';
 
 type LoginOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export function LoginContainer({ navigation }: LoginOrchestratorProps) {
 	const form = useLoginForm(navigation);
-	const provider = useProviderSignIn(form.reportError);
-	const googleButton = useProviderButtons(() => provider.signIn('google'), 'form');
+	const social = useSocialSignIn(form.reportError);
 
-	return (
-		<LoginView
-			email={form.email}
-			password={form.password}
-			isLoading={form.isSubmitting || provider.isPending}
-			onSubmit={form.submit}
-			onForgotPassword={form.goToForgotPassword}
-			onRegister={form.goToRegister}
-			onGoogle={() => provider.signIn('google')}
-			onFacebook={() => provider.signIn('facebook')}
-			googleButton={googleButton}
-		/>
-	);
+	return <LoginView form={form} social={social} />;
 }

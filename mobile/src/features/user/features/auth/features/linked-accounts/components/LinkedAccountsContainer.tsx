@@ -3,27 +3,7 @@ import { useLinkedAccountsScreen } from '@/features/user/features/auth/features/
 import { LinkedAccountsView } from '@/features/user/features/auth/features/linked-accounts/components/presenters/LinkedAccountsView';
 
 export function LinkedAccountsContainer() {
-	const {
-		theme,
-		bottomPadding,
-		isLoading,
-		linkedProviders,
-		pending,
-		handleLink,
-		handleUnlink,
-		googleButton,
-	} = useLinkedAccountsScreen();
+	const screen = useLinkedAccountsScreen();
 
-	return (
-		<LinkedAccountsView
-			theme={theme}
-			bottomPadding={bottomPadding}
-			isLoading={isLoading}
-			linkedProviders={linkedProviders}
-			pending={pending}
-			onLink={handleLink}
-			onUnlink={handleUnlink}
-			googleButton={googleButton}
-		/>
-	);
+	return <LinkedAccountsView screen={screen} />;
 }

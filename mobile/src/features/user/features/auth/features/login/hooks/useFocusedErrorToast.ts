@@ -1,17 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { showError } from '@/shared/theme/lib/toast';
 
 export function useFocusedErrorToast(): (message: string) => void {
 	const isFocused = useIsFocused();
-	const [pending, setPending] = useState<string | null>(null);
+	const focused = useRef(false);
+	const pending = useRef<string | null>(null);
 
 	useEffect(() => {
-		if (pending && isFocused) {
-			showError(pending);
-			setPending(null);
+		focused.current = isFocused;
+		if (isFocused && pending.current) {
+			showError(pending.current);
+			pending.current = null;
 		}
-	}, [pending, isFocused]);
+		return () => {
+			focused.current = false;
+		};
+	}, [isFocused]);
 
-	return setPending;
+	return useCallback((message: string) => {
+		if (focused.current) showError(message);
+		else pending.current = message;
+	}, []);
 }

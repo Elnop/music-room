@@ -1,99 +1,13 @@
 import { useEffect, useMemo } from 'react';
-import { Animated, Dimensions, Easing } from 'react-native';
-
-export type FloatingIconSpec = {
-	size: number;
-	top: number;
-	left: number;
-	delay: number;
-	duration: number;
-	rotateDirection: 1 | -1;
-	floatRange: number;
-};
-
-export type FloatingIconMotion = {
-	spec: FloatingIconSpec;
-	translateY: Animated.AnimatedInterpolation<number>;
-	rotate: Animated.AnimatedInterpolation<string>;
-	scale: Animated.Value;
-};
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-const ICONS: FloatingIconSpec[] = [
-	{ size: 80, top: 60, left: 20, delay: 0, duration: 1200, rotateDirection: 1, floatRange: 35 },
-	{
-		size: 65,
-		top: 120,
-		left: SCREEN_WIDTH - 100,
-		delay: 400,
-		duration: 1400,
-		rotateDirection: -1,
-		floatRange: 30,
-	},
-	{
-		size: 70,
-		top: SCREEN_HEIGHT * 0.45,
-		left: 15,
-		delay: 200,
-		duration: 1100,
-		rotateDirection: 1,
-		floatRange: 40,
-	},
-	{
-		size: 75,
-		top: SCREEN_HEIGHT * 0.55,
-		left: SCREEN_WIDTH - 95,
-		delay: 600,
-		duration: 1300,
-		rotateDirection: -1,
-		floatRange: 32,
-	},
-];
-
-function timing(value: Animated.Value, toValue: number, duration: number, delay = 0) {
-	return Animated.timing(value, {
-		toValue,
-		duration,
-		delay,
-		easing: Easing.inOut(Easing.sin),
-		useNativeDriver: true,
-	});
-}
-
-function startLoops(
-	spec: FloatingIconSpec,
-	float: Animated.Value,
-	spin: Animated.Value,
-	scale: Animated.Value
-) {
-	const { duration, delay } = spec;
-	Animated.loop(
-		Animated.sequence([timing(float, 1, duration, delay), timing(float, 0, duration)])
-	).start();
-	Animated.loop(
-		Animated.timing(spin, {
-			toValue: 1,
-			duration: duration * 2.5,
-			easing: Easing.linear,
-			useNativeDriver: true,
-		})
-	).start();
-	function pulse(toValue: number) {
-		return Animated.timing(scale, {
-			toValue,
-			duration: duration * 1.5,
-			easing: Easing.inOut(Easing.ease),
-			useNativeDriver: true,
-		});
-	}
-	Animated.loop(Animated.sequence([pulse(1.15), pulse(1)])).start();
-}
+import { Animated } from 'react-native';
+import { FLOATING_ICONS } from '@/features/user/features/auth/features/welcome/floatingIconsConfig';
+import { startFloatingLoops } from '@/features/user/features/auth/features/welcome/startFloatingLoops';
+import type { FloatingIconMotion } from '@/features/user/features/auth/features/welcome/welcomeTypes';
 
 export function useFloatingIcons(): FloatingIconMotion[] {
 	const values = useMemo(
 		() =>
-			ICONS.map(spec => ({
+			FLOATING_ICONS.map(spec => ({
 				spec,
 				float: new Animated.Value(0),
 				spin: new Animated.Value(0),
@@ -103,7 +17,7 @@ export function useFloatingIcons(): FloatingIconMotion[] {
 	);
 
 	useEffect(() => {
-		values.forEach(({ spec, float, spin, scale }) => startLoops(spec, float, spin, scale));
+		for (const value of values) startFloatingLoops(value);
 	}, [values]);
 
 	return values.map(({ spec, float, spin, scale }) => ({

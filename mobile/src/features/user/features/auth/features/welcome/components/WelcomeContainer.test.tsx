@@ -2,7 +2,7 @@ import { Text } from '@/shared/theme/components/Text';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import type { AuthStackParamList } from '@/features/user/features/auth/authTypes';
 import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
 import { WelcomeContainer } from '@/features/user/features/auth/features/welcome/components/WelcomeContainer';
 

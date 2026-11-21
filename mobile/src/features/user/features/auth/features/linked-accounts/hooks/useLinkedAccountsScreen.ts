@@ -1,88 +1,31 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useLinkedProviders } from '@/features/user/features/auth/features/linked-accounts/hooks/useLinkedProviders';
 import {
-	useLinkedProviders,
-	useLinkProvider,
-	useUnlinkProvider,
-} from '@/features/user/features/auth/features/linked-accounts/hooks/useLinkedProviders';
+	useLinkAccount,
+	useUnlinkAccount,
+} from '@/features/user/features/auth/features/linked-accounts/hooks/useAccountLinking';
+import { useLoadErrorToast } from '@/features/user/features/auth/features/linked-accounts/hooks/useLoadErrorToast';
 import { useProviderButtons } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons';
-import type { OAuthProvider } from '@/features/user/features/auth/types';
+import type { OAuthProvider } from '@/features/user/features/auth/authTypes';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { showError, showSuccess } from '@/shared/theme/lib/toast';
+import type { LinkedAccountsScreen } from '@/features/user/features/auth/features/linked-accounts/linkedAccountsTypes';
 
-const PROVIDER_LABELS: Record<OAuthProvider, string> = {
-	google: 'Google',
-	facebook: 'Facebook',
-};
-
-function isCancelled(error: unknown): boolean {
-	return error instanceof Error && error.message === 'SIGN_IN_CANCELLED';
-}
-
-export function useLinkedAccountsScreen() {
-	const { theme } = useTheme();
-	const bottomPadding = useBottomPadding();
+export function useLinkedAccountsScreen(): LinkedAccountsScreen {
 	const providersQuery = useLinkedProviders();
-	const linkedProviders = providersQuery.data;
-	const linkProvider = useLinkProvider().mutateAsync;
-	const unlinkProvider = useUnlinkProvider().mutateAsync;
-
 	const [pending, setPending] = useState<OAuthProvider | null>(null);
-
-	const { error: loadError, errorUpdatedAt, isFetchedAfterMount } = providersQuery;
-	useEffect(() => {
-		if (loadError && isFetchedAfterMount) {
-			showError(apiErrorMessage(loadError, 'Impossible de charger les comptes liés'));
-		}
-	}, [loadError, errorUpdatedAt, isFetchedAfterMount]);
-
-	const handleLink = useCallback(
-		async (provider: OAuthProvider) => {
-			setPending(provider);
-			try {
-				await linkProvider(provider);
-				showSuccess(`Compte ${PROVIDER_LABELS[provider]} lié`);
-			} catch (error) {
-				if (!isCancelled(error)) {
-					showError(
-						apiErrorMessage(error, `Impossible de lier le compte ${PROVIDER_LABELS[provider]}`)
-					);
-				}
-			} finally {
-				setPending(null);
-			}
-		},
-		[linkProvider]
-	);
-
-	const handleUnlink = useCallback(
-		async (provider: OAuthProvider) => {
-			setPending(provider);
-			try {
-				await unlinkProvider(provider);
-				showSuccess(`Compte ${PROVIDER_LABELS[provider]} délié`);
-			} catch (error) {
-				showError(
-					apiErrorMessage(error, `Impossible de délier le compte ${PROVIDER_LABELS[provider]}`)
-				);
-			} finally {
-				setPending(null);
-			}
-		},
-		[unlinkProvider]
-	);
-
-	const googleButton = useProviderButtons(() => handleLink('google'), 'row');
+	const onLink = useLinkAccount(setPending);
+	const onUnlink = useUnlinkAccount(setPending);
+	useLoadErrorToast(providersQuery);
 
 	return {
-		theme,
-		bottomPadding,
+		bottomPadding: useBottomPadding(),
 		isLoading: providersQuery.isLoading,
-		linkedProviders,
-		pending,
-		handleLink,
-		handleUnlink,
-		googleButton,
+		linkedProviders: providersQuery.data,
+		actions: {
+			pending,
+			onLink,
+			onUnlink,
+			googleButton: useProviderButtons(() => onLink('google'), 'row'),
+		},
 	};
 }

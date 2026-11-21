@@ -4,57 +4,44 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import { registerSchema } from '@/features/user/features/auth/shared/sign-in/lib/validators';
-import type { RegisterInput } from '@/features/user/features/auth/shared/sign-in/lib/validators';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import { registerSchema } from '@/features/user/features/auth/shared/sign-in/authSchemas';
+import type { RegisterInput } from '@/features/user/features/auth/shared/sign-in/types/authInputTypes';
+import type { AuthStackParamList, RegisterResult } from '@/features/user/features/auth/authTypes';
 import { useRegisterMutation } from '@/features/user/features/auth/shared/sign-in/hooks/useSignInMutations';
 import { useFieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
-import type { FieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
+import type { RegisterForm } from '@/features/user/features/auth/features/register/registerTypes';
 
-type RegisterForm = {
-	email: FieldBinding;
-	username: FieldBinding;
-	password: FieldBinding;
-	submit: () => void;
-	isSubmitting: boolean;
-	goToLogin: () => void;
-};
+type RegisterNavigation = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
-export function useRegisterForm(
-	navigation: NativeStackNavigationProp<AuthStackParamList, 'Register'>
-): RegisterForm {
-	const { control, handleSubmit } = useForm<RegisterInput>({
+function registerCallbacks(navigation: RegisterNavigation) {
+	return {
+		onSuccess: (result: RegisterResult) => {
+			if (result.requiresVerification) {
+				navigation.navigate('EmailVerification', {
+					userId: result.userId,
+					email: result.email,
+				});
+			}
+		},
+		onError: (error: unknown) => {
+			logger.error('[RegisterScreen] Register error:', error);
+			showError(apiErrorMessage(error, 'Inscription impossible, réessayez'));
+		},
+	};
+}
+
+export function useRegisterForm(navigation: RegisterNavigation): RegisterForm {
+	const form = useForm<RegisterInput>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: { email: '', password: '', username: '' },
 	});
-	const email = useFieldBinding(control, 'email');
-	const username = useFieldBinding(control, 'username');
-	const password = useFieldBinding(control, 'password');
-
 	const register = useRegisterMutation();
 
-	const submit = handleSubmit(input =>
-		register.mutate(input, {
-			onSuccess: result => {
-				if (result.requiresVerification) {
-					navigation.navigate('EmailVerification', {
-						userId: result.userId,
-						email: result.email,
-					});
-				}
-			},
-			onError: error => {
-				logger.error('[RegisterScreen] Register error:', error);
-				showError(apiErrorMessage(error, 'Inscription impossible, réessayez'));
-			},
-		})
-	);
-
 	return {
-		email,
-		username,
-		password,
-		submit,
+		email: useFieldBinding(form.control, 'email'),
+		username: useFieldBinding(form.control, 'username'),
+		password: useFieldBinding(form.control, 'password'),
+		submit: form.handleSubmit(input => register.mutate(input, registerCallbacks(navigation))),
 		isSubmitting: register.isPending,
 		goToLogin: () => navigation.navigate('Login'),
 	};

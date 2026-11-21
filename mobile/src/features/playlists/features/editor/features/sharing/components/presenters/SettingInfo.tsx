@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SettingIcon } from '@/features/playlists/features/editor/features/sharing/components/presenters/SettingIcon';
+import { IconTile } from '@/shared/theme/components/IconTile';
 import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
@@ -17,7 +17,7 @@ export function SettingInfo({ icon, label, description }: SettingInfoProps) {
 
 	return (
 		<View style={styles.info}>
-			<SettingIcon icon={icon} />
+			<IconTile icon={icon} size="row" />
 			<View style={styles.text}>
 				<Text style={styles.label}>{label}</Text>
 				<Text style={styles.description}>{description}</Text>
