@@ -41,7 +41,7 @@ export function usePlaylistCardMenu(
 	const cover = useCoverActions(navigation, id, premium);
 	const deletePlaylist = useDeletePlaylist();
 
-	const confirmDelete = async () => {
+	async function confirmDelete() {
 		try {
 			await deletePlaylist.mutateAsync(id);
 			showSuccess('Playlist supprimée');
@@ -51,13 +51,13 @@ export function usePlaylistCardMenu(
 			logger.error('[PlaylistCardMenu] Delete playlist failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de supprimer la playlist'));
 		}
-	};
+	}
 
 	return {
 		visible,
 		playlist,
 		actionsFor: target =>
-			!!userId && target.ownerId === userId
+			Boolean(userId) && target.ownerId === userId
 				? () => {
 						setPlaylist(target);
 						setVisible(true);

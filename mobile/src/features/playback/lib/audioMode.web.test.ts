@@ -1,4 +1,4 @@
-import { configureAudioMode } from './audioMode.web';
+import { configureAudioMode } from '@/features/playback/lib/audioMode.web';
 
 jest.mock('expo-audio', () => {
 	throw new Error('the web variant must not load expo-audio');

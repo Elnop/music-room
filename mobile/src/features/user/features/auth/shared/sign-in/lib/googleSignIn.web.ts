@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
-import { loadScript } from './loadScript';
-import { GOOGLE_FORM_BUTTON } from './constants';
+import { loadScript } from '@/features/user/features/auth/shared/sign-in/lib/loadScript';
+import { GOOGLE_FORM_BUTTON } from '@/features/user/features/auth/shared/sign-in/lib/constants';
 import type { GoogleButtonVariant } from '@/features/user/features/auth/types';
 
 const GIS_SCRIPT = 'https://accounts.google.com/gsi/client';
@@ -83,7 +83,9 @@ export async function renderGoogleButton(
 	onCredential: () => void
 ): Promise<() => void> {
 	const identity = await loadIdentity();
-	const listener: Listener = () => onCredential();
+	function listener(): void {
+		onCredential();
+	}
 	const form = variant === 'form';
 	identity.renderButton(target, {
 		type: 'standard',

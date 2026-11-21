@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { PlaylistSharingContainer } from './PlaylistSharingContainer';
+import { PlaylistSharingContainer } from '@/features/playlists/features/editor/features/sharing/components/PlaylistSharingContainer';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showSuccess, showWarning } from '@/shared/theme/lib/toast';
@@ -15,6 +15,7 @@ import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { playlistWithTracks } from '@test-utils/playlistFixtures';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -57,10 +58,10 @@ type Props = NativeStackScreenProps<PlaylistStackParamList, 'PlaylistSharing'>;
 const PLAYLIST = 'GET /api/playlists/p1';
 const SEARCH = 'GET /api/profile/search?q=bo&limit=20';
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
-const answer = (overrides: Partial<PlaylistWithTracks> = {}) =>
-	ok({
+function answer(overrides: Partial<PlaylistWithTracks> = {}) {
+	return ok({
 		playlist: playlistWithTracks({
 			collaboratorIds: ['c1'],
 			visibility: 'private',
@@ -68,6 +69,7 @@ const answer = (overrides: Partial<PlaylistWithTracks> = {}) =>
 			...overrides,
 		}),
 	});
+}
 
 async function renderScreen() {
 	const view = renderWithClient(

@@ -12,9 +12,9 @@ import type { EventDetailScreen } from '@/features/events/features/detail/hooks/
 import { formatEventDate, isOngoing } from '@/features/events/shared/event-dates/eventDates';
 import { createEventScreenStyles } from '@/features/events/shared/event-screen/eventScreenStyles';
 import type { BeaconBroadcast } from '@/features/events/features/detail/hooks/useBeaconBroadcast';
-import { BeaconCard } from './BeaconCard';
-import { BeaconUnavailableCard } from './BeaconUnavailableCard';
-import { InfoRow } from './InfoRow';
+import { BeaconCard } from '@/features/events/features/detail/components/presenters/BeaconCard';
+import { BeaconUnavailableCard } from '@/features/events/features/detail/components/presenters/BeaconUnavailableCard';
+import { InfoRow } from '@/features/events/features/detail/components/presenters/InfoRow';
 import { Text } from '@/shared/theme/components/Text';
 import ClockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/clock-solid.svg';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
@@ -98,8 +98,8 @@ export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailVi
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		header: { gap: theme.spacing.sm },
 		live: {
 			alignSelf: 'flex-start',
@@ -122,3 +122,4 @@ const createStyles = (theme: Theme) =>
 		description: { fontSize: theme.typography.sizes.md, color: theme.colors.text, lineHeight: 20 },
 		actions: { gap: theme.spacing.sm, marginTop: theme.spacing.md },
 	});
+}

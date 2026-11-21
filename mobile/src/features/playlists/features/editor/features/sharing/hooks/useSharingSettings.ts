@@ -24,7 +24,7 @@ export function useSharingSettings(
 	const [isUpdating, setIsUpdating] = useState(false);
 	const { isPrivate, isEditRestricted } = mode;
 
-	const apply = async (changes: Partial<PlaylistInput>, failure: string) => {
+	async function apply(changes: Partial<PlaylistInput>, failure: string) {
 		setIsUpdating(true);
 		try {
 			await update.mutateAsync({ id, changes });
@@ -42,7 +42,7 @@ export function useSharingSettings(
 		} finally {
 			setIsUpdating(false);
 		}
-	};
+	}
 
 	return {
 		isUpdating,

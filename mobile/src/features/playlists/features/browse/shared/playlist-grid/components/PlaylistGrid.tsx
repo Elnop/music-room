@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
-import { PlaylistGridCard } from './PlaylistCards';
+import { PlaylistGridCard } from '@/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCards';
 
 interface PlaylistGridProps {
 	playlists: Playlist[];

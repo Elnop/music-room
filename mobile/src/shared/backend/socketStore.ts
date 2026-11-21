@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { io, Socket } from 'socket.io-client';
-import { deviceService, getAppVersion } from './deviceService';
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import { deviceService, getAppVersion } from '@/shared/backend/deviceService';
 import { getBackendUrl, onBackendUrlChange } from '@/shared/backend/lib/backendUrl';
 import { getAuthSession, getSession, onSessionEnd } from '@/shared/backend/lib/authSession';
 import { reportBackendError } from '@/shared/backend/lib/backendErrors';
@@ -79,12 +80,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		let hasRefreshed = false;
 		let deviceRetries = 0;
 
-		const stop = () => {
+		function stop() {
 			if (get().socket === socket) get().disconnect();
 			else socket.disconnect();
-		};
+		}
 
-		const handleRefusal = async (code: string) => {
+		async function handleRefusal(code: string) {
 			if (code === DEVICE_REGISTRATION_FAILED && deviceRetries < DEVICE_RETRY_MAX) {
 				deviceRetries += 1;
 				setTimeout(() => {
@@ -107,7 +108,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			}
 			reportBackendError('error', '[Socket] Handshake refused, staying disconnected:', code);
 			stop();
-		};
+		}
 
 		socket.on('connect', () => {
 			hasRefreshed = false;

@@ -1,4 +1,4 @@
-import { distanceMeters, formatDistance } from './geo';
+import { distanceMeters, formatDistance } from '@/features/events/features/nearby/lib/geo';
 
 describe('distanceMeters', () => {
 	it('is zero for the same point', () => {

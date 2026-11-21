@@ -1,7 +1,7 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import { BleManager, ScanMode, State } from 'react-native-ble-plx';
 import { logger } from '@/shared/logging/logger';
-import { base64ToBytes } from './base64';
+import { base64ToBytes } from '@/features/events/features/nearby/lib/base64';
 import { parseIBeacon, zumikBeaconMinor } from '@/features/events/shared/beacon/ibeacon';
 
 interface BeaconFrame {
@@ -13,7 +13,9 @@ interface BeaconFrame {
 export type ScannerState = 'on' | 'off' | 'unsupported';
 
 let manager: BleManager | null = null;
-const bleManager = () => (manager ??= new BleManager());
+function bleManager() {
+	return (manager ??= new BleManager());
+}
 
 export async function requestScanPermission(): Promise<boolean> {
 	if (Platform.OS !== 'android') return false;

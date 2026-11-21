@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
+import { View } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 interface SkeletonListProps {
 	count?: number;

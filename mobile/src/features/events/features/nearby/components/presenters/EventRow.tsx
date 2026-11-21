@@ -38,8 +38,8 @@ export function EventRow({ event, onPress }: EventRowProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: {
 			...keycap(theme),
 			height: 45,
@@ -61,3 +61,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

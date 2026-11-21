@@ -4,8 +4,8 @@ import {
 	AdvertiseError,
 	startEventBeacon,
 	stopEventBeacon,
-	type AdvertiseFailure,
-} from './beaconAdvertiser';
+} from '@/features/events/features/detail/beaconAdvertiser';
+import type { AdvertiseFailure } from '@/features/events/features/detail/beaconAdvertiser';
 
 type BeaconStatus = 'idle' | 'starting' | 'broadcasting';
 

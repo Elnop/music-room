@@ -6,10 +6,10 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { rowColumns } from '@/shared/theme/lib/gridLayout';
 import type { FriendProfile } from '@/features/user/features/friends/types';
-import { FriendCard } from './FriendCard';
-import { FriendItemRow } from './FriendItemRow';
+import { FriendCard } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendCard';
+import { FriendItemRow } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendItemRow';
 import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
-import { createFriendsListStyles } from './friendsListStyles';
+import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
@@ -73,7 +73,7 @@ export function FriendsListTab({
 						friend={item}
 						canControl={canControl(item.id)}
 						isToggling={togglingUserId === item.id}
-						disabled={!!togglingUserId}
+						disabled={Boolean(togglingUserId)}
 						onPress={onSelectUser}
 						onToggleControl={onToggleControl}
 					/>

@@ -17,7 +17,7 @@ const KEYS = {
 	tokenExpiresAt: '@zumik/token_expires_at',
 } as const;
 
-const LEGACY_SDK_SESSION_KEY = /^sb-.+-auth-token$/;
+const LEGACY_SDK_SESSION_KEY = /^sb-.+-auth-token$/u;
 
 async function removeLegacySdkSession(): Promise<void> {
 	const keys = await AsyncStorage.getAllKeys();
@@ -39,7 +39,7 @@ async function load(): Promise<StoredSession | null> {
 		user: JSON.parse(userJson) as UserProfile,
 		accessToken,
 		refreshToken,
-		tokenExpiresAt: expiresAt ? parseInt(expiresAt, 10) : null,
+		tokenExpiresAt: expiresAt ? Number.parseInt(expiresAt, 10) : null,
 	};
 }
 

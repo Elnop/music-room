@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 import { originalTheme } from '@/shared/theme/lib/original.theme';
-import { useBottomPadding } from './useBottomPadding';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme: theme } = jest.requireActual('@/shared/theme/lib/original.theme');

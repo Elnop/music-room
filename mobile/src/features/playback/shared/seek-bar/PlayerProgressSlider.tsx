@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import Slider from '@react-native-community/slider';
-import type { SeekPosition } from './useSeekPosition';
+import type { SeekPosition } from '@/features/playback/shared/seek-bar/useSeekPosition';
 import { Text } from '@/shared/theme/components/Text';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
@@ -9,12 +10,12 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
 const SEGMENTS = 24;
 
-const formatTime = (seconds: number): string => {
-	if (!seconds || isNaN(seconds)) return '0:00';
+function formatTime(seconds: number): string {
+	if (!seconds || Number.isNaN(seconds)) return '0:00';
 	const mins = Math.floor(seconds / 60);
 	const secs = Math.floor(seconds % 60);
 	return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
+}
 
 interface PlayerProgressSliderProps {
 	styles: {
@@ -102,8 +103,8 @@ export function PlayerProgressSlider({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		segments: {
 			...pixelFrame(theme),
 			position: 'absolute',
@@ -118,3 +119,4 @@ const createStyles = (theme: Theme) =>
 		},
 		segment: { flex: 1 },
 	});
+}

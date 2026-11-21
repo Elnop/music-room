@@ -5,7 +5,7 @@ import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/theme/co
 import type { Theme } from '@/shared/theme/lib/types';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { createDetailStyles } from './detailStyles';
+import { createDetailStyles } from '@/features/playlists/features/editor/features/detail/components/presenters/detailStyles';
 
 export function DetailSkeleton() {
 	const insets = useSafeAreaInsets();
@@ -31,8 +31,8 @@ export function DetailSkeleton() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		header: {
 			alignItems: 'center',
 			marginBottom: theme.spacing.lg,
@@ -44,3 +44,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.xs,
 		},
 	});
+}

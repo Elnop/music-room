@@ -1,6 +1,6 @@
 {
   "mobile": {
-    "oxlint": 4564
+    "oxlint": 3071
   },
   "allowedPaths": {
     "no-asyncstorage-outside-storage": [

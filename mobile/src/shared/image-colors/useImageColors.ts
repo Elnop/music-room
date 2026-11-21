@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { getColors } from 'react-native-image-colors';
 
-export { hexToRgba } from './adaptivePalette';
+export { hexToRgba } from '@/shared/image-colors/adaptivePalette';
 
 export function useImageColors(imageUrl: string | null | undefined, fallbackColor: string) {
 	const [dominantColor, setDominantColor] = useState<string | null>(null);
@@ -11,7 +11,7 @@ export function useImageColors(imageUrl: string | null | undefined, fallbackColo
 	useEffect(() => {
 		let isMounted = true;
 
-		const extractColors = async () => {
+		async function extractColors() {
 			if (!imageUrl) {
 				if (isMounted) setDominantColor(null);
 				return;
@@ -44,7 +44,7 @@ export function useImageColors(imageUrl: string | null | undefined, fallbackColo
 			} finally {
 				if (isMounted) setIsLoading(false);
 			}
-		};
+		}
 
 		extractColors();
 

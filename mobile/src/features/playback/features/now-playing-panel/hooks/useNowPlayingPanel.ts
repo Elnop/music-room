@@ -11,7 +11,7 @@ import { useNowPlaying } from '@/features/playback/shared/player/hooks/useNowPla
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { UP_NEXT_COUNT } from '@/features/playback/shared/player/lib/constants';
 import { upNext } from '@/features/playback/features/now-playing-panel/upNext';
-import { usePanelFocus } from './usePanelFocus';
+import { usePanelFocus } from '@/features/playback/features/now-playing-panel/hooks/usePanelFocus';
 import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
@@ -48,9 +48,9 @@ export function useNowPlayingPanel() {
 		[dominantColor]
 	);
 
-	const openActions = (start: TrackActionsStart) => {
+	function openActions(start: TrackActionsStart) {
 		if (source) setActions({ track: toTrackInput(source), start });
-	};
+	}
 
 	return {
 		track: nowPlaying.track,

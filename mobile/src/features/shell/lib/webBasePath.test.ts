@@ -1,10 +1,18 @@
-import { restoreRedirectedPath, stripBasePath, webBasePath } from './webBasePath';
+import {
+	restoreRedirectedPath,
+	stripBasePath,
+	webBasePath,
+} from '@/features/shell/lib/webBasePath';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 const BASE = '/music-room';
 
-const fakeLocation = (search: string, hash = '') => ({ pathname: `${BASE}/`, search, hash });
-const fakeHistory = () => ({ replaceState: jest.fn() });
+function fakeLocation(search: string, hash = '') {
+	return { pathname: `${BASE}/`, search, hash };
+}
+function fakeHistory() {
+	return { replaceState: jest.fn() };
+}
 
 describe('webBasePath', () => {
 	const original = process.env.EXPO_BASE_URL;

@@ -7,7 +7,7 @@ import {
 	POLICY_SECTIONS,
 	POLICY_UPDATED_AT,
 } from '@/features/legal/privacyPolicyContent';
-import { PolicyText } from './PolicyText';
+import { PolicyText } from '@/features/legal/components/presenters/PolicyText';
 
 interface PrivacyPolicyViewProps {
 	theme: Theme;
@@ -67,8 +67,8 @@ export function PrivacyPolicyView({ theme, bottomPadding, onOpenLink }: PrivacyP
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -111,3 +111,4 @@ const createStyles = (theme: Theme) =>
 			flex: 1,
 		},
 	});
+}

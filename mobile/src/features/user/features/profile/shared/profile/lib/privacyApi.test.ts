@@ -1,5 +1,5 @@
 import { apiRequest, authRequest } from '@/shared/backend/lib/api';
-import { privacyApi } from './privacyApi';
+import { privacyApi } from '@/features/user/features/profile/shared/profile/lib/privacyApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({
 	apiRequest: jest.fn(),

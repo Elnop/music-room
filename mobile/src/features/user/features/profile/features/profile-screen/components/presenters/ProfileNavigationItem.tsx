@@ -41,8 +41,8 @@ export function ProfileNavigationItem({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		buttonContainer: {
 			paddingHorizontal: theme.spacing.lg,
 			marginTop: theme.spacing.md,
@@ -77,3 +77,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 2,
 		},
 	});
+}

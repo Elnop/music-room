@@ -32,7 +32,7 @@ export function BackendUrlFieldContainer() {
 		[]
 	);
 
-	const handleSave = async () => {
+	async function handleSave() {
 		setIsSaving(true);
 		const result = await setBackendUrl(draft);
 		setIsSaving(false);
@@ -44,9 +44,9 @@ export function BackendUrlFieldContainer() {
 		setDraft(result.url);
 		setCurrentUrl(result.url);
 		showSuccess(`Adresse du serveur : ${result.url}`);
-	};
+	}
 
-	const handleReset = async () => {
+	async function handleReset() {
 		setIsSaving(true);
 		const url = await resetBackendUrl();
 		setIsSaving(false);
@@ -54,7 +54,7 @@ export function BackendUrlFieldContainer() {
 		setDraft(url);
 		setCurrentUrl(url);
 		showSuccess('Adresse du serveur par défaut rétablie');
-	};
+	}
 
 	return (
 		<View>
@@ -94,8 +94,8 @@ export function BackendUrlFieldContainer() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		current: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
@@ -109,3 +109,4 @@ const createStyles = (theme: Theme) =>
 			flex: 1,
 		},
 	});
+}

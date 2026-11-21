@@ -1,12 +1,12 @@
-import { matchScreenPath, pathFromState, stateFromMatch } from './screenPaths';
+import { matchScreenPath, pathFromState, stateFromMatch } from '@/features/shell/lib/screenPaths';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
-const stateOf = (path: string, signedIn?: boolean) => {
+function stateOf(path: string, signedIn?: boolean) {
 	const match = matchScreenPath(path, signedIn);
 	if (!match) throw new Error(`no screen for ${path}`);
 	return stateFromMatch(match);
-};
+}
 
 interface Node {
 	name: string;
@@ -14,10 +14,11 @@ interface Node {
 	state?: { routes: readonly Node[] };
 }
 
-const outline = (state: { routes: readonly Node[] }): unknown[] =>
-	state.routes.map(route =>
+function outline(state: { routes: readonly Node[] }): unknown[] {
+	return state.routes.map(route =>
 		route.state ? [route.name, outline(route.state)] : [route.name, route.params ?? null]
 	);
+}
 
 describe('screen paths', () => {
 	it.each([
@@ -245,10 +246,12 @@ describe('screen paths', () => {
 });
 
 describe('pathFromState', () => {
-	const tab = (name: string, routes: Node[]) => ({
-		index: 0,
-		routes: [{ name, state: { index: routes.length - 1, routes } }],
-	});
+	function tab(name: string, routes: Node[]) {
+		return {
+			index: 0,
+			routes: [{ name, state: { index: routes.length - 1, routes } }],
+		};
+	}
 
 	it('gives a screen held by several stacks one path', () => {
 		const detail = { name: 'PlaylistDetail', params: { id: ID } };

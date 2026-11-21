@@ -5,9 +5,9 @@ import { Button } from '@/shared/theme/components/Button';
 import { CappedInput } from '@/shared/theme/components/CappedInput';
 import type { EventForm } from '@/features/events/features/event-form/hooks/useEventForm';
 import { createEventScreenStyles } from '@/features/events/shared/event-screen/eventScreenStyles';
-import { DateTimeRow } from './DateTimeRow';
-import { GenreSelector } from './GenreSelector';
-import { PlaylistSelector } from './PlaylistSelector';
+import { DateTimeRow } from '@/features/events/features/event-form/components/presenters/DateTimeRow';
+import { GenreSelector } from '@/features/events/features/event-form/components/presenters/GenreSelector';
+import { PlaylistSelector } from '@/features/events/features/event-form/components/presenters/PlaylistSelector';
 
 interface EventFormViewProps {
 	form: EventForm;

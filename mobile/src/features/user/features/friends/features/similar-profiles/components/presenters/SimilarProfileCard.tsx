@@ -8,7 +8,7 @@ import {
 	profileName,
 	similarProfileLabel,
 } from '@/features/user/features/friends/features/similar-profiles/similarProfileLabels';
-import { createSimilarProfilesStyles } from './similarProfilesStyles';
+import { createSimilarProfilesStyles } from '@/features/user/features/friends/features/similar-profiles/components/presenters/similarProfilesStyles';
 
 interface SimilarProfileCardProps {
 	profile: RecommendedProfile;

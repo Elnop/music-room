@@ -59,8 +59,8 @@ export function DeviceHeader({ device, isCurrent, onOpenRename }: DeviceHeaderPr
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		deviceHeader: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -108,3 +108,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 2,
 		},
 	});
+}

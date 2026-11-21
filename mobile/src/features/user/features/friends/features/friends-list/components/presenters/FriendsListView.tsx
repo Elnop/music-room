@@ -4,9 +4,9 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FriendProfile, UserProfile } from '@/features/user/features/friends/types';
-import { FriendsListTab } from './FriendsListTab';
-import { SearchUsersTab } from './SearchUsersTab';
-import { createFriendsListStyles } from './friendsListStyles';
+import { FriendsListTab } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendsListTab';
+import { SearchUsersTab } from '@/features/user/features/friends/features/friends-list/components/presenters/SearchUsersTab';
+import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 import { Text } from '@/shared/theme/components/Text';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
 

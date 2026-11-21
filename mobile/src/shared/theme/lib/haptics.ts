@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 
-const ignore = () => {};
+function ignore() {}
 
 export function hapticTap(): void {
 	Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(ignore);

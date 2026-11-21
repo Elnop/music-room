@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ErrorBoundary } from './ErrorBoundary';
+import { ErrorBoundary } from '@/features/shell/components/presenters/ErrorBoundary';
 import { logger } from '@/shared/logging/logger';
 import { Text } from '@/shared/theme/components/Text';
 

@@ -1,4 +1,4 @@
-import type { ListeningStatus } from './listening.types';
+import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
 
 export function estimatePositionMs(
 	status: Pick<ListeningStatus, 'positionMs' | 'updatedAt' | 'isPlaying'>,

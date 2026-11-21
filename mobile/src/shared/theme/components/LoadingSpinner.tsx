@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { EqualizerBars } from './EqualizerBars';
-import { useTheme } from './ThemeContext';
+import { EqualizerBars } from '@/shared/theme/components/EqualizerBars';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface LoadingSpinnerProps {
 	size?: 'small' | 'large';
@@ -46,8 +46,8 @@ export function LoadingSpinner({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			justifyContent: 'center',
 			alignItems: 'center',
@@ -64,3 +64,4 @@ const createStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.medium,
 		},
 	});
+}

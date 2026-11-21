@@ -5,11 +5,14 @@ import { useSession } from '@/shared/backend/lib/authSession';
 import { logger } from '@/shared/logging/logger';
 import { NEARBY_CLOCK_MS } from '@/features/events/features/nearby/lib/constants';
 import { useEvents } from '@/features/events/shared/events/hooks/useEventQueries';
-import { useNow } from './useNow';
-import { useForegroundPosition } from './useForegroundPosition';
-import { useBeaconScan, type BeaconScanStatus } from './useBeaconScan';
-import { nearbyNotice, type NearbyNotice } from '@/features/events/features/nearby/lib/nearbyNotice';
-import { mergeNearby, type NearbyItem } from '@/features/events/features/nearby/lib/nearbyEvents';
+import { useNow } from '@/features/events/features/nearby/hooks/useNow';
+import { useForegroundPosition } from '@/features/events/features/nearby/hooks/useForegroundPosition';
+import { useBeaconScan } from '@/features/events/features/nearby/hooks/useBeaconScan';
+import type { BeaconScanStatus } from '@/features/events/features/nearby/hooks/useBeaconScan';
+import { nearbyNotice } from '@/features/events/features/nearby/lib/nearbyNotice';
+import type { NearbyNotice } from '@/features/events/features/nearby/lib/nearbyNotice';
+import { mergeNearby } from '@/features/events/features/nearby/lib/nearbyEvents';
+import type { NearbyItem } from '@/features/events/features/nearby/lib/nearbyEvents';
 import type { EventStackParamList, MusicEvent } from '@/features/events/lib/types';
 
 export interface NearbyEvents {

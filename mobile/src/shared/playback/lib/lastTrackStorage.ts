@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
-import type { QueueTrack } from './queue.types';
+import type { QueueTrack } from '@/shared/playback/lib/queue.types';
 
 export interface LastTrackEntry {
 	track: QueueTrack;
@@ -21,7 +21,9 @@ const entrySchema = z.object({
 	positionMs: z.number().nonnegative(),
 });
 
-const keyFor = (userId: string) => `zumik:lastTrack:${userId}`;
+function keyFor(userId: string) {
+	return `zumik:lastTrack:${userId}`;
+}
 
 async function save(userId: string, entry: LastTrackEntry): Promise<void> {
 	const parsed = entrySchema.safeParse(entry);

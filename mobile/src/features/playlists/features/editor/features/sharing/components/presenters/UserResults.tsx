@@ -8,7 +8,7 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
-import { createSharingStyles } from './sharingStyles';
+import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
 import { Text } from '@/shared/theme/components/Text';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
@@ -60,8 +60,8 @@ export function UserResults({ results, isSearching, busy, onAdd }: UserResultsPr
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			marginBottom: theme.spacing.lg,
 		},
@@ -94,3 +94,4 @@ const createStyles = (theme: Theme) =>
 			justifyContent: 'center',
 		},
 	});
+}

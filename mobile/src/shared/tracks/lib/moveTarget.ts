@@ -1,4 +1,4 @@
-import type { TrackInPlaylist } from './track.types';
+import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
 import type { QueueItem } from '@/shared/playback/lib/queue.types';
 
 function afterIndexForDrop(length: number, from: number, to: number): number | null | undefined {

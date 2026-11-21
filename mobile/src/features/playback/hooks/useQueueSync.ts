@@ -5,10 +5,10 @@ import { useSession } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import type { QueueState } from '@/features/playback/shared/player/lib/queue.types';
 
-const remoteOwnerId = (): string | null => {
+function remoteOwnerId(): string | null {
 	const { target } = useConnectStore.getState();
 	return target.kind === 'remote' ? target.ownerId : null;
-};
+}
 
 export function useQueueSync(): void {
 	const socket = useSocketStore(state => state.socket);
@@ -39,10 +39,10 @@ export function useQueueSync(): void {
 		}
 		connectedOnceRef.current = true;
 
-		const handleQueueUpdated = (state: QueueState) => {
+		function handleQueueUpdated(state: QueueState) {
 			if (state.ownerId !== userIdRef.current && state.ownerId !== remoteOwnerId()) return;
 			applyState(state);
-		};
+		}
 
 		socket.on('queue:updated', handleQueueUpdated);
 		return () => {

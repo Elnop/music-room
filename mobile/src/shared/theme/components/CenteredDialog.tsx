@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Pressable } from './Pressable';
+import { Pressable } from '@/shared/theme/components/Pressable';
 import { DIALOG_MAX_WIDTH } from '@/shared/theme/lib/layout';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
@@ -28,8 +28,8 @@ export function CenteredDialog({ onClose, fill = false, children }: CenteredDial
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		backdrop: {
 			flex: 1,
 			alignItems: 'center',
@@ -48,3 +48,4 @@ const createStyles = (theme: Theme) =>
 		fill: { height: '80%' },
 		fit: { maxHeight: '85%' },
 	});
+}

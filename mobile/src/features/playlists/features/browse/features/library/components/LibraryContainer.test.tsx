@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LibraryContainer } from './LibraryContainer';
+import { LibraryContainer } from '@/features/playlists/features/browse/features/library/components/LibraryContainer';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
@@ -13,6 +13,7 @@ import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -23,7 +24,7 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-let mockFocus: () => void = () => undefined;
+let mockFocus: () => void = noop;
 jest.mock('@react-navigation/native', () => {
 	const { useEffect } = jest.requireActual('react');
 	return {
@@ -37,23 +38,25 @@ jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn() }));
 
 type Props = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
 
-const playlist = (id: string, overrides: Partial<Playlist> = {}): Playlist => ({
-	id,
-	name: id,
-	ownerId: 'me',
-	collaboratorIds: [],
-	viewerIds: [],
-	trackCount: 1,
-	visibility: 'public',
-	editMode: 'open',
-	createdAt: '',
-	updatedAt: '',
-	...overrides,
-});
+function playlist(id: string, overrides: Partial<Playlist> = {}): Playlist {
+	return {
+		id,
+		name: id,
+		ownerId: 'me',
+		collaboratorIds: [],
+		viewerIds: [],
+		trackCount: 1,
+		visibility: 'public',
+		editMode: 'open',
+		createdAt: '',
+		updatedAt: '',
+		...overrides,
+	};
+}
 
 const navigation = { navigate: jest.fn(), setOptions: jest.fn() };
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 function renderLibrary() {
 	const view = renderWithClient(

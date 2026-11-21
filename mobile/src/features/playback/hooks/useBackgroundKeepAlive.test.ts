@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { jsKeepAlive } from '@/features/playback/lib/jsKeepAlive';
-import { useBackgroundKeepAlive } from './useBackgroundKeepAlive';
+import { useBackgroundKeepAlive } from '@/features/playback/hooks/useBackgroundKeepAlive';
 
 jest.mock('@/features/playback/lib/jsKeepAlive', () => ({
 	jsKeepAlive: { start: jest.fn(), stop: jest.fn() },

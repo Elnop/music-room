@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native';
 import { keycap, pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 
-export const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+export function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			...keycap(theme),
 			backgroundColor: theme.colors.surfaceAlt,
@@ -80,3 +80,4 @@ export const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 		},
 	});
+}

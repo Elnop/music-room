@@ -8,7 +8,7 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
 import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
-import type { NowPlayingPanelStyles } from './nowPlayingPanelStyles';
+import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
 interface PanelTrackActionsProps {

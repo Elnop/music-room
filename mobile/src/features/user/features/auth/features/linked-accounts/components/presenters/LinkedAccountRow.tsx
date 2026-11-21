@@ -47,12 +47,15 @@ export function LinkedAccountRow({
 	const isLinked = Boolean(linked);
 	const type = method.type;
 
-	const renderAction = () => {
+	function renderAction() {
 		if (type === 'password') return null;
+		const provider = type;
 
 		const label = isLinked ? 'Délier' : 'Lier';
 		const disabled = pending !== null;
-		const onPress = () => (isLinked ? onUnlink(type) : onLink(type));
+		function onPress() {
+			return isLinked ? onUnlink(provider) : onLink(provider);
+		}
 
 		if (googleButton && !isLinked && pending !== type) {
 			return (
@@ -82,7 +85,7 @@ export function LinkedAccountRow({
 				</Text>
 			</Pressable>
 		);
-	};
+	}
 
 	return (
 		<View style={styles.accountItem} testID={`linked-account-${method.type}`}>
@@ -100,8 +103,8 @@ export function LinkedAccountRow({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		accountItem: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -158,3 +161,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.error,
 		},
 	});
+}

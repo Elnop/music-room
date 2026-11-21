@@ -1,4 +1,7 @@
-import type { PlaylistUpdatedEvent, PlaylistWithTracks } from './types';
+import type {
+	PlaylistUpdatedEvent,
+	PlaylistWithTracks,
+} from '@/features/playlists/shared/playlist/lib/types';
 import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
 
 export function sortByRank(tracks: TrackInPlaylist[]): TrackInPlaylist[] {

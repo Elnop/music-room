@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import type { PixelIconSource } from './PixelIcon';
-import { Pressable } from './Pressable';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 
@@ -49,8 +49,8 @@ export function SectionHeader({ icon, title, count, open, onToggle, action }: Se
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		header: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -65,3 +65,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

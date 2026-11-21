@@ -5,7 +5,9 @@ import type {
 	OAuthProvider,
 } from '@/features/user/features/auth/types';
 
-const bearer = (accessToken: string) => ({ Authorization: `Bearer ${accessToken}` });
+function bearer(accessToken: string) {
+	return { Authorization: `Bearer ${accessToken}` };
+}
 
 export function getLinkedProviders(accessToken: string): Promise<LinkedProvidersResponse> {
 	return apiRequest('/api/auth/providers', { method: 'GET', headers: bearer(accessToken) });

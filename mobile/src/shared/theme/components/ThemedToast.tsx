@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import type { PixelIconSource } from './PixelIcon';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import type { ToastConfigParams } from 'react-native-toast-message';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Pressable } from './Pressable';
-import { Text } from './Text';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
@@ -49,8 +49,8 @@ export function ThemedToast({ kind, params, theme }: ThemedToastProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -79,3 +79,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 2,
 		},
 	});
+}

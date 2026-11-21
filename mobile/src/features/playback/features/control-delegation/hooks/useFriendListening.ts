@@ -13,7 +13,7 @@ import type {
 	FriendDeviceStatus,
 	FriendListeningResult,
 } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
-import { useControllableDevices } from './useControllableDevices';
+import { useControllableDevices } from '@/features/playback/features/control-delegation/hooks/useControllableDevices';
 
 export function useFriendListening(targetUserId: string | null): FriendListeningResult {
 	const socket = useSocketStore(state => state.socket);
@@ -40,18 +40,18 @@ export function useFriendListening(targetUserId: string | null): FriendListening
 			subscribed = true;
 		}, 200);
 
-		const handleStatus = (status: UserListeningStatus) => {
+		function handleStatus(status: UserListeningStatus) {
 			if (status.ownerId === targetUserId) {
 				setRawStatuses(status.devices);
 				setIsLoading(false);
 			}
-		};
+		}
 
-		const handleError = (err: { message: string; code: string }) => {
+		function handleError(err: { message: string; code: string }) {
 			logger.error('[MusicControl] Error:', err);
 			setError(err.message);
 			setIsLoading(false);
-		};
+		}
 
 		socket.on('listening:status', handleStatus);
 		socket.on('listening:error', handleError);

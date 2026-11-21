@@ -2,8 +2,8 @@ import React from 'react';
 import { View } from 'react-native';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfileHeaderProps } from '@/features/user/features/friends/types';
-import { UserProfileInfo } from './UserProfileInfo';
-import { UserProfileActions } from './UserProfileActions';
+import { UserProfileInfo } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileInfo';
+import { UserProfileActions } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileActions';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
 
 export function UserProfileHeader(props: UserProfileHeaderProps) {

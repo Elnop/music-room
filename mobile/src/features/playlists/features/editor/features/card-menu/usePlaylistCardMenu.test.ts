@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import { act, renderHook } from '@testing-library/react-native';
 import { showSuccess } from '@/shared/theme/lib/toast';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
-import { usePlaylistCardMenu } from './usePlaylistCardMenu';
+import { usePlaylistCardMenu } from '@/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -31,11 +31,15 @@ jest.mock('@/features/playlists/shared/playlist/lib/playlistCache', () => ({
 }));
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
 
-const playlist = (id: string, ownerId: string) => ({ id, ownerId, name: `Mix ${id}` }) as Playlist;
+function playlist(id: string, ownerId: string) {
+	return { id, ownerId, name: `Mix ${id}` } as Playlist;
+}
 const navigation = { navigate: jest.fn(), getParent: jest.fn() };
 
-const setup = () =>
-	renderHook(() => usePlaylistCardMenu(navigation, { isPremium: true, refetch: jest.fn() })).result;
+function setup() {
+	return renderHook(() => usePlaylistCardMenu(navigation, { isPremium: true, refetch: jest.fn() }))
+		.result;
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

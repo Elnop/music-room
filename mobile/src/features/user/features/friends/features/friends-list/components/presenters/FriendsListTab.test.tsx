@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, useWindowDimensions } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { FriendsListTab } from './FriendsListTab';
+import { FriendsListTab } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendsListTab';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
@@ -13,15 +13,18 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
 const friends = [
 	{ id: 'p', username: 'patrick', displayName: 'Patrick Étoile' },
 	{ id: 's', username: 'sandy' },
 ];
 
-const renderTab = (onToggleControl = jest.fn()) => {
+function renderTab(onToggleControl = jest.fn()) {
 	render(
 		<FriendsListTab
 			friends={friends}
@@ -39,7 +42,7 @@ const renderTab = (onToggleControl = jest.fn()) => {
 		/>
 	);
 	return onToggleControl;
-};
+}
 
 describe('FriendsListTab', () => {
 	it('names the control switch of each friend on the phone', async () => {
@@ -47,7 +50,7 @@ describe('FriendsListTab', () => {
 		renderTab();
 		await act(async () => {});
 		expect(screen.getByLabelText('Patrick Étoile peut contrôler ma musique')).toBeTruthy();
-		expect(screen.queryByText(/sur tous mes appareils/)).toBeNull();
+		expect(screen.queryByText(/sur tous mes appareils/u)).toBeNull();
 	});
 
 	it('spells out what the switch grants on desktop, and spreads a short list over the width', async () => {

@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { testPlayback } from '@test-utils/playback';
 import { showInfo } from '@/shared/theme/lib/toast';
 import { PlayPlaylistButton } from '@/features/playlists/features/editor/features/detail/components/presenters/PlayPlaylistButton';
-import { usePlayPlaylist } from './usePlayPlaylist';
+import { usePlayPlaylist } from '@/features/playlists/features/editor/features/detail/hooks/usePlayPlaylist';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
@@ -12,17 +12,17 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 jest.mock('@/shared/theme/lib/toast', () => ({ showInfo: jest.fn() }));
 
 const { playPlaylist, pause, resume } = testPlayback;
-const setState = (state: 'playing' | 'paused' | 'loading' | null) => {
+function setState(state: 'playing' | 'paused' | 'loading' | null) {
 	testPlayback.state = state;
-};
+}
 
 function Harness({ playlistId }: { playlistId: string }) {
 	return <PlayPlaylistButton play={usePlayPlaylist(playlistId, { ...testPlayback })} />;
 }
 
-const renderButton = async (playlistId = 'p1') => {
+async function renderButton(playlistId = 'p1') {
 	render(<Harness playlistId={playlistId} />);
-};
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

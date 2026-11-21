@@ -1,9 +1,11 @@
 import { musicEvent } from '@test-utils/eventFixtures';
-import { mergeNearby, nearbyByGps } from './nearbyEvents';
+import { mergeNearby, nearbyByGps } from '@/features/events/features/nearby/lib/nearbyEvents';
 
 const HOUR = 3_600_000;
 const here = { latitude: 48.8966, longitude: 2.3185 };
-const at = (offset: number) => new Date(Date.now() + offset).toISOString();
+function at(offset: number) {
+	return new Date(Date.now() + offset).toISOString();
+}
 
 describe('nearbyByGps', () => {
 	it('keeps ongoing events within the radius, nearest first', () => {
@@ -29,7 +31,9 @@ describe('nearbyByGps', () => {
 });
 
 describe('mergeNearby', () => {
-	const sighting = (rssi: number) => ({ rssi, measuredPower: -59, lastSeen: Date.now() });
+	function sighting(rssi: number) {
+		return { rssi, measuredPower: -59, lastSeen: Date.now() };
+	}
 
 	it('shows an event heard by beacon as "Tout près", once, before the GPS ones', () => {
 		const heard = musicEvent({ id: 'heard', beaconMinor: 7 });

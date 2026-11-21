@@ -64,8 +64,8 @@ export function ConnectionBanner({ status, topInset, onRetry }: ConnectionBanner
 	);
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
-	StyleSheet.create({
+function createStyles(theme: Theme, topInset: number) {
+	return StyleSheet.create({
 		container: {
 			paddingTop: topInset,
 		},
@@ -92,3 +92,4 @@ const createStyles = (theme: Theme, topInset: number) =>
 			fontFamily: theme.typography.families.bold,
 		},
 	});
+}

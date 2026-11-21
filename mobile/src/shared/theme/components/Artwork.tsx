@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Image, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import { useTheme } from './ThemeContext';
+import { View, Image, StyleSheet } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface ArtworkProps {

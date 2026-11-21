@@ -27,11 +27,12 @@ export function InfoRow({ icon, label, text }: InfoRowProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.md },
 		icon: { marginTop: 2 },
 		body: { flex: 1 },
 		label: pixelCaption(theme),
 		text: { fontSize: theme.typography.sizes.lg, color: theme.colors.text, marginTop: 2 },
 	});
+}

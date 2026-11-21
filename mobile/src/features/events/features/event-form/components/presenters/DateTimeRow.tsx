@@ -29,8 +29,8 @@ export function DateTimeRow({ label, value, onPress }: DateTimeRowProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -48,3 +48,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 2,
 		},
 	});
+}

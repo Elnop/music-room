@@ -44,8 +44,8 @@ export function EditProfilePhoto({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		photoBlock: {
 			alignItems: 'center',
 			gap: theme.spacing.md,
@@ -61,3 +61,4 @@ const createStyles = (theme: Theme) =>
 			alignSelf: 'center',
 		},
 	});
+}

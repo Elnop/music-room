@@ -27,16 +27,18 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 
-	const renderRightActions = () => (
-		<Pressable
-			style={styles.removeButton}
-			onPress={() => onRemove(user.id)}
-			accessibilityLabel="Retirer"
-		>
-			<PixelIcon icon={UserMinusSolid} size={24} color={theme.colors.onColor} />
-			<Text style={styles.removeText}>Retirer</Text>
-		</Pressable>
-	);
+	function renderRightActions() {
+		return (
+			<Pressable
+				style={styles.removeButton}
+				onPress={() => onRemove(user.id)}
+				accessibilityLabel="Retirer"
+			>
+				<PixelIcon icon={UserMinusSolid} size={24} color={theme.colors.onColor} />
+				<Text style={styles.removeText}>Retirer</Text>
+			</Pressable>
+		);
+	}
 
 	return (
 		<Swipeable renderRightActions={renderRightActions} overshootRight={false} friction={2}>
@@ -67,8 +69,8 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 	);
 }
 
-const createStyles = (theme: Theme, separator: string) =>
-	StyleSheet.create({
+function createStyles(theme: Theme, separator: string) {
+	return StyleSheet.create({
 		userContainer: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -123,3 +125,4 @@ const createStyles = (theme: Theme, separator: string) =>
 			marginTop: 4,
 		},
 	});
+}

@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-native';
-import { usePlayerShortcuts } from './usePlayerShortcuts';
+import { usePlayerShortcuts } from '@/features/playback/hooks/usePlayerShortcuts';
 
 const mockControls = {
 	sliderDisabled: false,
@@ -14,11 +14,11 @@ jest.mock('@/features/playback/shared/player/hooks/usePlaybackControls', () => (
 	usePlaybackControls: () => mockControls,
 }));
 
-const run = (key: string, shift?: boolean) => {
+function run(key: string, shift?: boolean) {
 	const { result } = renderHook(() => usePlayerShortcuts());
 	const shortcut = result.current.find(item => item.key === key && item.shift === shift);
 	shortcut?.run();
-};
+}
 
 describe('usePlayerShortcuts', () => {
 	beforeEach(() => {

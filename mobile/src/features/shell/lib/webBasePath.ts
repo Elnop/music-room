@@ -1,12 +1,12 @@
 export function webBasePath(): string {
-	return (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+	return (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/u, '');
 }
 
 export function stripBasePath(path: string, base = webBasePath()): string {
 	if (!base || !path.startsWith(base)) return path;
 	const rest = path.slice(base.length);
 	if (rest === '') return '/';
-	return /^[/?#]/.test(rest) ? rest : path;
+	return /^[/?#]/u.test(rest) ? rest : path;
 }
 
 interface BrowserLocation {
@@ -19,7 +19,7 @@ interface BrowserHistory {
 	replaceState(data: unknown, unused: string, url: string): void;
 }
 
-const REDIRECT_PARAM = /[?&]redirect=([^&]*)/;
+const REDIRECT_PARAM = /[?&]redirect=([^&]*)/u;
 
 const browser = globalThis as { location?: BrowserLocation; history?: BrowserHistory };
 

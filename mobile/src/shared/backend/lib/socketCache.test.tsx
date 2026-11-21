@@ -1,6 +1,7 @@
 import React from 'react';
 import { renderHook } from '@testing-library/react-native';
-import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import {
@@ -8,11 +9,13 @@ import {
 	bindSocketCache,
 	socketCacheRule,
 	useSocketCache,
-	type SocketCacheRule,
-} from './socketCache';
+} from '@/shared/backend/lib/socketCache';
+import type { SocketCacheRule } from '@/shared/backend/lib/socketCache';
 import { useSocketStore } from '@/shared/backend/socketStore';
 
-const playlistKey = (playlistId: string) => ['playlists', 'detail', playlistId] as const;
+function playlistKey(playlistId: string) {
+	return ['playlists', 'detail', playlistId] as const;
+}
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -52,8 +55,9 @@ function fakeSocket() {
 			listeners.get(event)?.delete(listener);
 		}),
 	};
-	const emit = (event: string, payload: unknown) =>
-		listeners.get(event)?.forEach(listener => listener(payload));
+	function emit(event: string, payload: unknown) {
+		return listeners.get(event)?.forEach(listener => listener(payload));
+	}
 	return { socket: socket as unknown as Socket, raw: socket, emit, listeners };
 }
 
@@ -165,9 +169,9 @@ describe('socketCache', () => {
 			client.setQueryData<Playlist>(key, { id: 'p1', name: 'Old', version: 1 });
 			const { socket, raw, emit } = fakeSocket();
 			setSocket(socket);
-			const wrapper = ({ children }: { children: React.ReactNode }) => (
-				<QueryClientProvider client={client}>{children}</QueryClientProvider>
-			);
+			function wrapper({ children }: { children: React.ReactNode }) {
+				return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+			}
 
 			const { unmount } = renderHook(() => useSocketCache(bindings), { wrapper });
 			emit('playlist:renamed', { playlistId: 'p1', name: 'New', version: 2 });
@@ -180,9 +184,9 @@ describe('socketCache', () => {
 		it('does nothing without a socket', () => {
 			const client = createClient();
 			setSocket(null);
-			const wrapper = ({ children }: { children: React.ReactNode }) => (
-				<QueryClientProvider client={client}>{children}</QueryClientProvider>
-			);
+			function wrapper({ children }: { children: React.ReactNode }) {
+				return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+			}
 
 			expect(() => renderHook(() => useSocketCache(bindings), { wrapper })).not.toThrow();
 		});

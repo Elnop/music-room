@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useAvatarPicker } from './useAvatarPicker';
+import { useAvatarPicker } from '@/features/user/features/profile/features/edit-profile/hooks/useAvatarPicker';
 import { ApiError } from '@/shared/backend/lib/api';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

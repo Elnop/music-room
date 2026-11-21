@@ -2,17 +2,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { getBackendUrl, resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { logger } from '@/shared/logging/logger';
-import { login, register, signInWithProvider, verifyEmail } from './signIn';
-import { oauthErrorMessage } from './oauthErrors';
-import { signInWithGoogle } from './googleSignIn';
-import { signInWithFacebook } from './facebookSignIn';
+import {
+	login,
+	register,
+	signInWithProvider,
+	verifyEmail,
+} from '@/features/user/features/auth/shared/sign-in/lib/signIn';
+import { oauthErrorMessage } from '@/features/user/features/auth/shared/sign-in/lib/oauthErrors';
+import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
+import { signInWithFacebook } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('./googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
-jest.mock('./facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
+	signInWithGoogle: jest.fn(),
+}));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn', () => ({
+	signInWithFacebook: jest.fn(),
+}));
 
 jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
@@ -148,7 +157,7 @@ describe('login', () => {
 
 		const { url, init, body } = requestAt();
 		expect(fetchMock).toHaveBeenCalledTimes(1);
-		expect(url).toMatch(/\/api\/auth\/login$/);
+		expect(url).toMatch(/\/api\/auth\/login$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toEqual({ email: 'a@example.com', password: 'Secret1!' });
 		expectAuthenticated();
@@ -168,7 +177,7 @@ describe('login', () => {
 		);
 
 		expect(calledUrls()).toHaveLength(1);
-		expect(calledUrls()[0]).toMatch(/\/api\/auth\/login$/);
+		expect(calledUrls()[0]).toMatch(/\/api\/auth\/login$/u);
 		await expectSignedOutAndNothingStored();
 	});
 });
@@ -198,7 +207,7 @@ describe('register', () => {
 		});
 
 		const { url, init, body } = requestAt();
-		expect(url).toMatch(/\/api\/auth\/register$/);
+		expect(url).toMatch(/\/api\/auth\/register$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toEqual(input);
 		await expectSignedOutAndNothingStored();
@@ -213,7 +222,7 @@ describe('register', () => {
 			requiresVerification: false,
 		});
 
-		expect(requestAt().url).toMatch(/\/api\/auth\/register$/);
+		expect(requestAt().url).toMatch(/\/api\/auth\/register$/u);
 		expectAuthenticated();
 		await expectPersisted();
 	});
@@ -241,7 +250,7 @@ describe('loginWithGoogle', () => {
 
 		const { url, init, body } = requestAt();
 		expect(fetchMock).toHaveBeenCalledTimes(1);
-		expect(url).toMatch(/\/api\/auth\/google$/);
+		expect(url).toMatch(/\/api\/auth\/google$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toEqual({ idToken: 'google-id-token' });
 		expectAuthenticated();
@@ -286,7 +295,7 @@ describe('loginWithFacebook', () => {
 
 		const { url, init, body } = requestAt();
 		expect(fetchMock).toHaveBeenCalledTimes(1);
-		expect(url).toMatch(/\/api\/auth\/facebook$/);
+		expect(url).toMatch(/\/api\/auth\/facebook$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toEqual({ accessToken: 'facebook-access-token' });
 		expectAuthenticated();
@@ -330,7 +339,7 @@ describe('verifyEmail', () => {
 
 		const { url, init, body } = requestAt();
 		expect(fetchMock).toHaveBeenCalledTimes(1);
-		expect(url).toMatch(/\/api\/auth\/verify-email$/);
+		expect(url).toMatch(/\/api\/auth\/verify-email$/u);
 		expect(init.method).toBe('POST');
 		expect(body).toEqual({ userId: 'user-a', code: '123456' });
 		expectAuthenticated();

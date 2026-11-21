@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { PixelIcon } from './PixelIcon';
-import { useTheme } from './ThemeContext';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 
@@ -20,18 +20,20 @@ export function QueueSwipe({ children, onAddToQueue, renderRightActions }: Queue
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-	const renderLeftActions = () => (
-		<View style={styles.queueAction} accessible accessibilityLabel="Ajouter à la file d'attente">
-			<PixelIcon icon={PlaylistSolid} size={24} color={theme.colors.onColor} />
-			<Text style={styles.queueText}>À la file</Text>
-		</View>
-	);
+	function renderLeftActions() {
+		return (
+			<View style={styles.queueAction} accessible accessibilityLabel="Ajouter à la file d'attente">
+				<PixelIcon icon={PlaylistSolid} size={24} color={theme.colors.onColor} />
+				<Text style={styles.queueText}>À la file</Text>
+			</View>
+		);
+	}
 
-	const handleOpen = (direction: 'left' | 'right', swipeable: Swipeable) => {
+	function handleOpen(direction: 'left' | 'right', swipeable: Swipeable) {
 		if (direction !== 'left') return;
 		swipeable.close();
 		onAddToQueue?.();
-	};
+	}
 
 	return (
 		<Swipeable
@@ -41,15 +43,15 @@ export function QueueSwipe({ children, onAddToQueue, renderRightActions }: Queue
 			overshootLeft={false}
 			overshootRight={false}
 			friction={2}
-			enabled={!!onAddToQueue || !!renderRightActions}
+			enabled={Boolean(onAddToQueue) || Boolean(renderRightActions)}
 		>
 			{children}
 		</Swipeable>
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		queueAction: {
 			backgroundColor: theme.colors.primary,
 			justifyContent: 'center',
@@ -64,3 +66,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 4,
 		},
 	});
+}

@@ -88,8 +88,8 @@ export function LoginView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		forgotPasswordButton: {
 			alignItems: 'center',
 			marginTop: 16,
@@ -101,3 +101,4 @@ const createStyles = (theme: Theme) =>
 			fontFamily: FONT_FAMILIES.semibold,
 		},
 	});
+}

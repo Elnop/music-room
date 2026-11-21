@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
-import { useTheme } from './ThemeContext';
+import { View, StyleSheet } from 'react-native';
+import type { ViewStyle, StyleProp } from 'react-native';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 import { sizedAvatarUri } from '@/shared/theme/lib/avatarUri';
 import { avatarColor, avatarInitials } from '@/shared/theme/lib/avatarInitials';
 import { displayText } from '@/shared/theme/lib/pixelFrame';
-import { AvatarPhoto } from './AvatarPhoto';
+import { AvatarPhoto } from '@/shared/theme/components/AvatarPhoto';
 
 interface AvatarProps {
 	uri?: string;
@@ -64,8 +65,8 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			backgroundColor: theme.colors.surfaceAlt,
 			justifyContent: 'center',
@@ -79,3 +80,4 @@ const createStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.display,
 		},
 	});
+}

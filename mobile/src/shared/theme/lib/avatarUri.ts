@@ -1,4 +1,4 @@
-const GOOGLE_SIZE_SUFFIX = /^(https:\/\/lh\d\.googleusercontent\.com\/.+)=s\d+(-c)?$/;
+const GOOGLE_SIZE_SUFFIX = /^(https:\/\/lh\d\.googleusercontent\.com\/.+)=s\d+(-c)?$/u;
 
 export function sizedAvatarUri(uri: string, size: number): string {
 	const match = GOOGLE_SIZE_SUFFIX.exec(uri);

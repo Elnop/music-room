@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { SearchTracksContainer } from './SearchTracksContainer';
+import { SearchTracksContainer } from '@/features/playlists/features/editor/features/search-tracks/components/SearchTracksContainer';
 import { Text } from '@/shared/theme/components/Text';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/keys';
@@ -15,6 +15,7 @@ import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
 import { testPlayback } from '@test-utils/playback';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -48,7 +49,7 @@ const known = { ...song, id: 43, title: 'Known', permalink_url: 'https://soundcl
 const SEARCH = 'GET /api/soundcloud/search?q=daft&limit=20';
 const ADD = 'POST /api/playlists/p1/tracks';
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 async function renderScreen() {
 	const client = createQueryClient();

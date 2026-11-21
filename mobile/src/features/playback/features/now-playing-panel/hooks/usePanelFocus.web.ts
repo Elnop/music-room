@@ -35,11 +35,11 @@ export function usePanelFocus(onClose: () => void): void {
 		if (!document || !panel) return;
 		const opener = document.activeElement;
 		document.getElementById(PANEL_CLOSE_ID)?.focus();
-		const onKeyDown = (event: BrowserKeyEvent) => {
+		function onKeyDown(event: BrowserKeyEvent) {
 			if (event.key !== 'Escape' || event.defaultPrevented) return;
 			event.preventDefault();
 			onCloseRef.current();
-		};
+		}
 		panel.addEventListener('keydown', onKeyDown);
 		return () => {
 			panel.removeEventListener('keydown', onKeyDown);

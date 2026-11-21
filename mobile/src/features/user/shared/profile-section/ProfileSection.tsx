@@ -40,8 +40,8 @@ export function ProfileSection({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
@@ -75,3 +75,4 @@ const createStyles = (theme: Theme) =>
 			paddingBottom: theme.spacing.md,
 		},
 	});
+}

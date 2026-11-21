@@ -3,12 +3,14 @@ import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import type { UserDeviceWithLicenses } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
-import type { FriendUserSummary } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
-import { DeviceCard } from './DeviceCard';
-import { MyDevicesHeader } from './MyDevicesHeader';
-import { MyDevicesLoadingView } from './MyDevicesLoadingView';
-import { MyDevicesErrorView } from './MyDevicesErrorView';
+import type {
+	UserDeviceWithLicenses,
+	FriendUserSummary,
+} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import { DeviceCard } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceCard';
+import { MyDevicesHeader } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesHeader';
+import { MyDevicesLoadingView } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesLoadingView';
+import { MyDevicesErrorView } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesErrorView';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
 interface MyDevicesViewProps {
@@ -103,8 +105,8 @@ export function MyDevicesView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		root: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -120,3 +122,4 @@ const createStyles = (theme: Theme) =>
 			padding: theme.spacing.md,
 		},
 	});
+}

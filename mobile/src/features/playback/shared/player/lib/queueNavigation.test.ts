@@ -5,24 +5,26 @@ import {
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
-} from './queueNavigation';
+} from '@/features/playback/shared/player/lib/queueNavigation';
 import type { QueueItem } from '@/shared/playback/lib/queue.types';
 
-const mockItem = (id: string): QueueItem => ({
-	id,
-	rank: id,
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-	track: {
-		title: id,
-		artist: 'Artist',
-		durationMs: 180000,
-		album: null,
-		albumArt: null,
-		trackUri: 'uri',
-	},
-});
+function mockItem(id: string): QueueItem {
+	return {
+		id,
+		rank: id,
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+		track: {
+			title: id,
+			artist: 'Artist',
+			durationMs: 180000,
+			album: null,
+			albumArt: null,
+			trackUri: 'uri',
+		},
+	};
+}
 
 describe('queueNavigation', () => {
 	it('defines RESTART_THRESHOLD_S as 3', () => {

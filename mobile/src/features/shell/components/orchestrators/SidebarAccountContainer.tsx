@@ -44,8 +44,8 @@ export function SidebarAccountContainer({ active, onPress }: SidebarAccountProps
 	);
 }
 
-const createStyles = (theme: Theme, separator: string) =>
-	StyleSheet.create({
+function createStyles(theme: Theme, separator: string) {
+	return StyleSheet.create({
 		container: {
 			marginHorizontal: theme.spacing.sm,
 			paddingVertical: theme.spacing.sm,
@@ -76,3 +76,4 @@ const createStyles = (theme: Theme, separator: string) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

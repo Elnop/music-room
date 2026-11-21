@@ -1,7 +1,11 @@
 import { apiRequest } from '@/shared/backend/lib/api';
 import { jpegFormData } from '@/shared/backend/lib/jpegFormData';
-import type { CoverResponse, Playlist, PlaylistWithTracks } from './types';
-import type { PlaylistInput } from './validators';
+import type {
+	CoverResponse,
+	Playlist,
+	PlaylistWithTracks,
+} from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistInput } from '@/features/playlists/shared/playlist/lib/validators';
 
 export async function fetchPlaylists(): Promise<Playlist[]> {
 	const data = await apiRequest<{ playlists: Playlist[] }>('/api/playlists');

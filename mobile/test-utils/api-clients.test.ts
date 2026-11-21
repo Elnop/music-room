@@ -4,7 +4,8 @@ import { privacyApi } from '@/features/user/features/profile/shared/profile/lib/
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { createStore } from 'zustand';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -42,7 +43,7 @@ const CLIENT_HEADERS = {
 	'X-App-Version': '1.2.3',
 };
 
-it.each([
+test.each([
 	['friendsApi', () => friendsApi.getFriends('caller-token'), [], 'caller-token'],
 	['profileApi', () => profileApi.getOwnProfile('caller-token'), { id: 'u1' }, 'caller-token'],
 	[

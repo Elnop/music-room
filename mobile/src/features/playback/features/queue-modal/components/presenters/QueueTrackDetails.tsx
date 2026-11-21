@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { createRowStyles } from './queueModalStyles';
+import type { createRowStyles } from '@/features/playback/features/queue-modal/components/presenters/queueModalStyles';
 import { Text } from '@/shared/theme/components/Text';
 
 interface QueueTrackDetailsProps {

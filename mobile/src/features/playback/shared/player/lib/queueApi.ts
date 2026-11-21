@@ -6,14 +6,16 @@ import type {
 	QueueStepResult,
 	TransferRequest,
 	TransferResult,
-} from './queue.types';
+} from '@/features/playback/shared/player/lib/queue.types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 
-const base = ({ ownerId }: QueueCallTarget = {}): string =>
-	ownerId ? `/api/users/${encodeURIComponent(ownerId)}/queue` : '/api/queue';
+function base({ ownerId }: QueueCallTarget = {}): string {
+	return ownerId ? `/api/users/${encodeURIComponent(ownerId)}/queue` : '/api/queue';
+}
 
-const deviceBody = ({ deviceId }: QueueCallTarget = {}): { body?: string } =>
-	deviceId ? { body: JSON.stringify({ deviceId }) } : {};
+function deviceBody({ deviceId }: QueueCallTarget = {}): { body?: string } {
+	return deviceId ? { body: JSON.stringify({ deviceId }) } : {};
+}
 
 async function step(
 	path: string,

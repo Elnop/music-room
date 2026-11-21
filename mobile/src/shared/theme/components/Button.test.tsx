@@ -1,10 +1,10 @@
 import React from 'react';
 import { ActivityIndicator } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Button } from './Button';
-import { Text } from './Text';
+import { Button } from '@/shared/theme/components/Button';
+import { Text } from '@/shared/theme/components/Text';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });

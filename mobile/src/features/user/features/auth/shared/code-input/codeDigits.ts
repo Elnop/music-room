@@ -19,7 +19,7 @@ export function fillCodeDigits(
 	}
 
 	const previous = code[index] ?? '';
-	let digits = text.replace(/\D/g, '');
+	let digits = text.replaceAll(/\D/gu, '');
 	if (previous && digits.length === CODE_LENGTH + 1) {
 		if (digits.startsWith(previous)) digits = digits.slice(1);
 		else if (digits.endsWith(previous)) digits = digits.slice(0, -1);

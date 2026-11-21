@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/lib/types';
 
-export const createSharingStyles = (theme: Theme) =>
-	StyleSheet.create({
+export function createSharingStyles(theme: Theme) {
+	return StyleSheet.create({
 		sectionTitle: {
 			fontSize: theme.typography.sizes.sm,
 			fontFamily: theme.typography.families.semibold,
@@ -23,3 +23,4 @@ export const createSharingStyles = (theme: Theme) =>
 			marginBottom: theme.spacing.sm,
 		},
 	});
+}

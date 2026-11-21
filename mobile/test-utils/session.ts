@@ -1,5 +1,6 @@
 import { createStore } from 'zustand';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import type { UserProfile } from '@/shared/users/user.types';
 
 export function signIn(userId: string): void {

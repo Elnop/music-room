@@ -1,10 +1,10 @@
 import { ApiError } from '@/shared/backend/lib/api';
-import { STALE, createQueryClient, shouldRetry } from './queryClient';
+import { STALE, createQueryClient, shouldRetry } from '@/shared/backend/queryClient';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('./deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
 describe('queryClient', () => {
 	it('orders the cache profiles from never fresh to long-lived', () => {

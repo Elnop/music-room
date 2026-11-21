@@ -2,7 +2,7 @@ import type { Track } from '@/shared/tracks/lib/track.types';
 import type { QueueItem, QueueTrack } from '@/shared/playback/lib/queue.types';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
-export const hashStringToNumber = (str: string): number => {
+export function hashStringToNumber(str: string): number {
 	let hash = 0;
 	for (let i = 0; i < str.length; i++) {
 		const chr = str.charCodeAt(i);
@@ -10,7 +10,7 @@ export const hashStringToNumber = (str: string): number => {
 		hash |= 0;
 	}
 	return Math.abs(hash);
-};
+}
 
 interface PlayableFields {
 	id: number;
@@ -21,22 +21,24 @@ interface PlayableFields {
 	albumArt: string | null;
 }
 
-const build = ({ id, title, artist, durationMs, trackUri, albumArt }: PlayableFields) => ({
-	id,
-	title,
-	description: null,
-	duration: durationMs,
-	genre: null,
-	artwork_url: albumArt,
-	permalink_url: trackUri,
-	user: {
+function build({ id, title, artist, durationMs, trackUri, albumArt }: PlayableFields) {
+	return {
 		id,
-		username: artist,
-		avatar_url: albumArt,
+		title,
+		description: null,
+		duration: durationMs,
+		genre: null,
+		artwork_url: albumArt,
 		permalink_url: trackUri,
-	},
-	playable: true,
-});
+		user: {
+			id,
+			username: artist,
+			avatar_url: albumArt,
+			permalink_url: trackUri,
+		},
+		playable: true,
+	};
+}
 
 export function queueTrackToSoundCloud(track: QueueTrack): SoundCloudTrack {
 	return build({
@@ -53,7 +55,7 @@ export function trackToSoundCloud(track: Track): SoundCloudTrack;
 export function trackToSoundCloud(item: QueueItem): SoundCloudTrack;
 export function trackToSoundCloud(input: Track | QueueItem): SoundCloudTrack {
 	if ('track' in input) return queueTrackToSoundCloud(input.track);
-	const parsed = parseInt(input.id, 10);
+	const parsed = Number.parseInt(input.id, 10);
 	const id = !Number.isNaN(parsed) ? parsed : hashStringToNumber(input.trackUri || input.id);
 	return build({
 		id,

@@ -35,10 +35,11 @@ export function NewPlaylistForm({ draft }: NewPlaylistFormProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		form: {
 			paddingHorizontal: theme.spacing.lg,
 			paddingTop: theme.spacing.md,
 		},
 	});
+}

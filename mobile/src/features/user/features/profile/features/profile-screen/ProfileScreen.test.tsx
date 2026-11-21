@@ -1,4 +1,5 @@
-import React, { type ReactElement } from 'react';
+import React from 'react';
+import type { ReactElement } from 'react';
 import { Alert, useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ProfileContainer } from '@/features/user/features/profile/features/profile-screen/components/ProfileContainer';
@@ -52,7 +53,7 @@ describe('ProfileScreen logout', () => {
 		jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 	});
 
-	const pressLogout = (): AlertButtons => {
+	function pressLogout(): AlertButtons {
 		render(<ProfileContainer />);
 		fireEvent.press(screen.getByText('Se déconnecter'));
 		expect(Alert.alert).toHaveBeenCalledWith('Se déconnecter ?', expect.any(String), [
@@ -60,7 +61,7 @@ describe('ProfileScreen logout', () => {
 			expect.objectContaining({ text: 'Se déconnecter', style: 'destructive' }),
 		]);
 		return (Alert.alert as jest.Mock).mock.calls[0][2];
-	};
+	}
 
 	it('asks for confirmation instead of logging out on the first tap', () => {
 		pressLogout();
@@ -85,13 +86,13 @@ describe('ProfileScreen header', () => {
 		jest.clearAllMocks();
 	});
 
-	const renderHeader = () => {
+	function renderHeader() {
 		render(<ProfileContainer />);
 		const { headerRight } = mockSetOptions.mock.calls.at(-1)[0] as {
 			headerRight: () => ReactElement;
 		};
 		render(headerRight());
-	};
+	}
 
 	it('opens the profile editor from the pencil', () => {
 		renderHeader();

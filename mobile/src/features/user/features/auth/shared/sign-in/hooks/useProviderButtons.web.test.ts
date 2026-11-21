@@ -3,10 +3,15 @@ import type { View } from 'react-native';
 import { renderGoogleButton } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn.web';
 import { preloadFacebookSdk } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web';
 import { logger } from '@/shared/logging/logger';
-import { useProviderButtons } from './useProviderButtons.web';
+import { useProviderButtons } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web';
+import { noop } from '@test-utils/noop';
 
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn.web', () => ({ renderGoogleButton: jest.fn() }));
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web', () => ({ preloadFacebookSdk: jest.fn() }));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn.web', () => ({
+	renderGoogleButton: jest.fn(),
+}));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web', () => ({
+	preloadFacebookSdk: jest.fn(),
+}));
 
 const node = { offsetWidth: 320 } as unknown as View;
 const render = jest.mocked(renderGoogleButton);
@@ -56,7 +61,7 @@ describe('useProviderButtons (web)', () => {
 
 	it('releases a button that renders after the slot is gone', async () => {
 		const release = jest.fn();
-		let finish: (done: () => void) => void = () => undefined;
+		let finish: (done: () => void) => void = noop;
 		render.mockReturnValue(new Promise(resolve => (finish = resolve)));
 		const { result } = renderHook(() => useProviderButtons(jest.fn(), 'form'));
 

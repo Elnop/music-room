@@ -3,10 +3,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { useSession } from '@/shared/backend/lib/authSession';
 import { logger } from '@/shared/logging/logger';
-import {
-	useDebouncedText,
-	type DebouncedText,
-} from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
+import { useDebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
+import type { DebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
 import { searchUsers } from '@/features/playlists/shared/playlist/lib/usersApi';
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 

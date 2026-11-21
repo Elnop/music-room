@@ -1,9 +1,12 @@
-import { applyPlaylistEvent, sortByRank } from './playlistSync';
-import type { PlaylistWithTracks } from './types';
+import {
+	applyPlaylistEvent,
+	sortByRank,
+} from '@/features/playlists/shared/playlist/lib/playlistSync';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
 
-const track = (id: string, rank: string): TrackInPlaylist =>
-	({
+function track(id: string, rank: string): TrackInPlaylist {
+	return {
 		id,
 		rank,
 		addedBy: null,
@@ -12,14 +15,17 @@ const track = (id: string, rank: string): TrackInPlaylist =>
 		artist: 'A',
 		trackUri: id,
 		durationMs: 1,
-	}) as TrackInPlaylist;
+	} as TrackInPlaylist;
+}
 
-const playlist = (tracksVersion: number, tracks: TrackInPlaylist[]): PlaylistWithTracks =>
-	({ id: 'p', tracksVersion, tracks }) as PlaylistWithTracks;
+function playlist(tracksVersion: number, tracks: TrackInPlaylist[]): PlaylistWithTracks {
+	return { id: 'p', tracksVersion, tracks } as PlaylistWithTracks;
+}
 
 const base = playlist(10, [track('A', 'a'), track('B', 'h'), track('C', 'p')]);
-const ids = (p: PlaylistWithTracks | 'ignore' | 'reload') =>
-	(p as PlaylistWithTracks).tracks.map(t => t.id);
+function ids(p: PlaylistWithTracks | 'ignore' | 'reload') {
+	return (p as PlaylistWithTracks).tracks.map(t => t.id);
+}
 
 describe('sortByRank', () => {
 	it('sorts by byte order, digits before upper case before lower case', () => {

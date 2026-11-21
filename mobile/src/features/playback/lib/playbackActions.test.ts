@@ -1,6 +1,6 @@
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import { playbackActions } from './playbackActions';
+import { playbackActions } from '@/features/playback/lib/playbackActions';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

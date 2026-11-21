@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, type TextInputProps } from 'react-native';
-import { Input } from './Input';
+import { StyleSheet, View } from 'react-native';
+import type { TextInputProps } from 'react-native';
+import { Input } from '@/shared/theme/components/Input';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { CappedField } from '@/shared/theme/hooks/useCappedField';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface CappedInputProps {
 	field: CappedField;
@@ -49,8 +50,8 @@ export function CappedInput({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		count: {
 			fontSize: 12,
 			color: theme.colors.textSecondary,
@@ -59,3 +60,4 @@ const createStyles = (theme: Theme) =>
 			marginBottom: theme.spacing.sm,
 		},
 	});
+}

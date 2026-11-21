@@ -4,8 +4,8 @@ import {
 	CONTENT_MAX_WIDTH,
 	NOW_PLAYING_PANEL_WIDTH,
 	SIDEBAR_WIDTH,
-	type ContentWidth,
 } from '@/shared/theme/lib/layout';
+import type { ContentWidth } from '@/shared/theme/lib/layout';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { ContentColumnContext } from '@/shared/content-column/useContentColumn';
 import { ContentWidthContext } from '@/shared/theme/hooks/useContentWidth';
@@ -49,8 +49,9 @@ export function ContentFrame({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		outer: { flex: 1, alignItems: 'center', backgroundColor: theme.colors.background },
 		inner: { flex: 1, width: '100%' },
 	});
+}

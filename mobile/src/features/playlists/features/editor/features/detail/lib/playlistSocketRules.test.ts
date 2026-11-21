@@ -2,7 +2,7 @@ import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/keys';
 import type { Playlist, PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
-import { PLAYLIST_SOCKET_RULES } from './playlistSocketRules';
+import { PLAYLIST_SOCKET_RULES } from '@/features/playlists/features/editor/features/detail/lib/playlistSocketRules';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -13,19 +13,24 @@ const client = createQueryClient();
 const detail = queryKeys.playlists.detail('p1');
 const list = queryKeys.playlists.list();
 
-const emit = (event: string, payload: unknown) =>
-	PLAYLIST_SOCKET_RULES.filter(rule => rule.event === event).map(rule =>
+function emit(event: string, payload: unknown) {
+	return PLAYLIST_SOCKET_RULES.filter(rule => rule.event === event).map(rule =>
 		rule.apply(client, payload)
 	);
+}
 
-const shown = () => client.getQueryData<PlaylistWithTracks>(detail)!;
-const removeA = (tracksVersion: number, rebalanced = false) => ({
-	playlistId: 'p1',
-	tracksVersion,
-	rebalanced,
-	event: 'track_removed',
-	trackId: 'A',
-});
+function shown() {
+	return client.getQueryData<PlaylistWithTracks>(detail)!;
+}
+function removeA(tracksVersion: number, rebalanced = false) {
+	return {
+		playlistId: 'p1',
+		tracksVersion,
+		rebalanced,
+		event: 'track_removed',
+		trackId: 'A',
+	};
+}
 
 beforeEach(() => {
 	client.clear();

@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import type { PixelIconSource } from './PixelIcon';
-import { useTheme } from './ThemeContext';
+import { View, StyleSheet } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { displayText, keycap } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Pressable } from './Pressable';
-import { Text } from './Text';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
 
 interface EmptyStateAction {
 	label: string;
@@ -45,8 +46,8 @@ export function EmptyState({ message, icon, action, compact = false, style }: Em
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			justifyContent: 'center',
@@ -84,3 +85,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.onColor,
 		},
 	});
+}

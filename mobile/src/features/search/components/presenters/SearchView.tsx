@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, RefreshControl, type TextInput } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import type { TextInput } from 'react-native';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
-import { SoundCloudTrackItem } from './SoundCloudTrackItem';
+import { SoundCloudTrackItem } from '@/features/search/components/presenters/SoundCloudTrackItem';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
@@ -118,8 +119,8 @@ export function SearchView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -130,3 +131,4 @@ const createStyles = (theme: Theme) =>
 			paddingBottom: theme.spacing.md,
 		},
 	});
+}

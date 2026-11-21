@@ -1,7 +1,9 @@
 import type { ViewStyle } from 'react-native';
-import { PIXEL } from './tokens';
+import { PIXEL } from '@/shared/theme/lib/tokens';
 
-export const focusedFieldStyle = (color: string): ViewStyle => ({
-	borderColor: color,
-	boxShadow: `0 0 0 ${PIXEL}px ${color}`,
-});
+export function focusedFieldStyle(color: string): ViewStyle {
+	return {
+		borderColor: color,
+		boxShadow: `0 0 0 ${PIXEL}px ${color}`,
+	};
+}

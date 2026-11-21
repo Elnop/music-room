@@ -17,7 +17,7 @@ export function useResendResetCode(
 ): ResendResetCode {
 	const countdown = useCountdown();
 
-	const resend = async () => {
+	async function resend() {
 		try {
 			const status = await canResendResetCode(email);
 			if (!status.canResend) {
@@ -31,7 +31,7 @@ export function useResendResetCode(
 		} catch {
 			showError('Échec envoi du code. Réessayez.');
 		}
-	};
+	}
 
 	return { resend, cooldown: countdown.seconds };
 }

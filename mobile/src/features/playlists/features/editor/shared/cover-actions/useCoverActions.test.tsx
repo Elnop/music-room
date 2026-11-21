@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import { act, renderHook } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCoverActions } from './useCoverActions';
+import { useCoverActions } from '@/features/playlists/features/editor/shared/cover-actions/useCoverActions';
 import { ApiError } from '@/shared/backend/lib/api';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
@@ -43,11 +43,12 @@ function setup() {
 	return renderHook(() => useCoverActions(navigation, ID, mockPlan)).result;
 }
 
-const alertButtons = () =>
-	(jest.mocked(Alert.alert).mock.calls.at(-1)?.[2] ?? []) as {
+function alertButtons() {
+	return (jest.mocked(Alert.alert).mock.calls.at(-1)?.[2] ?? []) as {
 		text: string;
 		onPress?: () => void;
 	}[];
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

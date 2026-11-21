@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
-import { MiniPlayerContainer } from './MiniPlayerContainer';
+import { MiniPlayerContainer } from '@/features/playback/features/mini-player/components/MiniPlayerContainer';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
 import { hapticTap } from '@/shared/theme/lib/haptics';
@@ -57,8 +57,8 @@ function nowPlaying(overrides: Partial<NowPlaying> = {}): NowPlaying {
 	};
 }
 
-const swipe = (translationX: number, translationY = 0, velocityX = 0) =>
-	act(() =>
+function swipe(translationX: number, translationY = 0, velocityX = 0) {
+	return act(() =>
 		fireGestureHandler<PanGesture>(getByGestureTestId('mini-player-pan'), [
 			{ state: State.BEGAN, translationX: 0, translationY: 0 },
 			{ state: State.ACTIVE, translationX: translationX / 2, translationY: translationY / 2 },
@@ -66,6 +66,7 @@ const swipe = (translationX: number, translationY = 0, velocityX = 0) =>
 			{ state: State.END, translationX, translationY, velocityX },
 		])
 	);
+}
 
 describe('MiniPlayerContainer gestures (#311)', () => {
 	beforeEach(() => {

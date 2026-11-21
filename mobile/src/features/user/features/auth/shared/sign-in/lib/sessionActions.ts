@@ -1,23 +1,28 @@
 import type { UserProfile } from '@/shared/users/user.types';
 import type { AuthSessionTokens } from '@/features/user/features/auth/types';
-import * as authApi from './authApi';
-import { storedSession } from './sessionStorage';
+import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
+import { storedSession } from '@/features/user/features/auth/shared/sign-in/lib/sessionStorage';
 import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
 import { logger } from '@/shared/logging/logger';
-import { createTokenRefresh } from './tokenRefresh';
-import { SIGNED_OUT, type GetAuthState, type SessionActions, type SetAuthState } from './authState';
+import { createTokenRefresh } from '@/features/user/features/auth/shared/sign-in/lib/tokenRefresh';
+import { SIGNED_OUT } from '@/features/user/features/auth/shared/sign-in/lib/authState';
+import type {
+	GetAuthState,
+	SessionActions,
+	SetAuthState,
+} from '@/features/user/features/auth/shared/sign-in/lib/authState';
 
 const EXPIRY_MARGIN_MS = 5 * 60 * 1000;
 
 export function createSessionActions(set: SetAuthState, get: GetAuthState): SessionActions {
-	const persist = async (): Promise<void> => {
+	async function persist(): Promise<void> {
 		const { user, accessToken, refreshToken, tokenExpiresAt, isAuthenticated } = get();
 		if (user && accessToken && isAuthenticated) {
 			await storedSession.save({ user, accessToken, refreshToken, tokenExpiresAt });
 		}
-	};
+	}
 
-	const applySession = (user: UserProfile, session: AuthSessionTokens): void => {
+	function applySession(user: UserProfile, session: AuthSessionTokens): void {
 		set({
 			user,
 			accessToken: session.accessToken,
@@ -25,12 +30,12 @@ export function createSessionActions(set: SetAuthState, get: GetAuthState): Sess
 			tokenExpiresAt: session.expiresAt * 1000,
 			isAuthenticated: true,
 		});
-	};
+	}
 
-	const endSessionLocally = async (): Promise<void> => {
+	async function endSessionLocally(): Promise<void> {
 		set(SIGNED_OUT);
 		await storedSession.clear();
-	};
+	}
 
 	return {
 		startSession: async (user, session) => {

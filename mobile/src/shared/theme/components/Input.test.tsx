@@ -1,9 +1,9 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Input } from './Input';
+import { Input } from '@/shared/theme/components/Input';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
@@ -75,7 +75,7 @@ describe('Input', () => {
 			Platform.OS = originalOS;
 		});
 
-		const renderField = (props: { multiline?: boolean } = {}) => {
+		function renderField(props: { multiline?: boolean } = {}) {
 			const submit = jest.fn();
 			render(
 				<Input
@@ -89,7 +89,7 @@ describe('Input', () => {
 			);
 			fireEvent(screen.getByPlaceholderText('Name'), 'submitEditing');
 			return submit;
-		};
+		}
 
 		it('submits the form on Enter in a browser', () => {
 			Platform.OS = 'web';

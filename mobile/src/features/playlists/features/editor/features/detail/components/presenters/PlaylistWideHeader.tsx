@@ -6,9 +6,9 @@ import { displayText } from '@/shared/theme/lib/pixelFrame';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { playlistLink } from '@/shared/share-links/shareLinks';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
-import { AddTrackRow } from './AddTrackRow';
-import { PlaylistByline } from './PlaylistByline';
-import { PlaylistCover } from './PlaylistCover';
+import { AddTrackRow } from '@/features/playlists/features/editor/features/detail/components/presenters/AddTrackRow';
+import { PlaylistByline } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistByline';
+import { PlaylistCover } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistCover';
 import { Text } from '@/shared/theme/components/Text';
 
 interface PlaylistWideHeaderProps {
@@ -37,7 +37,7 @@ export function PlaylistWideHeader({
 					<Text style={styles.name} numberOfLines={2}>
 						{playlist.name}
 					</Text>
-					{!!playlist.description && (
+					{Boolean(playlist.description) && (
 						<Text style={styles.description} numberOfLines={3}>
 							{playlist.description}
 						</Text>
@@ -54,8 +54,8 @@ export function PlaylistWideHeader({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.sm },
 		hero: {
 			flexDirection: 'row',
@@ -86,3 +86,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.lg,
 		},
 	});
+}

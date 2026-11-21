@@ -7,16 +7,17 @@ import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { HomeScreen } from '@/features/playlists/features/browse/features/home/useHomeScreen';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
-import { FriendPlaylistCarousel } from './FriendPlaylistCarousel';
+import { FriendPlaylistCarousel } from '@/features/playlists/features/browse/features/home/components/presenters/FriendPlaylistCarousel';
 import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
 import { PlaylistGrid } from '@/features/playlists/features/browse/shared/playlist-grid/components/PlaylistGrid';
-import { HomeSkeleton } from './HomeSkeleton';
+import { HomeSkeleton } from '@/features/playlists/features/browse/features/home/components/presenters/HomeSkeleton';
 import { RefreshableScroll } from '@/features/playlists/features/browse/shared/playlist-grid/components/RefreshableScroll';
 import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
-const countAll = (screen: HomeScreen) =>
-	screen.friendsPlaylists.reduce((total, entry) => total + entry.playlists.length, 0);
+function countAll(screen: HomeScreen) {
+	return screen.friendsPlaylists.reduce((total, entry) => total + entry.playlists.length, 0);
+}
 
 interface HomeViewProps {
 	screen: HomeScreen;

@@ -7,14 +7,11 @@ import {
 	enableMediaControls,
 	updateMetadata,
 	updatePlaybackState,
-	type MediaControlEvent,
-	type MediaMetadata,
 } from 'expo-media-control';
+import type { MediaControlEvent, MediaMetadata } from 'expo-media-control';
 import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
-import {
-	useNowPlaying,
-	type NowPlaying,
-} from '@/features/playback/shared/player/hooks/useNowPlaying';
+import { useNowPlaying } from '@/features/playback/shared/player/hooks/useNowPlaying';
+import type { NowPlaying } from '@/features/playback/shared/player/hooks/useNowPlaying';
 import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
 import { logger } from '@/shared/logging/logger';
 
@@ -59,7 +56,7 @@ export function useMediaSession(): void {
 	const resyncRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	useEffect(() => {
-		const scheduleResync = () => {
+		function scheduleResync() {
 			if (resyncRef.current) clearTimeout(resyncRef.current);
 			resyncRef.current = setTimeout(() => {
 				resyncRef.current = null;
@@ -71,7 +68,7 @@ export function useMediaSession(): void {
 				sentRef.current = { state, positionMs: posMs, at: Date.now() };
 				safely(updatePlaybackState(state, posMs / 1000));
 			}, STATE_RESYNC_MS);
-		};
+		}
 
 		const removeListener = addListener((event: MediaControlEvent) => {
 			const { nowPlaying: current, seekTo: seek } = latestRef.current;

@@ -4,9 +4,10 @@ import { FormError } from '@/shared/theme/components/FormError';
 import { GenreChip } from '@/shared/theme/components/GenreChip';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { MUSIC_GENRES, type MusicGenre } from '@/shared/users/user.types';
+import { MUSIC_GENRES } from '@/shared/users/user.types';
+import type { MusicGenre } from '@/shared/users/user.types';
 import { EVENT_LIMITS } from '@/features/events/features/event-form/lib/validators';
-import { FieldLabel } from './FieldLabel';
+import { FieldLabel } from '@/features/events/features/event-form/components/presenters/FieldLabel';
 
 interface GenreSelectorProps {
 	selected: MusicGenre[];
@@ -41,7 +42,8 @@ export function GenreSelector({ selected, onToggle, error }: GenreSelectorProps)
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		chips: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
 	});
+}

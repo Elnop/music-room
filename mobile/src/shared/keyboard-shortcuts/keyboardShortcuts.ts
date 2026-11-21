@@ -36,7 +36,8 @@ function isTypingTarget(target: ShortcutTarget | null): boolean {
 
 function handlesKeyItself(target: ShortcutTarget | null, key: string): boolean {
 	const role = target?.getAttribute?.('role');
-	return !!role && (OWN_KEYS[key]?.includes(role) ?? false);
+	if (!role) return false;
+	return OWN_KEYS[key]?.includes(role) ?? false;
 }
 
 export function matchShortcut(

@@ -1,7 +1,11 @@
-import type { UserDeviceWithLicenses } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
-import type { FriendUserSummary } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import type {
+	UserDeviceWithLicenses,
+	FriendUserSummary,
+} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 
-export const pairKey = (deviceId: string, userId: string): string => `${deviceId}|${userId}`;
+export function pairKey(deviceId: string, userId: string): string {
+	return `${deviceId}|${userId}`;
+}
 
 export function setPair(set: Set<string>, key: string, on: boolean): Set<string> {
 	const next = new Set(set);

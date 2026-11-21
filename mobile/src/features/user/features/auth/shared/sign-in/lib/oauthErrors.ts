@@ -1,7 +1,7 @@
 import { ApiError } from '@/shared/backend/lib/api';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import type { OAuthProvider } from '@/features/user/features/auth/types';
-import { isScriptLoadError } from './loadScript';
+import { isScriptLoadError } from '@/features/user/features/auth/shared/sign-in/lib/loadScript';
 
 const NETWORK_MESSAGE = 'Impossible de joindre le serveur. Vérifiez votre connexion.';
 

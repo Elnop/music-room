@@ -1,4 +1,4 @@
-import { geocode } from './eventsApi';
+import { geocode } from '@/features/events/shared/events/lib/eventsApi';
 import type { MusicEvent } from '@/features/events/lib/types';
 
 type Point = Pick<MusicEvent, 'latitude' | 'longitude'>;

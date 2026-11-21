@@ -1,4 +1,8 @@
-import { membersTitle, noMembersMessage, sharingHeader } from './sharingTexts';
+import {
+	membersTitle,
+	noMembersMessage,
+	sharingHeader,
+} from '@/features/playlists/features/editor/features/sharing/lib/sharingTexts';
 
 const modes = [
 	{ isPrivate: true, isEditRestricted: true },

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSocketStore } from '@/shared/backend/socketStore';
 import { useSession, getSession } from '@/shared/backend/lib/authSession';
-import { deviceService, type DeviceInfo } from '@/shared/backend/deviceService';
+import { deviceService } from '@/shared/backend/deviceService';
+import type { DeviceInfo } from '@/shared/backend/deviceService';
 import {
 	queueTrackToSoundCloud,
 	trackToSoundCloud,
@@ -34,8 +35,9 @@ export function useMusicControlEmitter() {
 
 	useEffect(() => {
 		if (!socket || !isConnected || !user || !deviceInfo) return;
+		const connectedSocket = socket;
 
-		const emitStatus = () => {
+		function emitStatus() {
 			const position = readPositionMs();
 			const status = {
 				track: currentTrack
@@ -51,8 +53,8 @@ export function useMusicControlEmitter() {
 					position != null && Number.isFinite(position) ? Math.max(0, Math.round(position)) : 0,
 			};
 
-			socket.emit('listening:update', status);
-		};
+			connectedSocket.emit('listening:update', status);
+		}
 
 		const timer = setTimeout(emitStatus, 200);
 
@@ -62,7 +64,7 @@ export function useMusicControlEmitter() {
 	useEffect(() => {
 		if (!socket || !isConnected) return;
 
-		const handleControlCommand = (data: ControlCommand) => {
+		function handleControlCommand(data: ControlCommand) {
 			const playback = usePlayerStore.getState();
 			switch (data.action) {
 				case 'play':
@@ -84,7 +86,7 @@ export function useMusicControlEmitter() {
 					useConnectStore.getState().setLocal();
 					break;
 			}
-		};
+		}
 
 		socket.on('control:command', handleControlCommand);
 

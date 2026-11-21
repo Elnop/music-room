@@ -20,12 +20,12 @@ export function useRenameDeviceForm({ deviceName, onSubmit }: UseRenameDeviceFor
 		}
 	}
 
-	const handleChangeName = (text: string) => {
+	function handleChangeName(text: string) {
 		setName(text);
 		setError(undefined);
-	};
+	}
 
-	const handleSave = () => {
+	function handleSave() {
 		const trimmed = name.trim();
 		if (trimmed.length === 0) {
 			setError('Saisissez un nom');
@@ -36,12 +36,12 @@ export function useRenameDeviceForm({ deviceName, onSubmit }: UseRenameDeviceFor
 			return;
 		}
 		onSubmit(trimmed);
-	};
+	}
 
-	const handleReset = () => {
+	function handleReset() {
 		setError(undefined);
 		onSubmit(null);
-	};
+	}
 
 	return {
 		name,

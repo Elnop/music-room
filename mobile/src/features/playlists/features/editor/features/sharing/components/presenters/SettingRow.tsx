@@ -6,7 +6,7 @@ import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { createSharingStyles } from './sharingStyles';
+import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
 import { Text } from '@/shared/theme/components/Text';
 
 interface SettingRowProps {
@@ -42,8 +42,8 @@ export function SettingRow({ icon, label, description, value, onToggle, busy }: 
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		item: {
 			justifyContent: 'space-between',
 		},
@@ -75,3 +75,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 2,
 		},
 	});
+}

@@ -5,7 +5,7 @@ import type {
 	PlaylistStackParamList,
 } from '@/features/playlists/shared/playlist/lib/types';
 import { useLibraryScreen } from '@/features/playlists/features/browse/features/library/useLibraryScreen';
-import { LibraryView } from './LibraryView';
+import { LibraryView } from '@/features/playlists/features/browse/features/library/components/LibraryView';
 import { HeaderIconButton } from '@/features/playlists/shared/header-button/HeaderIconButton';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 

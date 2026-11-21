@@ -23,7 +23,9 @@ interface DomDocument {
 
 const CONFIRM = 'confirm';
 
-const pad = (value: number) => String(value).padStart(2, '0');
+function pad(value: number) {
+	return String(value).padStart(2, '0');
+}
 
 export function toLocalInputValue(date: Date): string {
 	const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

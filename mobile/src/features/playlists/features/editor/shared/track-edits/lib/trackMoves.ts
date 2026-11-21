@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { ApiError } from '@/shared/backend/lib/api';
-import * as tracksApi from './tracksApi';
+import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import { usePendingMovesStore } from '@/features/playlists/features/editor/shared/track-edits/pendingMovesStore';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import {
@@ -58,7 +58,9 @@ export function moveTrack(
 ): Promise<'moved' | 'skipped'> {
 	const { change } = usePendingMovesStore.getState();
 	change(1);
-	const run = () => sendMove(client, playlistId, trackId, afterRank).finally(() => change(-1));
+	function run() {
+		return sendMove(client, playlistId, trackId, afterRank).finally(() => change(-1));
+	}
 	const next = moveQueue.then(run, run);
 	moveQueue = next.catch(() => undefined);
 	return next;

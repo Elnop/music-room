@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
-import { CODE_INPUT_MAX_LENGTH } from './codeDigits';
+import { View } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { CODE_INPUT_MAX_LENGTH } from '@/features/user/features/auth/shared/code-input/codeDigits';
 import { TextInput } from '@/shared/theme/components/TextInput';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';

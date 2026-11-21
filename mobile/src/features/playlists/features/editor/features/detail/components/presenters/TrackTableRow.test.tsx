@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { SwipeableTrackItem } from './SwipeableTrackItem';
+import { SwipeableTrackItem } from '@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem';
 import type { Track } from '@/shared/tracks/lib/track.types';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
@@ -14,13 +14,16 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
 const track = { id: 't1', title: 'Song', artist: 'Artist', durationMs: 125000 } as Track;
 
-const renderRow = (props: Partial<React.ComponentProps<typeof SwipeableTrackItem>> = {}) =>
-	render(
+function renderRow(props: Partial<React.ComponentProps<typeof SwipeableTrackItem>> = {}) {
+	return render(
 		<SwipeableTrackItem
 			track={track}
 			onDelete={jest.fn()}
@@ -31,9 +34,11 @@ const renderRow = (props: Partial<React.ComponentProps<typeof SwipeableTrackItem
 			{...props}
 		/>
 	);
+}
 
-const handleOpacity = () =>
-	StyleSheet.flatten(screen.getByLabelText('Réordonner').props.style).opacity;
+function handleOpacity() {
+	return StyleSheet.flatten(screen.getByLabelText('Réordonner').props.style).opacity;
+}
 
 describe('SwipeableTrackItem as a table row', () => {
 	it('keeps the phone row on the phone, even with a position', async () => {

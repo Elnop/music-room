@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { useTheme } from './ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 
 export function PreviewBadge() {
 	const { theme } = useTheme();
@@ -15,8 +15,8 @@ export function PreviewBadge() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		badge: {
 			alignSelf: 'flex-start',
 			fontSize: theme.typography.sizes.xs,
@@ -28,3 +28,4 @@ const createStyles = (theme: Theme) =>
 			overflow: 'hidden',
 		},
 	});
+}

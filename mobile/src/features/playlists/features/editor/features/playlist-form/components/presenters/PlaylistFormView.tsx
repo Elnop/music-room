@@ -5,7 +5,7 @@ import { Button } from '@/shared/theme/components/Button';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistForm } from '@/features/playlists/features/editor/features/playlist-form/usePlaylistForm';
-import { ToggleCard } from './ToggleCard';
+import { ToggleCard } from '@/features/playlists/features/editor/features/playlist-form/components/presenters/ToggleCard';
 
 interface PlaylistFormViewProps {
 	form: PlaylistForm;
@@ -79,11 +79,12 @@ export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps)
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		screen: { flex: 1, backgroundColor: theme.colors.background },
 		keyboard: { flex: 1 },
 		scroll: { flexGrow: 1, paddingTop: theme.spacing.md },
 		body: { flex: 1, padding: theme.spacing.lg },
 		form: { gap: theme.spacing.md },
 	});
+}

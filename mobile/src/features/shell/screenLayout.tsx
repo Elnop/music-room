@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScreenContent } from './ScreenContent';
+import { ScreenContent } from '@/features/shell/ScreenContent';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { AlignedHeader } from '@/features/shell/components/presenters/AlignedHeader';
 import {
@@ -13,9 +13,8 @@ interface ScreenLayoutArgs {
 	children: React.ReactElement;
 }
 
-export const screenLayout =
-	(besideSidebar: boolean) =>
-	({ route, children }: ScreenLayoutArgs) => {
+export function screenLayout(besideSidebar: boolean) {
+	return ({ route, children }: ScreenLayoutArgs) => {
 		const width = SCREEN_WIDTHS[route.name];
 		if (!width || FULL_BLEED_SCREENS.has(route.name)) return children;
 		return (
@@ -28,5 +27,8 @@ export const screenLayout =
 			</ScreenContent>
 		);
 	};
+}
 
-export const screenHeader = (props: NativeStackHeaderProps) => <AlignedHeader {...props} />;
+export function screenHeader(props: NativeStackHeaderProps) {
+	return <AlignedHeader {...props} />;
+}

@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { usePlayerShortcuts } from '@/features/playback/hooks/usePlayerShortcuts';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
 import { ShortcutsContainer } from '@/features/shell/components/orchestrators/ShortcutsContainer';

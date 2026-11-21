@@ -1,9 +1,9 @@
 import React from 'react';
 import { Image } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Avatar } from './Avatar';
+import { Avatar } from '@/shared/theme/components/Avatar';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });

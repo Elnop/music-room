@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
+import { AppState } from 'react-native';
+import type { AppStateStatus } from 'react-native';
 
-const isActive = (state: AppStateStatus | null) => state !== 'background' && state !== 'inactive';
+function isActive(state: AppStateStatus | null) {
+	return state !== 'background' && state !== 'inactive';
+}
 
 export function useAppActive(): boolean {
 	const [active, setActive] = useState(() => isActive(AppState.currentState));

@@ -7,7 +7,7 @@ import { ActionSheetRow } from '@/features/playlists/features/editor/shared/acti
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 import type { TrackActions } from '@/features/playlists/features/editor/features/track-actions/hooks/useTrackActions';
 import { Text } from '@/shared/theme/components/Text';
-import { NewPlaylistForm } from './NewPlaylistForm';
+import { NewPlaylistForm } from '@/features/playlists/features/editor/features/track-actions/components/presenters/NewPlaylistForm';
 import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
@@ -93,8 +93,8 @@ export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewP
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		list: {
 			maxHeight: 360,
 		},
@@ -109,3 +109,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

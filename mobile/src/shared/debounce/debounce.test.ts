@@ -1,4 +1,4 @@
-import { debounce } from './debounce';
+import { debounce } from '@/shared/debounce/debounce';
 
 describe('debounce', () => {
 	beforeEach(() => jest.useFakeTimers());

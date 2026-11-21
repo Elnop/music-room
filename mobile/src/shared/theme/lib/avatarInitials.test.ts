@@ -1,5 +1,5 @@
-import { AVATAR_COLORS } from './tokens';
-import { avatarColor, avatarInitials } from './avatarInitials';
+import { AVATAR_COLORS } from '@/shared/theme/lib/tokens';
+import { avatarColor, avatarInitials } from '@/shared/theme/lib/avatarInitials';
 
 describe('avatarInitials', () => {
 	it('takes the first letter of the first two words', () => {

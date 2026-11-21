@@ -50,8 +50,8 @@ export function DeviceFriendRow({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		friendRow: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -72,3 +72,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: 2,
 		},
 	});
+}

@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import { useTheme } from './ThemeContext';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';
 import { useFieldFocus } from '@/shared/theme/hooks/useFieldFocus';
-import { Pressable } from './Pressable';
-import { TextInput } from './TextInput';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { TextInput } from '@/shared/theme/components/TextInput';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 

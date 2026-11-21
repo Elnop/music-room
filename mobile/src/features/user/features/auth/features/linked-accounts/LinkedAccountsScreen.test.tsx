@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react-nativ
 import { LinkedAccountsContainer } from '@/features/user/features/auth/features/linked-accounts/components/LinkedAccountsContainer';
 import type { LinkedProvider } from '@/features/user/features/auth/types';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -37,7 +38,7 @@ let mockError: Error | null = null;
 const mockLinkProvider = jest.fn();
 const mockUnlinkProvider = jest.fn();
 let mockGoogleButton: jest.Mock | undefined;
-let mockGoogleCredential: () => void = () => undefined;
+let mockGoogleCredential: () => void = noop;
 
 jest.mock(
 	'@/features/user/features/auth/features/linked-accounts/hooks/useLinkedProviders',
@@ -73,10 +74,10 @@ describe('LinkedAccountsScreen', () => {
 	it('lists each sign-in method with its state', () => {
 		render(<LinkedAccountsContainer />);
 
-		expect(screen.getByTestId('linked-account-password')).toHaveTextContent(/Lié · Principal/);
+		expect(screen.getByTestId('linked-account-password')).toHaveTextContent(/Lié · Principal/u);
 		expect(screen.getByLabelText('Délier Google')).toBeTruthy();
 		expect(screen.getByLabelText('Lier Facebook')).toBeTruthy();
-		expect(screen.queryByLabelText(/Lier Email|Délier Email/)).toBeNull();
+		expect(screen.queryByLabelText(/Lier Email|Délier Email/u)).toBeNull();
 	});
 
 	it('shows error state when providers could not be loaded', () => {

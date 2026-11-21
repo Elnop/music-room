@@ -5,7 +5,7 @@ import { friendsApi } from '@/features/user/features/friends/shared/follows/frie
 import type { RecommendedProfile } from '@/features/user/features/friends/types';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { signIn } from '@test-utils/session';
-import { SimilarProfilesContainer } from './SimilarProfilesContainer';
+import { SimilarProfilesContainer } from '@/features/user/features/friends/features/similar-profiles/components/SimilarProfilesContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

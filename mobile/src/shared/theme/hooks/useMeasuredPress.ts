@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import type { View } from 'react-native';
-import { useBreakpoint } from './useBreakpoint';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 export function useMeasuredPress(

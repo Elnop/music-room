@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import type { QueryClient, QueryKey } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
 import { useSocketStore } from '@/shared/backend/socketStore';
 
@@ -49,9 +50,9 @@ export function bindSocketCache(
 	bindings: readonly SocketCacheBinding[]
 ): () => void {
 	const listeners = bindings.map(binding => {
-		const listener = (payload: unknown) => {
+		function listener(payload: unknown) {
 			binding.apply(client, payload);
-		};
+		}
 		socket.on(binding.event, listener);
 		return { event: binding.event, listener };
 	});

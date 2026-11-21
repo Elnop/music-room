@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Platform, type TextInputProps } from 'react-native';
+import { Platform } from 'react-native';
+import type { TextInputProps } from 'react-native';
 
 type FocusHandlers = Pick<TextInputProps, 'onFocus' | 'onBlur'>;
 

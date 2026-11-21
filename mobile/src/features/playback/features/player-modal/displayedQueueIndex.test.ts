@@ -1,15 +1,24 @@
 import type { QueueItem } from '@/shared/playback/lib/playback';
 import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import { displayedQueueIndex } from './displayedQueueIndex';
+import { displayedQueueIndex } from '@/features/playback/features/player-modal/displayedQueueIndex';
 
-const item = (id: string, uri: string): QueueItem => ({
-	id,
-	rank: id,
-	track: { trackUri: uri, title: uri, artist: 'a', album: null, albumArt: null, durationMs: 1000 },
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-});
+function item(id: string, uri: string): QueueItem {
+	return {
+		id,
+		rank: id,
+		track: {
+			trackUri: uri,
+			title: uri,
+			artist: 'a',
+			album: null,
+			albumArt: null,
+			durationMs: 1000,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	};
+}
 
 const RIPPED = 'https://soundcloud.com/a/ripped-pants';
 const VICTORY = 'https://soundcloud.com/a/sweet-victory';

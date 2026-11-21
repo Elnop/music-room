@@ -1,5 +1,8 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import type { LoginInput, RegisterInput } from './validators';
+import type {
+	LoginInput,
+	RegisterInput,
+} from '@/features/user/features/auth/shared/sign-in/lib/validators';
 import type { AuthResponse, MessageResponse } from '@/features/user/features/auth/types';
 
 function post<T>(endpoint: string, body: object, headers?: Record<string, string>): Promise<T> {

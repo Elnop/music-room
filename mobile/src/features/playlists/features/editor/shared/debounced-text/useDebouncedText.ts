@@ -18,7 +18,7 @@ export function useDebouncedText(): DebouncedText {
 
 	useEffect(() => () => settle.cancel(), [settle]);
 
-	const change = (value: string) => {
+	function change(value: string) {
 		setText(value);
 		if (value.trim()) {
 			settle(value);
@@ -26,7 +26,7 @@ export function useDebouncedText(): DebouncedText {
 			settle.cancel();
 			setSettled('');
 		}
-	};
+	}
 
 	return {
 		text,

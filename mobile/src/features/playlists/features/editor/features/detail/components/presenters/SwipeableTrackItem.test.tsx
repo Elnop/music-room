@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { SwipeableTrackItem } from './SwipeableTrackItem';
+import { SwipeableTrackItem } from '@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem';
 import type { Track } from '@/shared/tracks/lib/track.types';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {

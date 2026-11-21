@@ -14,10 +14,11 @@ interface BeaconAdvertiserModule {
 	stop(): void;
 }
 
-const nativeModule = () =>
-	Platform.OS === 'android'
+function nativeModule() {
+	return Platform.OS === 'android'
 		? requireOptionalNativeModule<BeaconAdvertiserModule>('BeaconAdvertiser')
 		: null;
+}
 
 export type AdvertiseFailure = 'unsupported' | 'bluetooth-off' | 'permission-denied' | 'failed';
 

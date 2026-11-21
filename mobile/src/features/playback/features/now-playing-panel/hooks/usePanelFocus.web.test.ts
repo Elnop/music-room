@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 import { PANEL_CLOSE_ID, PANEL_ID } from '@/features/playback/shared/player/lib/constants';
-import { usePanelFocus } from './usePanelFocus.web';
+import { usePanelFocus } from '@/features/playback/features/now-playing-panel/hooks/usePanelFocus.web';
 
 type Listener = (event: object) => void;
 
@@ -13,13 +13,15 @@ interface FakeElement {
 }
 
 const listeners = new Set<Listener>();
-const element = (): FakeElement => ({
-	isConnected: true,
-	focus: jest.fn(),
-	contains: () => false,
-	addEventListener: (_type, listener) => listeners.add(listener),
-	removeEventListener: (_type, listener) => listeners.delete(listener),
-});
+function element(): FakeElement {
+	return {
+		isConnected: true,
+		focus: jest.fn(),
+		contains: () => false,
+		addEventListener: (_type, listener) => listeners.add(listener),
+		removeEventListener: (_type, listener) => listeners.delete(listener),
+	};
+}
 
 let opener: FakeElement;
 let close: FakeElement;
@@ -30,11 +32,11 @@ const fakeDocument = {
 	getElementById: (id: string) => (id === PANEL_ID ? panel : id === PANEL_CLOSE_ID ? close : null),
 };
 
-const keydown = (key: string) => {
+function keydown(key: string) {
 	const event = { key, defaultPrevented: false, preventDefault: jest.fn() };
 	listeners.forEach(listener => listener(event));
 	return event;
-};
+}
 
 describe('usePanelFocus (web)', () => {
 	beforeEach(() => {

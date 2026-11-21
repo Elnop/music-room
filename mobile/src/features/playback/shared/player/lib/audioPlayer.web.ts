@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
-import type { AudioPlayer, AudioPlayerStatus } from './types';
+import type { AudioPlayer, AudioPlayerStatus } from '@/features/playback/shared/player/lib/types';
 import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
-import { HtmlAudioPlayer, type PlaybackEvents } from './htmlAudioPlayer';
+import { HtmlAudioPlayer } from '@/features/playback/shared/player/lib/htmlAudioPlayer';
+import type { PlaybackEvents } from '@/features/playback/shared/player/lib/htmlAudioPlayer';
 
 const playbackEvents: PlaybackEvents = {
 	onPlayBlocked: () => {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import type { Control, FieldErrors } from 'react-hook-form';
-import { EditProfileFormFields } from './EditProfileFormFields';
-import { EditProfilePhoto } from './EditProfilePhoto';
+import { EditProfileFormFields } from '@/features/user/features/profile/features/edit-profile/components/presenters/EditProfileFormFields';
+import { EditProfilePhoto } from '@/features/user/features/profile/features/edit-profile/components/presenters/EditProfilePhoto';
 import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import { FormError } from '@/shared/theme/components/FormError';
 import { Button } from '@/shared/theme/components/Button';

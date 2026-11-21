@@ -1,7 +1,7 @@
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 export function base64ToBytes(base64: string): number[] {
-	const clean = base64.replace(/[^A-Za-z0-9+/]/g, '');
+	const clean = base64.replaceAll(/[^A-Za-z0-9+/]/gu, '');
 	const bytes: number[] = [];
 	let buffer = 0;
 	let bits = 0;

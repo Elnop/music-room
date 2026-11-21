@@ -5,15 +5,16 @@ import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import type { DevicePickerOwner } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
 import type { Theme } from '@/shared/theme/lib/types';
-import type { createPickerStyles } from './devicePickerStyles';
+import type { createPickerStyles } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/devicePickerStyles';
 import { Text } from '@/shared/theme/components/Text';
 import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
 export type PickerDevice = DevicePickerOwner['devices'][number];
 
-const deviceIcon = (platform: string): PixelIconSource =>
-	platform === 'web' ? LaptopSolid : PhoneRingingLowSolid;
+function deviceIcon(platform: string): PixelIconSource {
+	return platform === 'web' ? LaptopSolid : PhoneRingingLowSolid;
+}
 
 interface DeviceRowProps {
 	owner: DevicePickerOwner;

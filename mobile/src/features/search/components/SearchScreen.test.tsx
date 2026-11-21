@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SearchContainer } from './SearchContainer';
+import { SearchContainer } from '@/features/search/components/SearchContainer';
 import { searchApi } from '@/features/search/lib/searchApi';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import { testPlayback } from '@test-utils/playback';
@@ -36,34 +36,36 @@ const mockSearchTracks = searchApi.searchTracks as jest.MockedFunction<
 	typeof searchApi.searchTracks
 >;
 
-const track = (overrides: Partial<SoundCloudTrack>): SoundCloudTrack => ({
-	id: 1,
-	title: 'Song',
-	duration: 30000,
-	permalink_url: 'https://soundcloud.com/a/song',
-	artwork_url: null,
-	description: null,
-	genre: null,
-	user: {
-		id: 10,
-		username: 'artist',
-		avatar_url: null,
-		permalink_url: 'https://soundcloud.com/artist',
-	},
-	playable: true,
-	...overrides,
-});
+function track(overrides: Partial<SoundCloudTrack>): SoundCloudTrack {
+	return {
+		id: 1,
+		title: 'Song',
+		duration: 30000,
+		permalink_url: 'https://soundcloud.com/a/song',
+		artwork_url: null,
+		description: null,
+		genre: null,
+		user: {
+			id: 10,
+			username: 'artist',
+			avatar_url: null,
+			permalink_url: 'https://soundcloud.com/artist',
+		},
+		playable: true,
+		...overrides,
+	};
+}
 
 let queryClient: QueryClient;
 
-const renderScreen = async () => {
+async function renderScreen() {
 	render(
 		<QueryClientProvider client={queryClient}>
 			<SearchContainer TrackActionsSheet={() => null} playback={testPlayback} />
 		</QueryClientProvider>
 	);
 	await act(async () => {});
-};
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

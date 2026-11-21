@@ -42,8 +42,8 @@ export function SubscriptionSection({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -69,3 +69,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.sm,
 		},
 	});
+}

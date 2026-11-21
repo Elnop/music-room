@@ -6,7 +6,7 @@ import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useScreenTitle } from '@/shared/screen-title/useScreenTitle';
 import { showError, showInfo } from '@/shared/theme/lib/toast';
 import { usePlaylistDetail } from '@/features/playlists/shared/playlist/usePlaylistQueries';
-import { usePlaylistRoom } from './usePlaylistRoom';
+import { usePlaylistRoom } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistRoom';
 import { useRefetchOnFocus } from '@/features/playlists/shared/refetch-on-focus/useRefetchOnFocus';
 import { forgetPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
 import type {
@@ -63,12 +63,12 @@ export function usePlaylistDetailScreen(
 		forgetPlaylist(client, id);
 	}, [deleted, navigation, client, id]);
 
-	const refresh = async () => {
+	async function refresh() {
 		setIsRefreshing(true);
 		const result = await refetch();
 		setIsRefreshing(false);
 		if (result.isError) showError('Impossible de charger la playlist');
-	};
+	}
 
 	const notFound = error instanceof ApiError && (error.status === 403 || error.status === 404);
 	return {

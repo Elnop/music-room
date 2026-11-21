@@ -38,7 +38,7 @@ export function useLibraryScreen(navigation: Navigation): LibraryScreen {
 		}, [refetch])
 	);
 
-	const refresh = async () => {
+	async function refresh() {
 		setIsRefreshing(true);
 		const result = await refetch();
 		setIsRefreshing(false);
@@ -46,7 +46,7 @@ export function useLibraryScreen(navigation: Navigation): LibraryScreen {
 			logger.error('[LibraryScreen] Refresh failed:', result.error);
 			showError(apiErrorMessage(result.error, 'Impossible de rafraîchir les playlists'));
 		}
-	};
+	}
 
 	const playlists = mine.data ?? [];
 	const createPlaylist = useCallback(() => navigation.navigate('CreatePlaylist'), [navigation]);

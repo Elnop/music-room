@@ -1,5 +1,7 @@
-import React, { type ComponentType } from 'react';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
+import React from 'react';
+import type { ComponentType } from 'react';
+import { View } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
 export type PixelIconSource = ComponentType<SvgProps>;
@@ -26,7 +28,7 @@ export function PixelIcon({
 			style={[{ width: size, height: size }, style]}
 			pointerEvents="none"
 			testID={testID}
-			accessible={!!accessibilityLabel}
+			accessible={Boolean(accessibilityLabel)}
 			accessibilityRole={accessibilityLabel ? 'image' : undefined}
 			accessibilityLabel={accessibilityLabel}
 			importantForAccessibility={accessibilityLabel ? 'yes' : 'no'}

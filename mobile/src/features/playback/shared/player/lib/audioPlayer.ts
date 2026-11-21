@@ -1,9 +1,9 @@
 import {
 	useAudioPlayer as useExpoAudioPlayer,
 	useAudioPlayerStatus as useExpoAudioPlayerStatus,
-	type AudioPlayer as ExpoAudioPlayer,
 } from 'expo-audio';
-import type { AudioPlayer, AudioPlayerStatus } from './types';
+import type { AudioPlayer as ExpoAudioPlayer } from 'expo-audio';
+import type { AudioPlayer, AudioPlayerStatus } from '@/features/playback/shared/player/lib/types';
 import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 
 export function useAudioPlayer(source: string, _protocol: StreamProtocol): AudioPlayer {

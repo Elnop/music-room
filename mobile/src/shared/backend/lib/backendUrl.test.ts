@@ -9,7 +9,7 @@ import {
 	onBackendUrlChange,
 	resetBackendUrl,
 	setBackendUrl,
-} from './backendUrl';
+} from '@/shared/backend/lib/backendUrl';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -30,7 +30,7 @@ afterEach(() => {
 
 describe('backendUrl first launch', () => {
 	it('defaults to the build-time address', async () => {
-		expect(DEFAULT_BACKEND_URL).toBe(API_CONFIG.BASE_URL.replace(/\/+$/, ''));
+		expect(DEFAULT_BACKEND_URL).toBe(API_CONFIG.BASE_URL.replace(/\/+$/u, ''));
 		await expect(loadBackendUrl()).resolves.toBe(DEFAULT_BACKEND_URL);
 		expect(getBackendUrl()).toBe(DEFAULT_BACKEND_URL);
 	});

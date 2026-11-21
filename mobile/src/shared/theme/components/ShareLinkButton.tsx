@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import { useTheme } from './ThemeContext';
+import { StyleSheet } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
-import { Pressable } from './Pressable';
+import { Pressable } from '@/shared/theme/components/Pressable';
 import { useShareLink } from '@/shared/theme/hooks/useShareLink';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
 
 interface ShareLinkButtonProps {
@@ -28,8 +29,8 @@ export function ShareLinkButton({ url, title, style }: ShareLinkButtonProps) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		button: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -46,3 +47,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.text,
 		},
 	});
+}

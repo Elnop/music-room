@@ -1,4 +1,5 @@
-import { createStore, useStore, type StoreApi } from 'zustand';
+import { createStore, useStore } from 'zustand';
+import type { StoreApi } from 'zustand';
 import type { UserProfile } from '@/shared/users/user.types';
 
 export interface SessionView {
@@ -33,7 +34,9 @@ export function getAuthSession(): AuthSession | null {
 	return authSession;
 }
 
-const sessionStore = (): StoreApi<SessionView> => authSession?.store ?? signedOut;
+function sessionStore(): StoreApi<SessionView> {
+	return authSession?.store ?? signedOut;
+}
 
 export function getSession(): SessionView {
 	return sessionStore().getState();

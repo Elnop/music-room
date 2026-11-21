@@ -7,12 +7,10 @@ import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
 import { toTrackInput } from '@/shared/tracks/lib/trackInput';
 import { useCachedPlaylist } from '@/features/playlists/shared/playlist/usePlaylistQueries';
-import {
-	useDebouncedText,
-	type DebouncedText,
-} from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
+import { useDebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
+import type { DebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
 import { useAddTrack } from '@/features/playlists/features/editor/shared/track-edits/useTrackEdits';
-import { searchTracks } from './trackSearchApi';
+import { searchTracks } from '@/features/playlists/features/editor/features/search-tracks/trackSearchApi';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';

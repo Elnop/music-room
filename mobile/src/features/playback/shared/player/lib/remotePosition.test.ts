@@ -1,4 +1,4 @@
-import { estimatePositionMs } from './remotePosition';
+import { estimatePositionMs } from '@/features/playback/shared/player/lib/remotePosition';
 
 describe('estimatePositionMs', () => {
 	const NOW = 1_700_000_000_000;

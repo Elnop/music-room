@@ -5,7 +5,7 @@ import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { Plan } from '@/features/subscription/lib/subscription';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
-import { SubscriptionSection } from './SubscriptionSection';
+import { SubscriptionSection } from '@/features/user/features/settings/components/presenters/SubscriptionSection';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
@@ -68,8 +68,8 @@ export function SettingsView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -99,3 +99,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.text,
 		},
 	});
+}

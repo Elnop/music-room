@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { View } from 'react-native';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
-import { PlayerModalContainer } from './PlayerModalContainer';
+import { PlayerModalContainer } from '@/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import {
@@ -11,7 +11,8 @@ import {
 	useConnectStore,
 } from '@/features/playback/shared/player/stores/connectStore';
 import type { OwnerQueue } from '@/features/playback/shared/player/lib/queue.types';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import type { UserProfile } from '@/shared/users/user.types';
 import { useImageColors } from '@/shared/image-colors/useImageColors';
@@ -169,7 +170,9 @@ describe('PlayerModalContainer without a track', () => {
 	it('puts the devices and queue buttons in a row under the playback controls', () => {
 		render(<PlayerModalContainer {...sheets} />);
 		const tree = JSON.stringify(screen.toJSON());
-		const at = (label: string) => tree.indexOf(`"accessibilityLabel":"${label}"`);
+		function at(label: string) {
+			return tree.indexOf(`"accessibilityLabel":"${label}"`);
+		}
 		expect(at('Fermer le lecteur')).toBeLessThan(at('Piste suivante'));
 		expect(at('Piste suivante')).toBeLessThan(at("Choisir l'appareil"));
 		expect(at("Choisir l'appareil")).toBeLessThan(at("File d'attente"));
@@ -195,8 +198,8 @@ describe('PlayerModalContainer without a track', () => {
 });
 
 describe('PlayerModalContainer swipe down', () => {
-	const swipe = (translationY: number, velocityY = 0) =>
-		act(() =>
+	function swipe(translationY: number, velocityY = 0) {
+		return act(() =>
 			fireGestureHandler<PanGesture>(getByGestureTestId('player-modal-pan'), [
 				{ state: State.BEGAN, translationY: 0 },
 				{ state: State.ACTIVE, translationY: translationY / 2 },
@@ -204,6 +207,7 @@ describe('PlayerModalContainer swipe down', () => {
 				{ state: State.END, translationY, velocityY },
 			])
 		);
+	}
 
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -258,11 +262,14 @@ describe('PlayerModalContainer slider for a screen reader', () => {
 		user: { id: 1, username: 'x', avatar_url: null, permalink_url: '' },
 		playable: true,
 	};
-	const seekControl = () => screen.getByRole('adjustable', { name: 'Position de lecture' });
-	const action = (actionName: string) =>
-		fireEvent(seekControl(), 'accessibilityAction', {
+	function seekControl() {
+		return screen.getByRole('adjustable', { name: 'Position de lecture' });
+	}
+	function action(actionName: string) {
+		return fireEvent(seekControl(), 'accessibilityAction', {
 			nativeEvent: { actionName },
 		});
+	}
 
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -292,7 +299,9 @@ describe('PlayerModalContainer slider for a screen reader', () => {
 		});
 	});
 
-	const slider = () => screen.getByTestId('seek-slider', { includeHiddenElements: true });
+	function slider() {
+		return screen.getByTestId('seek-slider', { includeHiddenElements: true });
+	}
 
 	it('follows the finger while sliding, then holds the released position', () => {
 		render(<PlayerModalContainer {...sheets} />);
@@ -476,14 +485,16 @@ describe('PlayerModalContainer haptics', () => {
 
 describe('PlayerModalContainer in remote mode', () => {
 	const trackUri = 'https://soundcloud.com/artist/b';
-	const status = (id: number) => ({
-		ownerId: 'friend',
-		device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
-		track: { id, title: 'Remote song', artist: 'Léa', artworkUrl: null },
-		isPlaying: true,
-		positionMs: 30_000,
-		updatedAt: new Date().toISOString(),
-	});
+	function status(id: number) {
+		return {
+			ownerId: 'friend',
+			device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
+			track: { id, title: 'Remote song', artist: 'Léa', artworkUrl: null },
+			isPlaying: true,
+			positionMs: 30_000,
+			updatedAt: new Date().toISOString(),
+		};
+	}
 
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -550,31 +561,35 @@ describe('PlayerModalContainer artwork swipe', () => {
 		user: { id: 1, username: 'x', avatar_url: null, permalink_url: '' },
 		playable: true,
 	};
-	const queueItem = (id: string) => ({
-		id,
-		track: {
-			trackUri: `https://soundcloud.com/artist/${id}`,
-			title: id,
-			artist: 'A',
-			album: null,
-			albumArt: `https://i1.sndcdn.com/${id}-large.jpg`,
-			durationMs: 200_000,
-		},
-		rank: id,
-		sourcePlaylistId: null,
-		blockId: null,
-		blockDetached: false,
-	});
-	const swipe = (translationX: number, velocityX = 0) =>
-		act(() =>
+	function queueItem(id: string) {
+		return {
+			id,
+			track: {
+				trackUri: `https://soundcloud.com/artist/${id}`,
+				title: id,
+				artist: 'A',
+				album: null,
+				albumArt: `https://i1.sndcdn.com/${id}-large.jpg`,
+				durationMs: 200_000,
+			},
+			rank: id,
+			sourcePlaylistId: null,
+			blockId: null,
+			blockDetached: false,
+		};
+	}
+	function swipe(translationX: number, velocityX = 0) {
+		return act(() =>
 			fireGestureHandler<PanGesture>(getByGestureTestId('player-artwork-pan'), [
 				{ state: State.BEGAN, translationX: 0, translationY: 0 },
 				{ state: State.ACTIVE, translationX: translationX / 2, translationY: 0 },
 				{ state: State.END, translationX, translationY: 0, velocityX },
 			])
 		);
-	const artworks = () =>
-		screen.getAllByTestId('artwork-image').map(image => image.props.source.uri);
+	}
+	function artworks() {
+		return screen.getAllByTestId('artwork-image').map(image => image.props.source.uri);
+	}
 
 	beforeEach(() => {
 		jest.clearAllMocks();

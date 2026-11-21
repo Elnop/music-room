@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { Platform, type NativeSyntheticEvent, type TextInputFocusEventData } from 'react-native';
-import { useFieldFocus } from './useFieldFocus';
+import { Platform } from 'react-native';
+import type { NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
+import { useFieldFocus } from '@/shared/theme/hooks/useFieldFocus';
 
 const event = {} as NativeSyntheticEvent<TextInputFocusEventData>;
 

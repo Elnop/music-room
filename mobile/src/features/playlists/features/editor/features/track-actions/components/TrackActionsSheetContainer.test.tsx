@@ -1,7 +1,7 @@
 import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
-import { TrackActionsSheetContainer } from './TrackActionsSheetContainer';
+import { TrackActionsSheetContainer } from '@/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer';
 import { testPlayback } from '@test-utils/playback';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
@@ -13,6 +13,7 @@ import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { playlistTrack } from '@test-utils/playlistFixtures';
 import { queryKeys } from '@/shared/query-keys/keys';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
@@ -46,19 +47,21 @@ const track = {
 	durationMs: 180_000,
 };
 
-const playlist = (id: string, name: string, overrides: Partial<Playlist> = {}): Playlist => ({
-	id,
-	name,
-	ownerId: 'other',
-	collaboratorIds: [],
-	viewerIds: [],
-	trackCount: 2,
-	visibility: 'private',
-	editMode: 'restricted',
-	createdAt: '',
-	updatedAt: '',
-	...overrides,
-});
+function playlist(id: string, name: string, overrides: Partial<Playlist> = {}): Playlist {
+	return {
+		id,
+		name,
+		ownerId: 'other',
+		collaboratorIds: [],
+		viewerIds: [],
+		trackCount: 2,
+		visibility: 'private',
+		editMode: 'restricted',
+		createdAt: '',
+		updatedAt: '',
+		...overrides,
+	};
+}
 
 const playlists = [
 	playlist('mine', 'Mine', { ownerId: 'me' }),
@@ -70,7 +73,7 @@ const playlists = [
 const onClose = jest.fn();
 const { playNext, addToQueue: addItem } = testPlayback;
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 const added = ok({ track: playlistTrack('t', 'z'), tracksVersion: 3, rebalanced: false });
 
@@ -90,13 +93,13 @@ afterEach(() => {
 	jest.restoreAllMocks();
 });
 
-const renderSheet = () => {
+function renderSheet() {
 	const view = renderWithClient(
 		<TrackActionsSheetContainer track={track} onClose={onClose} playback={testPlayback} />
 	);
 	clear = () => view.client.clear();
 	return view;
-};
+}
 
 describe('TrackActionsSheetContainer', () => {
 	it('shows the track and the four actions', () => {
@@ -202,13 +205,13 @@ describe('TrackActionsSheetContainer new playlist', () => {
 		editMode: 'open',
 	});
 
-	const openForm = async () => {
+	async function openForm() {
 		const view = renderSheet();
 		fireEvent.press(screen.getByText('Ajouter à une playlist'));
 		fireEvent.press(screen.getByText('Nouvelle playlist'));
 		await screen.findByLabelText('Nom de la playlist');
 		return view;
-	};
+	}
 
 	beforeEach(() => {
 		let exists = false;

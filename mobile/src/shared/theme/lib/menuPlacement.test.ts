@@ -1,4 +1,4 @@
-import { menuPlacement } from './menuPlacement';
+import { menuPlacement } from '@/shared/theme/lib/menuPlacement';
 
 const window = { width: 1440, height: 900 };
 

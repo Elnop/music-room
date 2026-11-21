@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { act, render } from '@testing-library/react-native';
-import { PlayerProvider } from './PlayerProvider';
+import { PlayerProvider } from '@/features/playback/components/PlayerProvider';
 import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
 import {
 	readPositionMs,
@@ -8,7 +8,8 @@ import {
 } from '@/features/playback/shared/player/stores/playerStore';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { createStore } from 'zustand';
 import { streamPrefetch } from '@/features/playback/shared/player/lib/streamPrefetch';
 import { apiRequest } from '@/shared/backend/lib/api';
@@ -16,6 +17,7 @@ import { trackToSoundCloud } from '@/features/playback/shared/player/lib/trackTo
 import type { SoundCloudTrack, StreamUrlResponse } from '@/shared/tracks/lib/soundcloud.types';
 import type { QueueItem } from '@/shared/playback/lib/queue.types';
 import type { UserProfile } from '@/shared/users/user.types';
+import { noop } from '@test-utils/noop';
 
 interface MockPlayer {
 	id: number;
@@ -130,7 +132,9 @@ const track: SoundCloudTrack = {
 };
 
 const MINUTE_MS = 60 * 1000;
-const inMinutes = (minutes: number) => new Date(Date.now() + minutes * MINUTE_MS).toISOString();
+function inMinutes(minutes: number) {
+	return new Date(Date.now() + minutes * MINUTE_MS).toISOString();
+}
 
 let seekRef: ((seconds: number) => void) | null = null;
 function setSeekRef(seekTo: (seconds: number) => void) {
@@ -409,7 +413,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		await startPlaying(inMinutes(1));
 		act(() => usePlayerStore.getState().pause());
 		mockPlayerFor('u1').currentTime = 42;
-		let answer: (data: { streamUrl: string; expiresAt: string }) => void = () => undefined;
+		let answer: (data: { streamUrl: string; expiresAt: string }) => void = noop;
 		mockApiRequest.mockReturnValueOnce(new Promise(resolve => (answer = resolve)));
 
 		await act(async () => usePlayerStore.getState().resume());
@@ -677,21 +681,23 @@ describe('PlayerProvider restored track (#312)', () => {
 });
 
 describe('PlayerProvider next track prefetch (#314)', () => {
-	const queueItem = (id: string, slug: string): QueueItem => ({
-		id,
-		rank: id,
-		track: {
-			trackUri: `https://soundcloud.com/artist/${slug}`,
-			title: slug,
-			artist: 'artist',
-			album: null,
-			albumArt: null,
-			durationMs: 200000,
-		},
-		sourcePlaylistId: null,
-		blockId: null,
-		blockDetached: false,
-	});
+	function queueItem(id: string, slug: string): QueueItem {
+		return {
+			id,
+			rank: id,
+			track: {
+				trackUri: `https://soundcloud.com/artist/${slug}`,
+				title: slug,
+				artist: 'artist',
+				album: null,
+				albumArt: null,
+				durationMs: 200000,
+			},
+			sourcePlaylistId: null,
+			blockId: null,
+			blockDetached: false,
+		};
+	}
 	const A = queueItem('qa', 'a');
 	const B = queueItem('qb', 'b');
 	const C = queueItem('qc', 'c');
@@ -728,10 +734,11 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		await flush();
 	}
 
-	const streamCallFor = (item: QueueItem) =>
-		mockApiRequest.mock.calls.filter(([endpoint]) =>
+	function streamCallFor(item: QueueItem) {
+		return mockApiRequest.mock.calls.filter(([endpoint]) =>
 			String(endpoint).includes(encodeURIComponent(item.track.trackUri))
 		).length;
+	}
 
 	beforeEach(() => {
 		testSessionStore.setState({ user: { id: 'me' } as UserProfile });
@@ -812,7 +819,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 
 	it('ignores a prefetch answered after the next item changed', async () => {
 		const { view, player } = await playQueueItem(A, [A, B, C]);
-		let answer: (data: { streamUrl: string; expiresAt: string }) => void = () => undefined;
+		let answer: (data: { streamUrl: string; expiresAt: string }) => void = noop;
 		mockApiRequest.mockReturnValueOnce(new Promise(resolve => (answer = resolve)));
 		await reach(view, player, 185);
 

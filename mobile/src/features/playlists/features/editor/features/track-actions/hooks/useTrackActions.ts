@@ -8,7 +8,8 @@ import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { usePlaylists } from '@/features/playlists/shared/playlist/usePlaylistQueries';
 import { useAddTrack } from '@/features/playlists/features/editor/shared/track-edits/useTrackEdits';
 import { canEditPlaylist } from '@/features/playlists/features/editor/shared/permissions/playlistPermissions';
-import { useNewPlaylistFromTrack, type NewPlaylistDraft } from './useNewPlaylistFromTrack';
+import { useNewPlaylistFromTrack } from '@/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack';
+import type { NewPlaylistDraft } from '@/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsSheet';
@@ -50,8 +51,9 @@ export function useTrackActions(
 	const newPlaylist = useNewPlaylistFromTrack(shown, onClose);
 
 	useEffect(() => {
-		if (list.error)
+		if (list.error) {
 			logger.error('[TrackActionsSheetContainer] Loading playlists failed:', list.error);
+		}
 	}, [list.error]);
 
 	const editable = useMemo(
@@ -59,11 +61,11 @@ export function useTrackActions(
 		[list.data, userId]
 	);
 
-	const run = (action: (body: AddQueueItemBody) => Promise<unknown>) => {
+	function run(action: (body: AddQueueItemBody) => Promise<unknown>) {
 		if (!shown) return;
 		onClose();
 		void action(shown);
-	};
+	}
 
 	return {
 		visible: track !== null,

@@ -1,4 +1,4 @@
-import { prepareSquareImage, SQUARE_IMAGE_SIZE } from './squareImage';
+import { prepareSquareImage, SQUARE_IMAGE_SIZE } from '@/shared/square-image/squareImage';
 
 const mockContext = {
 	crop: jest.fn(),

@@ -1,4 +1,4 @@
-import { base64ToBytes } from './base64';
+import { base64ToBytes } from '@/features/events/features/nearby/lib/base64';
 
 describe('base64ToBytes', () => {
 	it('decodes with and without padding', () => {

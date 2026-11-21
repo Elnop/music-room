@@ -1,6 +1,8 @@
 import type { MusicEvent } from '@/features/events/lib/types';
 
-const byStart = (a: MusicEvent, b: MusicEvent) => Date.parse(a.startsAt) - Date.parse(b.startsAt);
+function byStart(a: MusicEvent, b: MusicEvent) {
+	return Date.parse(a.startsAt) - Date.parse(b.startsAt);
+}
 
 export function upsertEvent(list: MusicEvent[], event: MusicEvent, now = Date.now()): MusicEvent[] {
 	const others = list.filter(current => current.id !== event.id);

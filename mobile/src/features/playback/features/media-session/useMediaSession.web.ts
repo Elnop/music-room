@@ -50,7 +50,9 @@ export function useMediaSession(): void {
 	const hasTrack = track !== null;
 	useEffect(() => {
 		if (!session) return;
-		const current = () => latestRef.current.nowPlaying;
+		function current() {
+			return latestRef.current.nowPlaying;
+		}
 		const handlers: Record<MediaAction, ActionHandler> = {
 			play: () => {
 				if (!current().isPlaying) current().toggle();

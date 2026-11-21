@@ -7,7 +7,7 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfileHeaderProps } from '@/features/user/features/friends/types';
 import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
-import { UserProfileListening } from './UserProfileListening';
+import { UserProfileListening } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileListening';
 import { Text } from '@/shared/theme/components/Text';
 
 type UserProfileActionsProps = UserProfileHeaderProps;

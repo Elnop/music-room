@@ -1,11 +1,11 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import { SwipeableUserItem } from './SwipeableUserItem';
+import { SwipeableUserItem } from '@/features/playlists/features/editor/features/sharing/components/presenters/SwipeableUserItem';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistMember } from '@/features/playlists/shared/playlist/lib/types';
-import { createSharingStyles } from './sharingStyles';
+import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
 import { Text } from '@/shared/theme/components/Text';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
@@ -49,8 +49,8 @@ export function MembersSection({ title, members, emptyMessage, onRemove }: Membe
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		section: {
 			flex: 1,
 		},
@@ -59,3 +59,4 @@ const createStyles = (theme: Theme) =>
 			padding: theme.spacing.lg,
 		},
 	});
+}

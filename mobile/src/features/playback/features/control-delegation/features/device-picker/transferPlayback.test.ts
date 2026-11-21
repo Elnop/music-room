@@ -1,9 +1,10 @@
 import { createStore } from 'zustand';
-import { transferTo } from './transferPlayback';
+import { transferTo } from '@/features/playback/features/control-delegation/features/device-picker/transferPlayback';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import {
 	setPositionReader,
 	usePlayerStore,
@@ -42,15 +43,17 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 
 const transfer = queueApi.transfer as jest.Mock;
 
-const device = (deviceId: string, online = true) => ({
-	deviceId,
-	deviceName: deviceId,
-	platform: 'android',
-	model: 'Model',
-	lastSeenAt: '2026-10-15T00:00:00Z',
-	access: 'all-devices' as const,
-	online,
-});
+function device(deviceId: string, online = true) {
+	return {
+		deviceId,
+		deviceName: deviceId,
+		platform: 'android',
+		model: 'Model',
+		lastSeenAt: '2026-10-15T00:00:00Z',
+		access: 'all-devices' as const,
+		online,
+	};
+}
 
 const me: DevicePickerOwner = {
 	ownerId: 'me',
@@ -65,28 +68,32 @@ const lea: DevicePickerOwner = {
 	devices: [device('lea-tab')],
 };
 
-const item = (id: string): QueueItem => ({
-	id,
-	rank: id,
-	track: {
-		trackUri: `https://soundcloud.com/artist/${id}`,
-		title: `Title ${id}`,
-		artist: 'Artist',
-		album: null,
-		albumArt: null,
-		durationMs: 200_000,
-	},
-	sourcePlaylistId: null,
-	blockId: null,
-	blockDetached: false,
-});
+function item(id: string): QueueItem {
+	return {
+		id,
+		rank: id,
+		track: {
+			trackUri: `https://soundcloud.com/artist/${id}`,
+			title: `Title ${id}`,
+			artist: 'Artist',
+			album: null,
+			albumArt: null,
+			durationMs: 200_000,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	};
+}
 
-const queue = (ownerId: string, current: string, version = 1): QueueState => ({
-	ownerId,
-	version,
-	currentItemId: current,
-	items: [item(current)],
-});
+function queue(ownerId: string, current: string, version = 1): QueueState {
+	return {
+		ownerId,
+		version,
+		currentItemId: current,
+		items: [item(current)],
+	};
+}
 
 const soundCloudTrack: SoundCloudTrack = {
 	id: 7,
@@ -100,24 +107,26 @@ const soundCloudTrack: SoundCloudTrack = {
 	playable: true,
 };
 
-const remoteStatus = (
+function remoteStatus(
 	ownerId: string,
 	deviceId: string,
 	positionMs: number,
 	itemId: string
-): ListeningStatus => ({
-	ownerId,
-	device: { deviceId, deviceName: deviceId, platform: 'android', model: 'Model' },
-	track: {
-		id: hashStringToNumber(`https://soundcloud.com/artist/${itemId}`),
-		title: 'x',
-		artist: 'y',
-		artworkUrl: null,
-	},
-	isPlaying: false,
-	positionMs,
-	updatedAt: '2026-10-15T00:00:00Z',
-});
+): ListeningStatus {
+	return {
+		ownerId,
+		device: { deviceId, deviceName: deviceId, platform: 'android', model: 'Model' },
+		track: {
+			id: hashStringToNumber(`https://soundcloud.com/artist/${itemId}`),
+			title: 'x',
+			artist: 'y',
+			artworkUrl: null,
+		},
+		isPlaying: false,
+		positionMs,
+		updatedAt: '2026-10-15T00:00:00Z',
+	};
+}
 
 const stop = jest.fn();
 let position = 0;

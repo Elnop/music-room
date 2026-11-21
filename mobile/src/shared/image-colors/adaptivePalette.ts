@@ -1,36 +1,42 @@
 type Rgb = [number, number, number];
 
-const parseHex = (hex: string): Rgb | null => {
-	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+function parseHex(hex: string): Rgb | null {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/iu.exec(hex);
 	if (!result) return null;
-	return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)];
-};
+	return [
+		Number.parseInt(result[1], 16),
+		Number.parseInt(result[2], 16),
+		Number.parseInt(result[3], 16),
+	];
+}
 
-export const hexToRgba = (hex: string, alpha: number): string => {
+export function hexToRgba(hex: string, alpha: number): string {
 	const rgb = parseHex(hex);
 	if (!rgb) return `rgba(0, 0, 0, ${alpha})`;
 	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
-};
+}
 
-const relativeLuminance = ([r, g, b]: Rgb): number => {
-	const lin = (c: number) => {
+function relativeLuminance([r, g, b]: Rgb): number {
+	function lin(c: number) {
 		const v = c / 255;
 		return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-	};
+	}
 	return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-};
+}
 
-export const contrastRatio = (a: Rgb, b: Rgb): number => {
+export function contrastRatio(a: Rgb, b: Rgb): number {
 	const la = relativeLuminance(a);
 	const lb = relativeLuminance(b);
 	return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
-};
+}
 
-export const compositeOver = (color: Rgb, alpha: number, base: Rgb): Rgb => [
-	color[0] * alpha + base[0] * (1 - alpha),
-	color[1] * alpha + base[1] * (1 - alpha),
-	color[2] * alpha + base[2] * (1 - alpha),
-];
+export function compositeOver(color: Rgb, alpha: number, base: Rgb): Rgb {
+	return [
+		color[0] * alpha + base[0] * (1 - alpha),
+		color[1] * alpha + base[1] * (1 - alpha),
+		color[2] * alpha + base[2] * (1 - alpha),
+	];
+}
 
 export const MIN_TEXT_CONTRAST = 4.5;
 
@@ -52,27 +58,29 @@ interface AdaptivePalette {
 	gradient: [string, string, string, string];
 }
 
-const gradientSamples = (): number[] => {
+function gradientSamples(): number[] {
 	const low = Math.min(...GRADIENT_ALPHAS);
 	const high = Math.max(...GRADIENT_ALPHAS);
 	const samples: number[] = [];
 	for (let a = low; a < high; a += 0.05) samples.push(a);
 	samples.push(high);
 	return samples;
-};
+}
 
-const worstContrast = (fg: Rgb, backgrounds: Rgb[]) =>
-	Math.min(...backgrounds.map(bg => contrastRatio(fg, bg)));
+function worstContrast(fg: Rgb, backgrounds: Rgb[]) {
+	return Math.min(...backgrounds.map(bg => contrastRatio(fg, bg)));
+}
 
-export const getAdaptiveColors = (dominantColor: string, base: string): AdaptivePalette | null => {
+export function getAdaptiveColors(dominantColor: string, base: string): AdaptivePalette | null {
 	const dominant = parseHex(dominantColor);
 	const baseRgb = parseHex(base);
 	if (!dominant || !baseRgb) return null;
 
 	let alphas: readonly number[] = GRADIENT_ALPHAS;
 	let backgrounds = gradientSamples().map(a => compositeOver(dominant, a, baseRgb));
-	const pick = () =>
-		worstContrast(WHITE, backgrounds) >= worstContrast(BLACK, backgrounds) ? WHITE : BLACK;
+	function pick() {
+		return worstContrast(WHITE, backgrounds) >= worstContrast(BLACK, backgrounds) ? WHITE : BLACK;
+	}
 
 	let pole = pick();
 	if (worstContrast(pole, backgrounds) < MIN_TEXT_CONTRAST) {
@@ -106,4 +114,4 @@ export const getAdaptiveColors = (dominantColor: string, base: string): Adaptive
 		onAccent: isWhite ? '#000000' : '#FFFFFF',
 		gradient: alphas.map(a => hexToRgba(dominantColor, a)) as AdaptivePalette['gradient'],
 	};
-};
+}

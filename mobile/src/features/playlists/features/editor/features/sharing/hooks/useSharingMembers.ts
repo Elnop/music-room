@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { STALE } from '@/shared/backend/queryClient';
 import { useSession } from '@/shared/backend/lib/authSession';
@@ -11,13 +12,15 @@ import * as usersApi from '@/features/playlists/shared/playlist/lib/usersApi';
 import { refreshPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
 import type { PlaylistMember, UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 
-const toMember = (user: UserSummary, canEdit: boolean): PlaylistMember => ({
-	id: user.id,
-	username: user.username,
-	displayName: user.displayName,
-	avatarUrl: user.avatarUrl,
-	canEdit,
-});
+function toMember(user: UserSummary, canEdit: boolean): PlaylistMember {
+	return {
+		id: user.id,
+		username: user.username,
+		displayName: user.displayName,
+		avatarUrl: user.avatarUrl,
+		canEdit,
+	};
+}
 
 async function loadMembers(client: QueryClient, id: string): Promise<PlaylistMember[]> {
 	const playlist = await refreshPlaylist(client, id);
@@ -67,21 +70,22 @@ export function useSharingMembers(id: string): SharingMembers {
 	}, [error]);
 
 	const members = query.data ?? [];
-	const setMembers = (update: (list: PlaylistMember[]) => PlaylistMember[]) =>
-		client.setQueryData<PlaylistMember[]>(key, list => update(list ?? []));
+	function setMembers(update: (list: PlaylistMember[]) => PlaylistMember[]) {
+		return client.setQueryData<PlaylistMember[]>(key, list => update(list ?? []));
+	}
 
 	const change = useMutation({
 		mutationFn: (request: () => Promise<void>) => request(),
 	});
 
-	const run = async (userId: string, request: () => Promise<void>) => {
+	async function run(userId: string, request: () => Promise<void>) {
 		setProcessing(userId);
 		try {
 			await change.mutateAsync(request);
 		} finally {
 			setProcessing(null);
 		}
-	};
+	}
 
 	return {
 		members,

@@ -12,11 +12,11 @@ export function useSettingsScreen(subscription: PlanState) {
 	const bottomPadding = useBottomPadding();
 	const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
 
-	const handleTogglePremium = (premium: boolean) => {
+	function handleTogglePremium(premium: boolean) {
 		subscription.changePlan(premium ? 'premium' : 'free', error =>
 			showError(apiErrorMessage(error, "Impossible de changer d'offre"))
 		);
-	};
+	}
 
 	return {
 		theme,

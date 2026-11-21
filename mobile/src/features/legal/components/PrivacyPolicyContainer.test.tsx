@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
-import { PrivacyPolicyContainer } from './PrivacyPolicyContainer';
+import { PrivacyPolicyContainer } from '@/features/legal/components/PrivacyPolicyContainer';
 
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
@@ -37,6 +37,10 @@ describe('PrivacyPolicyContainer', () => {
 		fireEvent.press(screen.getAllByText('leon.perrotin@gmail.com')[0]);
 
 		expect(openExternalUrl).toHaveBeenNthCalledWith(1, 'https://www.cnil.fr', expect.any(Function));
-		expect(openExternalUrl).toHaveBeenNthCalledWith(2, 'mailto:leon.perrotin@gmail.com', expect.any(Function));
+		expect(openExternalUrl).toHaveBeenNthCalledWith(
+			2,
+			'mailto:leon.perrotin@gmail.com',
+			expect.any(Function)
+		);
 	});
 });

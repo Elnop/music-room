@@ -5,7 +5,7 @@ import {
 	parseIBeacon,
 	ZUMIK_BEACON_UUID,
 	zumikBeaconMinor,
-} from './ibeacon';
+} from '@/features/events/shared/beacon/ibeacon';
 
 describe('buildIBeaconPayload', () => {
 	it('lays out type, length, UUID, major, minor and measured power', () => {
@@ -29,7 +29,7 @@ describe('buildIBeaconPayload', () => {
 				.slice(2, 18)
 				.map(b => b.toString(16).padStart(2, '0'))
 				.join('')
-		).toBe(ZUMIK_BEACON_UUID.replace(/-/g, ''));
+		).toBe(ZUMIK_BEACON_UUID.replaceAll('-', ''));
 		expect(payload.slice(20, 22)).toEqual([0, 42]);
 		expect(payload[22]).toBe(MEASURED_POWER & 0xff);
 	});
@@ -43,7 +43,9 @@ describe('buildIBeaconPayload', () => {
 });
 
 describe('parseIBeacon', () => {
-	const withCompanyId = (payload: number[]) => [0x4c, 0x00, ...payload];
+	function withCompanyId(payload: number[]) {
+		return [0x4c, 0x00, ...payload];
+	}
 
 	it('reads back a frame built by buildIBeaconPayload', () => {
 		const frame = eventBeaconFrame(513);

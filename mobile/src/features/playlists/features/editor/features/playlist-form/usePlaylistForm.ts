@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { queryKeys } from '@/shared/query-keys/keys';
-import { useCappedField, type CappedField } from '@/shared/theme/hooks/useCappedField';
+import { useCappedField } from '@/shared/theme/hooks/useCappedField';
+import type { CappedField } from '@/shared/theme/hooks/useCappedField';
 import { useSession } from '@/shared/backend/lib/authSession';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
@@ -13,10 +14,8 @@ import {
 	useCreatePlaylist,
 	useUpdatePlaylist,
 } from '@/features/playlists/features/editor/shared/playlist-mutations/usePlaylistMutations';
-import {
-	playlistFormSchema,
-	type PlaylistFormInput,
-} from '@/features/playlists/shared/playlist/lib/validators';
+import { playlistFormSchema } from '@/features/playlists/shared/playlist/lib/validators';
+import type { PlaylistFormInput } from '@/features/playlists/shared/playlist/lib/validators';
 import type {
 	Playlist,
 	PlaylistStackParamList,
@@ -59,7 +58,7 @@ export function usePlaylistForm(
 		defaultValues: { name: edited?.name ?? '', description: edited?.description ?? '' },
 	});
 
-	const onSubmit = async (data: PlaylistFormInput) => {
+	async function onSubmit(data: PlaylistFormInput) {
 		if (editedId !== undefined) {
 			try {
 				await update.mutateAsync({
@@ -89,7 +88,7 @@ export function usePlaylistForm(
 			logger.error('[CreatePlaylistScreen] Create playlist failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de créer la playlist'));
 		}
-	};
+	}
 
 	return {
 		isEditing: editedId !== undefined,

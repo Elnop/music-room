@@ -6,7 +6,9 @@ import { logger } from '@/shared/logging/logger';
 import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/playback/shared/player/lib/constants';
 import { isLocalTarget } from '@/features/playback/shared/player/stores/connectStore';
 
-const playsLocally = () => isLocalTarget();
+function playsLocally() {
+	return isLocalTarget();
+}
 
 function clearTimers(
 	pollRef: React.MutableRefObject<ReturnType<typeof setInterval> | null>,
@@ -60,7 +62,7 @@ export function useAudioPlaybackSync(player: AudioPlayer): void {
 		const thisLoadCounter = currentLoadCounterRef.current;
 		hasTriedToPlayRef.current = false;
 
-		const checkAndPlay = () => {
+		function checkAndPlay() {
 			if (currentLoadCounterRef.current !== thisLoadCounter || hasTriedToPlayRef.current) {
 				return false;
 			}
@@ -85,7 +87,7 @@ export function useAudioPlaybackSync(player: AudioPlayer): void {
 				return true;
 			}
 			return false;
-		};
+		}
 
 		if (checkAndPlay()) return;
 		pollingIntervalRef.current = setInterval(checkAndPlay, 50);

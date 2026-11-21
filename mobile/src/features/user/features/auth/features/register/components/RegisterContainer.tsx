@@ -6,7 +6,7 @@ import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { useRegisterForm } from '@/features/user/features/auth/features/register/useRegisterForm';
 import { useProviderSignIn } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderSignIn';
 import { useProviderButtons } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons';
-import { RegisterView } from './RegisterView';
+import { RegisterView } from '@/features/user/features/auth/features/register/components/RegisterView';
 
 type RegisterOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 

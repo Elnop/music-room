@@ -1,13 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-	AccessibilityInfo,
-	Animated,
-	Easing,
-	type DimensionValue,
-	type StyleProp,
-	type ViewStyle,
-} from 'react-native';
-import { useTheme } from './ThemeContext';
+import { AccessibilityInfo, Animated, Easing } from 'react-native';
+import type { DimensionValue, StyleProp, ViewStyle } from 'react-native';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 
 function useReduceMotion(): boolean | null {
 	const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);

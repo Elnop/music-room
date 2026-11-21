@@ -51,7 +51,7 @@ export function usePlaylistTracks(
 	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 	const canEdit = canEditPlaylist(userId, playlist);
 
-	const deleteTrack = async (trackId: string) => {
+	async function deleteTrack(trackId: string) {
 		if (!canEdit) {
 			showError('Vous ne pouvez pas éditer cette playlist');
 			return;
@@ -63,9 +63,9 @@ export function usePlaylistTracks(
 			logger.error('[PlaylistDetailScreen] Remove track failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de supprimer le titre'));
 		}
-	};
+	}
 
-	const reorder = async (from: number, to: number) => {
+	async function reorder(from: number, to: number) {
 		const tracks = playlist?.tracks ?? [];
 		const afterRank = afterRankForDrop(tracks, from, to);
 		if (afterRank === undefined) return;
@@ -80,7 +80,7 @@ export function usePlaylistTracks(
 			}
 			throw error;
 		}
-	};
+	}
 
 	return {
 		canEdit,

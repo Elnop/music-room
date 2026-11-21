@@ -5,7 +5,8 @@ import {
 	readPositionMs,
 } from '@/features/playback/shared/player/stores/playerStore';
 import { useSession } from '@/shared/backend/lib/authSession';
-import { lastTrackStorage, type LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
+import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
+import type { LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
 import { queueTrackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import { toTrackInput } from '@/shared/tracks/lib/trackInput';
 import { logger } from '@/shared/logging/logger';
@@ -17,7 +18,9 @@ import {
 export const LAST_TRACK_SAVE_INTERVAL_MS = 10_000;
 export const LAST_TRACK_PLAY_SAVE_DELAY_MS = 2000;
 
-const isLocal = () => isLocalTarget();
+function isLocal() {
+	return isLocalTarget();
+}
 
 function snapshot(): LastTrackEntry | null {
 	const { currentTrack, queueItemId, playbackState, startPositionMs, needsStreamLoad } =

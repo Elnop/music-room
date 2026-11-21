@@ -5,7 +5,7 @@ import { usePlayerStore } from '@/features/playback/shared/player/stores/playerS
 import type { AudioPlayer } from '@/features/playback/shared/player/lib/types';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import { showAlert } from '@/shared/alerts/alert';
-import { useAutoplayPrompt } from './useAutoplayPrompt';
+import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
 
 jest.mock('@/shared/alerts/alert', () => ({ showAlert: jest.fn() }));
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -19,7 +19,9 @@ const track = {
 	permalink_url: 'https://soundcloud.com/a/song',
 } as SoundCloudTrack;
 
-const shownButtons = () => (showAlert as jest.Mock).mock.calls[0][2] as AlertButton[];
+function shownButtons() {
+	return (showAlert as jest.Mock).mock.calls[0][2] as AlertButton[];
+}
 
 beforeEach(() => {
 	jest.clearAllMocks();

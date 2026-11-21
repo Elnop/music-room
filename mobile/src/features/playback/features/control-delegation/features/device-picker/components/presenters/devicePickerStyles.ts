@@ -4,12 +4,12 @@ import { keycap, pixelCaption, pixelRow } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
-export const createPickerStyles = (
+export function createPickerStyles(
 	theme: Theme,
 	insets: { top: number; bottom: number },
 	separator: string
-) =>
-	StyleSheet.create({
+) {
+	return StyleSheet.create({
 		...sheetHeaderStyles(theme, insets, separator),
 		listContent: {
 			paddingBottom: insets.bottom + 16,
@@ -87,3 +87,4 @@ export const createPickerStyles = (
 			color: theme.colors.primary,
 		},
 	});
+}

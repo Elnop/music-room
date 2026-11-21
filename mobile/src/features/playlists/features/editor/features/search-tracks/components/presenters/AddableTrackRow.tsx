@@ -76,8 +76,8 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 	);
 });
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		trackRow: {
 			marginBottom: theme.spacing.xs,
 		},
@@ -127,3 +127,4 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.success,
 		},
 	});
+}

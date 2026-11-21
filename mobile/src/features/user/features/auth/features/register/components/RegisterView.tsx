@@ -95,8 +95,8 @@ export function RegisterView({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		passwordHint: {
 			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.sm,
@@ -108,3 +108,4 @@ const createStyles = (theme: Theme) =>
 			lineHeight: 16,
 		},
 	});
+}

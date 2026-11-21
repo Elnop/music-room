@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { useSoundCloudSearch } from './useSoundCloudSearch';
+import { useSoundCloudSearch } from '@/features/search/hooks/useSoundCloudSearch';
 import { searchApi } from '@/features/search/lib/searchApi';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
@@ -58,9 +58,9 @@ describe('useSoundCloudSearch', () => {
 		queryClient.clear();
 	});
 
-	const wrapper = ({ children }: { children: React.ReactNode }) => (
-		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-	);
+	function wrapper({ children }: { children: React.ReactNode }) {
+		return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+	}
 
 	it('does not trigger search when query is blank', () => {
 		const { result } = renderHook(() => useSoundCloudSearch('   '), { wrapper });

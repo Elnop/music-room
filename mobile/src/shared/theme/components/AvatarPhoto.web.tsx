@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AvatarPhotoProps } from './AvatarPhoto';
+import type { AvatarPhotoProps } from '@/shared/theme/components/AvatarPhoto';
 
 export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 	return (

@@ -1,5 +1,5 @@
-import { ApiError } from './api';
-import { apiErrorMessage } from './apiErrorMessage';
+import { ApiError } from '@/shared/backend/lib/api';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

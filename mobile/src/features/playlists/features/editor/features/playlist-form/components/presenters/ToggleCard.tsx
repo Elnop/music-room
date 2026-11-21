@@ -28,8 +28,8 @@ export function ToggleCard({ label, description, value, onValueChange }: ToggleC
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		card: {
 			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.md,
@@ -56,3 +56,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

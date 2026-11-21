@@ -6,7 +6,7 @@ import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skelet
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { SearchTracks } from '@/features/playlists/features/editor/features/search-tracks/useSearchTracks';
-import { AddableTrackRow } from './AddableTrackRow';
+import { AddableTrackRow } from '@/features/playlists/features/editor/features/search-tracks/components/presenters/AddableTrackRow';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface SearchTracksViewProps {
@@ -65,8 +65,8 @@ export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProp
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -80,3 +80,4 @@ const createStyles = (theme: Theme) =>
 			paddingTop: theme.spacing.sm,
 		},
 	});
+}

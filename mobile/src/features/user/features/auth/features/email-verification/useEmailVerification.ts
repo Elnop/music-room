@@ -2,10 +2,8 @@ import { useState } from 'react';
 import { Keyboard } from 'react-native';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showSuccess } from '@/shared/theme/lib/toast';
-import {
-	useCodeInput,
-	type CodeInput,
-} from '@/features/user/features/auth/shared/code-input/useCodeInput';
+import { useCodeInput } from '@/features/user/features/auth/shared/code-input/useCodeInput';
+import type { CodeInput } from '@/features/user/features/auth/shared/code-input/useCodeInput';
 import { useCountdown } from '@/features/user/features/auth/shared/countdown/useCountdown';
 import {
 	useResendVerificationMutation,
@@ -34,7 +32,7 @@ export function useEmailVerification(userId: string, email: string): EmailVerifi
 	const [error, setError] = useState<string | null>(null);
 	const [codeError, setCodeError] = useState<string | null>(null);
 
-	const verify = (fullCode = code.digits.join('')) => {
+	function verify(fullCode = code.digits.join('')) {
 		if (fullCode.length !== 6) {
 			setCodeError('Saisissez les 6 chiffres');
 			return;
@@ -51,9 +49,9 @@ export function useEmailVerification(userId: string, email: string): EmailVerifi
 				},
 			}
 		);
-	};
+	}
 
-	const resend = () => {
+	function resend() {
 		if (cooldown.seconds > 0) return;
 		setError(null);
 		resendMutation.mutate(
@@ -67,7 +65,7 @@ export function useEmailVerification(userId: string, email: string): EmailVerifi
 					setError(apiErrorMessage(failure, "Impossible d'envoyer un nouveau code")),
 			}
 		);
-	};
+	}
 
 	return {
 		code,

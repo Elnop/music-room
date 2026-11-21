@@ -7,8 +7,8 @@ import {
 	onSessionEnd,
 	registerAuthSession,
 	useSession,
-	type SessionView,
-} from './authSession';
+} from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 
 describe('authSession', () => {
 	it('reads signed out before the auth store registers', () => {

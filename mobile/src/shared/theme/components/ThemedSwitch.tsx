@@ -1,6 +1,7 @@
 import React from 'react';
-import { Switch, type SwitchProps } from 'react-native';
-import { useTheme } from './ThemeContext';
+import { Switch } from 'react-native';
+import type { SwitchProps } from 'react-native';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 
 type ThemedSwitchProps = Omit<SwitchProps, 'trackColor' | 'thumbColor' | 'ios_backgroundColor'>;
 

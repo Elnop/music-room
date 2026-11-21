@@ -64,8 +64,8 @@ export function SoundCloudTrackItem({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: pixelRow(theme),
 		pressable: {
 			flex: 1,
@@ -100,3 +100,4 @@ const createStyles = (theme: Theme) =>
 			marginRight: theme.spacing.sm,
 		},
 	});
+}

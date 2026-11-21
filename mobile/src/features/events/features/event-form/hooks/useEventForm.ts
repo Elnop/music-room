@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form';
 import { logger } from '@/shared/logging/logger';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { useCappedField, type CappedField } from '@/shared/theme/hooks/useCappedField';
+import { useCappedField } from '@/shared/theme/hooks/useCappedField';
+import type { CappedField } from '@/shared/theme/hooks/useCappedField';
 import { queryKeys } from '@/shared/query-keys/keys';
 import type { MusicGenre } from '@/shared/users/user.types';
 import {
@@ -14,14 +15,15 @@ import {
 	useUpdateEvent,
 } from '@/features/events/shared/events/hooks/useEventMutations';
 import { usePlaylistChoices } from '@/features/events/shared/events/hooks/useEventQueries';
-import { useEventPlace, type EventPlace } from './useEventPlace';
+import { useEventPlace } from '@/features/events/features/event-form/hooks/useEventPlace';
+import type { EventPlace } from '@/features/events/features/event-form/hooks/useEventPlace';
 import { pickDateTime } from '@/features/events/features/event-form/lib/pickDateTime';
 import { defaultSchedule, scheduleError } from '@/features/events/shared/event-dates/eventDates';
 import {
 	EVENT_LIMITS,
 	eventFormSchema,
-	type EventFormInput,
 } from '@/features/events/features/event-form/lib/validators';
+import type { EventFormInput } from '@/features/events/features/event-form/lib/validators';
 import type {
 	EventInput,
 	EventStackParamList,
@@ -52,7 +54,9 @@ export interface EventForm {
 	isSubmitting: boolean;
 }
 
-const orNull = (text: string) => text.trim() || null;
+function orNull(text: string) {
+	return text.trim() || null;
+}
 
 function useEditedEvent(eventId: string | undefined): MusicEvent | undefined {
 	const client = useQueryClient();
@@ -91,21 +95,21 @@ export function useEventForm(navigation: Navigation, eventId: string | undefined
 		setValue('address', address, { shouldValidate: true })
 	);
 
-	const toggleGenre = (genre: MusicGenre) => {
+	function toggleGenre(genre: MusicGenre) {
 		setGenresError(undefined);
 		setGenres(current => {
 			if (current.includes(genre)) return current.filter(g => g !== genre);
 			return current.length < EVENT_LIMITS.GENRES_MAX ? [...current, genre] : current;
 		});
-	};
+	}
 
-	const moveStart = (date: Date) => {
+	function moveStart(date: Date) {
 		const length = endsAt.getTime() - startsAt.getTime();
 		setStartsAt(date);
 		if (endsAt.getTime() <= date.getTime()) setEndsAt(new Date(date.getTime() + length));
-	};
+	}
 
-	const onSubmit = async (data: EventFormInput) => {
+	async function onSubmit(data: EventFormInput) {
 		if (genres.length === 0) {
 			setGenresError('Choisissez au moins un genre');
 			return;
@@ -142,7 +146,7 @@ export function useEventForm(navigation: Navigation, eventId: string | undefined
 			logger.error('[EventForm] Save failed:', error);
 			showError(apiErrorMessage(error, "Impossible d'enregistrer l'événement"));
 		}
-	};
+	}
 
 	return {
 		isEditing: eventId !== undefined,

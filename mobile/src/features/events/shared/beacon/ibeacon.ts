@@ -17,12 +17,14 @@ interface IBeaconFrame {
 }
 
 function uuidBytes(uuid: string): number[] {
-	const hex = uuid.replace(/-/g, '');
-	if (!/^[0-9a-f]{32}$/i.test(hex)) throw new Error(`Invalid UUID: ${uuid}`);
-	return Array.from({ length: 16 }, (_, i) => parseInt(hex.slice(i * 2, i * 2 + 2), 16));
+	const hex = uuid.replaceAll('-', '');
+	if (!/^[0-9a-f]{32}$/iu.test(hex)) throw new Error(`Invalid UUID: ${uuid}`);
+	return Array.from({ length: 16 }, (_, i) => Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16));
 }
 
-const uint16 = (value: number) => [(value >> 8) & 0xff, value & 0xff];
+function uint16(value: number) {
+	return [(value >> 8) & 0xff, value & 0xff];
+}
 
 export function buildIBeaconPayload(frame: IBeaconFrame): number[] {
 	for (const [name, value] of [
@@ -52,14 +54,18 @@ export function eventBeaconFrame(beaconMinor: number): IBeaconFrame {
 	};
 }
 
-const hex = (bytes: number[]) => bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
+function hex(bytes: number[]) {
+	return bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
 
 function formatUuid(bytes: number[]): string {
 	const h = hex(bytes);
 	return [h.slice(0, 8), h.slice(8, 12), h.slice(12, 16), h.slice(16, 20), h.slice(20)].join('-');
 }
 
-const toSigned = (byte: number) => (byte > 127 ? byte - 256 : byte);
+function toSigned(byte: number) {
+	return byte > 127 ? byte - 256 : byte;
+}
 
 export function parseIBeacon(data: number[]): IBeaconFrame | null {
 	if (data.length < 25) return null;

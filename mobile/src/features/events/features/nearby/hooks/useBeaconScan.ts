@@ -4,13 +4,13 @@ import {
 	BEACON_PRUNE_MS,
 	BEACON_TIMEOUT_MS,
 } from '@/features/events/features/nearby/lib/constants';
-import { useAppActive } from './useAppActive';
+import { useAppActive } from '@/features/events/features/nearby/hooks/useAppActive';
 import * as beaconScanner from '@/features/events/features/nearby/lib/beaconScanner';
 import {
 	pruneSightings,
 	recordSighting,
-	type BeaconSighting,
 } from '@/features/events/features/nearby/lib/beaconDistance';
+import type { BeaconSighting } from '@/features/events/features/nearby/lib/beaconDistance';
 
 export type BeaconScanStatus = 'checking' | 'needs-permission' | 'off' | 'unsupported' | 'scanning';
 

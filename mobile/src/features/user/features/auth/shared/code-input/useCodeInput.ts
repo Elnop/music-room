@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import type { TextInput } from 'react-native';
-import { fillCodeDigits } from './codeDigits';
+import { fillCodeDigits } from '@/features/user/features/auth/shared/code-input/codeDigits';
 
 const EMPTY_CODE = ['', '', '', '', '', ''];
 
@@ -27,25 +27,25 @@ export function useCodeInput(): CodeInput {
 
 	const focusFirst = useCallback(() => boxes.current[0]?.focus(), []);
 
-	const changeDigit = (index: number, text: string): string | null => {
+	function changeDigit(index: number, text: string): string | null {
 		const result = fillCodeDigits(digits, index, text);
 		if (!result) return null;
 
 		setDigits(result.code);
 		if (result.focusIndex !== null) boxes.current[result.focusIndex]?.focus();
 		return text && result.code.every(digit => digit !== '') ? result.code.join('') : null;
-	};
+	}
 
-	const pressKey = (index: number, key: string) => {
+	function pressKey(index: number, key: string) {
 		if (key === 'Backspace' && !digits[index] && index > 0) {
 			boxes.current[index - 1]?.focus();
 		}
-	};
+	}
 
-	const reset = () => {
+	function reset() {
 		setDigits(EMPTY_CODE);
 		focusFirst();
-	};
+	}
 
 	return {
 		digits,

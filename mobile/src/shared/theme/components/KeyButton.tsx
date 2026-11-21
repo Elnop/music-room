@@ -1,11 +1,12 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import type { PixelIconSource } from './PixelIcon';
+import { ActivityIndicator, StyleSheet } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import { keycap } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { Pressable } from './Pressable';
+import { Pressable } from '@/shared/theme/components/Pressable';
 
 type KeyTone = 'primary' | 'surface' | 'device';
 
@@ -65,8 +66,8 @@ export function KeyButton({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		key: {
 			...keycap(theme),
 			flexDirection: 'row',
@@ -79,3 +80,4 @@ const createStyles = (theme: Theme) =>
 		device: { backgroundColor: theme.colors.surfaceAlt, paddingHorizontal: theme.spacing.md },
 		disabled: { opacity: 0.4 },
 	});
+}

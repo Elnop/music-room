@@ -45,7 +45,7 @@ export function TrackTableRow({
 	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 	const { hovered, hoverProps } = useHover();
-	const showPlay = hovered && !unavailable && !isPending && !!onPress;
+	const showPlay = hovered && !unavailable && !isPending && Boolean(onPress);
 	const contextMenu = useContextMenu(onShowActions);
 
 	return (
@@ -125,8 +125,8 @@ export function TrackTableRow({
 	);
 }
 
-const createStyles = (theme: Theme, separator: string) =>
-	StyleSheet.create({
+function createStyles(theme: Theme, separator: string) {
+	return StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -162,3 +162,4 @@ const createStyles = (theme: Theme, separator: string) =>
 		dragHandle: { marginLeft: theme.spacing.xs, padding: theme.spacing.xs },
 		dragHandleIdle: { opacity: 0.3 },
 	});
+}

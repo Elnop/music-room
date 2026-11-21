@@ -1,7 +1,7 @@
 import type { QueueTrack } from '@/shared/playback/lib/queue.types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
-import type { SoundCloudTrack } from './soundcloud.types';
-import type { Track } from './track.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { Track } from '@/shared/tracks/lib/track.types';
 
 export function toTrackInput(track: SoundCloudTrack | Track | QueueTrack): AddQueueItemBody {
 	if ('permalink_url' in track) {

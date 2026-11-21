@@ -1,10 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { Text } from '@/shared/theme/components/Text';
 import type { CarouselSlot } from '@/features/playback/features/player-modal/hooks/useArtworkCarousel';
-import type { createStyles } from './playerModalStyles';
+import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
 
 interface PlayerCarouselSlotProps {
 	styles: ReturnType<typeof createStyles>;

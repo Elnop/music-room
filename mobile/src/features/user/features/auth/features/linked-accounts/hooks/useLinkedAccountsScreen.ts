@@ -3,7 +3,7 @@ import {
 	useLinkedProviders,
 	useLinkProvider,
 	useUnlinkProvider,
-} from './useLinkedProviders';
+} from '@/features/user/features/auth/features/linked-accounts/hooks/useLinkedProviders';
 import { useProviderButtons } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons';
 import type { OAuthProvider } from '@/features/user/features/auth/types';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';

@@ -1,27 +1,35 @@
-import { usePlayerStore, readPositionMs, setPositionReader } from './playerStore';
+import {
+	usePlayerStore,
+	readPositionMs,
+	setPositionReader,
+} from '@/features/playback/shared/player/stores/playerStore';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import type { PlaybackState } from '@/shared/playback/lib/playback';
 
 const initialState = usePlayerStore.getState();
 
-const makeTrack = (id: number): SoundCloudTrack => ({
-	id,
-	title: `Track ${id}`,
-	description: null,
-	duration: 180000,
-	genre: null,
-	artwork_url: null,
-	permalink_url: `https://soundcloud.com/artist/track-${id}`,
-	user: {
-		id: 1,
-		username: 'artist',
-		avatar_url: null,
-		permalink_url: 'https://soundcloud.com/artist',
-	},
-	playable: true,
-});
+function makeTrack(id: number): SoundCloudTrack {
+	return {
+		id,
+		title: `Track ${id}`,
+		description: null,
+		duration: 180000,
+		genre: null,
+		artwork_url: null,
+		permalink_url: `https://soundcloud.com/artist/track-${id}`,
+		user: {
+			id: 1,
+			username: 'artist',
+			avatar_url: null,
+			permalink_url: 'https://soundcloud.com/artist',
+		},
+		playable: true,
+	};
+}
 
-const withState = (playbackState: PlaybackState) => usePlayerStore.setState({ playbackState });
+function withState(playbackState: PlaybackState) {
+	return usePlayerStore.setState({ playbackState });
+}
 
 beforeEach(() => {
 	usePlayerStore.setState(initialState, true);
@@ -419,8 +427,9 @@ describe('pause by the system (#310)', () => {
 });
 
 describe('restored track (#312)', () => {
-	const restore = (positionMs = 42_000) =>
-		usePlayerStore.getState().restoreTrack(makeTrack(9), 'q9', positionMs);
+	function restore(positionMs = 42_000) {
+		return usePlayerStore.getState().restoreTrack(makeTrack(9), 'q9', positionMs);
+	}
 
 	it('shows the track paused, with no stream and no load', () => {
 		restore();

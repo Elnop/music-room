@@ -31,8 +31,8 @@ export function useCoverActions(
 	const { isPremium, refetch: refetchPlan } = premium;
 	const [isUploading, setIsUploading] = useState(false);
 
-	const showLocked = () =>
-		showAlert(
+	function showLocked() {
+		return showAlert(
 			'Réservé au Premium',
 			"Changer la cover d'une playlist est réservé à l'offre Premium. Vous pouvez l'activer dans les paramètres.",
 			[
@@ -44,8 +44,9 @@ export function useCoverActions(
 				},
 			]
 		);
+	}
 
-	const run = async (action: () => Promise<string | null>, done: string, fallback: string) => {
+	async function run(action: () => Promise<string | null>, done: string, fallback: string) {
 		setIsUploading(true);
 		try {
 			const coverUrl = await action();
@@ -61,9 +62,9 @@ export function useCoverActions(
 		} finally {
 			setIsUploading(false);
 		}
-	};
+	}
 
-	const change = async () => {
+	async function change() {
 		if (isUploading) return;
 		if (!isPremium) {
 			showLocked();
@@ -79,16 +80,16 @@ export function useCoverActions(
 			'Cover mise à jour',
 			'Impossible de changer la cover'
 		);
-	};
+	}
 
-	const remove = async () => {
+	async function remove() {
 		if (isUploading) return;
 		await run(
 			async () => (await playlistApi.removeCover(playlistId)).coverUrl,
 			'Cover retirée',
 			'Impossible de retirer la cover'
 		);
-	};
+	}
 
 	return {
 		isPremium,

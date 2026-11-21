@@ -1,13 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { BottomTabBar, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BottomTabBar } from '@react-navigation/bottom-tabs';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
 import { PIXEL } from '@/shared/theme/lib/tokens';
 import { SIDEBAR_WIDTH } from '@/shared/theme/lib/layout';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
-import { SidebarAccountContainer } from './SidebarAccountContainer';
+import { SidebarAccountContainer } from '@/features/shell/components/orchestrators/SidebarAccountContainer';
 
 export function TabBarLayout({
 	miniPlayer,

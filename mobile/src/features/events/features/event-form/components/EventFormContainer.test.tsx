@@ -3,7 +3,7 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { EventFormContainer } from './EventFormContainer';
+import { EventFormContainer } from '@/features/events/features/event-form/components/EventFormContainer';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
@@ -16,6 +16,7 @@ import { ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { musicEvent } from '@test-utils/eventFixtures';
 import { formatEventDate } from '@/features/events/shared/event-dates/eventDates';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -47,7 +48,7 @@ const location = jest.mocked(Location);
 const navigation = { goBack: jest.fn(), replace: jest.fn() };
 let routes: ReturnType<typeof mockFetchRoutes>;
 let sent: Record<string, unknown> | undefined;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 function renderForm(eventId?: string) {
 	const client = createQueryClient();
@@ -68,12 +69,13 @@ function renderForm(eventId?: string) {
 	return view;
 }
 
-const type = (placeholder: string, text: string) =>
-	fireEvent.changeText(screen.getByPlaceholderText(placeholder), text);
+function type(placeholder: string, text: string) {
+	return fireEvent.changeText(screen.getByPlaceholderText(placeholder), text);
+}
 
-const submit = async (label = "Créer l'événement") => {
+async function submit(label = "Créer l'événement") {
 	await act(async () => fireEvent.press(screen.getByText(label)));
-};
+}
 
 beforeEach(async () => {
 	jest.clearAllMocks();
@@ -191,7 +193,7 @@ describe('EventFormContainer', () => {
 				)
 			);
 		renderForm();
-		await act(async () => fireEvent.press(screen.getByLabelText(/^Début :/)));
+		await act(async () => fireEvent.press(screen.getByLabelText(/^Début :/u)));
 
 		const threeHoursLater = new Date(later.getTime() + 3 * 3_600_000);
 		expect(screen.getByLabelText(`Début : ${formatEventDate(later)}`)).toBeTruthy();

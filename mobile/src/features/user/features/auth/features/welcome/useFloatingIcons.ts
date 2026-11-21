@@ -51,14 +51,15 @@ const ICONS: FloatingIconSpec[] = [
 	},
 ];
 
-const timing = (value: Animated.Value, toValue: number, duration: number, delay = 0) =>
-	Animated.timing(value, {
+function timing(value: Animated.Value, toValue: number, duration: number, delay = 0) {
+	return Animated.timing(value, {
 		toValue,
 		duration,
 		delay,
 		easing: Easing.inOut(Easing.sin),
 		useNativeDriver: true,
 	});
+}
 
 function startLoops(
 	spec: FloatingIconSpec,
@@ -78,13 +79,14 @@ function startLoops(
 			useNativeDriver: true,
 		})
 	).start();
-	const pulse = (toValue: number) =>
-		Animated.timing(scale, {
+	function pulse(toValue: number) {
+		return Animated.timing(scale, {
 			toValue,
 			duration: duration * 1.5,
 			easing: Easing.inOut(Easing.ease),
 			useNativeDriver: true,
 		});
+	}
 	Animated.loop(Animated.sequence([pulse(1.15), pulse(1)])).start();
 }
 

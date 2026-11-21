@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import type { UserSummary } from './types';
+import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 
 export function getFriends(): Promise<UserSummary[]> {
 	return apiRequest<UserSummary[]>('/api/friends', { method: 'GET' });

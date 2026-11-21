@@ -8,7 +8,7 @@ import {
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
-import { FriendCardSkeleton } from './FriendCardSkeleton';
+import { FriendCardSkeleton } from '@/features/playlists/features/browse/features/home/components/presenters/FriendCardSkeleton';
 import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
 
 export function HomeSkeleton() {
@@ -38,8 +38,8 @@ export function HomeSkeleton() {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		header: {
 			width: '100%',
 		},
@@ -51,3 +51,4 @@ const createStyles = (theme: Theme) =>
 			marginBottom: theme.spacing.md * 2 + theme.spacing.sm,
 		},
 	});
+}

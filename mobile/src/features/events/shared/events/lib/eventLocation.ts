@@ -1,5 +1,5 @@
 import * as Location from 'expo-location';
-import { placeName } from './geocoder';
+import { placeName } from '@/features/events/shared/events/lib/geocoder';
 
 export interface Coordinates {
 	latitude: number;

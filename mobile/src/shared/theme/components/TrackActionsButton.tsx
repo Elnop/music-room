@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from './PixelIcon';
-import { Pressable } from './Pressable';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
 import { useMeasuredPress } from '@/shared/theme/hooks/useMeasuredPress';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
-import { useTheme } from './ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 
 interface TrackActionsButtonProps {

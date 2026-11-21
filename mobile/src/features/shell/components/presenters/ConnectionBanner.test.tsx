@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ConnectionBanner } from './ConnectionBanner';
+import { ConnectionBanner } from '@/features/shell/components/presenters/ConnectionBanner';
 import { textColorOn } from '@/features/shell/lib/textContrast';
 import { FIXED_COLORS } from '@/shared/theme/lib/tokens';
 import { originalTheme } from '@/shared/theme/lib/original.theme';

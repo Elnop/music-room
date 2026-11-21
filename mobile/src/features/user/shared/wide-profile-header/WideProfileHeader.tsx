@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, type ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import type { Theme } from '@/shared/theme/lib/types';
 import { displayText } from '@/shared/theme/lib/pixelFrame';
@@ -45,7 +46,7 @@ export function WideProfileHeader({
 					<Text style={styles.username}>@{username}</Text>
 					{badges}
 				</View>
-				{!!bio && (
+				{Boolean(bio) && (
 					<Text style={styles.bio} numberOfLines={3}>
 						{bio}
 					</Text>
@@ -65,13 +66,15 @@ export function WideProfileHeader({
 	);
 }
 
-export const wideProfileActionStyle = (theme: Theme): ViewStyle => ({
-	height: 40,
-	paddingHorizontal: theme.spacing.md,
-});
+export function wideProfileActionStyle(theme: Theme): ViewStyle {
+	return {
+		height: 40,
+		paddingHorizontal: theme.spacing.md,
+	};
+}
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -128,3 +131,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.md,
 		},
 	});
+}

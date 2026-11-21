@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useNavigationContainerRef } from '@react-navigation/native';
 import { AuthNavigator } from '@/app/AuthNavigator';
-import { AppNavigator, type AppTabsParamList } from '@/app/AppNavigator';
+import { AppNavigator } from '@/app/AppNavigator';
+import type { AppTabsParamList } from '@/app/AppNavigator';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { createLinking, openPendingLink } from '@/features/shell/lib/linking';

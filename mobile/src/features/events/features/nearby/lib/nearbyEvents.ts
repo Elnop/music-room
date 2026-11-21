@@ -1,7 +1,8 @@
-import { NEARBY_RADIUS_M } from './constants';
+import { NEARBY_RADIUS_M } from '@/features/events/features/nearby/lib/constants';
 import { isOngoing } from '@/features/events/shared/event-dates/eventDates';
-import { distanceMeters, formatDistance } from './geo';
-import { estimateDistance, type BeaconSighting } from './beaconDistance';
+import { distanceMeters, formatDistance } from '@/features/events/features/nearby/lib/geo';
+import { estimateDistance } from '@/features/events/features/nearby/lib/beaconDistance';
+import type { BeaconSighting } from '@/features/events/features/nearby/lib/beaconDistance';
 import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
 import type { MusicEvent } from '@/features/events/lib/types';
 

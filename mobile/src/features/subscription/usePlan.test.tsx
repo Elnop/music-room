@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useChangePlan, usePlan } from './usePlan';
+import { useChangePlan, usePlan } from '@/features/subscription/usePlan';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
 import type { Subscription } from '@/features/subscription/lib/subscription';

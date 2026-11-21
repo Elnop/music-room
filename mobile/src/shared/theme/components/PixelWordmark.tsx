@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Text } from './Text';
+import { Text } from '@/shared/theme/components/Text';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
@@ -19,8 +19,8 @@ export function PixelWordmark({ size = 24 }: { size?: number }) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		word: {
 			fontFamily: theme.typography.families.mono,
 			color: theme.colors.primary,
@@ -28,3 +28,4 @@ const createStyles = (theme: Theme) =>
 			textShadowRadius: 0,
 		},
 	});
+}

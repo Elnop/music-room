@@ -1,13 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp } from '@react-navigation/native';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { getSession } from '@/shared/backend/lib/authSession';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
-import type { FriendUserSummary } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import type {
+	FriendUserSummary,
+	UserDeviceWithLicenses,
+} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 import { deviceService } from '@/shared/backend/deviceService';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import type { UserDeviceWithLicenses } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 import {
 	pairKey,
 	setPair,

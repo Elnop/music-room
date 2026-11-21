@@ -10,11 +10,11 @@ import {
 	noMembersMessage,
 	sharingHeader,
 } from '@/features/playlists/features/editor/features/sharing/lib/sharingTexts';
-import { MembersSection } from './MembersSection';
-import { OpenPlaylistInfo } from './OpenPlaylistInfo';
-import { SettingRow } from './SettingRow';
-import { createSharingStyles } from './sharingStyles';
-import { UserResults } from './UserResults';
+import { MembersSection } from '@/features/playlists/features/editor/features/sharing/components/presenters/MembersSection';
+import { OpenPlaylistInfo } from '@/features/playlists/features/editor/features/sharing/components/presenters/OpenPlaylistInfo';
+import { SettingRow } from '@/features/playlists/features/editor/features/sharing/components/presenters/SettingRow';
+import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
+import { UserResults } from '@/features/playlists/features/editor/features/sharing/components/presenters/UserResults';
 import { Text } from '@/shared/theme/components/Text';
 import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
@@ -104,8 +104,8 @@ export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		container: { flex: 1, backgroundColor: theme.colors.background },
 		scroll: { flexGrow: 1 },
 		header: {
@@ -125,3 +125,4 @@ const createStyles = (theme: Theme) =>
 		settings: { marginBottom: theme.spacing.lg },
 		searchBar: { marginBottom: theme.spacing.md },
 	});
+}

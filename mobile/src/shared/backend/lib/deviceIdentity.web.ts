@@ -1,18 +1,18 @@
 const BROWSERS: [RegExp, string][] = [
-	[/Edg(A|iOS)?\//, 'Edge'],
-	[/OPR\//, 'Opera'],
-	[/Firefox\/|FxiOS\//, 'Firefox'],
-	[/Chrome\/|CriOS\//, 'Chrome'],
-	[/Safari\//, 'Safari'],
+	[/Edg(A|iOS)?\//u, 'Edge'],
+	[/OPR\//u, 'Opera'],
+	[/Firefox\/|FxiOS\//u, 'Firefox'],
+	[/Chrome\/|CriOS\//u, 'Chrome'],
+	[/Safari\//u, 'Safari'],
 ];
 
 const SYSTEMS: [RegExp, string][] = [
-	[/Windows/, 'Windows'],
-	[/Android/, 'Android'],
-	[/iPhone|iPad|iPod/, 'iOS'],
-	[/Mac OS X|Macintosh/, 'macOS'],
-	[/CrOS/, 'ChromeOS'],
-	[/Linux/, 'Linux'],
+	[/Windows/u, 'Windows'],
+	[/Android/u, 'Android'],
+	[/iPhone|iPad|iPod/u, 'iOS'],
+	[/Mac OS X|Macintosh/u, 'macOS'],
+	[/CrOS/u, 'ChromeOS'],
+	[/Linux/u, 'Linux'],
 ];
 
 function match(userAgent: string, table: [RegExp, string][]): string | null {

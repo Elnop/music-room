@@ -1,20 +1,26 @@
 import { renderHook } from '@testing-library/react-native';
-import { useWindowDimensions, type View } from 'react-native';
-import { useMeasuredPress } from './useMeasuredPress';
+import { useWindowDimensions } from 'react-native';
+import type { View } from 'react-native';
+import { useMeasuredPress } from '@/shared/theme/hooks/useMeasuredPress';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
 	default: jest.fn(),
 }));
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
-const buttonAt = (x: number, y: number) => ({
-	current: {
-		measureInWindow: (callback: (...rect: number[]) => void) => callback(x, y, 32, 32),
-	} as unknown as View,
-});
+function buttonAt(x: number, y: number) {
+	return {
+		current: {
+			measureInWindow: (callback: (...rect: number[]) => void) => callback(x, y, 32, 32),
+		} as unknown as View,
+	};
+}
 
 describe('useMeasuredPress', () => {
 	it('passes where the button is on desktop', () => {

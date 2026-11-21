@@ -2,7 +2,7 @@ import React from 'react';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { Platform } from 'react-native';
 import * as Location from 'expo-location';
-import { NearbyEventsContainer } from './NearbyEventsContainer';
+import { NearbyEventsContainer } from '@/features/events/features/nearby/components/NearbyEventsContainer';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { logger } from '@/shared/logging/logger';
 import { renderWithClient } from '@test-utils/renderWithClient';
@@ -11,6 +11,7 @@ import { ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { musicEvent } from '@test-utils/eventFixtures';
 import * as beaconScanner from '@/features/events/features/nearby/lib/beaconScanner';
+import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -45,11 +46,11 @@ jest.mock('@/features/events/features/nearby/lib/beaconScanner', () => ({
 const location = jest.mocked(Location);
 const scanner = jest.mocked(beaconScanner);
 const stopScan = jest.fn();
-let hear: (minor: number, rssi?: number) => void = () => undefined;
+let hear: (minor: number, rssi?: number) => void = noop;
 const remove = jest.fn();
-let moveTo: (latitude: number, longitude: number) => void = () => undefined;
+let moveTo: (latitude: number, longitude: number) => void = noop;
 let routes: ReturnType<typeof mockFetchRoutes>;
-let clear: () => void = () => undefined;
+let clear: () => void = noop;
 
 const RIVER = { latitude: 48.8966, longitude: 2.3185 };
 
@@ -127,7 +128,7 @@ describe('NearbyEventsContainer', () => {
 		await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalled());
 		await act(async () => moveTo(RIVER.latitude, RIVER.longitude));
 		const sent = routes.fetchMock.mock.calls.map(([url, init]) => `${url} ${init?.body ?? ''}`);
-		expect(sent.join(' ')).not.toMatch(/48\.89|2\.31/);
+		expect(sent.join(' ')).not.toMatch(/48\.89|2\.31/u);
 	});
 
 	it('stops following the position when the home is left', async () => {
@@ -148,7 +149,7 @@ describe('NearbyEventsContainer', () => {
 		} as Location.LocationPermissionResponse);
 		await renderSection();
 
-		expect(await screen.findByText(/Autorisez la localisation/)).toBeTruthy();
+		expect(await screen.findByText(/Autorisez la localisation/u)).toBeTruthy();
 		await act(async () => fireEvent.press(screen.getByText('Autoriser la localisation')));
 		expect(location.requestForegroundPermissionsAsync).toHaveBeenCalled();
 		expect(location.watchPositionAsync).not.toHaveBeenCalled();
@@ -171,7 +172,7 @@ describe('NearbyEventsContainer', () => {
 		await renderSection();
 
 		await act(async () => fireEvent.press(await screen.findByText('Autoriser la localisation')));
-		expect(await screen.findByText(/paramètres du site/)).toBeTruthy();
+		expect(await screen.findByText(/paramètres du site/u)).toBeTruthy();
 		expect(screen.queryByText('Autoriser la localisation')).toBeNull();
 		expect(screen.queryByText('Ouvrir les réglages')).toBeNull();
 		expect(location.watchPositionAsync).not.toHaveBeenCalled();
@@ -188,7 +189,7 @@ describe('NearbyEventsContainer', () => {
 			expect(screen.getByText('Recherche de votre position…')).toBeTruthy();
 
 			act(() => jest.advanceTimersByTime(15_000));
-			expect(screen.getByText(/Position introuvable/)).toBeTruthy();
+			expect(screen.getByText(/Position introuvable/u)).toBeTruthy();
 			await act(async () => fireEvent.press(screen.getByText('Réessayer')));
 			await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalledTimes(2));
 		} finally {
@@ -213,7 +214,7 @@ describe('NearbyEventsContainer', () => {
 	it('says when the GPS is off', async () => {
 		location.hasServicesEnabledAsync.mockResolvedValue(false);
 		await renderSection();
-		expect(await screen.findByText(/Activez la localisation \(GPS\)/)).toBeTruthy();
+		expect(await screen.findByText(/Activez la localisation \(GPS\)/u)).toBeTruthy();
 	});
 
 	it('shows an event heard by its beacon as "Tout près", even with the GPS off', async () => {

@@ -4,7 +4,7 @@ import { usePlayerAudio } from '@/features/playback/shared/player/hooks/usePlaye
 import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
-import { useMusicControlEmitter } from './useMusicControlEmitter';
+import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { showAlert } from '@/shared/alerts/alert';
 import type { DeviceCommand } from '@/shared/playback/lib/queue.types';
 import {
@@ -55,10 +55,10 @@ const media = new FakeMediaElement();
 installFakeDocument(media);
 media.nativeHls = 'maybe';
 
-const command = (data: DeviceCommand | { action: 'play'; fromUserId: string }) => {
+function command(data: DeviceCommand | { action: 'play'; fromUserId: string }) {
 	const call = mockSocket.on.mock.calls.find(([event]) => event === 'control:command');
 	return act(async () => (call![1] as (payload: typeof data) => void)(data));
-};
+}
 
 const playTrack: DeviceCommand = {
 	action: 'play-track',
@@ -74,10 +74,11 @@ const playTrack: DeviceCommand = {
 	},
 };
 
-const sentStatuses = () =>
-	mockSocket.emit.mock.calls
+function sentStatuses() {
+	return mockSocket.emit.mock.calls
 		.filter(([event]) => event === 'listening:update')
 		.map(([, status]) => status as { track: { title: string } | null; isPlaying: boolean });
+}
 
 async function settle(ms = 500) {
 	for (let elapsed = 0; elapsed < ms; elapsed += 50) {
@@ -104,7 +105,7 @@ async function receiveTrack() {
 beforeEach(() => {
 	jest.useFakeTimers();
 	jest.clearAllMocks();
-	Object.assign(media, { paused: true, ended: false, readyState: 0, duration: NaN });
+	Object.assign(media, { paused: true, ended: false, readyState: 0, duration: Number.NaN });
 	media.playResult = () => Promise.resolve();
 	usePlayerStore.setState(usePlayerStore.getInitialState());
 	useAutoplayStore.setState({ blocked: false });

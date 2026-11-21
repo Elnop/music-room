@@ -3,10 +3,12 @@ import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import type { UserDeviceWithLicenses } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
-import type { FriendUserSummary } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
-import { DeviceFriendRow } from './DeviceFriendRow';
-import { DeviceHeader } from './DeviceHeader';
+import type {
+	UserDeviceWithLicenses,
+	FriendUserSummary,
+} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import { DeviceFriendRow } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceFriendRow';
+import { DeviceHeader } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceHeader';
 
 interface DeviceCardProps {
 	device: UserDeviceWithLicenses;
@@ -75,8 +77,8 @@ export function DeviceCard({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		card: {
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.lg,
@@ -93,3 +95,4 @@ const createStyles = (theme: Theme) =>
 			padding: theme.spacing.md,
 		},
 	});
+}

@@ -1,21 +1,27 @@
 import { renderHook } from '@testing-library/react-native';
-import { useWindowDimensions, type View } from 'react-native';
+import { useWindowDimensions } from 'react-native';
+import type { View } from 'react-native';
 import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
-import { useAnchoredPress } from './useAnchoredPress';
+import { useAnchoredPress } from '@/features/playlists/features/editor/features/detail/hooks/useAnchoredPress';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
 	default: jest.fn(),
 }));
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
-const buttonAt = (x: number, y: number) => ({
-	current: {
-		measureInWindow: (callback: (...rect: number[]) => void) => callback(x, y, 32, 32),
-	} as unknown as View,
-});
+function buttonAt(x: number, y: number) {
+	return {
+		current: {
+			measureInWindow: (callback: (...rect: number[]) => void) => callback(x, y, 32, 32),
+		} as unknown as View,
+	};
+}
 
 afterEach(() => useMenuAnchorStore.setState({ anchor: null }));
 

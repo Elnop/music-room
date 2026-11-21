@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { lastTrackStorage, type LastTrackEntry } from './lastTrackStorage';
+import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
+import type { LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

@@ -9,7 +9,7 @@ import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/lib/types';
 import { LANDING_FEATURES } from '@/features/user/features/auth/features/welcome/landingContent';
-import { FeatureCard } from './FeatureCard';
+import { FeatureCard } from '@/features/user/features/auth/features/welcome/components/presenters/FeatureCard';
 
 interface LandingSectionsProps {
 	buildLabel: string;
@@ -84,8 +84,8 @@ export function LandingSections({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		sections: {
 			width: '100%',
 			maxWidth: CONTENT_MAX_WIDTH.content,
@@ -138,3 +138,4 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 		},
 	});
+}

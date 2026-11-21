@@ -1,8 +1,10 @@
 import { musicEvent } from '@test-utils/eventFixtures';
-import { removeEvent, upsertEvent } from './eventCache';
+import { removeEvent, upsertEvent } from '@/features/events/shared/events/lib/eventCache';
 
 const HOUR = 3_600_000;
-const at = (offset: number) => new Date(Date.now() + offset).toISOString();
+function at(offset: number) {
+	return new Date(Date.now() + offset).toISOString();
+}
 
 describe('upsertEvent', () => {
 	it('adds an event in start order and replaces an existing one', () => {

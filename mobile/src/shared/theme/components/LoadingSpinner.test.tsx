@@ -1,10 +1,10 @@
 import React from 'react';
 import { ActivityIndicator } from 'react-native';
-import { EqualizerBars } from './EqualizerBars';
+import { EqualizerBars } from '@/shared/theme/components/EqualizerBars';
 import { render, screen } from '@testing-library/react-native';
-import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SkeletonRow } from './SkeletonRow';
+import { SkeletonRow } from '@/shared/theme/components/SkeletonRow';
 
 export function TrackRowSkeleton() {
 	return <SkeletonRow radius={4} firstWidth="70%" secondWidth="45%" />;

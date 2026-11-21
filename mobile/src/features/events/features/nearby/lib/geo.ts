@@ -1,7 +1,9 @@
 import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
 
 const EARTH_RADIUS_M = 6_371_000;
-const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+function toRadians(degrees: number) {
+	return (degrees * Math.PI) / 180;
+}
 
 export function distanceMeters(from: Coordinates, to: Coordinates): number {
 	const dLat = toRadians(to.latitude - from.latitude);

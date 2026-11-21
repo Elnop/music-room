@@ -2,7 +2,7 @@ import {
 	fromLocalInputValue,
 	pickDateTime,
 	toLocalInputValue,
-} from './pickDateTime.web';
+} from '@/features/events/features/event-form/lib/pickDateTime.web';
 
 interface FakeNode {
 	tag: string;
@@ -46,8 +46,12 @@ function fakeNode(tag: string): FakeNode {
 	return node;
 }
 
-const find = (root: FakeNode, tag: string): FakeNode[] =>
-	root.children.flatMap(child => [...(child.tag === tag ? [child] : []), ...find(child, tag)]);
+function find(root: FakeNode, tag: string): FakeNode[] {
+	return root.children.flatMap(child => [
+		...(child.tag === tag ? [child] : []),
+		...find(child, tag),
+	]);
+}
 
 let body: FakeNode;
 
@@ -64,11 +68,11 @@ function open(current: Date) {
 	const picked = pickDateTime(current);
 	const [dialog] = body.children;
 	const [input] = find(dialog, 'input');
-	const close = (returnValue: string) => {
+	function close(returnValue: string) {
 		dialog.returnValue = returnValue;
 		dialog.onClose?.();
 		return picked;
-	};
+	}
 	return { dialog, input, close };
 }
 

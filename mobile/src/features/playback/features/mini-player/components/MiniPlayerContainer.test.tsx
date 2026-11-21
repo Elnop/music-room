@@ -1,9 +1,10 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { MiniPlayerContainer } from './MiniPlayerContainer';
+import { MiniPlayerContainer } from '@/features/playback/features/mini-player/components/MiniPlayerContainer';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import type { UserProfile } from '@/shared/users/user.types';
@@ -129,14 +130,16 @@ describe('MiniPlayerContainer', () => {
 	});
 
 	describe('in remote mode', () => {
-		const remoteStatus = (ownerId: string) => ({
-			ownerId,
-			device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
-			track: { id: 5, title: 'Sur la tablette', artist: 'Léa', artworkUrl: null },
-			isPlaying: true,
-			positionMs: 0,
-			updatedAt: new Date().toISOString(),
-		});
+		function remoteStatus(ownerId: string) {
+			return {
+				ownerId,
+				device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
+				track: { id: 5, title: 'Sur la tablette', artist: 'Léa', artworkUrl: null },
+				isPlaying: true,
+				positionMs: 0,
+				updatedAt: new Date().toISOString(),
+			};
+		}
 
 		it("shows the friend's device track and « Sur Tablette de Léa »", () => {
 			useConnectStore.setState({
@@ -163,7 +166,7 @@ describe('MiniPlayerContainer', () => {
 		it('shows no device line in local mode', () => {
 			usePlayerStore.setState({ currentTrack: track, playbackState: 'paused' });
 			render(<MiniPlayerContainer />);
-			expect(screen.queryByText(/^Sur /)).toBeNull();
+			expect(screen.queryByText(/^Sur /u)).toBeNull();
 		});
 	});
 });

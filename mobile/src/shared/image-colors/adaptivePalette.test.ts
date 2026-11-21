@@ -4,24 +4,26 @@ import {
 	getAdaptiveColors,
 	GRADIENT_ALPHAS,
 	MIN_TEXT_CONTRAST,
-} from './adaptivePalette';
+} from '@/shared/image-colors/adaptivePalette';
 
 type Rgb = [number, number, number];
 
-const hex = (value: string): Rgb => [
-	parseInt(value.slice(1, 3), 16),
-	parseInt(value.slice(3, 5), 16),
-	parseInt(value.slice(5, 7), 16),
-];
+function hex(value: string): Rgb {
+	return [
+		Number.parseInt(value.slice(1, 3), 16),
+		Number.parseInt(value.slice(3, 5), 16),
+		Number.parseInt(value.slice(5, 7), 16),
+	];
+}
 
-const rgba = (value: string): { rgb: Rgb; alpha: number } => {
-	const parts = /rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\)/.exec(value);
+function rgba(value: string): { rgb: Rgb; alpha: number } {
+	const parts = /rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\)/u.exec(value);
 	if (!parts) throw new Error(`not rgba: ${value}`);
 	return {
 		rgb: [Number(parts[1]), Number(parts[2]), Number(parts[3])],
 		alpha: Number(parts[4]),
 	};
-};
+}
 
 const THEME_BACKGROUNDS = ['#0D0D0D', '#FEFCE8', '#F8FAFC', '#FFFBEB'];
 const ARTWORK_COLORS = ['#F5F5F5', '#0A0A0A', '#808080'];

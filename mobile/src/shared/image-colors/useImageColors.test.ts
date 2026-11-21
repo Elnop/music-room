@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { getColors } from 'react-native-image-colors';
-import { useImageColors } from './useImageColors';
+import { useImageColors } from '@/shared/image-colors/useImageColors';
 
 jest.mock('react-native-image-colors', () => ({ getColors: jest.fn() }));
 

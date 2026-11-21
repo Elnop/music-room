@@ -1,36 +1,41 @@
 import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
-import { RowGrid } from './RowGrid';
-import { Text } from './Text';
+import { RowGrid } from '@/shared/theme/components/RowGrid';
+import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
 	default: jest.fn(),
 }));
 
-jest.mock('./ThemeContext', () => {
+jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme: theme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme }) };
 });
 
-const mockWidth = (width: number) =>
-	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+function mockWidth(width: number) {
+	return jest
+		.mocked(useWindowDimensions)
+		.mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
+}
 
-const cellWidths = () =>
-	screen
+function cellWidths() {
+	return screen
 		.UNSAFE_getAllByType(View)
 		.map(view => StyleSheet.flatten(view.props.style)?.width)
 		.filter(Boolean);
+}
 
-const renderRows = () =>
-	render(
+function renderRows() {
+	return render(
 		<RowGrid>
 			<Text>one</Text>
 			<Text>two</Text>
 			<Text>three</Text>
 		</RowGrid>
 	);
+}
 
 describe('RowGrid', () => {
 	it('leaves the rows as they are on the phone', () => {
@@ -50,6 +55,6 @@ describe('RowGrid', () => {
 		mockWidth(1440);
 		renderRows();
 		expect(cellWidths()).toHaveLength(3);
-		expect(cellWidths()[0]).toMatch(/^33\.3/);
+		expect(cellWidths()[0]).toMatch(/^33\.3/u);
 	});
 });

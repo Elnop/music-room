@@ -41,7 +41,7 @@ function renderLoaded(): Promise<void> {
 			<MusicPreferencesContainer />
 		</QueryClientProvider>
 	);
-	return screen.findByText(/Quels genres aimez-vous/).then(() => undefined);
+	return screen.findByText(/Quels genres aimez-vous/u).then(() => undefined);
 }
 
 describe('MusicPreferencesScreen', () => {

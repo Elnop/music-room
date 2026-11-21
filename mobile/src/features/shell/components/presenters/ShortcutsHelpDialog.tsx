@@ -42,8 +42,8 @@ export function ShortcutsHelpDialog({ visible, shortcuts, onClose }: ShortcutsHe
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		...dialogStyles(theme),
 		list: { marginTop: theme.spacing.md, gap: theme.spacing.sm },
 		row: {
@@ -80,3 +80,4 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.lg,
 		},
 	});
+}

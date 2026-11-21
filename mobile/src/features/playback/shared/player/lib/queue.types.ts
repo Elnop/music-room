@@ -6,7 +6,7 @@ import type {
 	TransferRequest,
 	TransferResult,
 } from '@/shared/playback/lib/queue.types';
-import type { ListeningStatus } from './listening.types';
+import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
 import type { OwnerQueue, QueueStepOutcome } from '@/shared/playback/lib/playback';
 
 export type {

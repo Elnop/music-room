@@ -4,8 +4,8 @@ import { ProfileSection } from '@/features/user/shared/profile-section/ProfileSe
 import {
 	ProfileInfoRows,
 	memberSinceLabel,
-	type ProfileInfoRow,
 } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
+import type { ProfileInfoRow } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
 import { GenreChip } from '@/shared/theme/components/GenreChip';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/lib/types';
@@ -13,8 +13,8 @@ import type {
 	FilteredProfile,
 	FriendPlaylistSummary,
 } from '@/features/user/features/friends/types';
-import { FriendPlaylistCard } from './FriendPlaylistCard';
-import { HiddenFieldNote } from './HiddenFieldNote';
+import { FriendPlaylistCard } from '@/features/user/features/friends/features/user-profile/components/presenters/FriendPlaylistCard';
+import { HiddenFieldNote } from '@/features/user/features/friends/features/user-profile/components/presenters/HiddenFieldNote';
 import { Text } from '@/shared/theme/components/Text';
 
 interface UserProfileWideSectionsProps {
@@ -28,8 +28,9 @@ interface UserProfileWideSectionsProps {
 function infoRows(profile: FilteredProfile): ProfileInfoRow[] {
 	const rows: ProfileInfoRow[] = [{ label: "Nom d'utilisateur", value: `@${profile.username}` }];
 	if (profile.email) rows.push({ label: 'Email', value: profile.email });
-	if (profile.favoriteArtist)
+	if (profile.favoriteArtist) {
 		rows.push({ label: 'Artiste préféré', value: profile.favoriteArtist });
+	}
 	rows.push({ label: 'Membre depuis', value: memberSinceLabel(profile.createdAt) });
 	return rows;
 }
@@ -92,10 +93,11 @@ export function UserProfileWideSections({
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	return StyleSheet.create({
 		section: { marginTop: theme.spacing.md },
 		genres: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.xs },
 		empty: { fontSize: theme.typography.sizes.md, color: theme.colors.textSecondary },
 		playlist: { paddingHorizontal: 0 },
 	});
+}

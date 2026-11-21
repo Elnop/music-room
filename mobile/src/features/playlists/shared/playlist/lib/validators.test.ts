@@ -1,4 +1,4 @@
-import { playlistFormSchema } from './validators';
+import { playlistFormSchema } from '@/features/playlists/shared/playlist/lib/validators';
 
 describe('playlistFormSchema (#342)', () => {
 	it('accepts a name of 50 characters, such as a long French title', () => {

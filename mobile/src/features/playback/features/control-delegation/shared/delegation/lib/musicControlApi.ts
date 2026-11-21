@@ -12,10 +12,11 @@ import type {
 	RevokeDeviceLicenseResponse,
 	UserDevice,
 	UserDeviceWithLicenses,
-} from './types';
+} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 
-const licensePath = (deviceId: string, userId: string): string =>
-	`/api/music-control/devices/${encodeURIComponent(deviceId)}/licenses/${encodeURIComponent(userId)}`;
+function licensePath(deviceId: string, userId: string): string {
+	return `/api/music-control/devices/${encodeURIComponent(deviceId)}/licenses/${encodeURIComponent(userId)}`;
+}
 
 function req<T>(path: string, token?: string, options: RequestInit = {}): Promise<T> {
 	if (token) return authRequest<T>(path, token, options);

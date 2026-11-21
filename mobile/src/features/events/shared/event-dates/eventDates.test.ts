@@ -1,4 +1,8 @@
-import { defaultSchedule, isOngoing, scheduleError } from './eventDates';
+import {
+	defaultSchedule,
+	isOngoing,
+	scheduleError,
+} from '@/features/events/shared/event-dates/eventDates';
 
 const HOUR = 3_600_000;
 
@@ -18,8 +22,8 @@ describe('scheduleError', () => {
 	});
 
 	it('refuses an end before the start, and an event already over', () => {
-		expect(scheduleError(new Date(now + 2 * HOUR), new Date(now + HOUR), now)).toMatch(/après/);
-		expect(scheduleError(new Date(now - 2 * HOUR), new Date(now - HOUR), now)).toMatch(/terminé/);
+		expect(scheduleError(new Date(now + 2 * HOUR), new Date(now + HOUR), now)).toMatch(/après/u);
+		expect(scheduleError(new Date(now - 2 * HOUR), new Date(now - HOUR), now)).toMatch(/terminé/u);
 	});
 });
 

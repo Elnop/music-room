@@ -1,4 +1,4 @@
-import type { PrefetchedStream } from './types';
+import type { PrefetchedStream } from '@/features/playback/shared/player/lib/types';
 
 export const STREAM_RENEW_MARGIN_MS = 2 * 60 * 1000;
 

@@ -4,18 +4,18 @@ import { pixelCaption, pixelRow } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
-export const formatDuration = (ms: number): string => {
+export function formatDuration(ms: number): string {
 	const minutes = Math.floor(ms / 60000);
 	const seconds = Math.floor((ms % 60000) / 1000);
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
+}
 
-export const createModalStyles = (
+export function createModalStyles(
 	theme: Theme,
 	insets: { top: number; bottom: number },
 	separator: string
-) =>
-	StyleSheet.create({
+) {
+	return StyleSheet.create({
 		...sheetHeaderStyles(theme, insets, separator),
 		listContent: {
 			flexGrow: 1,
@@ -33,9 +33,10 @@ export const createModalStyles = (
 			color: theme.colors.textSecondary,
 		},
 	});
+}
 
-export const createRowStyles = (theme: Theme) =>
-	StyleSheet.create({
+export function createRowStyles(theme: Theme) {
+	return StyleSheet.create({
 		row: pixelRow(theme),
 		rowMain: {
 			flex: 1,
@@ -90,3 +91,4 @@ export const createRowStyles = (theme: Theme) =>
 			marginTop: 4,
 		},
 	});
+}

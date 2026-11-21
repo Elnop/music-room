@@ -5,7 +5,7 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfile } from '@/features/user/features/friends/types';
-import { createFriendsListStyles } from './friendsListStyles';
+import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
