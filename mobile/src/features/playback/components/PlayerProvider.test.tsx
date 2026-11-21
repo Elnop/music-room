@@ -9,14 +9,14 @@ import {
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { createStore } from 'zustand';
 import { streamPrefetch } from '@/features/playback/shared/player/lib/streamPrefetch';
 import { apiRequest } from '@/shared/backend/lib/api';
 import { trackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import type { SoundCloudTrack, StreamUrlResponse } from '@/shared/tracks/lib/soundcloud.types';
-import type { QueueItem } from '@/shared/playback/lib/queue.types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { SoundCloudTrack, StreamUrlResponse } from '@/shared/tracks/types/soundcloudTypes';
+import type { QueueItem } from '@/shared/playback/types/queueTypes';
+import type { UserProfile } from '@/shared/users/userTypes';
 import { noop } from '@test-utils/noop';
 
 type MockPlayer = {

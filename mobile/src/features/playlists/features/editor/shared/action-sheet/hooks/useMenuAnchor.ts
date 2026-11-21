@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import { useMenuAnchorState } from '@/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchorState';
+import { menuAnchorActions } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 export function useMenuAnchor(visible: boolean): MenuAnchor | null {
-	const recorded = useMenuAnchorStore(state => state.anchor);
+	const recorded = useMenuAnchorState(state => state.anchor);
 	const [anchor, setAnchor] = useState<MenuAnchor | null>(visible ? recorded : null);
 	const [wasVisible, setWasVisible] = useState(visible);
 	if (visible !== wasVisible) {
@@ -12,7 +13,7 @@ export function useMenuAnchor(visible: boolean): MenuAnchor | null {
 	}
 
 	useEffect(() => {
-		if (visible && recorded) useMenuAnchorStore.getState().setAnchor(null);
+		if (visible && recorded) menuAnchorActions.set(null);
 	}, [visible, recorded]);
 
 	return anchor;

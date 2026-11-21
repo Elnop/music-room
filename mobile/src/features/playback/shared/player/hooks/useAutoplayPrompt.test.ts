@@ -3,11 +3,11 @@ import type { AlertButton } from 'react-native';
 import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import type { AudioPlayer } from '@/features/playback/shared/player/lib/types';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
-import { showAlert } from '@/shared/alerts/alert';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
+import { showAlert } from '@/shared/alerts/showAlert';
 import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
 
-jest.mock('@/shared/alerts/alert', () => ({ showAlert: jest.fn() }));
+jest.mock('@/shared/alerts/showAlert', () => ({ showAlert: jest.fn() }));
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );

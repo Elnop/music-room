@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { SearchTracks } from '@/features/playlists/features/editor/features/search-tracks/useSearchTracks';
 import { AddableTrackRow } from '@/features/playlists/features/editor/features/search-tracks/components/presenters/AddableTrackRow';
@@ -26,7 +26,7 @@ export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProp
 					onChangeText={screen.search.change}
 					placeholder="Rechercher sur SoundCloud..."
 					loading={screen.isLoading}
-					autoFocus
+					input={{ autoFocus: true }}
 				/>
 			</View>
 

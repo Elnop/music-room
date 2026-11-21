@@ -9,16 +9,16 @@ import {
 } from '@/features/playback/shared/player/lib/queueSelectors';
 import { createStore } from 'zustand';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { deferred } from '@test-utils/deferred';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { ApiError } from '@/shared/backend/lib/api';
 import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
-import type { QueueItem, QueueState, QueueStepResult } from '@/shared/playback/lib/queue.types';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { QueueItem, QueueState, QueueStepResult } from '@/shared/playback/types/queueTypes';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

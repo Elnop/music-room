@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GenreChip } from '@/shared/theme/components/GenreChip';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { MusicGenre } from '@/shared/users/user.types';
-import { MAX_GENRES, MUSIC_GENRES } from '@/shared/users/user.types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { MusicGenre } from '@/shared/users/userTypes';
+import { MAX_GENRES, MUSIC_GENRES } from '@/shared/users/userConfig';
 import { Text } from '@/shared/theme/components/Text';
 
 type GenreSelectorProps = {

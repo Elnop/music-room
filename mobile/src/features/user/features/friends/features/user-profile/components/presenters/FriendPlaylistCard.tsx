@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { FriendPlaylistSummary } from '@/features/user/features/friends/types';
 import { Text } from '@/shared/theme/components/Text';
 

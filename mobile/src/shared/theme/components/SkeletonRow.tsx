@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
 import type { DimensionValue } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { SkeletonBlock } from '@/shared/theme/components/SkeletonBlock';
-import { createRowSkeletonStyles } from '@/shared/theme/lib/skeletonStyles';
+import { createRowSkeletonStyles } from '@/shared/theme/lib/createRowSkeletonStyles';
 
 type RowSkeletonLayoutProps = {
 	radius: number;

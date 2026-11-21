@@ -142,7 +142,7 @@
 	"jest": {
 		"preset": "jest-expo",
 		"moduleNameMapper": {
-			"\\.svg$": "<rootDir>/test-utils/svgMock.tsx"
+			"\\.svg$": "<rootDir>/test-utils/fixtures/SvgMock.tsx"
 		},
 		"testTimeout": 15000,
 		"maxWorkers": "50%",

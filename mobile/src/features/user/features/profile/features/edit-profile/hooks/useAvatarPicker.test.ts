@@ -22,7 +22,7 @@ jest.mock('expo-image-picker', () => ({
 }));
 
 const mockPrepareAvatar = jest.fn();
-jest.mock('@/shared/square-image/squareImage', () => ({
+jest.mock('@/shared/square-image/prepareSquareImage', () => ({
 	prepareSquareImage: (asset: unknown) => mockPrepareAvatar(asset),
 }));
 
@@ -36,9 +36,11 @@ jest.mock('@/features/user/features/profile/shared/profile/lib/profileApi', () =
 }));
 
 const mockSetAvatarUrl = jest.fn();
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (s: { accessToken: string }) => unknown) =>
 		selector({ accessToken: 'token' }),
+}));
+jest.mock('@/features/user/features/profile/shared/profile/lib/sessionActions', () => ({
 	setAvatarUrl: (url: string | null) => mockSetAvatarUrl(url),
 }));
 

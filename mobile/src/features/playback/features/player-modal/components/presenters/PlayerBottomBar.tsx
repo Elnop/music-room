@@ -23,11 +23,9 @@ export function PlayerBottomBar({
 		<View style={styles.bottomBar}>
 			<KeyButton
 				icon={PhoneRingingLowSolid}
-				tone="device"
-				size={54}
 				onPress={onOpenDevices}
 				accessibilityLabel="Choisir l'appareil"
-				style={styles.deviceKey}
+				appearance={{ tone: 'device', size: 54, style: styles.deviceKey }}
 			>
 				<Text
 					style={styles.deviceText}
@@ -39,9 +37,9 @@ export function PlayerBottomBar({
 			</KeyButton>
 			<KeyButton
 				icon={PlaylistSolid}
-				size={54}
 				onPress={onOpenQueue}
 				accessibilityLabel="File d'attente"
+				appearance={{ size: 54 }}
 			/>
 		</View>
 	);

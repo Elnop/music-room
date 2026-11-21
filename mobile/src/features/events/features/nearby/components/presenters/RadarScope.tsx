@@ -2,7 +2,7 @@ import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { useLoop } from '@/shared/theme/hooks/useLoop';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
 const HEIGHT = 216;

@@ -2,13 +2,13 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ConnectionBanner } from '@/features/shell/components/presenters/ConnectionBanner';
 import { textColorOn } from '@/features/shell/lib/textContrast';
-import { FIXED_COLORS } from '@/shared/theme/lib/tokens';
-import { originalTheme } from '@/shared/theme/lib/original.theme';
+import { FIXED_COLORS } from '@/shared/theme/configs/tokensConfig';
+import { originalTheme } from '@/shared/theme/configs/originalThemeConfig';
 
 const retry = jest.fn();
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

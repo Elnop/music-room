@@ -3,12 +3,12 @@ import { StyleSheet } from 'react-native';
 import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { tabIconFor } from '@/features/shell/components/presenters/TabIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import type { Breakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { TAB_BAR_HEIGHT } from '@/shared/theme/lib/layout';
+import type { Breakpoint } from '@/shared/theme/types/layoutTypes';
+import { TAB_BAR_HEIGHT } from '@/shared/theme/configs/layoutConfig';
 import { headerTitle } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 const sidebarOptions = (
 	breakpoint: Exclude<Breakpoint, 'phone'>,

@@ -2,10 +2,10 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import type { PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
-import type { QueueItem } from '@/shared/playback/lib/queue.types';
+import type { PlaylistPlayback } from '@/shared/playback/types/playbackActionsTypes';
+import type { QueueItem } from '@/shared/playback/types/queueTypes';
 import { PlaylistPlaybackContainer } from '@/features/playback/components/PlaylistPlaybackContainer';
-import { signIn } from '@test-utils/session';
+import { signIn } from '@test-utils/signIn';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

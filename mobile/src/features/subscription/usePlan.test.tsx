@@ -2,7 +2,7 @@ import React from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useChangePlan, usePlan } from '@/features/subscription/usePlan';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
 import type { Subscription } from '@/features/subscription/lib/subscription';
 
@@ -12,7 +12,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (s: { isAuthenticated: boolean }) => unknown) =>
 		selector({ isAuthenticated: true }),
 }));

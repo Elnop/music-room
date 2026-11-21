@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 
 export function useSocketConnection(isAuthenticated: boolean): void {
-	const connect = useSocketStore(state => state.connect);
-	const disconnect = useSocketStore(state => state.disconnect);
+	const connect = useSocketState(state => state.connect);
+	const disconnect = useSocketState(state => state.disconnect);
 	useEffect(() => {
 		if (isAuthenticated) {
 			connect();

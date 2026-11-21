@@ -2,15 +2,15 @@ import React from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { SwipeableTrackItem } from '@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem';
-import type { Track } from '@/shared/tracks/lib/track.types';
+import type { Track } from '@/shared/tracks/types/trackTypes';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
 	default: jest.fn(),
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

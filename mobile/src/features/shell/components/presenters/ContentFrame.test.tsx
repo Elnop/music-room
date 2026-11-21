@@ -3,7 +3,7 @@ import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { useContentWidth } from '@/shared/theme/hooks/useContentWidth';
-import { NOW_PLAYING_PANEL_WIDTH, SIDEBAR_WIDTH } from '@/shared/theme/lib/layout';
+import { NOW_PLAYING_PANEL_WIDTH, SIDEBAR_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import { ContentFrame } from '@/features/shell/components/presenters/ContentFrame';
 import { Text } from '@/shared/theme/components/Text';
 
@@ -12,8 +12,8 @@ jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	default: jest.fn(),
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme: theme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme: theme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme }) };
 });
 

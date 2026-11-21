@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { useSoundCloudSearch } from '@/features/search/hooks/useSoundCloudSearch';
 import { searchApi } from '@/features/search/lib/searchApi';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

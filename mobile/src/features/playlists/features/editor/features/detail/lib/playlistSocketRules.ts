@@ -1,4 +1,4 @@
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { socketCacheRule } from '@/shared/backend/lib/socketCache';
 import type {
 	Playlist,

@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand/vanilla';
 import type { AlertButton } from 'react-native';
 
 type AlertRequest = {
@@ -13,7 +13,7 @@ type AlertState = {
 	dismiss: () => void;
 };
 
-export const useAlertStore = create<AlertState>(set => ({
+export const alertStore = createStore<AlertState>(set => ({
 	queue: [],
 	push: alert => set(state => ({ queue: [...state.queue, alert] })),
 	dismiss: () => set(state => ({ queue: state.queue.slice(1) })),

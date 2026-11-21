@@ -8,8 +8,8 @@ const mockLogout = jest.fn();
 const mockNavigate = jest.fn();
 const mockSetOptions = jest.fn();
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -26,8 +26,10 @@ const mockUser = {
 	createdAt: '2026-10-01',
 };
 
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (s: { user: typeof mockUser }) => unknown) => selector({ user: mockUser }),
+}));
+jest.mock('@/features/user/features/profile/shared/profile/lib/sessionActions', () => ({
 	logout: () => mockLogout(),
 }));
 

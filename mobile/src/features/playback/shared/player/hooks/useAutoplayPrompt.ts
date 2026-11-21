@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import type { AudioPlayer } from '@/features/playback/shared/player/lib/types';
-import { showAlert } from '@/shared/alerts/alert';
+import { showAlert } from '@/shared/alerts/showAlert';
 
 export function useAutoplayPrompt(player: AudioPlayer): void {
 	const blocked = useAutoplayStore(state => state.blocked);

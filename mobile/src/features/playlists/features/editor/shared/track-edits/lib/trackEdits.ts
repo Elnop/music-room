@@ -1,8 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import {
 	reloadIfOnScreen,
 	settleTrackEvent,

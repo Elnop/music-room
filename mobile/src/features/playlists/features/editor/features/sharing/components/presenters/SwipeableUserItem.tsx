@@ -3,12 +3,12 @@ import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Swipeable } from 'react-native-gesture-handler';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 import UserMinusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-minus-solid.svg';
 
 type SwipeableUserItemProps = {

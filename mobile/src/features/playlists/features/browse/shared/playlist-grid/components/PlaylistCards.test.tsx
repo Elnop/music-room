@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react-native';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import { PlaylistGridCard } from '@/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCards';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

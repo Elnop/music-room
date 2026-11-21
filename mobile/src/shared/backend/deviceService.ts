@@ -4,6 +4,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { deviceStorage } from '@/shared/backend/lib/deviceStorage';
 import { getDeviceName, getModelName } from '@/shared/backend/lib/deviceIdentity';
+import type { DeviceInfo } from '@/shared/backend/types/deviceTypes';
 
 export function getAppVersion(): string {
 	return (
@@ -28,13 +29,6 @@ export function getBuildLabel(): string {
 		process.env.EXPO_PUBLIC_COMMIT_SHA
 	);
 }
-
-export type DeviceInfo = {
-	deviceId: string;
-	deviceName: string;
-	platform: string;
-	model: string;
-};
 
 export const deviceService = {
 	async getDeviceInfo(): Promise<DeviceInfo> {

@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Input } from '@/shared/theme/components/Input';
 import { Button } from '@/shared/theme/components/Button';
 import { showSuccess } from '@/shared/theme/lib/toast';
-import {
-	DEFAULT_BACKEND_URL,
-	getBackendUrl,
-	onBackendUrlChange,
-	resetBackendUrl,
-	setBackendUrl,
-} from '@/shared/backend/lib/backendUrl';
+import { DEFAULT_BACKEND_URL } from '@/shared/backend/configs/backendUrlConfig';
+import { getBackendUrl, resetBackendUrl, setBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { onBackendUrlChange } from '@/shared/backend/lib/backendUrlListeners';
 import { Text } from '@/shared/theme/components/Text';
 
 export function BackendUrlFieldContainer() {

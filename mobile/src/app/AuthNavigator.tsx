@@ -1,8 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
-import { WelcomeContainer } from '@/features/user/features/auth/features/welcome/components/WelcomeContainer';
-import { BackendUrlFieldContainer } from '@/features/shell/components/orchestrators/BackendUrlFieldContainer';
+import { WelcomeScreen } from '@/app/screens/WelcomeScreen';
 import { LoginContainer } from '@/features/user/features/auth/features/login/components/LoginContainer';
 import { RegisterContainer } from '@/features/user/features/auth/features/register/components/RegisterContainer';
 import { EmailVerificationContainer } from '@/features/user/features/auth/features/email-verification/components/EmailVerificationContainer';
@@ -15,15 +14,14 @@ import { useStackOptions } from '@/features/shell/hooks/useStackOptions';
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 const layout = screenLayout(false);
 
-export function AuthNavigator() {
-	const stackOptions = useStackOptions();
+const PRIVACY_POLICY_OPTIONS = {
+	title: 'Politique de confidentialité',
+	headerTitle: 'Politique de confidentialité',
+};
 
+function signUpScreens() {
 	return (
-		<Stack.Navigator screenLayout={layout} screenOptions={{ ...stackOptions, headerTitle: '' }}>
-			<Stack.Screen name="Welcome" options={{ title: 'Bienvenue', headerShown: false }}>
-				{props => <WelcomeContainer {...props} backendUrlField={<BackendUrlFieldContainer />} />}
-			</Stack.Screen>
-			<Stack.Screen name="Login" component={LoginContainer} options={{ title: 'Connexion' }} />
+		<>
 			<Stack.Screen
 				name="Register"
 				component={RegisterContainer}
@@ -34,6 +32,13 @@ export function AuthNavigator() {
 				component={EmailVerificationContainer}
 				options={{ title: "Vérification de l'email" }}
 			/>
+		</>
+	);
+}
+
+function passwordRecoveryScreens() {
+	return (
+		<>
 			<Stack.Screen
 				name="ForgotPassword"
 				component={ForgotPasswordContainer}
@@ -44,13 +49,27 @@ export function AuthNavigator() {
 				component={ResetPasswordContainer}
 				options={{ title: 'Nouveau mot de passe' }}
 			/>
+		</>
+	);
+}
+
+export function AuthNavigator() {
+	const stackOptions = useStackOptions();
+
+	return (
+		<Stack.Navigator screenLayout={layout} screenOptions={{ ...stackOptions, headerTitle: '' }}>
+			<Stack.Screen
+				name="Welcome"
+				component={WelcomeScreen}
+				options={{ title: 'Bienvenue', headerShown: false }}
+			/>
+			<Stack.Screen name="Login" component={LoginContainer} options={{ title: 'Connexion' }} />
+			{signUpScreens()}
+			{passwordRecoveryScreens()}
 			<Stack.Screen
 				name="PrivacyPolicy"
 				component={PrivacyPolicyContainer}
-				options={{
-					title: 'Politique de confidentialité',
-					headerTitle: 'Politique de confidentialité',
-				}}
+				options={PRIVACY_POLICY_OPTIONS}
 			/>
 		</Stack.Navigator>
 	);

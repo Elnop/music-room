@@ -2,21 +2,21 @@ import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { TrackActionsSheetContainer } from '@/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer';
-import { testPlayback } from '@test-utils/playback';
+import { testPlayback } from '@test-utils/testPlaybackConfig';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import { logger } from '@/shared/logging/logger';
 import { renderWithClient } from '@test-utils/renderWithClient';
-import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
-import { signIn } from '@test-utils/session';
+import { signIn } from '@test-utils/signIn';
 import { playlistTrack } from '@test-utils/playlistFixtures';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { noop } from '@test-utils/noop';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

@@ -1,4 +1,4 @@
-import type { ContentWidth } from '@/shared/theme/lib/layout';
+import type { ContentWidth } from '@/shared/theme/types/layoutTypes';
 
 export const SCREEN_WIDTHS: Record<string, ContentWidth> = {
 	Home: 'wide',

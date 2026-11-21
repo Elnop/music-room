@@ -5,7 +5,7 @@ import Slider from '@react-native-community/slider';
 import type { SeekPosition } from '@/features/playback/shared/seek-bar/useSeekPosition';
 import { Text } from '@/shared/theme/components/Text';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
 const SEGMENTS = 24;

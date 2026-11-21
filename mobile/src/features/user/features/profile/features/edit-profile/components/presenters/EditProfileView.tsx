@@ -6,8 +6,8 @@ import { EditProfilePhoto } from '@/features/user/features/profile/features/edit
 import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import { FormError } from '@/shared/theme/components/FormError';
 import { Button } from '@/shared/theme/components/Button';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { UserProfile } from '@/shared/users/userTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 interface EditProfileViewProps {

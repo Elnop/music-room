@@ -1,5 +1,5 @@
 import type { Theme as NavigationTheme } from '@react-navigation/native';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 export const NAVIGATION_FONTS: NavigationTheme['fonts'] = {
 	regular: { fontFamily: FONT_FAMILIES.regular, fontWeight: 'normal' },

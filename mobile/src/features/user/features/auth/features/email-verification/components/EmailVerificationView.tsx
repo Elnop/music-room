@@ -1,13 +1,13 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { displayText } from '@/shared/theme/lib/pixelFrame';
 import { CodeInput } from '@/features/user/features/auth/shared/code-input/CodeInput';
 import type { EmailVerification } from '@/features/user/features/auth/features/email-verification/useEmailVerification';
 import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 type EmailVerificationViewProps = {
 	email: string;

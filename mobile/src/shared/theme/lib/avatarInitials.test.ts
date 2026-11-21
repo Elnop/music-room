@@ -1,4 +1,4 @@
-import { AVATAR_COLORS } from '@/shared/theme/lib/tokens';
+import { AVATAR_COLORS } from '@/shared/theme/configs/tokensConfig';
 import { avatarColor, avatarInitials } from '@/shared/theme/lib/avatarInitials';
 
 describe('avatarInitials', () => {

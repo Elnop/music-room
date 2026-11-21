@@ -1,5 +1,16 @@
 import React from 'react';
-import type { AvatarPhotoProps } from '@/shared/theme/components/AvatarPhoto';
+import type { CSSProperties } from 'react';
+import type { AvatarPhotoProps } from '@/shared/theme/types/avatarPhotoTypes';
+
+function imageStyle(size: number): CSSProperties {
+	return {
+		position: 'absolute',
+		inset: 0,
+		width: size,
+		height: size,
+		objectFit: 'cover',
+	};
+}
 
 export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 	return (
@@ -10,13 +21,7 @@ export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 			draggable={false}
 			onLoad={onLoad}
 			onError={onError}
-			style={{
-				position: 'absolute',
-				inset: 0,
-				width: size,
-				height: size,
-				objectFit: 'cover',
-			}}
+			style={imageStyle(size)}
 		/>
 	);
 }

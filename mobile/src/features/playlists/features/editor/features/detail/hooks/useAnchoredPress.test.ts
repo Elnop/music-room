@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-native';
 import { useWindowDimensions } from 'react-native';
 import type { View } from 'react-native';
-import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
+import { menuAnchorStore } from '@/shared/theme/menuAnchorStore';
 import { useAnchoredPress } from '@/features/playlists/features/editor/features/detail/hooks/useAnchoredPress';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
@@ -23,13 +23,13 @@ function buttonAt(x: number, y: number) {
 	};
 }
 
-afterEach(() => useMenuAnchorStore.setState({ anchor: null }));
+afterEach(() => menuAnchorStore.setState({ anchor: null }));
 
 describe('useAnchoredPress', () => {
 	it('records where the button is before opening the menu on desktop', () => {
 		mockWidth(1440);
 		const onPress = jest.fn(() =>
-			expect(useMenuAnchorStore.getState().anchor).toStrictEqual({
+			expect(menuAnchorStore.getState().anchor).toStrictEqual({
 				x: 5,
 				y: 6,
 				width: 32,
@@ -47,6 +47,6 @@ describe('useAnchoredPress', () => {
 		const { result } = renderHook(() => useAnchoredPress(buttonAt(5, 6), onPress));
 		result.current();
 		expect(onPress).toHaveBeenCalledTimes(1);
-		expect(useMenuAnchorStore.getState().anchor).toBeNull();
+		expect(menuAnchorStore.getState().anchor).toBeNull();
 	});
 });

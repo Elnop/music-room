@@ -13,7 +13,7 @@ const mockInvalidate = jest.fn();
 jest.mock('@tanstack/react-query', () => ({
 	useQueryClient: () => ({ invalidateQueries: mockInvalidate }),
 }));
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (select: (session: object) => unknown) => select({ user: { id: 'me' } }),
 }));
 jest.mock('@/features/playlists/features/editor/shared/cover-actions/useCoverActions', () => ({

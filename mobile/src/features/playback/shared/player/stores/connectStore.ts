@@ -1,5 +1,6 @@
-import { create } from 'zustand';
-import { getSession, useSession, onSessionEnd } from '@/shared/backend/lib/authSession';
+import { create, useStore } from 'zustand';
+import { getSession, sessionStore } from '@/shared/backend/lib/authSession';
+import { onSessionEnd } from '@/shared/backend/lib/sessionEnd';
 import { showInfo } from '@/shared/theme/lib/toast';
 import type {
 	ConnectTarget,
@@ -72,7 +73,7 @@ export function useActiveOwnerId(): string | null {
 	const remoteOwnerId = useConnectStore(state =>
 		state.target.kind === 'remote' ? state.target.ownerId : null
 	);
-	const userId = useSession(state => state?.user?.id ?? null);
+	const userId = useStore(sessionStore(), state => state?.user?.id ?? null);
 	return remoteOwnerId ?? userId;
 }
 

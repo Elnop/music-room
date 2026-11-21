@@ -1,4 +1,4 @@
-import { musicEvent } from '@test-utils/eventFixtures';
+import { musicEvent } from '@test-utils/musicEvent';
 import { removeEvent, upsertEvent } from '@/features/events/shared/events/lib/eventCache';
 
 const HOUR = 3_600_000;

@@ -3,12 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '@/shared/theme/components/Button';
 import { Input } from '@/shared/theme/components/Input';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { PasswordScreenFrame } from '@/features/user/features/auth/shared/password-screen/PasswordScreenFrame';
 import { ErrorBox } from '@/features/user/features/auth/shared/error-box/ErrorBox';
 import type { ForgotPassword } from '@/features/user/features/auth/features/forgot-password/useForgotPassword';
 import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 export function ForgotPasswordView({ form }: { form: ForgotPassword }) {
 	const { theme } = useTheme();
@@ -30,7 +30,7 @@ export function ForgotPasswordView({ form }: { form: ForgotPassword }) {
 					autoComplete="email"
 					error={form.emailError ?? undefined}
 					editable={!form.isSending}
-					submitOnEnter={form.email && !form.isSending ? form.sendCode : undefined}
+					onEnter={form.email && !form.isSending ? form.sendCode : undefined}
 				/>
 
 				{form.error && <ErrorBox message={form.error} />}

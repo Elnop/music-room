@@ -5,10 +5,10 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { useHover } from '@/features/playlists/features/editor/features/detail/hooks/useHover';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { formatDuration } from '@/shared/formatting/formatters';
-import type { Track } from '@/shared/tracks/lib/track.types';
+import type { Track } from '@/shared/tracks/types/trackTypes';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import { trackTableColumns as columns } from '@/features/playlists/features/editor/features/detail/lib/trackTableLayout';
 import { Text } from '@/shared/theme/components/Text';
@@ -16,7 +16,7 @@ import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 interface TrackTableRowProps {
 	track: Track;

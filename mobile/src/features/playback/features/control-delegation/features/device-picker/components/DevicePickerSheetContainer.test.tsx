@@ -6,18 +6,18 @@ import { useConnectStore } from '@/features/playback/shared/player/stores/connec
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { ApiError } from '@/shared/backend/lib/api';
 import { showError } from '@/shared/theme/lib/toast';
 import type { DevicePickerResponse } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
-import type { UserProfile } from '@/shared/users/user.types';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { UserProfile } from '@/shared/users/userTypes';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { logger } from '@/shared/logging/logger';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

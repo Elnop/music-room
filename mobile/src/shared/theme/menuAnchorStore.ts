@@ -1,16 +1,17 @@
-import { create } from 'zustand';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import { createStore } from 'zustand/vanilla';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 type MenuAnchorState = {
 	anchor: MenuAnchor | null;
-	setAnchor: (anchor: MenuAnchor | null) => void;
 };
 
-export const useMenuAnchorStore = create<MenuAnchorState>(set => ({
+export const menuAnchorStore = createStore<MenuAnchorState>(() => ({
 	anchor: null,
-	setAnchor: anchor => set({ anchor }),
 }));
 
-export function recordMenuAnchor(anchor?: MenuAnchor): void {
-	if (anchor) useMenuAnchorStore.getState().setAnchor(anchor);
-}
+export const menuAnchorActions = {
+	set: (anchor: MenuAnchor | null) => menuAnchorStore.setState({ anchor }),
+	record: (anchor?: MenuAnchor) => {
+		if (anchor) menuAnchorStore.setState({ anchor });
+	},
+};

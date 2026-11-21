@@ -1,7 +1,6 @@
-import { createContext, useContext, useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-
-export const ContentColumnContext = createContext<number | null>(null);
+import { ContentColumnContext } from '@/shared/content-column/contentColumnConfig';
 
 export function useContentColumn(): ViewStyle | null {
 	const maxWidth = useContext(ContentColumnContext);

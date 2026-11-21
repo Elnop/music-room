@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 export function useThemedStyles<T>(factory: (theme: Theme) => T): { styles: T; theme: Theme } {
 	const { theme } = useTheme();

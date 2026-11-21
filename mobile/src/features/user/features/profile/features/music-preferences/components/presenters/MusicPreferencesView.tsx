@@ -3,10 +3,10 @@ import { StyleSheet, View } from 'react-native';
 import { GenreSelector } from '@/features/user/features/profile/features/music-preferences/components/presenters/GenreSelector';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
 import { Button } from '@/shared/theme/components/Button';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { MusicGenre } from '@/shared/users/user.types';
-import { MAX_GENRES } from '@/shared/users/user.types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { MusicGenre } from '@/shared/users/userTypes';
+import { MAX_GENRES } from '@/shared/users/userConfig';
 
 interface MusicPreferencesViewProps {
 	theme: Theme;

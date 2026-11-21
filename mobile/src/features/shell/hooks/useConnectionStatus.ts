@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { useNetworkState } from 'expo-network';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 
 export type ConnectionStatus = 'offline' | 'reconnecting' | 'failed' | null;
 
 export function useConnectionStatus(): ConnectionStatus {
 	const network = useNetworkState();
-	const status = useSocketStore(state => state.status);
-	const retry = useSocketStore(state => state.retry);
+	const status = useSocketState(state => state.status);
+	const retry = useSocketState(state => state.retry);
 
 	const offline = network.isConnected === false || network.isInternetReachable === false;
 

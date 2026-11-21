@@ -7,7 +7,7 @@ import {
 import { useProviderButtons } from '@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons';
 import type { OAuthProvider } from '@/features/user/features/auth/types';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 

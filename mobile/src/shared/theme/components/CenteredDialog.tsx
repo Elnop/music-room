@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { DIALOG_MAX_WIDTH } from '@/shared/theme/lib/layout';
+import { DIALOG_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 type CenteredDialogProps = {
 	onClose: () => void;

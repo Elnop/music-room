@@ -1,5 +1,5 @@
 import type { TextStyle, ViewStyle } from 'react-native';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 export function dialogStyles(theme: Theme): { body: ViewStyle; title: TextStyle } {
 	return {

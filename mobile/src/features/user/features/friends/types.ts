@@ -1,4 +1,4 @@
-import type { FilteredProfile, MusicGenre, UserProfile } from '@/shared/users/user.types';
+import type { FilteredProfile, MusicGenre, UserProfile } from '@/shared/users/userTypes';
 
 export type { FilteredProfile, MusicGenre, UserProfile };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
-import type { QueueItem } from '@/shared/playback/lib/playback';
+import type { QueueItem } from '@/shared/playback/types/playbackTypes';
 import { UpNextRow } from '@/features/playback/features/now-playing-panel/components/presenters/UpNextRow';
 import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 

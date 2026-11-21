@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
-import { STALE } from '@/shared/backend/queryClient';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { STALE } from '@/shared/backend/configs/staleQueryConfig';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';

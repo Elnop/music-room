@@ -4,7 +4,7 @@ import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { Plan } from '@/features/subscription/lib/subscription';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { SubscriptionSection } from '@/features/user/features/settings/components/presenters/SubscriptionSection';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';

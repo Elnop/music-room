@@ -4,8 +4,8 @@ import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
 import { useSearchTracks } from '@/features/playlists/features/editor/features/search-tracks/useSearchTracks';
 import { SearchTracksView } from '@/features/playlists/features/editor/features/search-tracks/components/presenters/SearchTracksView';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
-import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
+import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
+import type { PlaybackActions } from '@/shared/playback/types/playbackActionsTypes';
 
 type SearchTracksOrchestratorProps = NativeStackScreenProps<
 	PlaylistStackParamList,

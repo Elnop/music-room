@@ -2,10 +2,10 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 type SidebarAccountProps = {

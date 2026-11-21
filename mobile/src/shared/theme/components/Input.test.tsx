@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Input } from '@/shared/theme/components/Input';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -69,7 +69,7 @@ describe('Input', () => {
 		expect(screen.queryByLabelText('Afficher le mot de passe')).toBeNull();
 	});
 
-	describe('submitOnEnter', () => {
+	describe('onEnter', () => {
 		const originalOS = Platform.OS;
 		afterEach(() => {
 			Platform.OS = originalOS;
@@ -83,7 +83,7 @@ describe('Input', () => {
 					value=""
 					onChangeText={jest.fn()}
 					placeholder="Name"
-					submitOnEnter={submit}
+					onEnter={submit}
 					{...props}
 				/>
 			);

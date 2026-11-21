@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAnchoredPress } from '@/features/playlists/features/editor/features/detail/hooks/useAnchoredPress';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
 import { usePlaylistDetailScreen } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistDetailScreen';
 import { usePlaylistTracks } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistTracks';
@@ -21,8 +21,11 @@ import {
 	HeaderIconButton,
 	headerButtonStyles,
 } from '@/features/playlists/shared/header-button/HeaderIconButton';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
-import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
+import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
+import type {
+	PlaybackActions,
+	PlaylistPlayback,
+} from '@/shared/playback/types/playbackActionsTypes';
 import { PlaylistActionsSheetContainer } from '@/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheetContainer';
 import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 import type { PlanState } from '@/features/subscription/lib/subscription';

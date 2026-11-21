@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { isDarkBackground } from '@/features/shell/lib/textContrast';
 import { useFocusRing } from '@/features/shell/hooks/useFocusRing';
 

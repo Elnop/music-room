@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { GENRE_INFO } from '@/shared/theme/lib/genres';
+import { GENRE_INFO } from '@/shared/theme/configs/genresConfig';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { RadarScope } from '@/features/events/features/nearby/components/presenters/RadarScope';
 import { Button } from '@/shared/theme/components/Button';
@@ -8,8 +8,8 @@ import { KeyButton } from '@/shared/theme/components/KeyButton';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import { GENRE_COLORS } from '@/shared/theme/lib/tokens';
-import type { Theme } from '@/shared/theme/lib/types';
+import { GENRE_COLORS } from '@/shared/theme/configs/tokensConfig';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/features/nearby/hooks/useNearbyEvents';
 import { radarSpot } from '@/features/events/features/nearby/lib/radarBlips';
@@ -91,10 +91,9 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 				</View>
 				<KeyButton
 					icon={PlusSolid}
-					tone="primary"
-					size={45}
 					onPress={nearby.createEvent}
 					accessibilityLabel="Créer un événement"
+					appearance={{ tone: 'primary', size: 45 }}
 				/>
 			</View>
 			<BeaconStatusLine

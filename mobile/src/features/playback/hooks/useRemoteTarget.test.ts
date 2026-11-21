@@ -3,13 +3,13 @@ import { createStore } from 'zustand';
 import { useRemoteTarget } from '@/features/playback/hooks/useRemoteTarget';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { showError, showInfo } from '@/shared/theme/lib/toast';
 import type {
 	ListeningStatus,
 	UserListeningStatus,
 } from '@/features/playback/shared/player/lib/listening.types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 import { logger } from '@/shared/logging/logger';
 
 const mockSocket = {
@@ -22,8 +22,8 @@ const mockSocketState = { socket: mockSocket, isConnected: true };
 const mockLoad = jest.fn();
 const mockForget = jest.fn();
 
-jest.mock('@/shared/backend/socketStore', () => ({
-	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
+jest.mock('@/shared/backend/hooks/useSocketState', () => ({
+	useSocketState: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 

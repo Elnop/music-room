@@ -1,12 +1,12 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { testPlayback } from '@test-utils/playback';
+import { testPlayback } from '@test-utils/testPlaybackConfig';
 import { showInfo } from '@/shared/theme/lib/toast';
 import { PlayPlaylistButton } from '@/features/playlists/features/editor/features/detail/components/presenters/PlayPlaylistButton';
 import { usePlayPlaylist } from '@/features/playlists/features/editor/features/detail/hooks/usePlayPlaylist';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('@/shared/theme/lib/toast', () => ({ showInfo: jest.fn() }));

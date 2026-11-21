@@ -3,8 +3,8 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
 import { PrivacyPolicyContainer } from '@/features/legal/components/PrivacyPolicyContainer';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('@/shared/external-links/openExternalUrl', () => ({ openExternalUrl: jest.fn() }));

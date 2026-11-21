@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistSharing } from '@/features/playlists/features/editor/features/sharing/hooks/usePlaylistSharing';
 import {

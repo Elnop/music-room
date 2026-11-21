@@ -1,16 +1,10 @@
-import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import type { QueryClient, QueryKey } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
-import { useSocketStore } from '@/shared/backend/socketStore';
-
-export type SocketCacheRule<Payload, Data> = {
-	event: string;
-	queryKey: (payload: Payload) => QueryKey | null;
-	update?: (current: Data, payload: Payload) => Data | undefined;
-};
-
-type SocketCacheResult = 'updated' | 'invalidated' | 'ignored';
+import type {
+	SocketCacheBinding,
+	SocketCacheResult,
+	SocketCacheRule,
+} from '@/shared/backend/types/socketCacheTypes';
 
 export function applySocketEvent<Payload, Data>(
 	client: QueryClient,
@@ -29,11 +23,6 @@ export function applySocketEvent<Payload, Data>(
 	void client.invalidateQueries({ queryKey });
 	return 'invalidated';
 }
-
-type SocketCacheBinding = {
-	event: string;
-	apply: (client: QueryClient, payload: unknown) => SocketCacheResult;
-};
 
 export function socketCacheRule<Payload, Data>(
 	rule: SocketCacheRule<Payload, Data>
@@ -59,14 +48,4 @@ export function bindSocketCache(
 	return () => {
 		for (const { event, listener } of listeners) socket.off(event, listener);
 	};
-}
-
-export function useSocketCache(bindings: readonly SocketCacheBinding[]): void {
-	const socket = useSocketStore(state => state.socket);
-	const client = useQueryClient();
-
-	useEffect(() => {
-		if (!socket) return undefined;
-		return bindSocketCache(socket, client, bindings);
-	}, [socket, client, bindings]);
 }

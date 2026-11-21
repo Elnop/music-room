@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
-import { STALE } from '@/shared/backend/queryClient';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import * as providersApi from '@/features/user/features/auth/features/linked-accounts/providersApi';
 import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';

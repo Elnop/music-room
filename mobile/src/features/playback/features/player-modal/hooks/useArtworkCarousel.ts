@@ -10,7 +10,7 @@ import {
 } from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
-import type { QueueItem } from '@/shared/playback/lib/playback';
+import type { QueueItem } from '@/shared/playback/types/playbackTypes';
 import { hapticTap } from '@/shared/theme/lib/haptics';
 import { trackSwipeDirection } from '@/features/playback/shared/track-swipe/trackSwipe';
 import { displayedQueueIndex } from '@/features/playback/features/player-modal/displayedQueueIndex';

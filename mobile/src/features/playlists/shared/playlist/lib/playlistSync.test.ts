@@ -3,7 +3,7 @@ import {
 	sortByRank,
 } from '@/features/playlists/shared/playlist/lib/playlistSync';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
-import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
+import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
 
 function track(id: string, rank: string): TrackInPlaylist {
 	return {

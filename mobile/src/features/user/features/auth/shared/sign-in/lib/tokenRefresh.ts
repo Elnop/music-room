@@ -1,4 +1,4 @@
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 import type { AuthSessionTokens } from '@/features/user/features/auth/types';
 import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
 import { ApiError } from '@/shared/backend/lib/api';

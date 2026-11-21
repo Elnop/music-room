@@ -3,21 +3,21 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { NowPlayingPanelContainer } from '@/features/playback/features/now-playing-panel/components/NowPlayingPanelContainer';
 import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
-import type { TrackActionsSheetProps } from '@/shared/playback/lib/trackActionsSheet';
-import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
+import type { TrackActionsSheetProps } from '@/shared/playback/types/trackActionsSheetTypes';
+import { THIS_DEVICE_LABEL } from '@/shared/platform/platformConfig';
 import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
-import type { OwnerQueue, QueueItem } from '@/shared/playback/lib/playback';
+import type { OwnerQueue, QueueItem } from '@/shared/playback/types/playbackTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 let mockNowPlaying: NowPlaying;
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
 jest.mock('@/shared/image-colors/useImageColors', () => ({
-	...jest.requireActual('@/shared/image-colors/adaptivePalette'),
+	...jest.requireActual('@/shared/image-colors/lib/adaptivePalette'),
 	useImageColors: () => ({ dominantColor: null, isLoading: false }),
 }));
 

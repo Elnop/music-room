@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { Text } from '@/shared/theme/components/Text';
+import { SectionHeaderLabel } from '@/shared/theme/components/SectionHeaderLabel';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 
@@ -21,12 +21,7 @@ type SectionHeaderProps = {
 export function SectionHeader({ icon, title, count, open, onToggle, action }: SectionHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 
-	const label = (
-		<View style={styles.label}>
-			<PixelIcon icon={icon} size={18} color={theme.colors.textSecondary} />
-			{count > 0 && <Text style={styles.count}>{count}</Text>}
-		</View>
-	);
+	const label = <SectionHeaderLabel icon={icon} count={count} />;
 
 	if (!onToggle) {
 		return (
@@ -57,12 +52,6 @@ function createStyles(theme: Theme) {
 			justifyContent: 'space-between',
 			paddingHorizontal: theme.spacing.md,
 			marginBottom: theme.spacing.md,
-		},
-		label: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
-		count: {
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.mono,
-			color: theme.colors.textSecondary,
 		},
 	});
 	return styles;

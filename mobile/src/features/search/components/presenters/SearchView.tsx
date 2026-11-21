@@ -1,19 +1,19 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import type { TextInput } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
 import { SoundCloudTrackItem } from '@/features/search/components/presenters/SoundCloudTrackItem';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 interface SearchViewProps {
 	TrackActionsSheet: TrackActionsSheetComponent;
@@ -62,7 +62,7 @@ export function SearchView({
 		<View style={styles.container}>
 			<View style={[styles.header, column]}>
 				<SearchBar
-					inputRef={inputRef}
+					input={{ inputRef }}
 					value={searchQuery}
 					onChangeText={onSearchChange}
 					placeholder="Rechercher sur SoundCloud..."

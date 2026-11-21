@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { onSessionEnd } from '@/shared/backend/lib/authSession';
+import { onSessionEnd } from '@/shared/backend/lib/sessionEnd';
 
 type NowPlayingPanelState = {
 	isOpen: boolean;

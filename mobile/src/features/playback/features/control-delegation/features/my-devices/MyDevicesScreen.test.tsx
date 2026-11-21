@@ -5,7 +5,7 @@ import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-
 import { createStore } from 'zustand';
 import type { StoreApi } from 'zustand';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
@@ -34,8 +34,8 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

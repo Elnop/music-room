@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import type { Plan } from '@/features/subscription/lib/subscription';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 type SubscriptionSectionProps = {

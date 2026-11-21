@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { showAlert } from '@/shared/alerts/alert';
+import { showAlert } from '@/shared/alerts/showAlert';
 import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { useProfilePrivacy } from '@/features/user/features/profile/shared/profile/hooks/useProfileQueries';
 import { useUpdatePrivacyMutation } from '@/features/user/features/profile/shared/profile/hooks/useProfileMutations';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
-import type { ProfilePrivacy, VisibilityLevel } from '@/shared/users/user.types';
+import type { ProfilePrivacy, VisibilityLevel } from '@/shared/users/userTypes';
 
 export function usePrivacySettingsScreen() {
 	const { theme } = useTheme();

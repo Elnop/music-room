@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { EqualizerBars } from '@/shared/theme/components/EqualizerBars';
@@ -102,12 +102,10 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 
 				<KeyButton
 					icon={isPlaying ? PauseSolid : PlaySolid}
-					tone={track ? 'primary' : 'surface'}
-					size={42}
 					onPress={onTogglePlay}
-					disabled={playDisabled}
-					loading={isLoading}
 					accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
+					appearance={{ tone: track ? 'primary' : 'surface', size: 42 }}
+					state={{ disabled: playDisabled, loading: isLoading }}
 				/>
 
 				<Pressable

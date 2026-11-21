@@ -7,7 +7,7 @@ import type {
 	TransferRequest,
 	TransferResult,
 } from '@/features/playback/shared/player/lib/queue.types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 
 function base({ ownerId }: QueueCallTarget = {}): string {
 	return ownerId ? `/api/users/${encodeURIComponent(ownerId)}/queue` : '/api/queue';

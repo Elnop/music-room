@@ -1,13 +1,6 @@
 import { useWindowDimensions } from 'react-native';
-import { BREAKPOINTS } from '@/shared/theme/lib/layout';
-
-export type Breakpoint = 'phone' | 'tablet' | 'desktop';
-
-export function breakpointOf(width: number): Breakpoint {
-	if (width >= BREAKPOINTS.desktop) return 'desktop';
-	if (width >= BREAKPOINTS.tablet) return 'tablet';
-	return 'phone';
-}
+import { breakpointOf } from '@/shared/theme/lib/breakpointOf';
+import type { Breakpoint } from '@/shared/theme/types/layoutTypes';
 
 type BreakpointInfo = {
 	breakpoint: Breakpoint;

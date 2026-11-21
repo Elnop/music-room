@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react-native';
 import { useWindowDimensions } from 'react-native';
-import { breakpointOf, useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { breakpointOf } from '@/shared/theme/lib/breakpointOf';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,

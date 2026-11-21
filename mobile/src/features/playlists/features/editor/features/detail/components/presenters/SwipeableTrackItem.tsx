@@ -2,23 +2,23 @@ import React from 'react';
 import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import { TrackTableRow } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackTableRow';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { Track } from '@/shared/tracks/lib/track.types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { Track } from '@/shared/tracks/types/trackTypes';
 import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 import { pixelRow } from '@/shared/theme/lib/pixelFrame';
 import { formatDuration } from '@/shared/formatting/formatters';
 import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -72,7 +72,7 @@ export function SwipeableTrackItem({
 	return (
 		<QueueSwipe
 			onAddToQueue={unavailable ? undefined : onAddToQueue}
-			renderRightActions={disabled ? undefined : renderRightActions}
+			rightActions={disabled ? undefined : renderRightActions()}
 		>
 			{isWide && position !== undefined ? (
 				<TrackTableRow

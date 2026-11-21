@@ -2,9 +2,9 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { logger } from '@/shared/logging/logger';
-import { originalTheme } from '@/shared/theme/lib/original.theme';
+import { originalTheme } from '@/shared/theme/configs/originalThemeConfig';
 import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 type Props = {
 	children: React.ReactNode;

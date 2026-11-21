@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Button } from '@/shared/theme/components/Button';
 import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
 import { userLink } from '@/shared/share-links/shareLinks';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { UserProfileHeaderProps } from '@/features/user/features/friends/types';
 import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';

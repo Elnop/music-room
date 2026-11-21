@@ -1,14 +1,12 @@
 import React from 'react';
-import type { ViewStyle } from 'react-native';
-import { StyleSheet, ActivityIndicator } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { ButtonLook, ButtonSize, ButtonVariant } from '@/shared/theme/types/buttonTypes';
+import { ButtonBody } from '@/shared/theme/components/ButtonBody';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { Text } from '@/shared/theme/components/Text';
-import { displayText, keycap } from '@/shared/theme/lib/pixelFrame';
-
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
-type ButtonSize = 'default' | 'compact';
+import { keycap } from '@/shared/theme/lib/pixelFrame';
 
 type ButtonLabel = { title: string; children?: never } | { title?: never; children: string };
 
@@ -24,97 +22,76 @@ type ButtonProps = ButtonLabel & {
 	accessibilityLabel?: string;
 };
 
-export function Button({
-	title,
-	children,
-	onPress,
-	variant = 'primary',
-	size = 'default',
-	disabled = false,
-	loading = false,
-	fullWidth = false,
-	icon,
-	style,
-	accessibilityLabel,
-}: ButtonProps) {
+export function Button(props: ButtonProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-	const isDisabled = disabled || loading;
-	const buttonText = title ?? children;
-
-	const variantStyle = {
-		primary: styles.primary,
-		secondary: styles.secondary,
-		outline: styles.outline,
-	}[variant];
-	const variantTextStyle = {
-		primary: styles.primaryText,
-		secondary: styles.secondaryText,
-		outline: styles.outlineText,
-	}[variant];
-
-	const containerStyle = [
-		styles.container,
-		variantStyle,
-		size === 'compact' && styles.compact,
-		fullWidth && styles.fullWidth,
-		isDisabled && styles.disabled,
-		style,
-	];
-
-	const textStyle = [
-		styles.text,
-		variantTextStyle,
-		size === 'compact' && styles.compactText,
-		isDisabled && styles.disabledText,
-	];
-
-	const spinnerColor = variant === 'primary' ? theme.colors.onColor : theme.colors.primary;
+	const lookStyles = React.useMemo(() => createLookStyles(theme), [theme]);
+	const look = buttonLook(props);
+	const label = props.title ?? props.children;
 
 	return (
 		<Pressable
-			style={containerStyle}
-			onPress={onPress}
-			disabled={isDisabled}
-			accessibilityLabel={accessibilityLabel ?? buttonText}
+			style={[containerStyle(styles, lookStyles, look), props.style]}
+			onPress={props.onPress}
+			disabled={look.disabled}
+			accessibilityLabel={props.accessibilityLabel ?? label}
 		>
-			{loading ? (
-				<ActivityIndicator color={spinnerColor} size="small" />
-			) : (
-				<>
-					{icon}
-					<Text style={textStyle}>{buttonText}</Text>
-				</>
-			)}
+			<ButtonBody label={label} look={look} icon={props.icon} loading={props.loading} />
 		</Pressable>
 	);
+}
+
+function buttonLook(props: ButtonProps): ButtonLook {
+	return {
+		variant: props.variant ?? 'primary',
+		size: props.size ?? 'default',
+		fullWidth: props.fullWidth ?? false,
+		disabled: Boolean(props.disabled || props.loading),
+	};
+}
+
+function containerStyle(
+	styles: ReturnType<typeof createStyles>,
+	lookStyles: ReturnType<typeof createLookStyles>,
+	look: ButtonLook
+): StyleProp<ViewStyle> {
+	const variant = {
+		primary: lookStyles.primary,
+		secondary: lookStyles.secondary,
+		outline: lookStyles.outline,
+	}[look.variant];
+	return [
+		styles.container,
+		variant,
+		look.size === 'compact' && styles.compact,
+		look.fullWidth && lookStyles.fullWidth,
+		look.disabled && lookStyles.disabled,
+	];
 }
 
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		container: {
 			...keycap(theme),
-			height: 52,
-			paddingHorizontal: 24,
+			height: theme.controls.button,
+			paddingHorizontal: theme.spacing.lg,
 			alignItems: 'center',
 			justifyContent: 'center',
 			flexDirection: 'row',
-			gap: 8,
+			gap: theme.spacing.sm,
 		},
 		compact: {
-			height: 28,
-			paddingHorizontal: 12,
+			height: theme.controls.buttonCompact,
+			paddingHorizontal: theme.spacing.smd,
 			borderBottomWidth: theme.borders.thick,
-			gap: 4,
+			gap: theme.spacing.xs,
 		},
-		fullWidth: {
-			width: '100%',
-		},
-		disabled: {
-			opacity: 0.5,
-		},
+	});
+	return styles;
+}
 
+function createLookStyles(theme: Theme) {
+	const lookStyles = StyleSheet.create({
 		primary: {
 			backgroundColor: theme.colors.primary,
 		},
@@ -125,26 +102,12 @@ function createStyles(theme: Theme) {
 			backgroundColor: 'transparent',
 			borderColor: theme.colors.text,
 		},
-
-		text: {
-			...displayText(theme, 16, 'button'),
-			textTransform: 'uppercase',
+		fullWidth: {
+			width: '100%',
 		},
-		compactText: {
-			fontSize: displayText(theme, 13, 'button').fontSize,
-		},
-		primaryText: {
-			color: theme.colors.onColor,
-		},
-		secondaryText: {
-			color: theme.colors.text,
-		},
-		outlineText: {
-			color: theme.colors.text,
-		},
-		disabledText: {
-			opacity: 0.7,
+		disabled: {
+			opacity: 0.5,
 		},
 	});
-	return styles;
+	return lookStyles;
 }

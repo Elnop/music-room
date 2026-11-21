@@ -4,8 +4,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

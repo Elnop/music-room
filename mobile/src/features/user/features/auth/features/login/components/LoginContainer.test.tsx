@@ -29,8 +29,8 @@ jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showWarning: jest.fn() }));
 let mockFocused = true;
 jest.mock('@react-navigation/native', () => ({ useIsFocused: () => mockFocused }));
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

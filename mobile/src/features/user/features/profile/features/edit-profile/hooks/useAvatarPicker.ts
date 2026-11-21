@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useSession, setAvatarUrl } from '@/shared/backend/lib/authSession';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import { setAvatarUrl } from '@/features/user/features/profile/shared/profile/lib/sessionActions';
 import { profileApi } from '@/features/user/features/profile/shared/profile/lib/profileApi';
-import { pickImage } from '@/shared/image-picker/imagePicker';
-import type { ImageSource } from '@/shared/image-picker/imagePicker';
-import { prepareSquareImage } from '@/shared/square-image/squareImage';
+import { pickImage } from '@/shared/image-picker/pickImage';
+import type { ImageSource } from '@/shared/image-picker/imagePickerTypes';
+import { prepareSquareImage } from '@/shared/square-image/prepareSquareImage';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 

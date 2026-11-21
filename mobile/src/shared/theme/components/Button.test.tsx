@@ -4,8 +4,8 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Button } from '@/shared/theme/components/Button';
 import { Text } from '@/shared/theme/components/Text';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -20,8 +20,9 @@ describe('Button', () => {
 	});
 
 	it('shows children when no title is given', () => {
-		render(<Button onPress={jest.fn()}>Continue</Button>);
-		expect(screen.getByText('Continue')).toBeTruthy();
+		const label = 'Continue';
+		render(<Button onPress={jest.fn()}>{label}</Button>);
+		expect(screen.getByText(label)).toBeTruthy();
 	});
 
 	it('is a button labelled by its text, or by an explicit label', () => {

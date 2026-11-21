@@ -1,11 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
+import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { ApiError } from '@/shared/backend/lib/api';
-
-export const STALE = {
-	none: 0,
-	short: 30_000,
-	long: 5 * 60_000,
-} as const;
 
 const MAX_RETRIES = 2;
 

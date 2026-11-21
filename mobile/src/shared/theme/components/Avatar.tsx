@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import type { ViewStyle, StyleProp } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
-import { Text } from '@/shared/theme/components/Text';
-import { sizedAvatarUri } from '@/shared/theme/lib/avatarUri';
-import { avatarColor, avatarInitials } from '@/shared/theme/lib/avatarInitials';
-import { displayText } from '@/shared/theme/lib/pixelFrame';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { useAvatarPhoto } from '@/shared/theme/hooks/useAvatarPhoto';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import { avatarColor } from '@/shared/theme/lib/avatarInitials';
+import { squareStyle } from '@/shared/theme/lib/squareStyle';
+import { AvatarInitials } from '@/shared/theme/components/AvatarInitials';
 import { AvatarPhoto } from '@/shared/theme/components/AvatarPhoto';
 
 type AvatarProps = {
@@ -24,45 +24,28 @@ const SIZE_MAP = {
 };
 
 export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
+	const { styles } = useThemedStyles(createStyles);
 	const dimension = SIZE_MAP[size];
-	const source = uri ? sizedAvatarUri(uri, dimension) : undefined;
-	const [loaded, setLoaded] = React.useState<string | null>(null);
-	const [failed, setFailed] = React.useState<string | null>(null);
-	const photo = source && failed !== source ? source : undefined;
-	const initials = avatarInitials(name);
-	const { fontSize } = displayText(
-		theme,
-		dimension * (initials.length > 1 ? 0.38 : 0.44),
-		'initials'
-	);
-	const background = name?.trim() ? { backgroundColor: avatarColor(name.trim()) } : undefined;
+	const photo = useAvatarPhoto(uri, dimension);
 
 	return (
-		<View
-			style={[
-				styles.container,
-				{
-					width: dimension,
-					height: dimension,
-				},
-				background,
-				style,
-			]}
-		>
-			{loaded !== photo && <Text style={[styles.initials, { fontSize }]}>{initials}</Text>}
-			{photo && (
+		<View style={[styles.container, squareStyle(dimension), nameBackground(name), style]}>
+			{photo.showInitials && <AvatarInitials name={name} dimension={dimension} />}
+			{photo.uri && (
 				<AvatarPhoto
-					uri={photo}
+					uri={photo.uri}
 					size={dimension}
-					onLoad={() => setLoaded(photo)}
-					onError={() => setFailed(photo)}
+					onLoad={photo.onLoad}
+					onError={photo.onError}
 				/>
 			)}
 		</View>
 	);
+}
+
+function nameBackground(name?: string): ViewStyle | undefined {
+	const trimmed = name?.trim();
+	return trimmed ? { backgroundColor: avatarColor(trimmed) } : undefined;
 }
 
 function createStyles(theme: Theme) {
@@ -74,10 +57,6 @@ function createStyles(theme: Theme) {
 			overflow: 'hidden',
 			borderWidth: theme.borders.medium,
 			borderColor: theme.colors.border,
-		},
-		initials: {
-			color: theme.colors.onColor,
-			fontFamily: theme.typography.families.display,
 		},
 	});
 	return styles;

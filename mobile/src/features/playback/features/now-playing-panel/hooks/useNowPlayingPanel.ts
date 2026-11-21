@@ -1,19 +1,19 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { hexToRgba, useImageColors } from '@/shared/image-colors/useImageColors';
 import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
-import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsSheet';
-import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
+import type { TrackActionsStart } from '@/shared/playback/types/trackActionsSheetTypes';
+import { THIS_DEVICE_LABEL } from '@/shared/platform/platformConfig';
 import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
-import { toTrackInput } from '@/shared/tracks/lib/trackInput';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import { useNowPlaying } from '@/features/playback/shared/player/hooks/useNowPlaying';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { UP_NEXT_COUNT } from '@/features/playback/shared/player/lib/constants';
 import { upNext } from '@/features/playback/features/now-playing-panel/upNext';
 import { usePanelFocus } from '@/features/playback/features/now-playing-panel/hooks/usePanelFocus';
-import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import { menuAnchorActions } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 
 type Sheet = 'queue' | 'devices';
@@ -72,11 +72,11 @@ export function useNowPlayingPanel() {
 		onCloseSheet: () => setSheet(null),
 		actions,
 		onAddToPlaylist: (anchor?: MenuAnchor) => {
-			recordMenuAnchor(anchor);
+			menuAnchorActions.record(anchor);
 			openActions('playlists');
 		},
 		onMoreActions: (anchor?: MenuAnchor) => {
-			recordMenuAnchor(anchor);
+			menuAnchorActions.record(anchor);
 			openActions('actions');
 		},
 		onCloseActions: () => setActions(null),

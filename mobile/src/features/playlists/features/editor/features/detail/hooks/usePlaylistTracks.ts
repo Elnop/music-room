@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSession } from '@/shared/backend/lib/authSession';
-import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import type {
+	PlaybackActions,
+	PlaylistPlayback,
+} from '@/shared/playback/types/playbackActionsTypes';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
 import { afterRankForDrop } from '@/shared/tracks/lib/moveTarget';
 import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
-import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
 import {
 	useMoveTrack,
 	useRemoveTrack,
@@ -19,10 +22,10 @@ import {
 	isMoveConflict,
 } from '@/features/playlists/features/editor/shared/track-edits/lib/trackMoves';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
-import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
-import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
+import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
+import { menuAnchorActions } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 export type PlaylistTracks = {
 	canEdit: boolean;
@@ -88,7 +91,7 @@ export function usePlaylistTracks(
 		currentUri: playingUri,
 		actionTrack,
 		showActions: (track, anchor) => {
-			recordMenuAnchor(anchor);
+			menuAnchorActions.record(anchor);
 			setActionTrack(toTrackInput(track));
 		},
 		closeActions: () => setActionTrack(null),

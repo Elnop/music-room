@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { useSocketStore } from '@/shared/backend/socketStore';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import { controlErrorMessage } from '@/shared/control-error/controlError';
-import type { ControlError } from '@/shared/control-error/controlError';
+import { controlErrorMessage } from '@/shared/control-error/controlErrorMessage';
+import type { ControlError } from '@/shared/control-error/controlErrorTypes';
 import {
 	acquireListening,
 	releaseListening,
@@ -15,8 +15,8 @@ import type { ControlRevokedPayload } from '@/features/playback/features/control
 import { logger } from '@/shared/logging/logger';
 
 export function useRemoteTarget(): void {
-	const socket = useSocketStore(state => state.socket);
-	const isConnected = useSocketStore(state => state.isConnected);
+	const socket = useSocketState(state => state.socket);
+	const isConnected = useSocketState(state => state.isConnected);
 	const userId = useSession(state => state?.user?.id ?? null);
 	const ownerId = useConnectStore(state =>
 		state.target.kind === 'remote' ? state.target.ownerId : null

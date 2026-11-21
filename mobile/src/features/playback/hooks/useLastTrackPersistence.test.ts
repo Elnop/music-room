@@ -8,17 +8,18 @@ import {
 	LAST_TRACK_SAVE_INTERVAL_MS,
 	useLastTrackPersistence,
 } from '@/features/playback/hooks/useLastTrackPersistence';
-import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
-import type { LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
+import { lastTrackStorage } from '@/shared/playback/lastTrackStorage';
+import type { LastTrackEntry } from '@/shared/playback/types/playbackTypes';
 import {
 	usePlayerStore,
 	setPositionReader,
 } from '@/features/playback/shared/player/stores/playerStore';
-import { registerAuthSession, notifySessionEnd } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { queueTrackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { onSessionEnd } from '@/shared/backend/lib/authSession';
+import { onSessionEnd } from '@/shared/backend/lib/sessionEnd';
 import { initialPlayerState } from '@/features/playback/shared/player/lib/playerState';
 import type { PlayerState } from '@/features/playback/shared/player/lib/playerState';
 

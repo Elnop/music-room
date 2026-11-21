@@ -43,7 +43,7 @@ export class FakeMediaElement {
 	}
 
 	emit(type: string): void {
-		this.listeners.get(type)?.forEach(listener => listener());
+		for (const listener of this.listeners.get(type) ?? []) listener();
 	}
 
 	loadStream(durationSeconds: number): void {

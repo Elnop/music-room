@@ -1,4 +1,4 @@
-import { GENRE_INFO } from '@/shared/theme/lib/genres';
+import { GENRE_INFO } from '@/shared/theme/configs/genresConfig';
 import type { MusicGenre, RecommendedProfile } from '@/features/user/features/friends/types';
 
 function commonGenresLabel(genres: MusicGenre[]): string {

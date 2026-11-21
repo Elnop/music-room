@@ -3,10 +3,10 @@ import { StyleSheet } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
 import Toast from 'react-native-toast-message';
 import { AppToast } from '@/shared/theme/components/AppToast';
-import { originalTheme } from '@/shared/theme/lib/original.theme';
+import { originalTheme } from '@/shared/theme/configs/originalThemeConfig';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme: theme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme: theme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme }) };
 });
 

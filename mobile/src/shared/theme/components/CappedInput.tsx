@@ -1,47 +1,34 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { TextInputProps } from 'react-native';
 import { Input } from '@/shared/theme/components/Input';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { CappedField } from '@/shared/theme/hooks/useCappedField';
+import type { CappedField } from '@/shared/theme/types/cappedFieldTypes';
 import { Text } from '@/shared/theme/components/Text';
 
-interface CappedInputProps {
+type CappedInputProps = {
 	field: CappedField;
 	label: string;
 	placeholder: string;
 	autoFocus?: boolean;
 	multiline?: boolean;
-	keyboardType?: TextInputProps['keyboardType'];
-	submitOnEnter?: () => void;
-}
+	onEnter?: () => void;
+};
 
-export function CappedInput({
-	field,
-	label,
-	placeholder,
-	autoFocus,
-	multiline,
-	keyboardType,
-	submitOnEnter,
-}: CappedInputProps) {
+export function CappedInput({ field, label, ...options }: CappedInputProps) {
 	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View>
 			<Input
+				{...options}
 				label={label}
 				value={field.value}
 				onChangeText={field.onChangeText}
-				placeholder={placeholder}
 				error={field.error}
-				autoFocus={autoFocus}
-				multiline={multiline}
-				numberOfLines={multiline ? 3 : undefined}
+				numberOfLines={options.multiline ? 3 : undefined}
 				maxLength={field.max}
-				keyboardType={keyboardType}
-				submitOnEnter={submitOnEnter}
+				containerStyle={styles.input}
 			/>
 			<Text style={styles.count}>
 				{field.value.length}/{field.max}
@@ -51,13 +38,16 @@ export function CappedInput({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
+		input: {
+			marginBottom: theme.spacing.sm,
+		},
 		count: {
-			fontSize: 12,
+			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
 			textAlign: 'right',
-			marginTop: -theme.spacing.sm,
 			marginBottom: theme.spacing.sm,
 		},
 	});
+	return styles;
 }

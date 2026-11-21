@@ -2,7 +2,7 @@ import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { CappedInput } from '@/shared/theme/components/CappedInput';
 import { Button } from '@/shared/theme/components/Button';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistForm } from '@/features/playlists/features/editor/features/playlist-form/usePlaylistForm';
 import { ToggleCard } from '@/features/playlists/features/editor/features/playlist-form/components/presenters/ToggleCard';
@@ -32,7 +32,7 @@ export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps)
 								label="Nom de la playlist"
 								placeholder="Ma super playlist"
 								autoFocus
-								submitOnEnter={form.isSubmitting ? undefined : form.submit}
+								onEnter={form.isSubmitting ? undefined : form.submit}
 							/>
 							<CappedInput
 								field={form.description}

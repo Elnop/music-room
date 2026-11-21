@@ -1,14 +1,18 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import {
-	HOVERED_OPACITY,
-	PRESSED_OPACITY,
-	Pressable,
-	pressableStyle,
-} from '@/shared/theme/components/Pressable';
+import { HOVERED_OPACITY, PRESSED_OPACITY } from '@/shared/theme/configs/pressableConfig';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { pressableStyle } from '@/shared/theme/lib/pressableStyle';
 import { hapticSelection, hapticTap } from '@/shared/theme/lib/haptics';
 import { Text } from '@/shared/theme/components/Text';
+import { originalTheme } from '@/shared/theme/configs/originalThemeConfig';
+
+const MARGIN = originalTheme.spacing.xs;
+
+const styles = StyleSheet.create({
+	spaced: { margin: MARGIN },
+});
 
 jest.mock('@/shared/theme/lib/haptics', () => ({
 	hapticTap: jest.fn(),
@@ -62,7 +66,7 @@ describe('Pressable', () => {
 
 	it('dims to the shared opacity while pressed', () => {
 		const { rerender } = render(
-			<Pressable accessibilityLabel="Hold" onPress={jest.fn()} style={{ margin: 4 }} />
+			<Pressable accessibilityLabel="Hold" onPress={jest.fn()} style={styles.spaced} />
 		);
 		function style() {
 			return StyleSheet.flatten(screen.getByRole('button').props.style);
@@ -73,16 +77,16 @@ describe('Pressable', () => {
 			<Pressable
 				accessibilityLabel="Hold"
 				onPress={jest.fn()}
-				style={{ margin: 4 }}
+				style={styles.spaced}
 				testOnly_pressed
 			/>
 		);
-		expect(style()).toMatchObject({ margin: 4, opacity: PRESSED_OPACITY });
+		expect(style()).toMatchObject({ margin: MARGIN, opacity: PRESSED_OPACITY });
 	});
 
 	it('lightens under the mouse pointer, unless disabled or pressed', () => {
 		function opacity(pressed: boolean, hovered: boolean, disabled = false) {
-			return StyleSheet.flatten(pressableStyle({ margin: 4 }, { pressed, hovered }, disabled))
+			return StyleSheet.flatten(pressableStyle(styles.spaced, { pressed, hovered }, disabled))
 				.opacity;
 		}
 

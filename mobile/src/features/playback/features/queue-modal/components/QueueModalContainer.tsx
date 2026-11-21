@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
 import { useQueueModal } from '@/features/playback/features/queue-modal/useQueueModal';
 import { QueueModalView } from '@/features/playback/features/queue-modal/components/presenters/QueueModalView';
 

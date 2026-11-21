@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import { SwipeableUserItem } from '@/features/playlists/features/editor/features/sharing/components/presenters/SwipeableUserItem';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistMember } from '@/features/playlists/shared/playlist/lib/types';
 import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';

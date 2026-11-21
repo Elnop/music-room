@@ -1,5 +1,6 @@
 import React from 'react';
-import { Animated, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { useLoop } from '@/shared/theme/hooks/useLoop';
 
 const LEVELS = [0.25, 0.75, 0.5, 1, 0.5, 0.25, 0.75, 1, 0.75, 0.5, 0.25, 0.5, 1, 0.75, 0.25, 0.5];
@@ -15,6 +16,23 @@ function steppedRange(levels: number[]) {
 	const inputRange = levels.flatMap((_, step) => [step / count, (step + HOLD_END) / count]);
 	const outputRange = levels.flatMap(level => [level, level]);
 	return { inputRange: [...inputRange, 1], outputRange: [...outputRange, levels[0]] };
+}
+
+type BarShape = {
+	color: string;
+	height: number;
+	barWidth: number;
+};
+
+function rowStyle({ height, barWidth }: BarShape): ViewStyle {
+	return { gap: barWidth / 1.5, height };
+}
+
+function barStyle(
+	{ color, height, barWidth }: BarShape,
+	scaleY: Animated.AnimatedInterpolation<number>
+) {
+	return { width: barWidth, height, backgroundColor: color, transform: [{ scaleY }] };
 }
 
 type EqualizerBarsProps = {
@@ -33,24 +51,26 @@ export function EqualizerBars({
 	playing = true,
 }: EqualizerBarsProps) {
 	const progress = useLoop(playing, LEVELS.length * STEP_MS);
+	const shape = { color, height, barWidth };
 
 	return (
-		<View
-			style={{ flexDirection: 'row', alignItems: 'flex-end', gap: barWidth / 1.5, height }}
-			importantForAccessibility="no-hide-descendants"
-		>
+		<View style={[styles.row, rowStyle(shape)]} importantForAccessibility="no-hide-descendants">
 			{Array.from({ length: bars }, (_, bar) => (
 				<Animated.View
 					key={bar}
-					style={{
-						width: barWidth,
-						height,
-						backgroundColor: color,
-						transformOrigin: 'bottom',
-						transform: [{ scaleY: progress.interpolate(steppedRange(barLevels(bar))) }],
-					}}
+					style={[styles.bar, barStyle(shape, progress.interpolate(steppedRange(barLevels(bar))))]}
 				/>
 			))}
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	row: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+	},
+	bar: {
+		transformOrigin: 'bottom',
+	},
+});

@@ -3,7 +3,7 @@ import { Share, useWindowDimensions } from 'react-native';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 import { renderWithClient } from '@test-utils/renderWithClient';
-import { signIn } from '@test-utils/session';
+import { signIn } from '@test-utils/signIn';
 import { UserProfileContainer } from '@/features/user/features/friends/features/user-profile/components/UserProfileContainer';
 import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 
@@ -19,8 +19,8 @@ jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	default: jest.fn(() => ({ width: 390, height: 844, scale: 1, fontScale: 1 })),
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -30,7 +30,7 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 	showInfo: jest.fn(),
 }));
 
-jest.mock('@/shared/control-error/controlError', () => ({
+jest.mock('@/shared/control-error/controlErrorMessage', () => ({
 	controlErrorMessage: jest.fn(),
 }));
 

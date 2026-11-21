@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { FriendProfile, UserProfile } from '@/features/user/features/friends/types';
 import { FriendsListTab } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendsListTab';
 import { SearchUsersTab } from '@/features/user/features/friends/features/friends-list/components/presenters/SearchUsersTab';

@@ -1,6 +1,6 @@
 import { usePlaybackControls } from '@/features/playback/shared/player/hooks/usePlaybackControls';
 import { SEEK_STEP_S } from '@/features/playback/shared/player/lib/constants';
-import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 
 export function usePlayerShortcuts(): KeyboardShortcut[] {
 	const controls = usePlaybackControls();

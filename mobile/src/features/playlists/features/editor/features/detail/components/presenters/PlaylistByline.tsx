@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Avatar } from '@/shared/theme/components/Avatar';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { headerFacts } from '@/features/playlists/features/editor/features/detail/lib/headerFacts';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';

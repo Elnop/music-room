@@ -23,8 +23,8 @@ import type {
 	QueueState,
 	QueueStepOutcome,
 } from '@/features/playback/shared/player/lib/queue.types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 
 type QueueStoreState = {

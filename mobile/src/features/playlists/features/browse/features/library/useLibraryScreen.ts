@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';

@@ -2,7 +2,7 @@
 
 Bonus V.1 (Multi-platform support): the service is also available in a browser, as a responsive web app that adapts to phone, tablet and desktop. Epic #474, stories #518 to #524.
 
-Code: the same `mobile/` app, built for the web by Expo (`react-native-web`). Every `*.web.ts` file in `mobile/src/`, `shared/theme/hooks/useBreakpoint.ts`, `shared/theme/lib/layout.ts`, `shared/platform/platform.ts`, `shared/theme/components/` (layout and dialogs), `features/shell/screenLayout.tsx`; backend `GET /api/events/geocode` ([events.md](events.md)). The choice of Expo web over a separate client is in [decisions.md](../decisions.md#3-bonus-v1-web-client-epic-474).
+Code: the same `mobile/` app, built for the web by Expo (`react-native-web`). Every `*.web.ts` file in `mobile/src/`, `shared/theme/hooks/useBreakpoint.ts`, `shared/theme/configs/layoutConfig.ts`, `shared/platform/platformConfig.ts`, `shared/theme/components/` (layout and dialogs), `features/shell/screenLayout.tsx`; backend `GET /api/events/geocode` ([events.md](events.md)). The choice of Expo web over a separate client is in [decisions.md](../decisions.md#3-bonus-v1-web-client-epic-474).
 
 ## Approach
 
@@ -14,7 +14,7 @@ Each native module was already isolated in one service or hook. That file gets a
 | --- | --- |
 | `shared/backend/lib/deviceIdentity.web.ts` | `expo-device` (empty on the web): model and name from the user agent (`Chrome on Linux`, `Chrome sur Linux` in the device list) |
 | `shared/image-colors/useImageColors.web.ts` | `react-native-image-colors`: no extraction, the theme's fallback colour |
-| `shared/alerts/alert.web.ts` | `Alert.alert` (a no-op in react-native-web): the alert is queued in `shared/alerts/alertStore.ts` and `AlertHost` shows it as a centred dialog with every button |
+| `shared/alerts/showAlert.web.ts` | `Alert.alert` (a no-op in react-native-web): the alert is queued in `shared/alerts/alertStore.ts` and `AlertHost` shows it as a centred dialog with every button |
 | `shared/backend/lib/jpegFormData.web.ts` | The React Native `{ uri }` upload object: the picked image is read into a `Blob` (avatar, playlist cover) |
 | `features/user/features/auth/shared/sign-in/lib/googleSignIn.web.ts` | Native Google Sign-In: Google Identity Services, Google's rendered button in popup mode |
 | `features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.ts` | Facebook Android SDK: Facebook JavaScript SDK, `FB.login` |
@@ -27,11 +27,11 @@ Each native module was already isolated in one service or hook. That file gets a
 | `features/events/features/event-form/lib/pickDateTime.web.ts` | The Android date and time pickers: a modal `<dialog>` with a `datetime-local` field |
 | `features/events/features/nearby/lib/beaconScanner.web.ts` | The BLE scan: always reports « unsupported » |
 
-`shared/platform/platform.ts` hides what the browser cannot do: the beacon broadcast (`BEACON_BROADCAST_AVAILABLE`). The backend address field (`BackendUrlField`) works in the browser too, on Welcome and in Settings: the address is kept in the browser's storage, and the chosen backend must list the page's origin in its `ALLOWED_ORIGINS`.
+`shared/platform/platformConfig.ts` hides what the browser cannot do: the beacon broadcast (`BEACON_BROADCAST_AVAILABLE`). The backend address field (`BackendUrlField`) works in the browser too, on Welcome and in Settings: the address is kept in the browser's storage, and the chosen backend must list the page's origin in its `ALLOWED_ORIGINS`.
 
 ## Responsive layout
 
-`useBreakpoint()` (`shared/theme/hooks/useBreakpoint.ts`, from `useWindowDimensions`, so it follows a window resize live) gives three levels, set in `shared/theme/lib/layout.ts`:
+`useBreakpoint()` (`shared/theme/hooks/useBreakpoint.ts`, from `useWindowDimensions`, so it follows a window resize live) gives three levels, set in `shared/theme/configs/layoutConfig.ts`:
 
 | Level | Window width | Layout |
 | --- | --- | --- |

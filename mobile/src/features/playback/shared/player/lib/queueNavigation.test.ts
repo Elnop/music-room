@@ -6,7 +6,7 @@ import {
 	selectHasNext,
 	selectHasPrevious,
 } from '@/features/playback/shared/player/lib/queueNavigation';
-import type { QueueItem } from '@/shared/playback/lib/queue.types';
+import type { QueueItem } from '@/shared/playback/types/queueTypes';
 
 function mockItem(id: string): QueueItem {
 	return {

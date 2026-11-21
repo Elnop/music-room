@@ -1,14 +1,14 @@
 import React from 'react';
 import { View } from 'react-native';
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
+import type { TextInput as NativeTextInput, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { CODE_INPUT_MAX_LENGTH } from '@/features/user/features/auth/shared/code-input/codeDigits';
 import { TextInput } from '@/shared/theme/components/TextInput';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { focusedFieldStyle } from '@/shared/theme/lib/focusedFieldStyle';
 
 interface CodeInputProps {
 	digits: string[];
-	setBoxRef: (index: number) => (input: TextInput | null) => void;
+	setBoxRef: (index: number) => (input: NativeTextInput | null) => void;
 	onChangeDigit: (index: number, text: string) => void;
 	onKeyPress: (index: number, key: string) => void;
 	containerStyle: StyleProp<ViewStyle>;

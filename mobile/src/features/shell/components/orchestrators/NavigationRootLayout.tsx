@@ -6,7 +6,7 @@ import type {
 	NavigationContainerRefWithCurrent,
 	ParamListBase,
 } from '@react-navigation/native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { NAVIGATION_FONTS } from '@/features/shell/lib/navigationFonts';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { isDarkBackground } from '@/features/shell/lib/textContrast';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
@@ -8,7 +8,7 @@ import { useCreatePlaylist } from '@/features/playlists/features/editor/shared/p
 import { useAddTrack } from '@/features/playlists/features/editor/shared/track-edits/useTrackEdits';
 import { playlistFormSchema } from '@/features/playlists/shared/playlist/lib/validators';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import { PLAYLIST_NAME_MAX } from '@/features/playlists/features/editor/features/track-actions/playlistName';
 
 export type NewPlaylistDraft = {

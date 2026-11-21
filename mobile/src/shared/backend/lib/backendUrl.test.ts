@@ -1,15 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_CONFIG } from '@/shared/backend/lib/apiConfig';
+import { API_CONFIG } from '@/shared/backend/configs/apiConfig';
 import {
 	DEFAULT_BACKEND_URL,
 	INVALID_BACKEND_URL_MESSAGE,
+} from '@/shared/backend/configs/backendUrlConfig';
+import {
 	getBackendUrl,
 	loadBackendUrl,
-	normalize,
-	onBackendUrlChange,
 	resetBackendUrl,
 	setBackendUrl,
 } from '@/shared/backend/lib/backendUrl';
+import { onBackendUrlChange } from '@/shared/backend/lib/backendUrlListeners';
+import { normalizeBackendUrl } from '@/shared/backend/lib/normalizeBackendUrl';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -126,7 +128,7 @@ describe('backendUrl invalid input', () => {
 		['http://192.168.1.20:3000///', 'http://192.168.1.20:3000'],
 		['http://[::1]:3000', 'http://[::1]:3000'],
 	])('accepts %p', (input, expected) => {
-		expect(normalize(input)).toBe(expected);
+		expect(normalizeBackendUrl(input)).toBe(expected);
 	});
 });
 

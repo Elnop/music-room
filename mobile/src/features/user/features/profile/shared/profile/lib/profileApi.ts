@@ -5,7 +5,7 @@ import type {
 	FilteredProfile,
 	UpdateProfileData,
 	UserProfile,
-} from '@/shared/users/user.types';
+} from '@/shared/users/userTypes';
 
 export const profileApi = {
 	async updateProfile(data: UpdateProfileData, accessToken?: string): Promise<UserProfile> {

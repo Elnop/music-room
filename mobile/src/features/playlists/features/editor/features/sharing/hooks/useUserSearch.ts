@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { logger } from '@/shared/logging/logger';
 import { useDebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
 import type { DebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';

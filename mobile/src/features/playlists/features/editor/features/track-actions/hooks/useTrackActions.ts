@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Share } from 'react-native';
-import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
-import { useSession } from '@/shared/backend/lib/authSession';
+import type { PlaybackActions } from '@/shared/playback/types/playbackActionsTypes';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
@@ -11,8 +11,8 @@ import { canEditPlaylist } from '@/features/playlists/features/editor/shared/per
 import { useNewPlaylistFromTrack } from '@/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack';
 import type { NewPlaylistDraft } from '@/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
-import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsSheet';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
+import type { TrackActionsStart } from '@/shared/playback/types/trackActionsSheetTypes';
 
 type Step = 'actions' | 'playlists' | 'newPlaylist';
 

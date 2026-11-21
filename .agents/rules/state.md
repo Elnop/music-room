@@ -15,11 +15,11 @@ The `QueryClient` comes from `createQueryClient()` (`src/shared/backend/queryCli
 
 ## query-keys
 
-Every query key is built by the factory `queryKeys` (`src/shared/query-keys/keys.ts`), never written inline: `useQuery({ queryKey: queryKeys.playlists.detail(id), ... })`. Each domain has an `all` root that prefixes all its keys, so `invalidateQueries({ queryKey: queryKeys.playlists.all })` refreshes every playlist query. A new kind of query adds its builder to its domain there (or a new domain).
+Every query key is built by the factory `queryKeys` (`src/shared/query-keys/queryKeys.ts`), never written inline: `useQuery({ queryKey: queryKeys.playlists.detail(id), ... })`. Each domain has an `all` root that prefixes all its keys, so `invalidateQueries({ queryKey: queryKeys.playlists.all })` refreshes every playlist query. A new kind of query adds its builder to its domain there (or a new domain).
 
 ## cache-profiles
 
-How long data stays fresh is one of the named profiles of `STALE` (`src/shared/backend/queryClient.ts`): `none` (refetch on every mount), `short` (the default), `long` (data that rarely changes). A query picks one (`staleTime: STALE.long`) instead of a number of its own. The client retries a failed query on a network error or a 5xx, at most twice, never on a 4xx, and never retries a mutation.
+How long data stays fresh is one of the named profiles of `STALE` (`src/shared/backend/configs/staleQueryConfig.ts`): `none` (refetch on every mount), `short` (the default), `long` (data that rarely changes). A query picks one (`staleTime: STALE.long`) instead of a number of its own. The client retries a failed query on a network error or a 5xx, at most twice, never on a 4xx, and never retries a mutation.
 
 ## socket-cache
 

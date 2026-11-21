@@ -4,7 +4,7 @@ import type { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { usePlayerShortcuts } from '@/features/playback/hooks/usePlayerShortcuts';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
 import { ShortcutsContainer } from '@/features/shell/components/orchestrators/ShortcutsContainer';
-import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 
 export function KeyboardShortcuts() {
 	const navigation = useNavigation<NavigationProp<ParamListBase>>();

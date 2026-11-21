@@ -1,5 +1,5 @@
-import type { TextStyle, ViewStyle } from 'react-native';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { ViewStyle } from 'react-native';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 export function pixelFrame(theme: Theme): ViewStyle {
 	return {
@@ -25,14 +25,6 @@ export function pixelRow(theme: Theme): ViewStyle {
 		marginHorizontal: theme.spacing.md,
 		marginBottom: theme.spacing.md,
 		backgroundColor: theme.colors.surface,
-	};
-}
-
-export function pixelCaption(theme: Theme): TextStyle {
-	return {
-		fontSize: theme.typography.sizes.xs,
-		fontFamily: theme.typography.families.mono,
-		color: theme.colors.textSecondary,
 	};
 }
 

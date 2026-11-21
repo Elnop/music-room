@@ -4,13 +4,13 @@ import {
 	CONTENT_MAX_WIDTH,
 	NOW_PLAYING_PANEL_WIDTH,
 	SIDEBAR_WIDTH,
-} from '@/shared/theme/lib/layout';
-import type { ContentWidth } from '@/shared/theme/lib/layout';
+} from '@/shared/theme/configs/layoutConfig';
+import type { ContentWidth } from '@/shared/theme/types/layoutTypes';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { ContentColumnContext } from '@/shared/content-column/useContentColumn';
-import { ContentWidthContext } from '@/shared/theme/hooks/useContentWidth';
+import { ContentColumnContext } from '@/shared/content-column/contentColumnConfig';
+import { ContentWidthContext } from '@/shared/theme/configs/contentWidthConfig';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 type ContentContainerProps = {
 	width: ContentWidth;

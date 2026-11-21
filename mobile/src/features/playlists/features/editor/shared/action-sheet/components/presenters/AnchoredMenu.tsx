@@ -4,9 +4,9 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { useContextMenuDismiss } from '@/shared/theme/hooks/useContextMenu';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
-import { menuPlacement } from '@/shared/theme/lib/menuPlacement';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import { menuPlacement } from '@/features/playlists/features/editor/shared/action-sheet/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 const MENU_WIDTH = 320;
 

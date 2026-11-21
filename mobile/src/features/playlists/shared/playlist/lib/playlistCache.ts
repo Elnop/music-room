@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
 import type {
 	Playlist,

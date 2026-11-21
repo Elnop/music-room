@@ -4,17 +4,17 @@ import type { AlertButton } from 'react-native';
 import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
 import { dialogStyles } from '@/features/shell/lib/dialogStyles';
 import { Button } from '@/shared/theme/components/Button';
-import { useAlertStore } from '@/shared/alerts/alertStore';
+import { useAlertState } from '@/features/shell/hooks/useAlertState';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 const OK_BUTTON: AlertButton = { text: 'OK' };
 
 export function AlertHostContainer() {
 	const { styles } = useThemedStyles(createStyles);
-	const alert = useAlertStore(state => state.queue[0]);
-	const dismiss = useAlertStore(state => state.dismiss);
+	const alert = useAlertState(state => state.queue[0]);
+	const dismiss = useAlertState(state => state.dismiss);
 
 	if (!alert) return null;
 

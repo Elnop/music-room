@@ -1,14 +1,14 @@
 import { renderHook } from '@testing-library/react-native';
 import { useConnectionStatus } from '@/features/shell/hooks/useConnectionStatus';
-import type { SocketStatus } from '@/shared/backend/socketStore';
+import type { SocketStatus } from '@/shared/backend/types/socketTypes';
 
 let mockNetwork: { isConnected?: boolean; isInternetReachable?: boolean } = {};
 const mockSocketState = { status: 'connected' as SocketStatus, retry: jest.fn() };
 
 jest.mock('expo-network', () => ({ useNetworkState: () => mockNetwork }));
 
-jest.mock('@/shared/backend/socketStore', () => ({
-	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
+jest.mock('@/shared/backend/hooks/useSocketState', () => ({
+	useSocketState: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 

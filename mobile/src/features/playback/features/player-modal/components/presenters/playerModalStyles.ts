@@ -1,7 +1,7 @@
 import { Dimensions, Platform, StyleSheet } from 'react-native';
-import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/theme/lib/layout';
-import type { Theme } from '@/shared/theme/lib/types';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/theme/configs/layoutConfig';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 import { displayText, pixelFrame } from '@/shared/theme/lib/pixelFrame';
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get('window');

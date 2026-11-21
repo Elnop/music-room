@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { CodeInput } from '@/features/user/features/auth/shared/code-input/CodeInput';
 import { PasswordScreenFrame } from '@/features/user/features/auth/shared/password-screen/PasswordScreenFrame';
 import { ErrorBox } from '@/features/user/features/auth/shared/error-box/ErrorBox';
@@ -10,7 +10,7 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import type { ResetPassword } from '@/features/user/features/auth/features/reset-password/hooks/useResetPassword';
 import { PasswordRequirements } from '@/features/user/features/auth/features/reset-password/components/presenters/PasswordRequirements';
 import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 type ResetPasswordViewProps = {
 	email: string;
@@ -73,7 +73,7 @@ export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 					secureTextEntry
 					autoCapitalize="none"
 					editable={!form.isLoading}
-					submitOnEnter={canSubmit ? form.submit : undefined}
+					onEnter={canSubmit ? form.submit : undefined}
 				/>
 				<PasswordRequirements />
 			</View>

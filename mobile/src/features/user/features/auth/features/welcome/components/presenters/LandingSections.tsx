@@ -3,11 +3,11 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '@/shared/theme/components/Button';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
-import { LATEST_RELEASE_URL, SOURCE_CODE_URL } from '@/shared/project-links/links';
-import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
+import { LATEST_RELEASE_URL, SOURCE_CODE_URL } from '@/shared/project-links/projectLinksConfig';
+import { CONTENT_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { LANDING_FEATURES } from '@/features/user/features/auth/features/welcome/landingContent';
 import { FeatureCard } from '@/features/user/features/auth/features/welcome/components/presenters/FeatureCard';
 

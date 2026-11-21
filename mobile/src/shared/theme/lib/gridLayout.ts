@@ -1,4 +1,4 @@
-import type { Breakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import type { Breakpoint } from '@/shared/theme/types/layoutTypes';
 
 const GRID_PADDING = 16;
 const GRID_GAP = 16;

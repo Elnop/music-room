@@ -7,9 +7,9 @@ import { logger } from '@/shared/logging/logger';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { useCappedField } from '@/shared/theme/hooks/useCappedField';
-import type { CappedField } from '@/shared/theme/hooks/useCappedField';
-import { queryKeys } from '@/shared/query-keys/keys';
-import type { MusicGenre } from '@/shared/users/user.types';
+import type { CappedField } from '@/shared/theme/types/cappedFieldTypes';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import type { MusicGenre } from '@/shared/users/userTypes';
 import {
 	useCreateEvent,
 	useUpdateEvent,

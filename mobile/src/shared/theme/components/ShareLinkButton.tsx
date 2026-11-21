@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { useShareLink } from '@/shared/theme/hooks/useShareLink';
 import { Text } from '@/shared/theme/components/Text';
@@ -38,7 +38,7 @@ function createStyles(theme: Theme) {
 			gap: theme.spacing.xs,
 			paddingVertical: theme.spacing.xs,
 			paddingHorizontal: theme.spacing.md,
-			borderWidth: 1,
+			borderWidth: theme.borders.hairline,
 			borderColor: theme.colors.border,
 		},
 		label: {

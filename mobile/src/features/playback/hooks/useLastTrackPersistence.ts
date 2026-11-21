@@ -4,11 +4,11 @@ import {
 	usePlayerStore,
 	readPositionMs,
 } from '@/features/playback/shared/player/stores/playerStore';
-import { useSession } from '@/shared/backend/lib/authSession';
-import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
-import type { LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import { lastTrackStorage } from '@/shared/playback/lastTrackStorage';
+import type { LastTrackEntry } from '@/shared/playback/types/playbackTypes';
 import { queueTrackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
 import { logger } from '@/shared/logging/logger';
 import {
 	isLocalTarget,
