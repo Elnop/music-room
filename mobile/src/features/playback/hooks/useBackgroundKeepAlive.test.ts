@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { jsKeepAlive } from '@/features/playback/lib/jsKeepAlive';
 import { useBackgroundKeepAlive } from '@/features/playback/hooks/useBackgroundKeepAlive';
 
@@ -14,24 +14,24 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 describe('useBackgroundKeepAlive', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
-		usePlayerStore.setState({ playbackState: 'idle' });
+		playerStore.setState({ playbackState: 'idle' });
 	});
 
 	it('keeps JS alive from loading through playing, then lets go on pause', () => {
 		renderHook(() => useBackgroundKeepAlive());
 		expect(jsKeepAlive.start).not.toHaveBeenCalled();
 
-		act(() => usePlayerStore.setState({ playbackState: 'loading' }));
-		act(() => usePlayerStore.setState({ playbackState: 'playing' }));
+		act(() => playerStore.setState({ playbackState: 'loading' }));
+		act(() => playerStore.setState({ playbackState: 'playing' }));
 		expect(jsKeepAlive.start).toHaveBeenCalledTimes(1);
 		expect(jsKeepAlive.stop).not.toHaveBeenCalled();
 
-		act(() => usePlayerStore.setState({ playbackState: 'paused' }));
+		act(() => playerStore.setState({ playbackState: 'paused' }));
 		expect(jsKeepAlive.stop).toHaveBeenCalledTimes(1);
 	});
 
 	it('lets go when the player unmounts while playing', () => {
-		usePlayerStore.setState({ playbackState: 'playing' });
+		playerStore.setState({ playbackState: 'playing' });
 		const { unmount } = renderHook(() => useBackgroundKeepAlive());
 		unmount();
 		expect(jsKeepAlive.start).toHaveBeenCalledTimes(1);

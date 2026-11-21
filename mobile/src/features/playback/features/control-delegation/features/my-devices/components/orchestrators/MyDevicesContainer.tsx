@@ -4,15 +4,15 @@ import { MyDevicesView } from '@/features/playback/features/control-delegation/f
 import { RenameDeviceModalContainer } from '@/features/playback/features/control-delegation/features/my-devices/components/orchestrators/RenameDeviceModalContainer';
 
 export function MyDevicesContainer() {
-	const screenState = useMyDevicesScreen();
+	const { rename, ...screen } = useMyDevicesScreen();
 	return (
 		<>
-			<MyDevicesView {...screenState} />
+			<MyDevicesView {...screen} />
 			<RenameDeviceModalContainer
-				deviceName={screenState.renamingDevice?.deviceName ?? null}
-				saving={screenState.isRenameSaving}
-				onClose={screenState.onCloseRename}
-				onSubmit={screenState.onSubmitRename}
+				deviceName={rename.rename.device?.deviceName ?? null}
+				saving={rename.rename.saving}
+				onClose={rename.onCloseRename}
+				onSubmit={rename.onSubmitRename}
 			/>
 		</>
 	);

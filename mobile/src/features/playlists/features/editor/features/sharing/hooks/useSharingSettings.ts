@@ -1,48 +1,18 @@
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { logger } from '@/shared/logging/logger';
-import { showError, showWarning } from '@/shared/theme/lib/toast';
-import { useUpdatePlaylist } from '@/features/playlists/features/editor/shared/playlist-mutations/usePlaylistMutations';
-import { refreshPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
-import type { PlaylistInput } from '@/features/playlists/shared/playlist/lib/validators';
-import type { SharingMode } from '@/features/playlists/features/editor/features/sharing/lib/sharingTexts';
-
-export type SharingSettings = {
-	isUpdating: boolean;
-	toggleVisibility: () => void;
-	toggleEditMode: () => void;
-};
+import { showWarning } from '@/shared/theme/lib/toast';
+import { openEditWarning } from '@/features/playlists/features/editor/features/sharing/lib/sharingTexts';
+import { useSharingUpdate } from '@/features/playlists/features/editor/features/sharing/hooks/useSharingUpdate';
+import type {
+	SharingMode,
+	SharingSettings,
+} from '@/features/playlists/features/editor/features/sharing/sharingTypes';
 
 export function useSharingSettings(
 	id: string,
 	mode: SharingMode,
 	loaded: boolean
 ): SharingSettings {
-	const client = useQueryClient();
-	const update = useUpdatePlaylist();
-	const [isUpdating, setIsUpdating] = useState(false);
+	const { isUpdating, apply } = useSharingUpdate(id);
 	const { isPrivate, isEditRestricted } = mode;
-
-	async function apply(changes: Partial<PlaylistInput>, failure: string) {
-		setIsUpdating(true);
-		try {
-			await update.mutateAsync({ id, changes });
-			await refreshPlaylist(client, id);
-		} catch (error) {
-			logger.error(`[PlaylistSharing] ${failure}:`, error);
-			showError(
-				apiErrorMessage(
-					error,
-					changes.visibility
-						? 'Impossible de changer la visibilité'
-						: 'Impossible de changer le mode édition'
-				)
-			);
-		} finally {
-			setIsUpdating(false);
-		}
-	}
 
 	return {
 		isUpdating,
@@ -53,9 +23,7 @@ export function useSharingSettings(
 		},
 		toggleEditMode: () => {
 			if (isUpdating || !loaded) return;
-			if (isEditRestricted) {
-				showWarning(isPrivate ? 'Tous les membres pourront éditer' : 'Tout le monde pourra éditer');
-			}
+			if (isEditRestricted) showWarning(openEditWarning(isPrivate));
 			void apply(
 				{ editMode: isEditRestricted ? 'open' : 'restricted' },
 				'Failed to update edit mode'

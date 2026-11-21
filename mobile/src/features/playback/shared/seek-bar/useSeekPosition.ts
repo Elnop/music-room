@@ -1,14 +1,8 @@
 import { useEffect, useState } from 'react';
+import type { SeekPosition } from '@/features/playback/shared/seek-bar/seekBarTypes';
 
 const CAUGHT_UP_S = 1;
 const HOLD_MS = 3000;
-
-export type SeekPosition = {
-	position: number;
-	onSlidingStart: (value: number) => void;
-	onValueChange: (value: number) => void;
-	onSlidingComplete: (value: number) => void;
-};
 
 export function useSeekPosition(
 	currentTime: number,
@@ -17,9 +11,7 @@ export function useSeekPosition(
 	const [dragValue, setDragValue] = useState<number | null>(null);
 	const [target, setTarget] = useState<number | null>(null);
 
-	useEffect(() => {
-		if (target !== null && Math.abs(currentTime - target) < CAUGHT_UP_S) setTarget(null);
-	}, [currentTime, target]);
+	if (target !== null && Math.abs(currentTime - target) < CAUGHT_UP_S) setTarget(null);
 
 	useEffect(() => {
 		if (target === null) return;

@@ -1,64 +1,42 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
 import { Artwork } from '@/shared/theme/components/Artwork';
-import { PreviewBadge } from '@/shared/theme/components/PreviewBadge';
-import { isPreviewOnly } from '@/shared/tracks/lib/isPreviewOnly';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import { formatDuration } from '@/shared/formatting/formatters';
 import { pixelRow } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { SoundCloudTrack } from '@/features/search/lib/types';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { Text } from '@/shared/theme/components/Text';
-import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
+import { SoundCloudTrackInfo } from '@/features/search/components/presenters/SoundCloudTrackInfo';
+import type { SearchTrackHandlers } from '@/features/search/searchTypes';
 
-type SoundCloudTrackItemProps = {
+type SoundCloudTrackItemProps = SearchTrackHandlers & {
 	track: SoundCloudTrack;
-	onPlay: (track: SoundCloudTrack) => void;
-	onAddToQueue: (track: SoundCloudTrack) => void;
-	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
 };
 
-export function SoundCloudTrackItem({
-	track,
-	onPlay,
-	onAddToQueue,
-	onShowActions,
-}: SoundCloudTrackItemProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-	const artworkUrl = track.artwork_url || track.user.avatar_url;
-	const contextMenu = useContextMenu(() => onShowActions(track));
+export function SoundCloudTrackItem({ track, ...handlers }: SoundCloudTrackItemProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const contextMenu = useContextMenu(() => handlers.onShowActions(track));
 
 	return (
-		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
+		<QueueSwipe onAddToQueue={() => handlers.onAddToQueue(track)}>
 			<View style={styles.container} {...contextMenu}>
 				<Pressable
 					style={styles.pressable}
-					onPress={() => onPlay(track)}
-					onLongPress={() => onShowActions(track)}
+					onPress={() => handlers.onPlay(track)}
+					onLongPress={() => handlers.onShowActions(track)}
 					accessibilityRole="button"
 					accessibilityLabel={`Écouter ${track.title} par ${track.user.username}`}
 				>
-					<Artwork uri={artworkUrl} size={48} style={styles.artwork} />
-					<View style={styles.info}>
-						<Text style={styles.title} numberOfLines={1}>
-							{track.title}
-						</Text>
-						<View style={styles.subtitle}>
-							{isPreviewOnly(track) && <PreviewBadge />}
-							<Text style={styles.artist} numberOfLines={1}>
-								{track.user.username}
-							</Text>
-						</View>
-					</View>
+					<Artwork uri={track.artwork_url || track.user.avatar_url} size={48} />
+					<SoundCloudTrackInfo track={track} />
 					<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
 				</Pressable>
-				<TrackActionsButton onPress={anchor => onShowActions(track, anchor)} />
+				<TrackActionsButton onPress={anchor => handlers.onShowActions(track, anchor)} />
 			</View>
 		</QueueSwipe>
 	);
@@ -72,26 +50,6 @@ function createStyles(theme: Theme) {
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: theme.spacing.md,
-		},
-		artwork: {},
-		info: {
-			flex: 1,
-		},
-		subtitle: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			gap: theme.spacing.xs,
-		},
-		title: {
-			fontSize: theme.typography.sizes.md,
-			fontFamily: theme.typography.families.medium,
-			color: theme.colors.text,
-			marginBottom: 2,
-		},
-		artist: {
-			flexShrink: 1,
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
 		},
 		duration: {
 			flexShrink: 0,

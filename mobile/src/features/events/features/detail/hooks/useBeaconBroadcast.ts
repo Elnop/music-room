@@ -1,16 +1,13 @@
 import { useShallow } from 'zustand/shallow';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
-import { useBeaconStore } from '@/features/events/features/detail/beaconStore';
+import { beaconActions } from '@/features/events/features/detail/beaconStore';
+import { useBeaconState } from '@/features/events/features/detail/hooks/useBeaconState';
 import { isOngoing } from '@/features/events/shared/event-dates/eventDates';
-import type { AdvertiseFailure } from '@/features/events/features/detail/beaconAdvertiser';
-import type { MusicEvent } from '@/features/events/lib/types';
-
-export type BeaconBroadcast = {
-	available: boolean;
-	active: boolean;
-	starting: boolean;
-	toggle: (on: boolean) => void;
-};
+import type {
+	AdvertiseFailure,
+	BeaconBroadcast,
+} from '@/features/events/features/detail/eventDetailTypes';
+import type { MusicEvent } from '@/features/events/eventTypes';
 
 const FAILURES: Record<AdvertiseFailure, string> = {
 	'permission-denied':
@@ -21,23 +18,18 @@ const FAILURES: Record<AdvertiseFailure, string> = {
 };
 
 export function useBeaconBroadcast(event: MusicEvent | undefined): BeaconBroadcast {
-	const { eventId, status, start, stop } = useBeaconStore(
-		useShallow(state => ({
-			eventId: state.eventId,
-			status: state.status,
-			start: state.start,
-			stop: state.stop,
-		}))
+	const { eventId, status } = useBeaconState(
+		useShallow(state => ({ eventId: state.eventId, status: state.status }))
 	);
 	const mine = event !== undefined && eventId === event.id;
 
 	function toggle(on: boolean) {
 		if (!event) return;
 		if (!on) {
-			stop();
+			beaconActions.stop();
 			return;
 		}
-		void start(event).then(failure => {
+		void beaconActions.start(event).then(failure => {
 			if (failure) showError(FAILURES[failure]);
 			else showSuccess('Balise diffusée : les téléphones proches voient votre événement');
 		});

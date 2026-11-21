@@ -11,7 +11,7 @@ import { logger } from '@/shared/logging/logger';
 import type {
 	Playlist,
 	PlaylistStackParamList,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
@@ -149,7 +149,11 @@ describe('PlaylistFormContainer edit mode (#342)', () => {
 		fireEvent.changeText(screen.getByDisplayValue('Mix'), 'Renamed');
 		fireEvent.press(screen.getByText('Enregistrer'));
 
-		await waitFor(() => expect(showError).toHaveBeenCalled());
+		await waitFor(() =>
+			expect(showError).toHaveBeenCalledWith(
+				'Le serveur a rencontré un problème. Réessayez plus tard.'
+			)
+		);
 		expect(mockNavigation.goBack).not.toHaveBeenCalled();
 		expect(screen.getByDisplayValue('Renamed')).toBeTruthy();
 	});
@@ -174,7 +178,9 @@ describe('PlaylistFormContainer caches', () => {
 		fireEvent(isRestricted, 'valueChange', true);
 		expect(screen.getByText('Visible uniquement par les invités')).toBeTruthy();
 		fireEvent.press(screen.getByText('Créer la playlist'));
-		await waitFor(() => expect(mockNavigation.replace).toHaveBeenCalled());
+		await waitFor(() =>
+			expect(mockNavigation.replace).toHaveBeenCalledWith('PlaylistDetail', { id: 'new-id' })
+		);
 		expect(sentBody).toMatchObject({ visibility: 'private', editMode: 'restricted' });
 		const list = view.client.getQueryData<Playlist[]>(queryKeys.playlists.list());
 		expect(list?.map(p => p.id)).toStrictEqual(['new-id', 'old']);
@@ -185,7 +191,11 @@ describe('PlaylistFormContainer caches', () => {
 		renderScreen();
 		fireEvent.changeText(screen.getByPlaceholderText('Ma super playlist'), 'Mix');
 		fireEvent.press(screen.getByText('Créer la playlist'));
-		await waitFor(() => expect(showError).toHaveBeenCalled());
+		await waitFor(() =>
+			expect(showError).toHaveBeenCalledWith(
+				'Le serveur a rencontré un problème. Réessayez plus tard.'
+			)
+		);
 		expect(mockNavigation.replace).not.toHaveBeenCalled();
 	});
 });

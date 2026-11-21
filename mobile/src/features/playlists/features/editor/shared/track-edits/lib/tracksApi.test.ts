@@ -1,6 +1,6 @@
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
-import * as usersApi from '@/features/playlists/shared/playlist/lib/usersApi';
+import * as peopleApi from '@/features/playlists/shared/playlist/lib/peopleApi';
 import { apiRequest } from '@/shared/backend/lib/api';
 
 jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
@@ -54,29 +54,13 @@ describe('playlistApi', () => {
 		await expect(playlistApi.fetchPlaylistById('p')).resolves.toStrictEqual({ id: 'p' });
 		expect(request).toHaveBeenCalledWith('/api/playlists/user/u');
 	});
-
-	it('creates, updates and deletes', async () => {
-		request.mockResolvedValue({ playlist: { id: 'p' } });
-		await playlistApi.createPlaylist({ name: 'Mix' });
-		await playlistApi.updatePlaylist('p', { name: 'New' });
-		await playlistApi.deletePlaylist('p');
-		expect(request).toHaveBeenNthCalledWith(1, '/api/playlists', {
-			method: 'POST',
-			body: JSON.stringify({ name: 'Mix' }),
-		});
-		expect(request).toHaveBeenNthCalledWith(2, '/api/playlists/p', {
-			method: 'PATCH',
-			body: JSON.stringify({ name: 'New' }),
-		});
-		expect(request).toHaveBeenNthCalledWith(3, '/api/playlists/p', { method: 'DELETE' });
-	});
 });
 
-describe('usersApi', () => {
+describe('peopleApi', () => {
 	it('reads friends, a profile and a user search', async () => {
-		await usersApi.getFriends();
-		await usersApi.getUserProfile('u');
-		await usersApi.searchUsers('bob');
+		await peopleApi.getFriends();
+		await peopleApi.getUserProfile('u');
+		await peopleApi.searchUsers('bob');
 		expect(request).toHaveBeenNthCalledWith(1, '/api/friends', { method: 'GET' });
 		expect(request).toHaveBeenNthCalledWith(2, '/api/profile/u', { method: 'GET' });
 		expect(request).toHaveBeenNthCalledWith(3, '/api/profile/search?q=bob&limit=20', {

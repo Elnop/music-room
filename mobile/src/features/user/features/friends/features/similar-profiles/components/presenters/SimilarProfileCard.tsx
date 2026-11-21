@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { Text } from '@/shared/theme/components/Text';
+import { NameLabel } from '@/shared/theme/components/NameLabel';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { RecommendedProfile } from '@/features/user/features/friends/friendsTypes';
@@ -28,9 +28,7 @@ export function SimilarProfileCard({ profile, onOpen }: SimilarProfileCardProps)
 			accessibilityLabel={similarProfileLabel(profile)}
 		>
 			<Avatar uri={profile.avatarUrl} name={name} size="xl" />
-			<Text style={styles.name} numberOfLines={1}>
-				{name}
-			</Text>
+			<NameLabel name={name} variant="card" />
 		</Pressable>
 	);
 }
@@ -43,12 +41,6 @@ function createStyles(theme: Theme) {
 			alignItems: 'center',
 			padding: theme.spacing.smd,
 			backgroundColor: theme.colors.surface,
-		},
-		name: {
-			marginTop: theme.spacing.sm,
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
 		},
 	});
 	return styles;

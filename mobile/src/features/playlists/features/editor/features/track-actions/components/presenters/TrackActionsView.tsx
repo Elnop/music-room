@@ -1,20 +1,9 @@
 import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
-import type { Theme } from '@/shared/theme/types/themeTypes';
-import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { ActionSheet } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheet';
-import { ActionSheetRow } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheetRow';
+import { ActionSheet } from '@/features/playlists/features/editor/shared/action-sheet/components/ActionSheet';
 import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
-import type { TrackActions } from '@/features/playlists/features/editor/features/track-actions/hooks/useTrackActions';
-import { Text } from '@/shared/theme/components/Text';
-import { NewPlaylistForm } from '@/features/playlists/features/editor/features/track-actions/components/presenters/NewPlaylistForm';
-import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
-import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
-import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
-import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
-import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
-
-const TITLES = { playlists: 'Ajouter à une playlist', newPlaylist: 'Nouvelle playlist' } as const;
+import type { TrackActions } from '@/features/playlists/features/editor/features/track-actions/trackActionsTypes';
+import { trackActionsHeading } from '@/features/playlists/features/editor/features/track-actions/lib/trackActionsHeading';
+import { TrackActionsBody } from '@/features/playlists/features/editor/features/track-actions/components/presenters/TrackActionsBody';
 
 type TrackActionsViewProps = {
 	actions: TrackActions;
@@ -23,91 +12,14 @@ type TrackActionsViewProps = {
 };
 
 export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewProps) {
-	const { styles, theme } = useThemedStyles(createStyles);
-	const { step } = actions;
-	const onActions = step === 'actions';
-
 	return (
 		<ActionSheet
 			visible={actions.visible}
-			title={onActions ? actions.shown?.title : TITLES[step]}
-			subtitle={onActions ? (actions.shown?.artist ?? '') : undefined}
-			onBack={
-				step === 'playlists'
-					? actions.backToActions
-					: step === 'newPlaylist'
-						? actions.backToPlaylists
-						: undefined
-			}
+			heading={trackActionsHeading(actions)}
 			onClose={onClose}
-			maxHeight="70%"
-			anchor={anchor}
+			placement={{ anchor, tall: true }}
 		>
-			{onActions ? (
-				<View>
-					<ActionSheetRow icon={ArrowRightSolid} label="Lire ensuite" onPress={actions.playNext} />
-					<ActionSheetRow
-						icon={PlaylistSolid}
-						label="Ajouter à la file d'attente"
-						onPress={actions.addToQueue}
-					/>
-					<ActionSheetRow
-						icon={PlusSolid}
-						label="Ajouter à une playlist"
-						onPress={actions.openPlaylists}
-						chevron
-					/>
-					<ActionSheetRow icon={ShareSolid} label="Partager" onPress={actions.share} />
-				</View>
-			) : step === 'newPlaylist' ? (
-				<NewPlaylistForm draft={actions.newPlaylist} />
-			) : (
-				<View>
-					<ActionSheetRow
-						icon={PlusSolid}
-						label="Nouvelle playlist"
-						onPress={actions.openNewPlaylist}
-					/>
-					{actions.loadingPlaylists ? (
-						<View style={styles.centered}>
-							<ActivityIndicator testID="track-actions-loading" color={theme.colors.primary} />
-						</View>
-					) : actions.editable.length === 0 ? (
-						<Text style={styles.emptyText}>Aucune playlist modifiable</Text>
-					) : (
-						<ScrollView style={styles.list}>
-							{actions.editable.map(playlist => (
-								<ActionSheetRow
-									key={playlist.id}
-									icon={MusicSolid}
-									label={playlist.name}
-									detail={`${playlist.trackCount} ${playlist.trackCount === 1 ? 'titre' : 'titres'}`}
-									onPress={() => actions.addToPlaylist(playlist)}
-								/>
-							))}
-						</ScrollView>
-					)}
-				</View>
-			)}
+			<TrackActionsBody actions={actions} />
 		</ActionSheet>
 	);
-}
-
-function createStyles(theme: Theme) {
-	const styles = StyleSheet.create({
-		list: {
-			maxHeight: 360,
-		},
-		centered: {
-			padding: theme.spacing.xl,
-			alignItems: 'center',
-		},
-		emptyText: {
-			padding: theme.spacing.xl,
-			textAlign: 'center',
-			fontSize: 15,
-			color: theme.colors.textSecondary,
-		},
-	});
-	return styles;
 }

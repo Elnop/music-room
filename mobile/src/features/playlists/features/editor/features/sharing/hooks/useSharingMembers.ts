@@ -1,122 +1,31 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/queryKeys';
-import { STALE } from '@/shared/backend/configs/staleQueryConfig';
-import { useSession } from '@/shared/backend/hooks/useSession';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { logger } from '@/shared/logging/logger';
-import { showError, showSuccess } from '@/shared/theme/lib/toast';
-import * as membersApi from '@/features/playlists/features/editor/features/sharing/lib/membersApi';
-import * as usersApi from '@/features/playlists/shared/playlist/lib/usersApi';
-import { refreshPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
-import type { PlaylistMember, UserSummary } from '@/features/playlists/shared/playlist/lib/types';
-
-function toMember(user: UserSummary, canEdit: boolean): PlaylistMember {
-	return {
-		id: user.id,
-		username: user.username,
-		displayName: user.displayName,
-		avatarUrl: user.avatarUrl,
-		canEdit,
-	};
-}
-
-async function loadMembers(client: QueryClient, id: string): Promise<PlaylistMember[]> {
-	const playlist = await refreshPlaylist(client, id);
-	try {
-		const viewers = await membersApi.getViewers(id);
-		const editors = await Promise.all(playlist.collaboratorIds.map(usersApi.getUserProfile));
-		const members = [
-			...editors.map(e => toMember(e, true)),
-			...viewers.map(v => toMember(v, false)),
-		];
-		return members.filter((member, index) => members.findIndex(m => m.id === member.id) === index);
-	} catch (error) {
-		logger.error('[PlaylistSharing] Failed to load members:', error);
-		return [];
-	}
-}
-
-export type SharingMembers = {
-	members: PlaylistMember[];
-	isLoading: boolean;
-	busy: boolean;
-	refetch: () => void;
-	add: (user: UserSummary, asViewer: boolean, canEdit: boolean) => void;
-	remove: (userId: string, isPrivate: boolean) => Promise<void>;
-};
+import { useMembersQuery } from '@/features/playlists/features/editor/features/sharing/hooks/useMembersQuery';
+import { useMemberChange } from '@/features/playlists/features/editor/features/sharing/hooks/useMemberChange';
+import {
+	addMember,
+	removeMember,
+} from '@/features/playlists/features/editor/features/sharing/lib/memberEdits';
+import type {
+	MemberEdits,
+	SharingMembers,
+} from '@/features/playlists/features/editor/features/sharing/sharingTypes';
 
 export function useSharingMembers(id: string): SharingMembers {
-	const client = useQueryClient();
-	const signedIn = useSession(session => session.isAuthenticated);
-	const key = queryKeys.playlists.members(id);
-	const query = useQuery({
-		queryKey: key,
-		queryFn: () => loadMembers(client, id),
-		enabled: signedIn,
-		staleTime: STALE.none,
-		gcTime: 0,
-		retry: false,
-	});
-	const [processing, setProcessing] = useState<string | null>(null);
-	const { error, refetch } = query;
-	const refetchMembers = useCallback(() => void refetch(), [refetch]);
-
-	useEffect(() => {
-		if (!error) return;
-		logger.error('[PlaylistSharing] Failed to fetch playlist:', error);
-		showError(apiErrorMessage(error, 'Impossible de charger la playlist'));
-	}, [error]);
-
-	const members = query.data ?? [];
-	function setMembers(update: (list: PlaylistMember[]) => PlaylistMember[]) {
-		return client.setQueryData<PlaylistMember[]>(key, list => update(list ?? []));
-	}
-
-	const change = useMutation({
-		mutationFn: (request: () => Promise<void>) => request(),
-	});
-
-	async function run(userId: string, request: () => Promise<void>) {
-		setProcessing(userId);
-		try {
-			await change.mutateAsync(request);
-		} finally {
-			setProcessing(null);
-		}
-	}
+	const list = useMembersQuery(id);
+	const { processing, run } = useMemberChange();
+	const edits: MemberEdits = {
+		id,
+		members: list.members,
+		setMembers: list.setMembers,
+		processing,
+		run,
+	};
 
 	return {
-		members,
-		isLoading: query.isLoading,
+		members: list.members,
+		isLoading: list.isLoading,
 		busy: processing !== null,
-		refetch: refetchMembers,
-		add: (user, asViewer, canEdit) => {
-			if (processing) return;
-			setMembers(list => [...list, toMember(user, canEdit)]);
-			run(user.id, () =>
-				asViewer ? membersApi.addViewer(id, user.id) : membersApi.addCollaborator(id, user.id)
-			).catch(err => {
-				setMembers(list => list.filter(m => m.id !== user.id));
-				showError(apiErrorMessage(err, "Impossible d'ajouter l'utilisateur"));
-			});
-		},
-		remove: async (userId, isPrivate) => {
-			const member = members.find(m => m.id === userId);
-			if (processing || !member) return;
-			setMembers(list => list.filter(m => m.id !== userId));
-			try {
-				await run(userId, async () => {
-					if (!isPrivate || member.canEdit) await membersApi.removeCollaborator(id, userId);
-					if (isPrivate) await membersApi.removeViewer(id, userId).catch(() => undefined);
-				});
-				showSuccess('Utilisateur retiré');
-			} catch (err) {
-				logger.error('[PlaylistSharing] Remove failed:', err);
-				setMembers(() => members);
-				showError(apiErrorMessage(err, "Impossible de retirer l'utilisateur"));
-			}
-		},
+		refetch: list.refetch,
+		add: (user, asViewer, canEdit) => addMember(edits, user, asViewer, canEdit),
+		remove: (userId, isPrivate) => removeMember(edits, userId, isPrivate),
 	};
 }

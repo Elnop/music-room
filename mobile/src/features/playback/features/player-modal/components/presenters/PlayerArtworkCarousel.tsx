@@ -1,55 +1,38 @@
 import React from 'react';
 import { View } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { Text } from '@/shared/theme/components/Text';
-import type { ArtworkCarousel } from '@/features/playback/features/player-modal/hooks/useArtworkCarousel';
-import { CAROUSEL_TEXT_HEIGHT } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
-import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { PlayerCarouselSlot } from '@/features/playback/features/player-modal/components/presenters/PlayerCarouselSlot';
-import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import { PlayerCarouselEmpty } from '@/features/playback/features/player-modal/components/presenters/PlayerCarouselEmpty';
+import { createCarouselStyles } from '@/features/playback/features/player-modal/lib/createCarouselStyles';
+import { boxSize } from '@/features/playback/features/player-modal/lib/dynamicStyles';
+import { CAROUSEL_TEXT_HEIGHT } from '@/features/playback/features/player-modal/playerModalConfig';
+import type {
+	ArtworkCarousel,
+	PlayerColors,
+} from '@/features/playback/features/player-modal/playerModalTypes';
 
 type PlayerArtworkCarouselProps = {
-	styles: ReturnType<typeof createStyles>;
 	carousel: ArtworkCarousel;
-	colors: { text: string; textSecondary: string };
+	colors: Pick<PlayerColors, 'text' | 'textSecondary'>;
 };
 
-export function PlayerArtworkCarousel({ styles, carousel, colors }: PlayerArtworkCarouselProps) {
+export function PlayerArtworkCarousel({ carousel, colors }: PlayerArtworkCarouselProps) {
+	const { styles, theme } = useThemedStyles(createCarouselStyles);
 	const size = carousel.artworkSize;
-	const frameSize = size + styles.artworkShadow.borderWidth * 2;
+	const frameSize = size + theme.borders.thick * 2;
+	const motion = { center: carousel.center, drag: carousel.drag, step: carousel.artworkStep };
 
-	if (carousel.slots.length === 0) {
-		return (
-			<View style={styles.artworkWrapper}>
-				<View style={styles.artworkShadow}>
-					<View style={[styles.artwork, styles.emptyArtwork, { width: size, height: size }]}>
-						<PixelIcon icon={MusicSolid} size={64} color={colors.textSecondary} />
-					</View>
-				</View>
-				<View style={[styles.slotText, { width: size }]}>
-					<View style={styles.titleBox}>
-						<Text style={[styles.title, { color: colors.text }]}>Rien en lecture</Text>
-					</View>
-					<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-						Choisissez un titre pour commencer
-					</Text>
-				</View>
-			</View>
-		);
-	}
+	if (carousel.slots.length === 0) return <PlayerCarouselEmpty size={size} colors={colors} />;
 
 	return (
 		<View style={styles.artworkWrapper}>
-			<View style={{ width: frameSize, height: frameSize + CAROUSEL_TEXT_HEIGHT }}>
+			<View style={boxSize(frameSize, frameSize + CAROUSEL_TEXT_HEIGHT)}>
 				{carousel.slots.map(slot => (
 					<PlayerCarouselSlot
 						key={slot.key}
-						styles={styles}
 						slot={slot}
-						center={carousel.center}
-						drag={carousel.drag}
+						motion={motion}
 						size={size}
-						step={carousel.artworkStep}
 						colors={colors}
 					/>
 				))}

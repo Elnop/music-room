@@ -1,18 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Artwork } from '@/shared/theme/components/Artwork';
-import { Avatar } from '@/shared/theme/components/Avatar';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Text } from '@/shared/theme/components/Text';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Playlist, UserSummary } from '@/features/playlists/shared/playlist/lib/types';
-import { ownerName } from '@/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels';
-import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
-import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
-import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
-import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
+import type { Playlist, UserSummary } from '@/features/playlists/shared/playlist/playlistTypes';
+import { widthStyle } from '@/features/playlists/features/browse/shared/playlist-grid/lib/sizedStyles';
+import { PlaylistCassetteMeta } from '@/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCassetteMeta';
 
 type PlaylistCassetteProps = {
 	playlist: Playlist;
@@ -21,11 +16,10 @@ type PlaylistCassetteProps = {
 };
 
 export function PlaylistCassette({ playlist, owner, width }: PlaylistCassetteProps) {
-	const { styles, theme } = useThemedStyles(createStyles);
-	const ink = theme.colors.textSecondary;
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
-		<View style={{ width }}>
+		<View style={widthStyle(width)}>
 			<View style={styles.cover}>
 				<Artwork
 					uri={playlist.coverUrl || playlist.firstTrackCover}
@@ -36,19 +30,7 @@ export function PlaylistCassette({ playlist, owner, width }: PlaylistCassettePro
 			<Text style={styles.name} numberOfLines={2}>
 				{playlist.name}
 			</Text>
-			<View style={styles.meta} importantForAccessibility="no-hide-descendants">
-				<PixelIcon
-					icon={playlist.visibility === 'public' ? GlobeSolid : EyeCrossSolid}
-					size={12}
-					color={ink}
-				/>
-				<PixelIcon
-					icon={playlist.editMode === 'open' ? PencilSolid : LockSolid}
-					size={12}
-					color={ink}
-				/>
-				{owner && <Avatar uri={owner.avatarUrl} name={ownerName(owner)} size="sm" />}
-			</View>
+			<PlaylistCassetteMeta playlist={playlist} owner={owner} />
 		</View>
 	);
 }
@@ -60,15 +42,9 @@ function createStyles(theme: Theme) {
 			fontSize: theme.typography.sizes.md,
 			fontFamily: theme.typography.families.medium,
 			color: theme.colors.text,
-			lineHeight: 18,
-			height: 36,
+			lineHeight: theme.typography.lineHeights.xs,
+			height: theme.typography.lineHeights.xs * 2,
 			marginTop: theme.spacing.sm,
-		},
-		meta: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			gap: theme.spacing.sm,
-			marginTop: theme.spacing.xs,
 		},
 	});
 	return styles;

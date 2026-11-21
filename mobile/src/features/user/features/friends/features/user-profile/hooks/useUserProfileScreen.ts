@@ -1,6 +1,6 @@
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useScreenTitle } from '@/shared/screen-title/useScreenTitle';
-import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
 import type { FriendPlaylistSummary } from '@/features/user/features/friends/friendsTypes';
 import type { ProfileListening } from '@/features/user/features/friends/features/user-profile/userProfileTypes';
 import {

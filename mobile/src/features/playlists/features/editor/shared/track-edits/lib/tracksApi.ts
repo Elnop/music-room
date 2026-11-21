@@ -3,7 +3,7 @@ import type {
 	AddTrackResult,
 	MoveTrackResult,
 	RemoveTrackResult,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 
 export function addTrack(playlistId: string, track: AddQueueItemBody): Promise<AddTrackResult> {

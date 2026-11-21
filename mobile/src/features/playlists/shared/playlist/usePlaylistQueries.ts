@@ -1,14 +1,11 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { useSession } from '@/shared/backend/hooks/useSession';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
-import * as usersApi from '@/features/playlists/shared/playlist/lib/usersApi';
+import { loadFriendsPlaylists } from '@/features/playlists/shared/playlist/lib/loadFriendsPlaylists';
 import { loadPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
-import type {
-	FriendPlaylists,
-	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 
 const ON_EVERY_VISIT = { staleTime: STALE.none, retry: false } as const;
 
@@ -32,20 +29,6 @@ export function usePublicPlaylists() {
 	});
 }
 
-async function loadFriendsPlaylists(): Promise<FriendPlaylists[]> {
-	const friends = await usersApi.getFriends();
-	const all = await Promise.all(
-		friends.map(async friend => {
-			try {
-				return { friend, playlists: await playlistApi.fetchUserPublicPlaylists(friend.id) };
-			} catch {
-				return { friend, playlists: [] };
-			}
-		})
-	);
-	return all.filter(entry => entry.playlists.length > 0);
-}
-
 export function useFriendsPlaylists() {
 	const signedIn = useSession(session => session.isAuthenticated);
 	return useQuery({
@@ -57,20 +40,18 @@ export function useFriendsPlaylists() {
 }
 
 export function usePlaylistDetail(id: string, enabled = true) {
-	const client = useQueryClient();
 	return useQuery({
 		queryKey: queryKeys.playlists.detail(id),
-		queryFn: () => loadPlaylist(client, id),
+		queryFn: context => loadPlaylist(context.client, id),
 		enabled,
 		...ON_EVERY_VISIT,
 	});
 }
 
 export function useCachedPlaylist(id: string): PlaylistWithTracks | undefined {
-	const client = useQueryClient();
 	return useQuery({
 		queryKey: queryKeys.playlists.detail(id),
-		queryFn: () => loadPlaylist(client, id),
+		queryFn: context => loadPlaylist(context.client, id),
 		enabled: false,
 	}).data;
 }

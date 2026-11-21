@@ -37,7 +37,7 @@ function createStyles(theme: Theme) {
 			marginTop: theme.spacing.xs,
 		},
 		bio: {
-			fontSize: theme.typography.sizes.mdlg,
+			fontSize: theme.typography.sizes.mlg,
 			color: theme.colors.textSecondary,
 			marginTop: theme.spacing.sm,
 			textAlign: 'center',

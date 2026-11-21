@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { autoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
 import type { SoundCloudTrack, StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
 import {
 	FakeMediaElement,
@@ -33,8 +33,8 @@ jest.mock('hls.js', () => {
 		mockHls.instances.push(instance);
 		return instance;
 	});
-	Object.assign(Hls, { isSupported: () => mockHls.supported, Events: { ERROR: 'hlsError' } });
-	return { __esModule: true, default: Hls };
+	Object.assign(Hls, { isSupported: () => mockHls.supported });
+	return { __esModule: true, default: Hls, Events: { ERROR: 'hlsError' } };
 });
 
 jest.mock('expo-audio', () => {
@@ -80,8 +80,8 @@ beforeEach(() => {
 	media.currentTime = 0;
 	media.error = null;
 	media.playResult = () => Promise.resolve();
-	usePlayerStore.setState(usePlayerStore.getInitialState());
-	useAutoplayStore.setState({ blocked: false });
+	playerStore.setState(playerStore.getInitialState());
+	autoplayStore.setState({ blocked: false });
 });
 
 describe('useAudioPlayer (web)', () => {
@@ -92,7 +92,7 @@ describe('useAudioPlayer (web)', () => {
 		expect(mockHls.instances[0].loadSource).toHaveBeenCalledWith(STREAM);
 		expect(mockHls.instances[0].attachMedia).toHaveBeenCalledWith(media);
 		unmount();
-		expect(mockHls.instances[0].destroy).toHaveBeenCalled();
+		expect(mockHls.instances[0].destroy).toHaveBeenCalledWith();
 	});
 
 	it('hands the stream to a browser that reads HLS itself', () => {
@@ -120,7 +120,7 @@ describe('useAudioPlayer (web)', () => {
 		rerender({ url: PROGRESSIVE, kind: 'progressive' });
 
 		expect(mockHls.instances).toHaveLength(1);
-		expect(mockHls.instances[0].destroy).toHaveBeenCalled();
+		expect(mockHls.instances[0].destroy).toHaveBeenCalledWith();
 		expect(media.src).toBe(PROGRESSIVE);
 		unmount();
 	});
@@ -182,7 +182,7 @@ describe('useAudioPlayer (web)', () => {
 		rerender({ url: `${STREAM}?next`, kind: 'hls' });
 
 		expect(result.current.player.id).not.toBe(first.id);
-		expect(mockHls.instances[0].destroy).toHaveBeenCalled();
+		expect(mockHls.instances[0].destroy).toHaveBeenCalledWith();
 		expect(mockHls.instances[1].loadSource).toHaveBeenCalledWith(`${STREAM}?next`);
 		expect(first.playing).toBe(false);
 		first.pause();
@@ -192,8 +192,8 @@ describe('useAudioPlayer (web)', () => {
 
 	it('pauses the store and asks for a click when the browser refuses to play', async () => {
 		act(() => {
-			usePlayerStore.getState().playTrack(track, 'q7');
-			usePlayerStore.getState().setPlaybackPlaying();
+			playerStore.getState().playTrack(track, 'q7');
+			playerStore.getState().setPlaybackPlaying();
 		});
 		media.playResult = autoplayRefusal;
 		const { result, unmount } = renderPlayer();
@@ -201,20 +201,20 @@ describe('useAudioPlayer (web)', () => {
 
 		await act(async () => result.current.player.play());
 
-		expect(useAutoplayStore.getState().blocked).toBe(true);
-		expect(usePlayerStore.getState()).toMatchObject({ playbackState: 'paused', isPlaying: false });
+		expect(autoplayStore.getState().blocked).toBe(true);
+		expect(playerStore.getState()).toMatchObject({ playbackState: 'paused', isPlaying: false });
 		expect(result.current.status.playing).toBe(false);
 
 		media.playResult = () => Promise.resolve();
 		await act(async () => result.current.player.play());
-		expect(useAutoplayStore.getState().blocked).toBe(false);
+		expect(autoplayStore.getState().blocked).toBe(false);
 		unmount();
 	});
 
 	it('ignores a play() interrupted by a pause', async () => {
 		act(() => {
-			usePlayerStore.getState().playTrack(track, 'q7');
-			usePlayerStore.getState().setPlaybackPlaying();
+			playerStore.getState().playTrack(track, 'q7');
+			playerStore.getState().setPlaybackPlaying();
 		});
 		media.playResult = () =>
 			Promise.reject(Object.assign(new Error('interrupted'), { name: 'AbortError' }));
@@ -222,8 +222,8 @@ describe('useAudioPlayer (web)', () => {
 
 		await act(async () => result.current.player.play());
 
-		expect(useAutoplayStore.getState().blocked).toBe(false);
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(autoplayStore.getState().blocked).toBe(false);
+		expect(playerStore.getState().playbackState).toBe('playing');
 		unmount();
 	});
 });

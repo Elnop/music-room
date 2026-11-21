@@ -29,7 +29,7 @@ function createStyles(theme: Theme) {
 			alignItems: 'center',
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.sm,
-			paddingVertical: theme.spacing.pixel,
+			paddingVertical: theme.spacing.xxsm,
 			gap: theme.spacing.xs,
 		},
 		statusBadgeOnline: {

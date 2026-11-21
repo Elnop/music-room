@@ -1,148 +1,27 @@
-import { useState, useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { getSession } from '@/shared/backend/lib/authSession';
-import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
-import type {
-	FriendUserSummary,
-	UserDeviceWithLicenses,
-} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
-import { deviceService } from '@/shared/backend/deviceService';
-import { showError, showSuccess } from '@/shared/theme/lib/toast';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import {
-	pairKey,
-	setPair,
-	friendName,
-	licensedPairs,
-} from '@/features/playback/features/control-delegation/features/my-devices/lib/devicePermissions';
-
-const LOAD_ERROR = 'Impossible de charger vos appareils';
+import { useLicenseToggle } from '@/features/playback/features/control-delegation/features/my-devices/hooks/useLicenseToggle';
+import { useMyDevicesData } from '@/features/playback/features/control-delegation/features/my-devices/hooks/useMyDevicesData';
+import { useRenameDevice } from '@/features/playback/features/control-delegation/features/my-devices/hooks/useRenameDevice';
+import { myDevicesModel } from '@/features/playback/features/control-delegation/features/my-devices/lib/myDevicesModel';
 
 export function useMyDevicesScreen() {
 	const navigation = useNavigation<NavigationProp<{ FriendsTab: undefined }>>();
 	const bottomPadding = useBottomPadding();
-
-	const [isLoading, setIsLoading] = useState(true);
-	const [loadFailed, setLoadFailed] = useState(false);
-	const [devices, setDevices] = useState<UserDeviceWithLicenses[]>([]);
-	const [friends, setFriends] = useState<FriendUserSummary[]>([]);
-	const [allDevicesFriendIds, setAllDevicesFriendIds] = useState<Set<string>>(new Set());
-	const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
-	const [licensed, setLicensed] = useState<Set<string>>(new Set());
-	const [pending, setPending] = useState<Set<string>>(new Set());
-
-	const [isRefreshing, setIsRefreshing] = useState(false);
-	const [renaming, setRenaming] = useState<UserDeviceWithLicenses | null>(null);
-	const [isRenameSaving, setIsRenameSaving] = useState(false);
-
-	const load = useCallback(async (isRefresh: boolean) => {
-		try {
-			const accessToken = getSession().accessToken;
-			if (!accessToken) throw new Error(LOAD_ERROR);
-			const [myDevices, myFriends, allowedIds, deviceInfo] = await Promise.all([
-				musicControlApi.getMyDevices(),
-				musicControlApi.getFriends(accessToken),
-				musicControlApi.getMyPermissions(),
-				deviceService.getDeviceInfo().catch(() => null),
-			]);
-			setDevices(myDevices);
-			setFriends(myFriends);
-			setAllDevicesFriendIds(new Set(allowedIds));
-			setCurrentDeviceId(deviceInfo?.deviceId ?? null);
-			setLicensed(licensedPairs(myDevices));
-			setLoadFailed(false);
-		} catch (error) {
-			if (!isRefresh) setLoadFailed(true);
-			showError(apiErrorMessage(error, LOAD_ERROR));
-		}
-	}, []);
-
-	useEffect(() => {
-		let isMounted = true;
-		void Promise.resolve().then(async () => {
-			await load(false);
-			if (isMounted) setIsLoading(false);
-		});
-		return () => {
-			isMounted = false;
-		};
-	}, [load]);
-
-	const handleRefresh = useCallback(async () => {
-		setIsRefreshing(true);
-		await load(true);
-		setIsRefreshing(false);
-	}, [load]);
-
-	const handleToggle = useCallback(
-		async (device: UserDeviceWithLicenses, friend: FriendUserSummary, grant: boolean) => {
-			const key = pairKey(device.deviceId, friend.id);
-			setPending(current => setPair(current, key, true));
-			setLicensed(current => setPair(current, key, grant));
-			try {
-				if (grant) {
-					await musicControlApi.grantDeviceLicense(device.deviceId, friend.id);
-					showSuccess(`${friendName(friend)} peut contrôler ${device.deviceName}`);
-				} else {
-					await musicControlApi.revokeDeviceLicense(device.deviceId, friend.id);
-					showSuccess(`${friendName(friend)} ne contrôle plus ${device.deviceName}`);
-				}
-			} catch (error) {
-				setLicensed(current => setPair(current, key, !grant));
-				showError(
-					apiErrorMessage(
-						error,
-						grant ? "Impossible d'accorder l'accès" : "Impossible de retirer l'accès"
-					)
-				);
-			} finally {
-				setPending(current => setPair(current, key, false));
-			}
-		},
-		[]
-	);
-
-	const handleRename = useCallback(
-		async (name: string | null) => {
-			if (!renaming) return;
-			setIsRenameSaving(true);
-			try {
-				await musicControlApi.renameDevice(renaming.deviceId, name);
-				setRenaming(null);
-				showSuccess('Appareil renommé');
-				await load(true);
-			} catch (error) {
-				showError(apiErrorMessage(error, "Impossible de renommer l'appareil"));
-			} finally {
-				setIsRenameSaving(false);
-			}
-		},
-		[renaming, load]
-	);
+	const devicesData = useMyDevicesData();
+	const licenses = useLicenseToggle(devicesData.updateLicensed);
+	const rename = useRenameDevice(devicesData.load);
 
 	return {
-		isLoading,
-		loadFailed,
-		isRefreshing,
+		...myDevicesModel(devicesData.screen, licenses.pending),
 		bottomPadding,
-		devices,
-		friends,
-		allDevicesFriendIds,
-		currentDeviceId,
-		licensed,
-		pending,
-		renamingDevice: renaming,
-		isRenameSaving,
-		pairKey,
-		onRefresh: handleRefresh,
-		onToggle: handleToggle,
-		onOpenRename: (device: UserDeviceWithLicenses) => setRenaming(device),
-		onCloseRename: () => {
-			if (!isRenameSaving) setRenaming(null);
+		actions: {
+			onRefresh: devicesData.onRefresh,
+			onToggle: licenses.onToggle,
+			onOpenRename: rename.onOpenRename,
+			onNavigateFriends: () => navigation.navigate('FriendsTab'),
 		},
-		onSubmitRename: handleRename,
-		onNavigateFriends: () => navigation.navigate('FriendsTab'),
+		rename,
 	};
 }

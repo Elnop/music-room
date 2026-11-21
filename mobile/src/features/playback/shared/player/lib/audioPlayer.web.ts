@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
-import type { AudioPlayer, AudioPlayerStatus } from '@/features/playback/shared/player/lib/types';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { autoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
+import { HtmlAudioPlayer } from '@/features/playback/shared/player/lib/HtmlAudioPlayer';
+import type {
+	AudioPlayer,
+	AudioPlayerStatus,
+	PlaybackEvents,
+} from '@/features/playback/shared/player/types/playerTypes';
 import type { StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
-import { HtmlAudioPlayer } from '@/features/playback/shared/player/lib/htmlAudioPlayer';
-import type { PlaybackEvents } from '@/features/playback/shared/player/lib/htmlAudioPlayer';
 
 const playbackEvents: PlaybackEvents = {
 	onPlayBlocked: () => {
-		useAutoplayStore.getState().setBlocked(true);
-		usePlayerStore.getState().pause();
+		autoplayStore.getState().setBlocked(true);
+		playerStore.getState().pause();
 	},
-	onPlaying: () => useAutoplayStore.getState().setBlocked(false),
+	onPlaying: () => autoplayStore.getState().setBlocked(false),
 };
 
 export function useAudioPlayer(source: string, protocol: StreamProtocol): AudioPlayer {

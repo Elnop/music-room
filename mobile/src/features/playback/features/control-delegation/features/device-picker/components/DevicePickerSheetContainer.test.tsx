@@ -2,16 +2,16 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { DevicePickerSheetContainer } from '@/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { queueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
+import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/musicControlApi';
 import { ApiError } from '@/shared/backend/lib/api';
 import { showError } from '@/shared/theme/lib/toast';
-import type { DevicePickerResponse } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
+import type { DevicePickerResponse } from '@/features/playback/features/control-delegation/shared/delegation/types/deviceTypes';
 import type { UserProfile } from '@/shared/users/userTypes';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { logger } from '@/shared/logging/logger';
@@ -35,7 +35,7 @@ jest.mock('@/shared/backend/deviceService', () => ({
 }));
 
 jest.mock(
-	'@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi',
+	'@/features/playback/features/control-delegation/shared/delegation/musicControlApi',
 	() => ({
 		musicControlApi: { getDevicePicker: jest.fn() },
 	})
@@ -113,7 +113,7 @@ registerAuthSession({
 	refreshAccessToken: async () => true,
 });
 
-const initialPlayerState = usePlayerStore.getState();
+const initialPlayerState = playerStore.getState();
 
 async function renderSheet() {
 	render(<DevicePickerSheetContainer visible onClose={onClose} />);
@@ -124,13 +124,13 @@ beforeEach(() => {
 	jest.clearAllMocks();
 	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	testSessionStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
-	useQueueStore.getState().reset();
-	useConnectStore.setState({
+	queueStore.getState().reset();
+	connectStore.setState({
 		target: { kind: 'local' },
 		remoteStatus: null,
 		controlPending: false,
 	});
-	usePlayerStore.setState(
+	playerStore.setState(
 		{ ...initialPlayerState, currentTrack: soundCloudTrack, queueItemId: 'i1' },
 		true
 	);
@@ -169,7 +169,7 @@ describe('DevicePickerSheetContainer', () => {
 	});
 
 	it('marks the remote target as active in remote mode', async () => {
-		useConnectStore.setState({ target: { kind: 'remote', ownerId: 'lea', deviceId: 'lea-tab' } });
+		connectStore.setState({ target: { kind: 'remote', ownerId: 'lea', deviceId: 'lea-tab' } });
 		await renderSheet();
 		expect(screen.getByLabelText('Tablette de Léa').props.accessibilityState.selected).toBe(true);
 		expect(screen.getByLabelText('Mon téléphone').props.accessibilityState.selected).toBe(false);
@@ -185,7 +185,7 @@ describe('DevicePickerSheetContainer', () => {
 	it('transfers to the tapped device and closes', async () => {
 		await renderSheet();
 		fireEvent.press(screen.getByLabelText('Mon PC'));
-		await waitFor(() => expect(onClose).toHaveBeenCalled());
+		await waitFor(() => expect(onClose).toHaveBeenCalledWith());
 		expect(transfer).toHaveBeenCalledWith(
 			expect.objectContaining({
 				targetUserId: 'me',
@@ -193,7 +193,7 @@ describe('DevicePickerSheetContainer', () => {
 				playing: { queueItemId: 'i1' },
 			})
 		);
-		expect(useConnectStore.getState().target).toMatchObject({ kind: 'remote', deviceId: 'pc' });
+		expect(connectStore.getState().target).toMatchObject({ kind: 'remote', deviceId: 'pc' });
 	});
 
 	it('keeps the target and stays open when the transfer is refused', async () => {
@@ -202,7 +202,7 @@ describe('DevicePickerSheetContainer', () => {
 		fireEvent.press(screen.getByLabelText('Tablette de Léa'));
 		await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'est plus en ligne"));
 		expect(onClose).not.toHaveBeenCalled();
-		expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
+		expect(connectStore.getState().target).toStrictEqual({ kind: 'local' });
 	});
 
 	it('shows the spinner, not the old list, while reloading on reopen', async () => {

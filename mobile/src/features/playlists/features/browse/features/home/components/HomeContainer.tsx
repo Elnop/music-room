@@ -3,21 +3,21 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type {
 	Playlist,
 	PlaylistStackParamList,
-} from '@/features/playlists/shared/playlist/lib/types';
-import { useHomeScreen } from '@/features/playlists/features/browse/features/home/useHomeScreen';
+} from '@/features/playlists/shared/playlist/playlistTypes';
+import { useHomeScreen } from '@/features/playlists/features/browse/features/home/hooks/useHomeScreen';
 import { HomeView } from '@/features/playlists/features/browse/features/home/components/presenters/HomeView';
 
 type HomeOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'> & {
 	nearbyEvents?: React.ReactNode;
 	similarProfiles?: React.ReactNode;
-	actionsFor: (playlist: Playlist) => (() => void) | undefined;
+	onPlaylistActions: (playlist: Playlist) => (() => void) | undefined;
 };
 
 export function HomeContainer({
 	navigation,
 	nearbyEvents,
 	similarProfiles,
-	actionsFor,
+	onPlaylistActions,
 }: HomeOrchestratorProps) {
 	const screen = useHomeScreen(navigation);
 	return (
@@ -26,7 +26,7 @@ export function HomeContainer({
 				screen={screen}
 				nearbyEvents={nearbyEvents}
 				similarProfiles={similarProfiles}
-				actionsFor={actionsFor}
+				onPlaylistActions={onPlaylistActions}
 			/>
 		</>
 	);

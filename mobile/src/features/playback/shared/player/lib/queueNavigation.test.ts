@@ -1,8 +1,8 @@
+import { RESTART_THRESHOLD_S } from '@/features/playback/shared/player/configs/playerConfig';
+import { previousAction } from '@/features/playback/shared/player/lib/previousAction';
 import {
-	RESTART_THRESHOLD_S,
 	currentItem,
 	nextItem,
-	previousAction,
 	selectHasNext,
 	selectHasPrevious,
 } from '@/features/playback/shared/player/lib/queueNavigation';

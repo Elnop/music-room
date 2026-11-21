@@ -1,6 +1,5 @@
-import type { PrefetchedStream } from '@/features/playback/shared/player/lib/types';
-
-export const STREAM_RENEW_MARGIN_MS = 2 * 60 * 1000;
+import { STREAM_RENEW_MARGIN_MS } from '@/features/playback/shared/player/configs/playerConfig';
+import type { PrefetchedStream } from '@/features/playback/shared/player/types/playerTypes';
 
 export function isStreamStale(expiresAt: number | null, now: number = Date.now()): boolean {
 	return expiresAt !== null && expiresAt - now < STREAM_RENEW_MARGIN_MS;

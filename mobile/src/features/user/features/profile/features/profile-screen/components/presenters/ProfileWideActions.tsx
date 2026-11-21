@@ -38,7 +38,7 @@ export function ProfileWideActions({ actions }: ProfileWideActionsProps) {
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		action: {
-			height: theme.controls.buttonMedium,
+			height: theme.controls.iconButtonXl,
 			paddingHorizontal: theme.spacing.md,
 		},
 	});

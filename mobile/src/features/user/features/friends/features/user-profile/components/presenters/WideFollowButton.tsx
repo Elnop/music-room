@@ -39,7 +39,7 @@ export function WideFollowButton({ status, follow }: WideFollowButtonProps) {
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		action: {
-			height: theme.controls.buttonMedium,
+			height: theme.controls.iconButtonXl,
 			paddingHorizontal: theme.spacing.md,
 		},
 	});

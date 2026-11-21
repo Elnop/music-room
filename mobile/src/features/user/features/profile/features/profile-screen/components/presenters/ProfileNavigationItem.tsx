@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ProfileNavigationIcon } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileNavigationIcon';
-import { ProfileNavigationText } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileNavigationText';
+import { IconTile } from '@/shared/theme/components/IconTile';
+import { TitleLines } from '@/shared/theme/components/TitleLines';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
@@ -28,8 +28,8 @@ export function ProfileNavigationItem({
 	return (
 		<View style={styles.buttonContainer}>
 			<Pressable style={styles.menuButton} onPress={onPress} accessibilityLabel={title}>
-				<ProfileNavigationIcon icon={icon} />
-				<ProfileNavigationText title={title} subtitle={subtitle} />
+				<IconTile icon={icon} size="badge" framed />
+				<TitleLines title={title} subtitle={subtitle} size="regular" />
 				<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 		</View>

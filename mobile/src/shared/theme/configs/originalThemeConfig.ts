@@ -14,6 +14,8 @@ export const originalTheme: Theme = {
 
 	colors: {
 		primary: '#C5F94A',
+		primaryTint: '#C5F94A18',
+		primaryTintStrong: '#C5F94A25',
 
 		background: '#13111C',
 		surface: '#1E1A2B',

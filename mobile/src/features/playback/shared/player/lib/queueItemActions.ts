@@ -1,5 +1,7 @@
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
+import { getPlayerState } from '@/features/playback/shared/player/lib/getPlayerState';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { actionScope, handleRemoteRefusal } from '@/features/playback/shared/player/lib/queueScope';
 import { asStep, mutate, runStep } from '@/features/playback/shared/player/lib/queueStepRunner';
 import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
@@ -7,13 +9,9 @@ import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
 import { logger } from '@/shared/logging/logger';
-import type { QueueState } from '@/features/playback/shared/player/lib/queue.types';
+import type { QueueState } from '@/features/playback/shared/player/types/queueTypes';
 import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
-import {
-	getPlayerState,
-	usePlayerStore,
-} from '@/features/playback/shared/player/stores/playerStore';
 
 export async function addItemAction(
 	track: AddQueueItemBody,
@@ -55,7 +53,7 @@ export async function removeItemAction(
 ): Promise<boolean> {
 	const errorMessage = 'Impossible de retirer ce titre';
 	const { queueItemId } = getPlayerState();
-	if (useConnectStore.getState().target.kind === 'local' && queueItemId === itemId) {
+	if (connectStore.getState().target.kind === 'local' && queueItemId === itemId) {
 		const outcome = await runStep(
 			asStep(call => queueApi.removeItem(itemId, call)),
 			'Remove current item',
@@ -72,9 +70,9 @@ export async function playListTrackAction(
 	track: SoundCloudTrack,
 	applyState: (state: QueueState) => void
 ): Promise<void> {
-	const { target } = useConnectStore.getState();
+	const { target } = connectStore.getState();
 	if (target.kind === 'local') {
-		usePlayerStore.getState().playTrack(track);
+		playerStore.getState().playTrack(track);
 		return;
 	}
 	const scope = actionScope();

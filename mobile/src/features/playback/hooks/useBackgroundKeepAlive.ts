@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
 import { jsKeepAlive } from '@/features/playback/lib/jsKeepAlive';
 
 export function useBackgroundKeepAlive(): void {
-	const active = usePlayerStore(
+	const active = usePlayerState(
 		state => state.playbackState === 'playing' || state.playbackState === 'loading'
 	);
 

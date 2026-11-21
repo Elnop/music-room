@@ -36,11 +36,11 @@ function createStyles(theme: Theme) {
 			paddingVertical: theme.spacing.sm,
 		},
 		infoLabel: {
-			fontSize: theme.typography.sizes.mdlg,
+			fontSize: theme.typography.sizes.mlg,
 			color: theme.colors.textSecondary,
 		},
 		infoValue: {
-			fontSize: theme.typography.sizes.mdlg,
+			fontSize: theme.typography.sizes.mlg,
 			color: theme.colors.text,
 			fontFamily: theme.typography.families.medium,
 		},

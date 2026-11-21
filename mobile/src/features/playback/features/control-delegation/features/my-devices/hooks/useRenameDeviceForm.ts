@@ -1,53 +1,49 @@
 import { useState } from 'react';
-
-const DEVICE_NAME_MAX_LENGTH = 40;
+import { deviceNameError } from '@/features/playback/features/control-delegation/features/my-devices/lib/deviceFormatters';
+import type { RenameForm } from '@/features/playback/features/control-delegation/features/my-devices/myDevicesTypes';
 
 type UseRenameDeviceFormOptions = {
 	deviceName: string | null;
 	onSubmit: (name: string | null) => void;
 };
 
-export function useRenameDeviceForm({ deviceName, onSubmit }: UseRenameDeviceFormOptions) {
-	const [name, setName] = useState(deviceName ?? '');
-	const [error, setError] = useState<string | undefined>();
-	const [openedFor, setOpenedFor] = useState(deviceName);
+type FormState = {
+	name: string;
+	error?: string;
+	openedFor: string | null;
+};
 
-	if (deviceName !== openedFor) {
-		setOpenedFor(deviceName);
-		if (deviceName !== null) {
-			setName(deviceName);
-			setError(undefined);
-		}
+function reopenedForm(form: FormState, deviceName: string | null): FormState {
+	return deviceName === null
+		? { ...form, openedFor: deviceName }
+		: { name: deviceName, error: undefined, openedFor: deviceName };
+}
+
+export function useRenameDeviceForm({
+	deviceName,
+	onSubmit,
+}: UseRenameDeviceFormOptions): RenameForm {
+	const [form, setForm] = useState<FormState>({ name: deviceName ?? '', openedFor: deviceName });
+
+	if (deviceName !== form.openedFor) {
+		setForm(reopenedForm(form, deviceName));
 	}
 
-	function handleChangeName(text: string) {
-		setName(text);
-		setError(undefined);
-	}
-
-	function handleSave() {
-		const trimmed = name.trim();
-		if (trimmed.length === 0) {
-			setError('Saisissez un nom');
-			return;
-		}
-		if (trimmed.length > DEVICE_NAME_MAX_LENGTH) {
-			setError(`${DEVICE_NAME_MAX_LENGTH} caractères au maximum`);
-			return;
-		}
-		onSubmit(trimmed);
-	}
-
-	function handleReset() {
-		setError(undefined);
-		onSubmit(null);
+	function onSave() {
+		const trimmed = form.name.trim();
+		const error = deviceNameError(trimmed);
+		if (error) setForm(current => ({ ...current, error }));
+		else onSubmit(trimmed);
 	}
 
 	return {
-		name,
-		onChangeName: handleChangeName,
-		error,
-		handleSave,
-		handleReset,
+		name: form.name,
+		error: form.error,
+		onChangeName: text => setForm(current => ({ ...current, name: text, error: undefined })),
+		onSave,
+		onReset: () => {
+			setForm(current => ({ ...current, error: undefined }));
+			onSubmit(null);
+		},
 	};
 }

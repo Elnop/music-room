@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import * as signIn from '@/features/user/features/auth/shared/sign-in/lib/signIn';
-import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
-import type { RegisterInput } from '@/features/user/features/auth/shared/sign-in/lib/validators';
+import { resendVerificationCode } from '@/features/user/features/auth/shared/sign-in/lib/emailVerificationApi';
+import type { RegisterInput } from '@/features/user/features/auth/shared/sign-in/types/authInputTypes';
 
 export function useLoginMutation() {
 	return useMutation({ mutationFn: signIn.login });
@@ -21,6 +21,6 @@ export function useVerifyEmailMutation() {
 export function useResendVerificationMutation() {
 	return useMutation({
 		mutationFn: ({ userId, email }: { userId: string; email: string }) =>
-			authApi.resendVerificationCode(userId, email),
+			resendVerificationCode(userId, email),
 	});
 }

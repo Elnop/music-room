@@ -23,8 +23,8 @@ function createStyles(theme: Theme) {
 		},
 		headerDesc: {
 			color: theme.colors.textSecondary,
-			fontSize: 14,
-			lineHeight: 20,
+			fontSize: theme.typography.sizes.md,
+			lineHeight: theme.typography.sizes.xl,
 		},
 	});
 	return styles;

@@ -1,50 +1,29 @@
 import { useCallback, useState } from 'react';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { logger } from '@/shared/logging/logger';
-import { showError, showSuccess } from '@/shared/theme/lib/toast';
-import { useDeletePlaylist } from '@/features/playlists/features/editor/shared/playlist-mutations/usePlaylistMutations';
-import { confirmPlaylistDelete } from '@/features/playlists/features/editor/shared/delete-confirmation/confirmPlaylistDelete';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import { useMenuAnchor } from '@/features/playlists/features/editor/shared/menu-anchor/hooks/useMenuAnchor';
+import { useDeleteFlow } from '@/features/playlists/features/editor/features/detail/hooks/useDeleteFlow';
 import type {
 	DetailNavigation,
+	OwnerActions,
 	PlaylistDetailScreen,
-} from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistDetailScreen';
-
-type OwnerActions = {
-	sheetVisible: boolean;
-	openSheet: () => void;
-	closeSheet: () => void;
-	edit: () => void;
-	sharing: () => void;
-	remove: () => void;
-};
+} from '@/features/playlists/features/editor/features/detail/types/detailScreenTypes';
 
 export function useOwnerActions(
 	navigation: DetailNavigation,
 	screen: PlaylistDetailScreen
 ): OwnerActions {
-	const { id, playlist, markDeleting, leaveDeleted } = screen;
+	const { id } = screen;
+	const userId = useSession(session => session.user?.id);
 	const [sheetVisible, setSheetVisible] = useState(false);
-	const deletePlaylist = useDeletePlaylist();
-
-	async function confirmDelete() {
-		markDeleting(true);
-		try {
-			await deletePlaylist.mutateAsync(id);
-			showSuccess('Playlist supprimée');
-			leaveDeleted();
-		} catch (error) {
-			markDeleting(false);
-			logger.error('[PlaylistDetailScreen] Delete playlist failed:', error);
-			showError(apiErrorMessage(error, 'Impossible de supprimer la playlist'));
-		}
-	}
 
 	return {
+		isOwner: Boolean(userId) && screen.playlist?.ownerId === userId,
 		sheetVisible,
+		sheetAnchor: useMenuAnchor(sheetVisible),
 		openSheet: useCallback(() => setSheetVisible(true), []),
 		closeSheet: () => setSheetVisible(false),
 		edit: () => navigation.navigate('CreatePlaylist', { playlistId: id }),
 		sharing: () => navigation.navigate('PlaylistSharing', { playlistId: id }),
-		remove: () => confirmPlaylistDelete(playlist?.name ?? '', () => void confirmDelete()),
+		remove: useDeleteFlow(screen),
 	};
 }

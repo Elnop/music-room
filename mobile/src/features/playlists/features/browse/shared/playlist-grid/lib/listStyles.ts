@@ -17,17 +17,23 @@ export function createListStyles(theme: Theme) {
 		sectionSpacer: {
 			height: theme.spacing.md,
 		},
+	});
+	return styles;
+}
+
+export function createGridStyles(theme: Theme) {
+	const styles = StyleSheet.create({
 		grid: {
 			flexDirection: 'row',
 			flexWrap: 'wrap',
 			paddingHorizontal: theme.spacing.md,
-			gap: 16,
+			gap: theme.spacing.md,
 		},
 		friendsSkeleton: {
 			flexDirection: 'row',
 			overflow: 'hidden',
 			paddingHorizontal: theme.spacing.md,
-			gap: 12,
+			gap: theme.spacing.smd,
 		},
 	});
 	return styles;

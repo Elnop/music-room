@@ -4,8 +4,8 @@ import { requireOptionalNativeModule } from 'expo';
 const TASK_KEY = 'JsKeepAlive';
 
 type JsKeepAliveModule = {
-	start(): void;
-	stop(): void;
+	start: () => void;
+	stop: () => void;
 };
 
 const native =

@@ -1,24 +1,24 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand/vanilla';
 import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import { createSessionActions } from '@/features/user/features/auth/shared/sign-in/lib/sessionActions';
-import { SIGNED_OUT } from '@/features/user/features/auth/shared/sign-in/lib/authState';
-import type { AuthState } from '@/features/user/features/auth/shared/sign-in/lib/authState';
+import { createSessionActions } from '@/features/user/features/auth/shared/sign-in/lib/createSessionActions';
+import { SIGNED_OUT } from '@/features/user/features/auth/shared/sign-in/configs/sessionConfig';
+import type { AuthState } from '@/features/user/features/auth/shared/sign-in/types/authStateTypes';
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const authStore = createStore<AuthState>((set, get) => ({
 	...SIGNED_OUT,
 	...createSessionActions(set, get),
 }));
 
-useAuthStore.subscribe((state, previous) => {
+authStore.subscribe((state, previous) => {
 	if (previous.isAuthenticated && !state.isAuthenticated) notifySessionEnd();
 });
 
 registerAuthSession({
-	store: useAuthStore,
-	isTokenExpiringSoon: () => useAuthStore.getState().isTokenExpiringSoon(),
-	refreshAccessToken: () => useAuthStore.getState().refreshAccessToken(),
-	logout: () => useAuthStore.getState().logout(),
-	setAvatarUrl: url => useAuthStore.getState().setAvatarUrl(url),
-	setUser: user => useAuthStore.getState().setUser(user),
+	store: authStore,
+	isTokenExpiringSoon: () => authStore.getState().isTokenExpiringSoon(),
+	refreshAccessToken: () => authStore.getState().refreshAccessToken(),
+	logout: () => authStore.getState().logout(),
+	setAvatarUrl: url => authStore.getState().setAvatarUrl(url),
+	setUser: user => authStore.getState().setUser(user),
 });

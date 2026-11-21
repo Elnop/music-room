@@ -27,7 +27,7 @@ function createStyles(theme: Theme) {
 			fontSize: theme.typography.sizes.md,
 			color: theme.colors.text,
 			marginTop: theme.spacing.sm,
-			lineHeight: theme.typography.lineHeights.body,
+			lineHeight: theme.typography.lineHeights.sm,
 		},
 	});
 	return styles;

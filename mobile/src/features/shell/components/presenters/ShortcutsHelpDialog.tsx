@@ -7,6 +7,7 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 import { Text } from '@/shared/theme/components/Text';
+import { ShortcutRow } from '@/features/shell/components/presenters/ShortcutRow';
 
 type ShortcutsHelpDialogProps = {
 	visible: boolean;
@@ -26,10 +27,7 @@ export function ShortcutsHelpDialog({ visible, shortcuts, onClose }: ShortcutsHe
 					</Text>
 					<View style={styles.list}>
 						{shortcuts.map(shortcut => (
-							<View key={shortcut.keys} style={styles.row}>
-								<Text style={styles.description}>{shortcut.description}</Text>
-								<Text style={styles.keys}>{shortcut.keys}</Text>
-							</View>
+							<ShortcutRow key={shortcut.keys} shortcut={shortcut} />
 						))}
 					</View>
 					<Text style={styles.hint}>Inactifs pendant la saisie dans un champ.</Text>
@@ -46,29 +44,6 @@ function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		...dialogStyles(theme),
 		list: { marginTop: theme.spacing.md, gap: theme.spacing.sm },
-		row: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			justifyContent: 'space-between',
-			gap: theme.spacing.md,
-		},
-		description: {
-			flex: 1,
-			fontSize: theme.typography.sizes.md,
-			color: theme.colors.text,
-		},
-		keys: {
-			minWidth: 32,
-			paddingHorizontal: theme.spacing.sm,
-			paddingVertical: theme.spacing.xs,
-			borderWidth: 1,
-			borderColor: theme.colors.border,
-			backgroundColor: theme.colors.surfaceAlt,
-			textAlign: 'center',
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-		},
 		hint: {
 			marginTop: theme.spacing.md,
 			fontSize: theme.typography.sizes.sm,

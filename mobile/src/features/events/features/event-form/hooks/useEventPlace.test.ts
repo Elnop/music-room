@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-native';
 import * as Location from 'expo-location';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import { geocode } from '@/features/events/shared/events/lib/eventsApi';
+import { geocode } from '@/features/events/shared/location/lib/geocode';
 import { useEventPlace } from '@/features/events/features/event-form/hooks/useEventPlace';
 
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn() }));
@@ -13,10 +13,14 @@ jest.mock('expo-location', () => ({
 	reverseGeocodeAsync: jest.fn(),
 	geocodeAsync: jest.fn(),
 }));
-jest.mock('@/features/events/shared/events/lib/eventsApi', () => ({ geocode: jest.fn() }));
-jest.mock('@/features/events/shared/events/lib/geocoder', () =>
-	jest.requireActual('@/features/events/shared/events/lib/geocoder.web')
+jest.mock('@/features/events/shared/location/lib/geocode', () => ({ geocode: jest.fn() }));
+jest.mock('@/features/events/shared/location/lib/geocoder', () =>
+	jest.requireActual('@/features/events/shared/location/lib/geocoder.web')
 );
+jest.mock('@/features/events/features/event-form/eventFormConfig', () => ({
+	...jest.requireActual('@/features/events/features/event-form/eventFormConfig'),
+	GEOCODER_NEEDS_LOCATION_PERMISSION: false,
+}));
 
 const location = jest.mocked(Location);
 const lookup = jest.mocked(geocode);

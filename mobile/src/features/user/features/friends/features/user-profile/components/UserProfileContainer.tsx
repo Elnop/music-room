@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
 import type { FriendsStackParamList } from '@/features/user/features/friends/friendsTypes';
-import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
 import { useUserProfileScreen } from '@/features/user/features/friends/features/user-profile/hooks/useUserProfileScreen';
 import { usePlaylistNavigation } from '@/features/user/features/friends/features/user-profile/hooks/usePlaylistNavigation';
 import { UserProfileView } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileView';

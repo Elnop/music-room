@@ -8,7 +8,7 @@ import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { GENRE_INFO } from '@/shared/theme/configs/genresConfig';
 import { formatEventDate, isOngoing } from '@/features/events/shared/event-dates/eventDates';
-import type { MusicEvent } from '@/features/events/lib/types';
+import type { MusicEvent } from '@/features/events/eventTypes';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 type EventRowProps = {
@@ -42,7 +42,7 @@ function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		row: {
 			...keycap(theme),
-			height: 45,
+			height: theme.controls.keyRow,
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: theme.spacing.sm,

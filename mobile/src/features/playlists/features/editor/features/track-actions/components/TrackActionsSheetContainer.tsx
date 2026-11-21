@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTrackActions } from '@/features/playlists/features/editor/features/track-actions/hooks/useTrackActions';
 import { TrackActionsView } from '@/features/playlists/features/editor/features/track-actions/components/presenters/TrackActionsView';
-import { useMenuAnchor } from '@/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchor';
+import { useMenuAnchor } from '@/features/playlists/features/editor/shared/menu-anchor/hooks/useMenuAnchor';
 import type { TrackActionsSheetProps } from '@/shared/playback/types/trackActionsSheetTypes';
 import type { PlaybackActions } from '@/shared/playback/types/playbackActionsTypes';
 

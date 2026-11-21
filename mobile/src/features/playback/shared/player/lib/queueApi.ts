@@ -6,7 +6,7 @@ import type {
 	QueueStepResult,
 	TransferRequest,
 	TransferResult,
-} from '@/features/playback/shared/player/lib/queue.types';
+} from '@/features/playback/shared/player/types/queueTypes';
 import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 
 function base({ ownerId }: QueueCallTarget = {}): string {

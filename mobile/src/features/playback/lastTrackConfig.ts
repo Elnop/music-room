@@ -1,0 +1,3 @@
+export const LAST_TRACK_SAVE_INTERVAL_MS = 10_000;
+
+export const LAST_TRACK_PLAY_SAVE_DELAY_MS = 2000;

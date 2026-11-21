@@ -1,21 +1,13 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
-import type {
-	Playlist,
-	PlaylistUpdatedEvent,
-	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
-import {
-	applyPlaylistEvent,
-	sortByRank,
-} from '@/features/playlists/shared/playlist/lib/playlistSync';
-
-const detailKey = queryKeys.playlists.detail;
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
+import { sortByRank } from '@/features/playlists/shared/playlist/lib/playlistSync';
 
 export async function loadPlaylist(client: QueryClient, id: string): Promise<PlaylistWithTracks> {
 	const fetched = await playlistApi.fetchPlaylistById(id);
-	const shown = client.getQueryData<PlaylistWithTracks>(detailKey(id));
+	const shown = client.getQueryData<PlaylistWithTracks>(queryKeys.playlists.detail(id));
 	return shown && shown.tracksVersion > fetched.tracksVersion
 		? { ...fetched, tracks: shown.tracks, tracksVersion: shown.tracksVersion }
 		: { ...fetched, tracks: sortByRank(fetched.tracks) };
@@ -23,9 +15,9 @@ export async function loadPlaylist(client: QueryClient, id: string): Promise<Pla
 
 export function refreshPlaylist(client: QueryClient, id: string): Promise<PlaylistWithTracks> {
 	return client.fetchQuery({
-		queryKey: detailKey(id),
-		queryFn: () => loadPlaylist(client, id),
-		staleTime: 0,
+		queryKey: queryKeys.playlists.detail(id),
+		queryFn: context => loadPlaylist(context.client, id),
+		staleTime: STALE.none,
 		retry: false,
 	});
 }
@@ -34,72 +26,16 @@ export function isOnScreen(client: QueryClient, id: string): boolean {
 	return (
 		client
 			.getQueryCache()
-			.find({ queryKey: detailKey(id), exact: true })
+			.find({ queryKey: queryKeys.playlists.detail(id), exact: true })
 			?.isActive() ?? false
 	);
 }
 
 export async function reloadIfOnScreen(client: QueryClient, id: string): Promise<void> {
 	if (!isOnScreen(client, id)) return;
-	await client.refetchQueries({ queryKey: detailKey(id), exact: true, type: 'active' });
-}
-
-function applyTrackEvent(
-	client: QueryClient,
-	event: PlaylistUpdatedEvent
-): 'applied' | 'ignored' | 'reload' {
-	const current = client.getQueryData<PlaylistWithTracks>(detailKey(event.playlistId));
-	if (!current) return 'ignored';
-	const next = applyPlaylistEvent(current, event);
-	if (next === 'ignore') return 'ignored';
-	if (next === 'reload') return 'reload';
-	client.setQueryData(detailKey(event.playlistId), next);
-	return 'applied';
-}
-
-export async function settleTrackEvent(
-	client: QueryClient,
-	event: PlaylistUpdatedEvent
-): Promise<void> {
-	if (applyTrackEvent(client, event) === 'reload') await reloadIfOnScreen(client, event.playlistId);
-}
-
-type PlaylistPatch = Partial<
-	Pick<
-		Playlist,
-		| 'name'
-		| 'description'
-		| 'coverUrl'
-		| 'visibility'
-		| 'editMode'
-		| 'collaboratorIds'
-		| 'viewerIds'
-		| 'updatedAt'
-	>
->;
-
-export function patchPlaylist(client: QueryClient, id: string, patch: PlaylistPatch): void {
-	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
-		list?.map(playlist => (playlist.id === id ? { ...playlist, ...patch } : playlist))
-	);
-	client.setQueryData<PlaylistWithTracks>(detailKey(id), playlist =>
-		playlist ? { ...playlist, ...patch } : playlist
-	);
-}
-
-export function prependPlaylist(client: QueryClient, playlist: Playlist): void {
-	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
-		list ? [playlist, ...list] : list
-	);
-}
-
-export function dropFromList(client: QueryClient, id: string): void {
-	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
-		list?.filter(playlist => playlist.id !== id)
-	);
-}
-
-export function forgetPlaylist(client: QueryClient, id: string): void {
-	client.removeQueries({ queryKey: detailKey(id), exact: true });
-	client.removeQueries({ queryKey: queryKeys.playlists.members(id), exact: true });
+	await client.refetchQueries({
+		queryKey: queryKeys.playlists.detail(id),
+		exact: true,
+		type: 'active',
+	});
 }

@@ -7,7 +7,7 @@ import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError } from '@/shared/theme/lib/toast';
-import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/playlistTypes';
 import { deferred } from '@test-utils/deferred';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
@@ -142,7 +142,9 @@ describe('SearchTracksContainer (#307)', () => {
 		await renderScreen();
 		await search();
 		await act(async () => fireEvent.press(screen.getByText('Song')));
-		expect(showError).toHaveBeenCalled();
+		expect(showError).toHaveBeenCalledWith(
+			'Le serveur a rencontré un problème. Réessayez plus tard.'
+		);
 		expect(screen.getByTestId('add-42')).toBeTruthy();
 	});
 

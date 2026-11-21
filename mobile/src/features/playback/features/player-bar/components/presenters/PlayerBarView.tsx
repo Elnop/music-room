@@ -1,154 +1,49 @@
 import React from 'react';
-import { View } from 'react-native';
-import Slider from '@react-native-community/slider';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { Artwork } from '@/shared/theme/components/Artwork';
-import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
-import { PlayerProgressSlider } from '@/features/playback/shared/seek-bar/PlayerProgressSlider';
-import type { PlayerBarData } from '@/features/playback/features/player-bar/usePlayerBar';
-import { PlayerBarButton } from '@/features/playback/features/player-bar/components/presenters/PlayerBarButton';
-import { createStyles } from '@/features/playback/features/player-bar/components/presenters/playerBarStyles';
-import { Text } from '@/shared/theme/components/Text';
-import ArrowLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-left-solid.svg';
-import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
-import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
-import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-solid.svg';
-import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
-import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
-import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
-import SoundMuteSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-mute-solid.svg';
-import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
+import { StyleSheet, View } from 'react-native';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/playerSheetsTypes';
+import { PlayerBarActions } from '@/features/playback/features/player-bar/components/presenters/PlayerBarActions';
+import { PlayerBarControls } from '@/features/playback/features/player-bar/components/presenters/PlayerBarControls';
+import { PlayerBarProgress } from '@/features/playback/features/player-bar/components/presenters/PlayerBarProgress';
+import { PlayerBarTrack } from '@/features/playback/features/player-bar/components/presenters/PlayerBarTrack';
+import type { PlayerBarData } from '@/features/playback/features/player-bar/playerBarTypes';
+
+const CENTER_MAX_WIDTH = 640;
 
 type PlayerBarViewProps = PlayerSheets & {
 	data: PlayerBarData;
 };
 
 export function PlayerBarView({ data, QueueModal, DevicePicker }: PlayerBarViewProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const { track } = data;
-	const sliderColors = {
-		slider: theme.colors.primary,
-		sliderBg: theme.colors.borderLight,
-		textSecondary: theme.colors.textSecondary,
-	};
+	const { styles } = useThemedStyles(createStyles);
+	const { sheets } = data;
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.side}>
-				<Pressable
-					style={styles.trackButton}
-					onPress={data.onTogglePanel}
-					accessibilityLabel={data.trackLabel}
-					accessibilityState={{ expanded: data.isPanelOpen }}
-				>
-					<Artwork uri={track?.artworkUrl} size={56} style={styles.artwork} iconSize={24} />
-					<View style={styles.info}>
-						<Text style={styles.title} numberOfLines={1}>
-							{track ? track.title : 'Rien en lecture'}
-						</Text>
-						<Text style={styles.artist} numberOfLines={1}>
-							{track ? track.artist : 'Choisissez un titre pour commencer'}
-						</Text>
-						{data.deviceLabel && (
-							<Text style={styles.device} numberOfLines={1}>
-								Sur {data.deviceLabel}
-							</Text>
-						)}
-					</View>
-				</Pressable>
-			</View>
-
+			<PlayerBarTrack nowPlaying={data.nowPlaying} panel={data.panel} />
 			<View style={styles.center}>
-				<View style={styles.controls}>
-					<PlayerBarButton
-						icon={ArrowLeftSolid}
-						label="Piste précédente"
-						onPress={data.handlePrevious}
-						disabled={!data.canGoPrevious}
-						color={theme.colors.text}
-						style={styles.iconButton}
-					/>
-					<PlayerBarButton
-						icon={data.isPlaying ? PauseSolid : PlaySolid}
-						label={data.isPlaying ? 'Pause' : 'Lecture'}
-						onPress={data.handlePlayPause}
-						disabled={data.playDisabled}
-						busy={data.isLoading}
-						color={track ? theme.colors.onColor : theme.colors.textSecondary}
-						style={[styles.playButton, !track && styles.playButtonEmpty]}
-					/>
-					<PlayerBarButton
-						icon={ArrowRightSolid}
-						label="Piste suivante"
-						onPress={data.handleNext}
-						disabled={!data.canGoNext}
-						color={theme.colors.text}
-						style={styles.iconButton}
-					/>
-				</View>
-				<View style={styles.progressSlot}>
-					<PlayerProgressSlider
-						styles={styles}
-						colors={sliderColors}
-						seek={data.seek}
-						duration={data.duration}
-						hasTrack={track !== null}
-						disabled={data.sliderDisabled}
-						onSliderAction={data.handleSliderAction}
-					/>
-				</View>
+				<PlayerBarControls nowPlaying={data.nowPlaying} transport={data.transport} />
+				<PlayerBarProgress playback={data} />
 			</View>
-
-			<View style={[styles.side, styles.sideEnd]}>
-				<PlayerBarButton
-					icon={CassetteTapeSolid}
-					label={data.panelLabel}
-					onPress={data.onTogglePanel}
-					selected={data.isPanelOpen}
-					color={data.isPanelOpen ? theme.colors.primary : theme.colors.text}
-					style={styles.iconButton}
-				/>
-				<PlayerBarButton
-					icon={PlaylistSolid}
-					label="File d'attente"
-					onPress={data.onOpenQueue}
-					color={theme.colors.text}
-					style={styles.iconButton}
-				/>
-				<PlayerBarButton
-					icon={PhoneRingingLowSolid}
-					label="Choisir l'appareil"
-					onPress={data.onOpenDevices}
-					selected={data.isRemote}
-					color={data.isRemote ? theme.colors.primary : theme.colors.text}
-					style={styles.iconButton}
-				/>
-				<PlayerBarButton
-					icon={data.volume === 0 ? SoundMuteSolid : SoundOnSolid}
-					label={data.volume === 0 ? 'Activer le son' : 'Couper le son'}
-					onPress={data.onToggleMute}
-					disabled={data.volumeDisabled}
-					color={theme.colors.text}
-					style={styles.iconButton}
-				/>
-				<Slider
-					style={styles.volumeSlider}
-					minimumValue={0}
-					maximumValue={1}
-					value={data.volume}
-					onValueChange={data.onVolumeChange}
-					disabled={data.volumeDisabled}
-					minimumTrackTintColor={theme.colors.text}
-					maximumTrackTintColor={theme.colors.borderLight}
-					thumbTintColor={theme.colors.text}
-					accessibilityLabel="Volume"
-				/>
-			</View>
-
-			<QueueModal visible={data.isQueueOpen} onClose={data.onCloseQueue} />
-			<DevicePicker visible={data.isDevicesOpen} onClose={data.onCloseDevices} />
+			<PlayerBarActions data={data} />
+			<QueueModal visible={sheets.isQueueOpen} onClose={sheets.onCloseQueue} />
+			<DevicePicker visible={sheets.isDevicesOpen} onClose={sheets.onCloseDevices} />
 		</View>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		container: {
+			height: theme.controls.playerBar,
+			flexDirection: 'row',
+			alignItems: 'center',
+			paddingHorizontal: theme.spacing.md,
+			gap: theme.spacing.md,
+			backgroundColor: theme.colors.background,
+		},
+		center: { flex: 2, flexBasis: 0, maxWidth: CENTER_MAX_WIDTH, alignItems: 'stretch' },
+	});
+	return styles;
 }

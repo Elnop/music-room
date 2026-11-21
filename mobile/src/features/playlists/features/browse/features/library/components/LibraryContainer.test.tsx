@@ -8,7 +8,7 @@ import { logger } from '@/shared/logging/logger';
 import type {
 	Playlist,
 	PlaylistStackParamList,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
@@ -61,7 +61,7 @@ let clear: () => void = noop;
 function renderLibrary() {
 	const view = renderWithClient(
 		<LibraryContainer
-			actionsFor={() => undefined}
+			onPlaylistActions={() => undefined}
 			route={{ key: 'k', name: 'Playlists' } as Props['route']}
 			navigation={navigation as unknown as Props['navigation']}
 		/>

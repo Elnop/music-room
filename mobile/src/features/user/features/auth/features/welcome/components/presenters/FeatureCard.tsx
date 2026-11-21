@@ -4,16 +4,20 @@ import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { LandingFeature } from '@/features/user/features/auth/features/welcome/landingContent';
+import type { LandingFeature } from '@/features/user/features/auth/features/welcome/welcomeTypes';
 
-export function FeatureCard({ title, description, icon }: LandingFeature) {
+type FeatureCardProps = {
+	feature: LandingFeature;
+};
+
+export function FeatureCard({ feature }: FeatureCardProps) {
 	const { theme, styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.card}>
-			<PixelIcon icon={icon} size={24} color={theme.colors.primary} />
-			<Text style={styles.title}>{title}</Text>
-			<Text style={styles.description}>{description}</Text>
+			<PixelIcon icon={feature.icon} size={24} color={theme.colors.primary} />
+			<Text style={styles.title}>{feature.title}</Text>
+			<Text style={styles.description}>{feature.description}</Text>
 		</View>
 	);
 }
@@ -33,7 +37,7 @@ function createStyles(theme: Theme) {
 		},
 		description: {
 			fontSize: theme.typography.sizes.md,
-			lineHeight: 20,
+			lineHeight: theme.typography.lineHeights.sm,
 			color: theme.colors.textSecondary,
 		},
 	});

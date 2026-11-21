@@ -1,7 +1,4 @@
-export type SharingMode = {
-	isPrivate: boolean;
-	isEditRestricted: boolean;
-};
+import type { SharingMode } from '@/features/playlists/features/editor/features/sharing/sharingTypes';
 
 export function sharingHeader({ isPrivate, isEditRestricted }: SharingMode) {
 	if (isPrivate && isEditRestricted) {
@@ -31,4 +28,14 @@ export function membersTitle({ isPrivate, isEditRestricted }: SharingMode, count
 
 export function noMembersMessage({ isPrivate }: SharingMode): string {
 	return isPrivate ? "Personne n'a encore accès à cette playlist" : 'Aucun éditeur ajouté';
+}
+
+export function settingFailureMessage(changes: { visibility?: string }): string {
+	return changes.visibility
+		? 'Impossible de changer la visibilité'
+		: 'Impossible de changer le mode édition';
+}
+
+export function openEditWarning(isPrivate: boolean): string {
+	return isPrivate ? 'Tous les membres pourront éditer' : 'Tout le monde pourra éditer';
 }

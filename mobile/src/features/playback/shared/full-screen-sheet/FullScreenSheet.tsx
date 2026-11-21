@@ -2,17 +2,9 @@ import React from 'react';
 import { Modal } from 'react-native';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
+import type { SheetProps } from '@/features/playback/shared/full-screen-sheet/playerSheetsTypes';
 
-export type SheetComponent = React.ComponentType<{ visible: boolean; onClose: () => void }>;
-
-export type PlayerSheets = {
-	QueueModal: SheetComponent;
-	DevicePicker: SheetComponent;
-};
-
-type FullScreenSheetProps = {
-	visible: boolean;
-	onClose: () => void;
+type FullScreenSheetProps = SheetProps & {
 	children: React.ReactNode;
 };
 

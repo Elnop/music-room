@@ -10,7 +10,7 @@ import type { FriendsStackParamList } from '@/app/stacks/FriendsStack';
 import { MiniPlayerContainer } from '@/features/playback/features/mini-player/components/MiniPlayerContainer';
 import { TabBarLayout } from '@/features/shell/components/orchestrators/TabBarLayout';
 import { useTabOptions } from '@/features/shell/hooks/useTabOptions';
-import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/playlistTypes';
 import type { ProfileStackParamList } from '@/features/user/features/profile/profileTypes';
 
 export type AppTabsParamList = {

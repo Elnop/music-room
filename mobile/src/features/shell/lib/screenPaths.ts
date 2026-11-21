@@ -1,139 +1,15 @@
 import type { InitialState } from '@react-navigation/native';
-import type { AppTabsParamList } from '@/app/AppNavigator';
+import { SCREEN_PATHS } from '@/features/shell/configs/screenPathsConfig';
+import type {
+	AppTab,
+	NestedParams,
+	RouteNode,
+	ScreenPath,
+	ScreenPathMatch,
+	StateNode,
+} from '@/features/shell/types/screenPathTypes';
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
-
-type AppTab = keyof AppTabsParamList;
-
-type StackRoute = {
-	name: string;
-	params?: object;
-};
-
-type ScreenPath = {
-	screen: string;
-	path: string;
-	param?: string;
-	tab?: AppTab;
-	routes: (id: string) => StackRoute[];
-	isShareLink?: true;
-};
-
-function PLAYLIST(id: string): StackRoute[] {
-	return [{ name: 'Playlists' }, { name: 'PlaylistDetail', params: { id } }];
-}
-function EVENT(id: string): StackRoute[] {
-	return [{ name: 'Home' }, { name: 'EventDetail', params: { id } }];
-}
-const LOGIN: StackRoute[] = [{ name: 'Welcome' }, { name: 'Login' }];
-const PROFILE: StackRoute[] = [{ name: 'Profile' }];
-
-function profileScreen(screen: string, path: string): ScreenPath {
-	return {
-		screen,
-		path,
-		tab: 'ProfileTab',
-		routes: () => [...PROFILE, { name: screen }],
-	};
-}
-
-const SCREEN_PATHS: readonly ScreenPath[] = [
-	{ screen: 'Welcome', path: '', routes: () => [{ name: 'Welcome' }] },
-	{ screen: 'Welcome', path: 'welcome', routes: () => [{ name: 'Welcome' }] },
-	{
-		screen: 'PrivacyPolicy',
-		path: 'privacy',
-		routes: () => [{ name: 'Welcome' }, { name: 'PrivacyPolicy' }],
-	},
-	{ screen: 'Login', path: 'login', routes: () => LOGIN },
-	{
-		screen: 'Register',
-		path: 'register',
-		routes: () => [{ name: 'Welcome' }, { name: 'Register' }],
-	},
-	{ screen: 'EmailVerification', path: 'verify-email', routes: () => LOGIN },
-	{
-		screen: 'ForgotPassword',
-		path: 'forgot-password',
-		routes: () => [...LOGIN, { name: 'ForgotPassword' }],
-	},
-	{
-		screen: 'ResetPassword',
-		path: 'reset-password',
-		routes: () => [...LOGIN, { name: 'ForgotPassword' }],
-	},
-	{ screen: 'Home', path: '', tab: 'HomeTab', routes: () => [{ name: 'Home' }] },
-	{
-		screen: 'Playlists',
-		path: 'playlists',
-		tab: 'PlaylistsTab',
-		routes: () => [{ name: 'Playlists' }],
-	},
-	{
-		screen: 'CreatePlaylist',
-		path: 'playlists/new',
-		tab: 'PlaylistsTab',
-		routes: () => [{ name: 'Playlists' }, { name: 'CreatePlaylist' }],
-	},
-	{
-		screen: 'PlaylistDetail',
-		path: 'playlist/:id',
-		param: 'id',
-		tab: 'PlaylistsTab',
-		routes: PLAYLIST,
-		isShareLink: true,
-	},
-	...(
-		[
-			['CreatePlaylist', 'edit'],
-			['PlaylistSharing', 'sharing'],
-			['SearchTracks', 'add-tracks'],
-		] as const
-	).map(([screen, path]) => ({
-		screen,
-		path: `playlist/:id/${path}`,
-		param: 'playlistId',
-		tab: 'PlaylistsTab' as const,
-		routes: (id: string) => [...PLAYLIST(id), { name: screen, params: { playlistId: id } }],
-	})),
-	{
-		screen: 'EventForm',
-		path: 'events/new',
-		tab: 'HomeTab',
-		routes: () => [{ name: 'Home' }, { name: 'EventForm' }],
-	},
-	{ screen: 'EventDetail', path: 'event/:id', param: 'id', tab: 'HomeTab', routes: EVENT },
-	{
-		screen: 'EventForm',
-		path: 'event/:id/edit',
-		param: 'eventId',
-		tab: 'HomeTab',
-		routes: id => [...EVENT(id), { name: 'EventForm', params: { eventId: id } }],
-	},
-	{ screen: 'Search', path: 'search', tab: 'SearchTab', routes: () => [{ name: 'Search' }] },
-	{ screen: 'Friends', path: 'friends', tab: 'FriendsTab', routes: () => [{ name: 'Friends' }] },
-	{
-		screen: 'UserProfile',
-		path: 'user/:id',
-		param: 'userId',
-		tab: 'FriendsTab',
-		routes: id => [{ name: 'Friends' }, { name: 'UserProfile', params: { userId: id } }],
-		isShareLink: true,
-	},
-	{ screen: 'Profile', path: 'profile', tab: 'ProfileTab', routes: () => PROFILE },
-	profileScreen('EditProfile', 'profile/edit'),
-	profileScreen('PrivacySettings', 'profile/privacy'),
-	profileScreen('LinkedAccounts', 'profile/linked-accounts'),
-	profileScreen('MyDevices', 'profile/devices'),
-	profileScreen('MusicPreferences', 'profile/music'),
-	profileScreen('Settings', 'settings'),
-	{
-		screen: 'PrivacyPolicy',
-		path: 'privacy',
-		tab: 'ProfileTab',
-		routes: () => [...PROFILE, { name: 'Settings' }, { name: 'PrivacyPolicy' }],
-	},
-];
 
 const TAB_SCREENS: Record<AppTab, string> = {
 	HomeTab: 'Home',
@@ -148,22 +24,16 @@ const MATCHERS = SCREEN_PATHS.map(entry => ({
 	regex: new RegExp(`^${entry.path.replace(':id', `(${UUID})`)}$`, 'iu'),
 }));
 
-export type ScreenPathMatch = {
-	entry: ScreenPath;
-	id: string;
-};
-
 export function matchScreenPath(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
 	const bare = path.split(/[?#]/u)[0].replaceAll(/^\/+|\/+$/gu, '');
-	let otherSession: ScreenPathMatch | undefined;
-	for (const { entry, regex } of MATCHERS) {
+	const matches = MATCHERS.flatMap(({ entry, regex }) => {
 		const found = regex.exec(bare);
-		if (!found) continue;
-		const match = { entry, id: found[1] ?? '' };
-		if (signedIn === undefined || Boolean(entry.tab) === signedIn) return match;
-		otherSession ??= match;
-	}
-	return otherSession;
+		return found ? [{ entry, id: found[1] ?? '' }] : [];
+	});
+	return (
+		matches.find(match => signedIn === undefined || Boolean(match.entry.tab) === signedIn) ??
+		matches[0]
+	);
 }
 
 export function stateFromMatch({ entry, id }: ScreenPathMatch): InitialState {
@@ -171,22 +41,6 @@ export function stateFromMatch({ entry, id }: ScreenPathMatch): InitialState {
 	const stack = { index: routes.length - 1, routes };
 	return entry.tab ? { routes: [{ name: entry.tab, state: stack }] } : stack;
 }
-
-type RouteNode = {
-	name: string;
-	params?: object;
-	state?: StateNode;
-};
-
-type StateNode = {
-	index?: number;
-	routes: readonly RouteNode[];
-};
-
-type NestedParams = {
-	screen?: string;
-	params?: object;
-};
 
 function focusedRoute(state: StateNode): RouteNode | undefined {
 	let route = state.routes[state.index ?? state.routes.length - 1];
@@ -200,15 +54,19 @@ function focusedRoute(state: StateNode): RouteNode | undefined {
 	}
 }
 
+function screenPathFor(name: string, params: Record<string, unknown>): ScreenPath | undefined {
+	const candidates = SCREEN_PATHS.filter(candidate => candidate.screen === name);
+	return (
+		candidates.find(candidate => candidate.param && typeof params[candidate.param] === 'string') ??
+		candidates.find(candidate => !candidate.param)
+	);
+}
+
 export function pathFromState(state: StateNode): string {
 	const route = focusedRoute(state);
 	if (!route) return '/';
-	const name = TAB_SCREENS[route.name as AppTab] ?? route.name;
 	const params = (route.params ?? {}) as Record<string, unknown>;
-	const candidates = SCREEN_PATHS.filter(candidate => candidate.screen === name);
-	const entry =
-		candidates.find(candidate => candidate.param && typeof params[candidate.param] === 'string') ??
-		candidates.find(candidate => !candidate.param);
+	const entry = screenPathFor(TAB_SCREENS[route.name as AppTab] ?? route.name, params);
 	if (!entry) return '/';
 	const id = entry.param ? String(params[entry.param]) : '';
 	return `/${entry.path.replace(':id', id)}`;

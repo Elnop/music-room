@@ -1,14 +1,5 @@
 import { CONTACT_EMAIL, CONTACT_MAILTO } from '@/shared/project-links/projectLinksConfig';
-
-export type PolicySpan =
-	string | { bold: string } | { code: string } | { link: string; url: string };
-
-type PolicyBlock = { paragraph: PolicySpan[] } | { list: PolicySpan[][] };
-
-type PolicySection = {
-	title: string;
-	blocks: PolicyBlock[];
-};
+import type { PolicySection, PolicySpan } from '@/features/legal/policyTypes';
 
 export const POLICY_UPDATED_AT = 'Dernière mise à jour : 25 octobre 2026';
 

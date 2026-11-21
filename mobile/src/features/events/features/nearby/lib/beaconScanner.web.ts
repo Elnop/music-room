@@ -1,18 +1,4 @@
-type BeaconFrame = {
-	minor: number;
-	rssi: number;
-	measuredPower: number;
-};
-
-export type ScannerState = 'on' | 'off' | 'unsupported';
-
-export function requestScanPermission(): Promise<boolean> {
-	return Promise.resolve(true);
-}
-
-export function hasScanPermission(): Promise<boolean> {
-	return Promise.resolve(true);
-}
+import type { BeaconFrame, ScannerState } from '@/features/events/features/nearby/nearbyTypes';
 
 export function watchBluetoothState(listener: (state: ScannerState) => void): () => void {
 	listener('unsupported');

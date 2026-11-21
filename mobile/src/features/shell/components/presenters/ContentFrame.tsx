@@ -1,18 +1,16 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import {
-	CONTENT_MAX_WIDTH,
-	NOW_PLAYING_PANEL_WIDTH,
-	SIDEBAR_WIDTH,
-} from '@/shared/theme/configs/layoutConfig';
+import type { ViewStyle } from 'react-native';
+import { CONTENT_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import type { ContentWidth } from '@/shared/theme/types/layoutTypes';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { ContentColumnContext } from '@/shared/content-column/contentColumnConfig';
 import { ContentWidthContext } from '@/shared/theme/configs/contentWidthConfig';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
+import { frameContentWidth } from '@/features/shell/lib/frameContentWidth';
 
-type ContentContainerProps = {
+type ContentFrameProps = {
 	width: ContentWidth;
 	besideSidebar?: boolean;
 	scrollsAtEdge?: boolean;
@@ -26,27 +24,28 @@ export function ContentFrame({
 	scrollsAtEdge = false,
 	panelOpen = false,
 	children,
-}: ContentContainerProps) {
+}: ContentFrameProps) {
 	const { styles } = useThemedStyles(createStyles);
-	const { breakpoint, isWide, isDesktop, width: windowWidth } = useBreakpoint();
+	const screen = useBreakpoint();
 
-	if (!isWide) return <>{children}</>;
+	if (!screen.isWide) return <>{children}</>;
 
-	const sidebar = besideSidebar && breakpoint !== 'phone' ? SIDEBAR_WIDTH[breakpoint] : 0;
-	const panel = besideSidebar && isDesktop && panelOpen ? NOW_PLAYING_PANEL_WIDTH : 0;
-	const contentWidth = Math.min(windowWidth - sidebar - panel, CONTENT_MAX_WIDTH[width]);
+	const maxWidth = CONTENT_MAX_WIDTH[width];
+	const contentWidth = frameContentWidth(screen, { maxWidth, besideSidebar, panelOpen });
 
 	return (
 		<ContentWidthContext.Provider value={contentWidth}>
-			<ContentColumnContext.Provider value={scrollsAtEdge ? CONTENT_MAX_WIDTH[width] : null}>
+			<ContentColumnContext.Provider value={scrollsAtEdge ? maxWidth : null}>
 				<View style={styles.outer}>
-					<View style={[styles.inner, !scrollsAtEdge && { maxWidth: CONTENT_MAX_WIDTH[width] }]}>
-						{children}
-					</View>
+					<View style={[styles.inner, !scrollsAtEdge && maxWidthStyle(maxWidth)]}>{children}</View>
 				</View>
 			</ContentColumnContext.Provider>
 		</ContentWidthContext.Provider>
 	);
+}
+
+function maxWidthStyle(maxWidth: number): ViewStyle {
+	return { maxWidth };
 }
 
 function createStyles(theme: Theme) {

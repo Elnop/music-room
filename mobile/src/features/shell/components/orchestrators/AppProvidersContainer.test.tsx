@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppProvidersContainer } from '@/features/shell/components/orchestrators/AppProvidersContainer';
 import { createQueryClient } from '@/shared/backend/queryClient';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
 import { Text } from '@/shared/theme/components/Text';
@@ -55,7 +56,7 @@ describe('AppProvidersContainer', () => {
 
 	it('clears the whole query cache when the session ends', () => {
 		const client = createQueryClient();
-		client.setQueryData(['playlists', 'friends'], [{ id: 'p1' }]);
+		client.setQueryData(queryKeys.playlists.friends(), [{ id: 'p1' }]);
 		const { unmount } = render(
 			<AppProvidersContainer queryClient={client}>
 				<Text>app</Text>
@@ -63,12 +64,12 @@ describe('AppProvidersContainer', () => {
 		);
 
 		notifySessionEnd();
-		expect(client.getQueryData(['playlists', 'friends'])).toBeUndefined();
+		expect(client.getQueryData(queryKeys.playlists.friends())).toBeUndefined();
 
-		client.setQueryData(['playlists', 'friends'], [{ id: 'p2' }]);
+		client.setQueryData(queryKeys.playlists.friends(), [{ id: 'p2' }]);
 		unmount();
 		notifySessionEnd();
-		expect(client.getQueryData(['playlists', 'friends'])).toStrictEqual([{ id: 'p2' }]);
+		expect(client.getQueryData(queryKeys.playlists.friends())).toStrictEqual([{ id: 'p2' }]);
 		client.clear();
 	});
 });

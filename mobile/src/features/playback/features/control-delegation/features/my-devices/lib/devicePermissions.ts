@@ -1,7 +1,12 @@
 import type {
+	UserDevice,
 	UserDeviceWithLicenses,
 	FriendUserSummary,
-} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+} from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
+import type {
+	DeviceAccess,
+	FriendLicense,
+} from '@/features/playback/features/control-delegation/features/my-devices/myDevicesTypes';
 
 export function pairKey(deviceId: string, userId: string): string {
 	return `${deviceId}|${userId}`;
@@ -26,4 +31,20 @@ export function licensedPairs(devices: UserDeviceWithLicenses[]): Set<string> {
 		}
 	}
 	return pairs;
+}
+
+export function friendLicenses(device: UserDevice, access: DeviceAccess): FriendLicense[] {
+	return access.friends.map(friend => {
+		const key = pairKey(device.deviceId, friend.id);
+		const allDevices = access.allDevicesFriendIds.has(friend.id);
+		const isPending = access.pending.has(key);
+		return {
+			friend,
+			key,
+			value: allDevices || access.licensed.has(key),
+			disabled: allDevices || isPending,
+			isPending,
+			allDevices,
+		};
+	});
 }

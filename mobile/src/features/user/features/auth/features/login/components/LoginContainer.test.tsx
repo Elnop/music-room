@@ -4,10 +4,10 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LoginContainer } from '@/features/user/features/auth/features/login/components/LoginContainer';
-import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
+import { authStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
 import { signInWithFacebook } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import type { AuthStackParamList } from '@/features/user/features/auth/authTypes';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showWarning } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
@@ -76,7 +76,7 @@ beforeEach(async () => {
 	jest.mocked(signInWithFacebook).mockReset();
 	await AsyncStorage.clear();
 	await resetBackendUrl();
-	useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false });
+	authStore.setState({ user: null, accessToken: null, isAuthenticated: false });
 });
 
 afterEach(() => {
@@ -91,7 +91,7 @@ describe('LoginContainer', () => {
 
 		fillAndSubmit('a@example.com', 'Secret1!');
 
-		await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true));
+		await waitFor(() => expect(authStore.getState().isAuthenticated).toBe(true));
 		expect(fetchMock.mock.calls[0][0]).toMatch(/\/api\/auth\/login$/u);
 		expect(showError).not.toHaveBeenCalled();
 	});
@@ -113,7 +113,7 @@ describe('LoginContainer', () => {
 		fillAndSubmit('a@example.com', 'wrong');
 
 		await waitFor(() => expect(showError).toHaveBeenCalledWith('Email ou mot de passe incorrect'));
-		expect(useAuthStore.getState().isAuthenticated).toBe(false);
+		expect(authStore.getState().isAuthenticated).toBe(false);
 	});
 
 	it('sends an unverified account to the code screen', async () => {
@@ -127,8 +127,9 @@ describe('LoginContainer', () => {
 		);
 		expect(navigate).not.toHaveBeenCalled();
 
-		await waitFor(() => expect(navigate).toHaveBeenCalled(), { timeout: 3000 });
-		expect(navigate).toHaveBeenCalledWith('EmailVerification', details);
+		await waitFor(() => expect(navigate).toHaveBeenCalledWith('EmailVerification', details), {
+			timeout: 3000,
+		});
 		expect(showError).not.toHaveBeenCalled();
 	});
 
@@ -150,7 +151,7 @@ describe('LoginContainer', () => {
 
 		fireEvent.press(screen.getByLabelText('Continuer avec Google'));
 
-		await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true));
+		await waitFor(() => expect(authStore.getState().isAuthenticated).toBe(true));
 		expect(fetchMock.mock.calls[0][0]).toMatch(/\/api\/auth\/google$/u);
 	});
 
@@ -160,7 +161,7 @@ describe('LoginContainer', () => {
 
 		fireEvent.press(screen.getByLabelText('Continuer avec Facebook'));
 
-		await waitFor(() => expect(signInWithFacebook).toHaveBeenCalled());
+		await waitFor(() => expect(signInWithFacebook).toHaveBeenCalledWith());
 		await waitFor(() => expect(screen.getByLabelText('Continuer avec Facebook')).toBeEnabled());
 		expect(showError).not.toHaveBeenCalled();
 		expect(fetchMock).not.toHaveBeenCalled();
@@ -183,7 +184,12 @@ describe('LoginContainer', () => {
 
 		fillAndSubmit('a@example.com', 'wrong');
 		view.setFocused(false);
-		await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+		await waitFor(() =>
+			expect(fetchMock).toHaveBeenCalledWith(
+				expect.stringMatching(/\/api\/auth\/login$/u),
+				expect.anything()
+			)
+		);
 		await new Promise<void>(resolve => setTimeout(resolve, 50));
 		expect(showError).not.toHaveBeenCalled();
 
@@ -198,7 +204,12 @@ describe('LoginContainer', () => {
 		const view = renderLogin();
 
 		fillAndSubmit('a@example.com', 'wrong');
-		await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+		await waitFor(() =>
+			expect(fetchMock).toHaveBeenCalledWith(
+				expect.stringMatching(/\/api\/auth\/login$/u),
+				expect.anything()
+			)
+		);
 		view.unmount();
 		answer(fail(401, 'INVALID_CREDENTIALS'));
 		await new Promise<void>(resolve => setTimeout(resolve, 50));

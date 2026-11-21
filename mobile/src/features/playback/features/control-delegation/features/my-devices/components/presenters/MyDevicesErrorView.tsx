@@ -4,14 +4,13 @@ import type { RefreshControlProps } from 'react-native';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
+import { LOAD_ERROR } from '@/features/playback/features/control-delegation/features/my-devices/myDevicesConfig';
 
-const LOAD_ERROR = 'Impossible de charger vos appareils';
-
-export function MyDevicesErrorView({
-	refreshControl,
-}: {
+type MyDevicesErrorViewProps = {
 	refreshControl: React.ReactElement<RefreshControlProps>;
-}) {
+};
+
+export function MyDevicesErrorView({ refreshControl }: MyDevicesErrorViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	return (
@@ -39,7 +38,7 @@ function createStyles(theme: Theme) {
 		},
 		errorMessage: {
 			color: theme.colors.textSecondary,
-			fontSize: 16,
+			fontSize: theme.typography.sizes.lg,
 			textAlign: 'center',
 		},
 	});

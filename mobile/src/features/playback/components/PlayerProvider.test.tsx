@@ -1,13 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { act, render } from '@testing-library/react-native';
 import { PlayerProvider } from '@/features/playback/components/PlayerProvider';
-import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
-import {
-	readPositionMs,
-	usePlayerStore,
-} from '@/features/playback/shared/player/stores/playerStore';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { readPositionMs } from '@/features/playback/shared/player/lib/positionReader';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { queueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { createStore } from 'zustand';
@@ -18,6 +15,9 @@ import type { SoundCloudTrack, StreamUrlResponse } from '@/shared/tracks/types/s
 import type { QueueItem } from '@/shared/playback/types/queueTypes';
 import type { UserProfile } from '@/shared/users/userTypes';
 import { noop } from '@test-utils/noop';
+import { flushAct } from '@test-utils/flushAct';
+import { inMinutes } from '@test-utils/inMinutes';
+import { SeekProbe } from '@test-utils/SeekProbe';
 
 type MockPlayer = {
 	id: number;
@@ -131,20 +131,14 @@ const track: SoundCloudTrack = {
 	playable: true,
 };
 
-const MINUTE_MS = 60 * 1000;
-function inMinutes(minutes: number) {
-	return new Date(Date.now() + minutes * MINUTE_MS).toISOString();
-}
-
 let seekRef: ((seconds: number) => void) | null = null;
-function setSeekRef(seekTo: (seconds: number) => void) {
-	seekRef = seekTo;
-}
-function SeekProbe() {
-	const { seekTo } = usePlayer();
-	useEffect(() => setSeekRef(seekTo), [seekTo]);
-	return null;
-}
+const seekProbe = (
+	<SeekProbe
+		onSeekTo={seekTo => {
+			seekRef = seekTo;
+		}}
+	/>
+);
 
 const testSessionStore = createStore<SessionView>(() => ({
 	user: { id: 'me' } as UserProfile,
@@ -160,22 +154,15 @@ registerAuthSession({
 
 let mockNext = jest.fn(async () => 'played' as const);
 
-const initialPlayerState = usePlayerStore.getState();
+const initialPlayerState = playerStore.getState();
 const initialAuthState = testSessionStore.getState();
-const initialConnectState = useConnectStore.getState();
-const initialQueueState = useQueueStore.getState();
+const initialConnectState = connectStore.getState();
+const initialQueueState = queueStore.getState();
 
 function answerStreams(
 	...urls: { streamUrl: string; expiresAt: string; protocol?: StreamUrlResponse['protocol'] }[]
 ) {
 	for (const data of urls) mockApiRequest.mockResolvedValueOnce(data);
-}
-
-async function flush() {
-	await act(async () => {
-		await Promise.resolve();
-		await Promise.resolve();
-	});
 }
 
 function setStatus(player: MockPlayer, status: Partial<MockStatus>) {
@@ -191,24 +178,14 @@ function setStatus(player: MockPlayer, status: Partial<MockStatus>) {
 }
 
 async function rerender(view: ReturnType<typeof render>) {
-	await act(async () =>
-		view.rerender(
-			<PlayerProvider>
-				<SeekProbe />
-			</PlayerProvider>
-		)
-	);
+	await act(async () => view.rerender(<PlayerProvider>{seekProbe}</PlayerProvider>));
 }
 
 async function startPlaying(expiresAt: string) {
 	answerStreams({ streamUrl: 'u1', expiresAt });
-	const view = render(
-		<PlayerProvider>
-			<SeekProbe />
-		</PlayerProvider>
-	);
-	await act(async () => usePlayerStore.getState().playTrack(track, 'q1'));
-	await flush();
+	const view = render(<PlayerProvider>{seekProbe}</PlayerProvider>);
+	await act(async () => playerStore.getState().playTrack(track, 'q1'));
+	await flushAct();
 	return view;
 }
 
@@ -217,12 +194,12 @@ beforeEach(() => {
 	mockStatuses.clear();
 	mockApiRequest.mockReset();
 	seekRef = null;
-	usePlayerStore.setState(initialPlayerState, true);
-	useQueueStore.setState(initialQueueState, true);
-	useQueueStore.setState({ next: () => mockNext() });
+	playerStore.setState(initialPlayerState, true);
+	queueStore.setState(initialQueueState, true);
+	queueStore.setState({ next: () => mockNext() });
 	testSessionStore.setState(initialAuthState, true);
 	streamPrefetch.clear();
-	useConnectStore.setState(initialConnectState, true);
+	connectStore.setState(initialConnectState, true);
 	mockNext = jest.fn(async () => 'played' as const);
 });
 
@@ -235,31 +212,27 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		const expiresAt = inMinutes(30);
 		await startPlaying(expiresAt);
 
-		const state = usePlayerStore.getState();
+		const state = playerStore.getState();
 		expect(state.playbackState).toBe('playing');
 		expect(state.streamUrl).toBe('u1');
 		expect(state.streamExpiresAt).toBe(Date.parse(expiresAt));
-		expect(mockPlayerFor('u1').play).toHaveBeenCalled();
+		expect(mockPlayerFor('u1').play).toHaveBeenCalledWith();
 	});
 
 	it('keeps the protocol of the stream, and of the URL that renews it', async () => {
 		answerStreams({ streamUrl: 'u1', expiresAt: inMinutes(1), protocol: 'progressive' });
-		render(
-			<PlayerProvider>
-				<SeekProbe />
-			</PlayerProvider>
-		);
-		await act(async () => usePlayerStore.getState().playTrack(track, 'q1'));
-		await flush();
-		expect(usePlayerStore.getState().streamProtocol).toBe('progressive');
-		act(() => usePlayerStore.getState().pause());
+		render(<PlayerProvider>{seekProbe}</PlayerProvider>);
+		await act(async () => playerStore.getState().playTrack(track, 'q1'));
+		await flushAct();
+		expect(playerStore.getState().streamProtocol).toBe('progressive');
+		act(() => playerStore.getState().pause());
 		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
 
-		await act(async () => usePlayerStore.getState().resume());
-		await flush();
+		await act(async () => playerStore.getState().resume());
+		await flushAct();
 
-		expect(usePlayerStore.getState().streamUrl).toBe('u2');
-		expect(usePlayerStore.getState().streamProtocol).toBe('hls');
+		expect(playerStore.getState().streamUrl).toBe('u2');
+		expect(playerStore.getState().streamProtocol).toBe('hls');
 	});
 
 	it('acts on the player directly when seeking a fresh URL', async () => {
@@ -269,24 +242,24 @@ describe('PlayerProvider stream renewal (#313)', () => {
 
 		expect(mockPlayerFor('u1').seekTo).toHaveBeenCalledWith(90);
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
-		expect(usePlayerStore.getState().seekCount).toBe(1);
+		expect(playerStore.getState().seekCount).toBe(1);
 	});
 
 	it('resumes a track paused past its expiry at the paused position, with no error', async () => {
 		await startPlaying(inMinutes(1));
 		const u1 = mockPlayerFor('u1');
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 		u1.currentTime = 42;
 		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
 
-		await act(async () => usePlayerStore.getState().resume());
-		await flush();
+		await act(async () => playerStore.getState().resume());
+		await flushAct();
 
 		const u2 = mockPlayerFor('u2');
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
 		expect(u2.seekTo).toHaveBeenCalledWith(42);
-		expect(u2.play).toHaveBeenCalled();
-		const state = usePlayerStore.getState();
+		expect(u2.play).toHaveBeenCalledWith();
+		const state = playerStore.getState();
 		expect(state.playbackState).toBe('playing');
 		expect(state.currentTrack).toStrictEqual(track);
 		expect(state.queueItemId).toBe('q1');
@@ -300,18 +273,18 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		'reloads at the seek position on a stale URL, keeping the %s state',
 		async (expected, playing) => {
 			await startPlaying(inMinutes(1));
-			if (!playing) act(() => usePlayerStore.getState().pause());
+			if (!playing) act(() => playerStore.getState().pause());
 			answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
 
 			await act(async () => seekRef?.(90));
-			await flush();
+			await flushAct();
 
 			const u2 = mockPlayerFor('u2');
 			expect(mockPlayerFor('u1').seekTo).not.toHaveBeenCalled();
 			expect(u2.seekTo).toHaveBeenCalledWith(90);
 			expect(u2.play).toHaveBeenCalledTimes(playing ? 1 : 0);
-			expect(usePlayerStore.getState().playbackState).toBe(expected);
-			expect(usePlayerStore.getState().error).toBeNull();
+			expect(playerStore.getState().playbackState).toBe(expected);
+			expect(playerStore.getState().error).toBeNull();
 		}
 	);
 
@@ -321,46 +294,26 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
 
 		setStatus(u1, { playbackState: 'ready', isLoaded: true, currentTime: 30 });
-		view.rerender(
-			<PlayerProvider>
-				<SeekProbe />
-			</PlayerProvider>
-		);
+		view.rerender(<PlayerProvider>{seekProbe}</PlayerProvider>);
 		setStatus(u1, { playbackState: 'idle', isLoaded: false, currentTime: 0 });
-		await act(async () =>
-			view.rerender(
-				<PlayerProvider>
-					<SeekProbe />
-				</PlayerProvider>
-			)
-		);
-		await flush();
+		await act(async () => view.rerender(<PlayerProvider>{seekProbe}</PlayerProvider>));
+		await flushAct();
 
 		const u2 = mockPlayerFor('u2');
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
 		expect(u2.seekTo).toHaveBeenCalledWith(30);
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
-		expect(usePlayerStore.getState().error).toBeNull();
+		expect(playerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().error).toBeNull();
 
 		setStatus(u2, { playbackState: 'ready', isLoaded: true, currentTime: 31 });
-		view.rerender(
-			<PlayerProvider>
-				<SeekProbe />
-			</PlayerProvider>
-		);
+		view.rerender(<PlayerProvider>{seekProbe}</PlayerProvider>);
 		setStatus(u2, { playbackState: 'failed', isLoaded: false });
-		await act(async () =>
-			view.rerender(
-				<PlayerProvider>
-					<SeekProbe />
-				</PlayerProvider>
-			)
-		);
-		await flush();
+		await act(async () => view.rerender(<PlayerProvider>{seekProbe}</PlayerProvider>));
+		await flushAct();
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
-		expect(usePlayerStore.getState().error).toBe('Impossible de charger ce titre');
-		expect(usePlayerStore.getState().currentTrack).toBeNull();
+		expect(playerStore.getState().error).toBe('Impossible de charger ce titre');
+		expect(playerStore.getState().currentTrack).toBeNull();
 	});
 
 	it('renews again once the renewed stream has played 30 s past its start', async () => {
@@ -375,55 +328,55 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		await rerender(view);
 		setStatus(u1, { playbackState: 'idle', isLoaded: false, currentTime: 0 });
 		await rerender(view);
-		await flush();
-		expect(usePlayerStore.getState().streamRenewed).toBe(true);
+		await flushAct();
+		expect(playerStore.getState().streamRenewed).toBe(true);
 
 		const u2 = mockPlayerFor('u2');
 		setStatus(u2, { playbackState: 'ready', isLoaded: true, currentTime: 60 });
 		await rerender(view);
-		expect(usePlayerStore.getState().streamRenewed).toBe(false);
+		expect(playerStore.getState().streamRenewed).toBe(false);
 
 		setStatus(u2, { playbackState: 'idle', isLoaded: false, currentTime: 0 });
 		await rerender(view);
-		await flush();
+		await flushAct();
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(3);
 		expect(mockPlayerFor('u3').seekTo).toHaveBeenCalledWith(60);
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
-		expect(usePlayerStore.getState().error).toBeNull();
+		expect(playerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().error).toBeNull();
 	});
 
 	it('ignores a player that never loaded', async () => {
 		const view = await startPlaying(inMinutes(30));
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().playbackState).toBe('playing');
 		const u1 = mockPlayerFor('u1');
 
 		setStatus(u1, { playbackState: 'idle', isLoaded: false });
 		await rerender(view);
 		setStatus(u1, { playbackState: 'idle', isLoaded: false, currentTime: 0 });
 		await rerender(view);
-		await flush();
+		await flushAct();
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
-		expect(usePlayerStore.getState().loadCounter).toBe(1);
-		expect(usePlayerStore.getState().error).toBeNull();
+		expect(playerStore.getState().loadCounter).toBe(1);
+		expect(playerStore.getState().error).toBeNull();
 	});
 
 	it('reports the resume position while a renewal reloads', async () => {
 		await startPlaying(inMinutes(1));
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 		mockPlayerFor('u1').currentTime = 42;
 		let answer: (data: { streamUrl: string; expiresAt: string }) => void = noop;
 		mockApiRequest.mockReturnValueOnce(new Promise(resolve => (answer = resolve)));
 
-		await act(async () => usePlayerStore.getState().resume());
+		await act(async () => playerStore.getState().resume());
 
-		expect(usePlayerStore.getState().playbackState).toBe('loading');
+		expect(playerStore.getState().playbackState).toBe('loading');
 		expect(readPositionMs()).toBe(42000);
 
 		await act(async () => answer({ streamUrl: 'u2', expiresAt: inMinutes(30) }));
-		await flush();
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		await flushAct();
+		expect(playerStore.getState().playbackState).toBe('playing');
 		expect(readPositionMs()).toBe(42000);
 	});
 
@@ -431,45 +384,35 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		const view = await startPlaying(inMinutes(30));
 		const u1 = mockPlayerFor('u1');
 		setStatus(u1, { playbackState: 'ready', isLoaded: true });
-		view.rerender(
-			<PlayerProvider>
-				<SeekProbe />
-			</PlayerProvider>
-		);
-		act(() => usePlayerStore.getState().pause());
+		view.rerender(<PlayerProvider>{seekProbe}</PlayerProvider>);
+		act(() => playerStore.getState().pause());
 		setStatus(u1, { playbackState: 'idle', isLoaded: false });
-		await act(async () =>
-			view.rerender(
-				<PlayerProvider>
-					<SeekProbe />
-				</PlayerProvider>
-			)
-		);
+		await act(async () => view.rerender(<PlayerProvider>{seekProbe}</PlayerProvider>));
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
-		expect(usePlayerStore.getState().error).toBeNull();
+		expect(playerStore.getState().error).toBeNull();
 	});
 
 	it('shows the error when the renewal request answers 404', async () => {
 		await startPlaying(inMinutes(1));
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 		mockApiRequest.mockRejectedValueOnce(
 			new MockApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
 		);
 
-		await act(async () => usePlayerStore.getState().resume());
-		await flush();
+		await act(async () => playerStore.getState().resume());
+		await flushAct();
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
-		expect(usePlayerStore.getState().error).toBe("Ce titre n'est plus disponible");
-		expect(usePlayerStore.getState().playbackState).toBe('idle');
+		expect(playerStore.getState().error).toBe("Ce titre n'est plus disponible");
+		expect(playerStore.getState().playbackState).toBe('idle');
 	});
 
 	it('does not renew in remote mode', async () => {
 		await startPlaying(inMinutes(1));
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 		act(() => {
-			useConnectStore.setState({
+			connectStore.setState({
 				target: { kind: 'remote', ownerId: 'o', deviceId: 'd' },
 				remoteStatus: null,
 				controlPending: false,
@@ -508,7 +451,7 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 		await nativeSets(view, u1, false);
 
-		const state = usePlayerStore.getState();
+		const state = playerStore.getState();
 		expect(state.playbackState).toBe('paused');
 		expect(state.isPlaying).toBe(false);
 		expect(state.pausedBySystem).toBe(true);
@@ -519,10 +462,10 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		u1.currentTime = 42;
 
 		await nativeSets(view, u1, false);
-		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		expect(playerStore.getState().playbackState).toBe('paused');
 		await nativeSets(view, u1, true);
 
-		const state = usePlayerStore.getState();
+		const state = playerStore.getState();
 		expect(state.playbackState).toBe('playing');
 		expect(state.pausedBySystem).toBe(false);
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
@@ -532,13 +475,13 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 	it('stays paused when the user paused during the interruption', async () => {
 		const { view, u1 } = await playingNatively();
 		await nativeSets(view, u1, false);
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 		u1.pause.mockClear();
 
 		await nativeSets(view, u1, true);
 
-		expect(usePlayerStore.getState().playbackState).toBe('paused');
-		expect(u1.pause).toHaveBeenCalled();
+		expect(playerStore.getState().playbackState).toBe('paused');
+		expect(u1.pause).toHaveBeenCalledWith();
 		expect(u1.playing).toBe(false);
 	});
 
@@ -547,8 +490,8 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 		await nativeSets(view, u1, true, { currentTime: 10 });
 
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
-		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+		expect(playerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().pausedBySystem).toBe(false);
 	});
 
 	it.each([
@@ -562,8 +505,8 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 		await nativeSets(view, u1, false, extra);
 
-		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
-		expect(usePlayerStore.getState().playbackState).not.toBe('paused');
+		expect(playerStore.getState().pausedBySystem).toBe(false);
+		expect(playerStore.getState().playbackState).not.toBe('paused');
 	});
 
 	it.each(['failed', 'idle'])(
@@ -576,8 +519,8 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 			await nativeSets(view, u1, false, { isLoaded: true, playbackState });
 
-			expect(usePlayerStore.getState().playbackState).toBe('playing');
-			expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+			expect(playerStore.getState().playbackState).toBe('playing');
+			expect(playerStore.getState().pausedBySystem).toBe(false);
 		}
 	);
 
@@ -588,14 +531,14 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		await rerender(view);
 
 		expect(u1.playing).toBe(true);
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
-		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+		expect(playerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().pausedBySystem).toBe(false);
 	});
 
 	it('does not mirror a stop in remote mode', async () => {
 		const { view, u1 } = await playingNatively();
 		act(() => {
-			useConnectStore.setState({
+			connectStore.setState({
 				target: { kind: 'remote', ownerId: 'o', deviceId: 'd' },
 				remoteStatus: null,
 				controlPending: false,
@@ -604,29 +547,25 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 		await nativeSets(view, u1, false);
 
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().playbackState).toBe('playing');
 	});
 
 	it('does not mirror a user pause', async () => {
 		const { view, u1 } = await playingNatively();
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 
 		await nativeSets(view, u1, false);
 
-		expect(usePlayerStore.getState().playbackState).toBe('paused');
-		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+		expect(playerStore.getState().playbackState).toBe('paused');
+		expect(playerStore.getState().pausedBySystem).toBe(false);
 	});
 });
 
 describe('PlayerProvider restored track (#312)', () => {
 	async function renderRestored() {
-		const view = render(
-			<PlayerProvider>
-				<SeekProbe />
-			</PlayerProvider>
-		);
-		await act(async () => usePlayerStore.getState().restoreTrack(track, 'q1', 42_000));
-		await flush();
+		const view = render(<PlayerProvider>{seekProbe}</PlayerProvider>);
+		await act(async () => playerStore.getState().restoreTrack(track, 'q1', 42_000));
+		await flushAct();
 		return view;
 	}
 
@@ -634,7 +573,7 @@ describe('PlayerProvider restored track (#312)', () => {
 		await renderRestored();
 
 		expect(mockApiRequest).not.toHaveBeenCalled();
-		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		expect(playerStore.getState().playbackState).toBe('paused');
 		expect(readPositionMs()).toBe(42_000);
 	});
 
@@ -642,15 +581,15 @@ describe('PlayerProvider restored track (#312)', () => {
 		await renderRestored();
 		answerStreams({ streamUrl: 'u1', expiresAt: inMinutes(30) });
 
-		await act(async () => usePlayerStore.getState().resume());
-		await flush();
+		await act(async () => playerStore.getState().resume());
+		await flushAct();
 
 		const u1 = mockPlayerFor('u1');
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
 		expect(u1.seekTo).toHaveBeenCalledWith(42);
-		expect(u1.play).toHaveBeenCalled();
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
-		expect(usePlayerStore.getState().queueItemId).toBe('q1');
+		expect(u1.play).toHaveBeenCalledWith();
+		expect(playerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().queueItemId).toBe('q1');
 	});
 
 	it('moves the start position on a seek before play', async () => {
@@ -659,8 +598,8 @@ describe('PlayerProvider restored track (#312)', () => {
 		act(() => seekRef?.(90));
 
 		expect(mockApiRequest).not.toHaveBeenCalled();
-		expect(usePlayerStore.getState().startPositionMs).toBe(90_000);
-		expect(usePlayerStore.getState().seekCount).toBe(1);
+		expect(playerStore.getState().startPositionMs).toBe(90_000);
+		expect(playerStore.getState().seekCount).toBe(1);
 	});
 
 	it('shows the existing error on play when the track is gone', async () => {
@@ -669,10 +608,10 @@ describe('PlayerProvider restored track (#312)', () => {
 			new MockApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
 		);
 
-		await act(async () => usePlayerStore.getState().resume());
-		await flush();
+		await act(async () => playerStore.getState().resume());
+		await flushAct();
 
-		const state = usePlayerStore.getState();
+		const state = playerStore.getState();
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
 		expect(state.error).toBe("Ce titre n'est plus disponible");
 		expect(state.currentTrack).toBeNull();
@@ -705,33 +644,29 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 
 	function setQueue(currentItemId: string | null, items: QueueItem[]) {
 		act(() => {
-			useQueueStore.setState({ queues: { me: { currentItemId, items, version: 1 } } });
+			queueStore.setState({ queues: { me: { currentItemId, items, version: 1 } } });
 		});
 	}
 
 	async function playQueueItem(item: QueueItem, items: QueueItem[]) {
 		answerStreams({ streamUrl: `u-${item.id}`, expiresAt: inMinutes(30) });
 		setQueue(item.id, items);
-		const view = render(
-			<PlayerProvider>
-				<SeekProbe />
-			</PlayerProvider>
-		);
-		await act(async () => usePlayerStore.getState().playTrack(trackToSoundCloud(item), item.id));
-		await flush();
+		const view = render(<PlayerProvider>{seekProbe}</PlayerProvider>);
+		await act(async () => playerStore.getState().playTrack(trackToSoundCloud(item), item.id));
+		await flushAct();
 		return { view, player: mockPlayerFor(`u-${item.id}`) };
 	}
 
 	async function reach(view: ReturnType<typeof render>, player: MockPlayer, currentTime: number) {
 		setStatus(player, { currentTime, duration: 200, playing: true });
 		await rerender(view);
-		await flush();
+		await flushAct();
 	}
 
 	async function stepTo(item: QueueItem, items: QueueItem[]) {
 		setQueue(item.id, items);
-		await act(async () => usePlayerStore.getState().playTrack(trackToSoundCloud(item), item.id));
-		await flush();
+		await act(async () => playerStore.getState().playTrack(trackToSoundCloud(item), item.id));
+		await flushAct();
 	}
 
 	function streamCallFor(item: QueueItem) {
@@ -760,17 +695,17 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		await stepTo(B, [A, B, C]);
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
-		expect(usePlayerStore.getState().streamUrl).toBe('u-qb');
-		expect(usePlayerStore.getState().streamProtocol).toBe('progressive');
-		expect(mockPlayerFor('u-qb').play).toHaveBeenCalled();
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().streamUrl).toBe('u-qb');
+		expect(playerStore.getState().streamProtocol).toBe('progressive');
+		expect(mockPlayerFor('u-qb').play).toHaveBeenCalledWith();
+		expect(playerStore.getState().playbackState).toBe('playing');
 		expect(streamPrefetch.peek()).toBeNull();
 	});
 
 	it('does not prefetch in remote mode', async () => {
 		const { view, player } = await playQueueItem(A, [A, B]);
 		act(() => {
-			useConnectStore.setState({
+			connectStore.setState({
 				target: { kind: 'remote', ownerId: 'me', deviceId: 'd' },
 				remoteStatus: null,
 				controlPending: false,
@@ -792,7 +727,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 
 	it('does not prefetch while paused', async () => {
 		const { view, player } = await playQueueItem(A, [A, B]);
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 
 		await reach(view, player, 190);
 
@@ -814,7 +749,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		await stepTo(C, [A, C, B]);
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(3);
-		expect(usePlayerStore.getState().streamUrl).toBe('u-qc');
+		expect(playerStore.getState().streamUrl).toBe('u-qc');
 	});
 
 	it('ignores a prefetch answered after the next item changed', async () => {
@@ -827,7 +762,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		setQueue('qa', [A, C, B]);
 		await rerender(view);
 		await act(async () => answer({ streamUrl: 'u-qb', expiresAt: inMinutes(30) }));
-		await flush();
+		await flushAct();
 
 		expect(streamPrefetch.peek()).toBeNull();
 	});
@@ -841,7 +776,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		await stepTo(D, [A, B, C, D]);
 
 		expect(streamCallFor(D)).toBe(1);
-		expect(usePlayerStore.getState().streamUrl).toBe('u-qd');
+		expect(playerStore.getState().streamUrl).toBe('u-qd');
 		expect(streamPrefetch.peek()).toBeNull();
 	});
 
@@ -854,7 +789,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		await stepTo(B, [A, B]);
 
 		expect(streamCallFor(B)).toBe(2);
-		expect(usePlayerStore.getState().streamUrl).toBe('u-qb-fresh');
+		expect(playerStore.getState().streamUrl).toBe('u-qb-fresh');
 	});
 
 	it('shows nothing when the prefetch fails, and fetches on load', async () => {
@@ -862,14 +797,14 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		mockApiRequest.mockRejectedValueOnce(new Error('Network request failed'));
 		await reach(view, player, 185);
 
-		expect(usePlayerStore.getState().error).toBeNull();
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(playerStore.getState().error).toBeNull();
+		expect(playerStore.getState().playbackState).toBe('playing');
 
 		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30) });
 		await stepTo(B, [A, B]);
 
 		expect(streamCallFor(B)).toBe(2);
-		expect(usePlayerStore.getState().streamUrl).toBe('u-qb');
-		expect(usePlayerStore.getState().error).toBeNull();
+		expect(playerStore.getState().streamUrl).toBe('u-qb');
+		expect(playerStore.getState().error).toBeNull();
 	});
 });

@@ -1,25 +1,13 @@
 import Constants from 'expo-constants';
 import { loadScript } from '@/features/user/features/auth/shared/sign-in/lib/loadScript';
-import { GOOGLE_FORM_BUTTON } from '@/features/user/features/auth/shared/sign-in/lib/constants';
-import type { GoogleButtonVariant } from '@/features/user/features/auth/types';
+import { googleButtonConfiguration } from '@/features/user/features/auth/shared/sign-in/lib/googleButtonConfiguration';
+import type { GoogleButtonVariant } from '@/features/user/features/auth/authTypes';
+import type {
+	GoogleButtonConfiguration,
+	GoogleButtonTarget,
+} from '@/features/user/features/auth/shared/sign-in/types/googleButtonTypes';
 
 const GIS_SCRIPT = 'https://accounts.google.com/gsi/client';
-
-export type GoogleButtonTarget = {
-	offsetWidth: number;
-};
-
-type ButtonConfiguration = {
-	type: 'standard';
-	theme: 'outline' | 'filled_black';
-	size: 'large' | 'medium';
-	text: 'continue_with';
-	shape: 'rectangular';
-	logo_alignment: 'center' | 'left';
-	locale: string;
-	width?: number;
-	click_listener: () => void;
-};
 
 type GoogleIdentity = {
 	initialize: (config: {
@@ -28,7 +16,7 @@ type GoogleIdentity = {
 		ux_mode: 'popup';
 		auto_select: boolean;
 	}) => void;
-	renderButton: (target: GoogleButtonTarget, config: ButtonConfiguration) => void;
+	renderButton: (target: GoogleButtonTarget, config: GoogleButtonConfiguration) => void;
 };
 
 type Listener = () => void;
@@ -70,11 +58,6 @@ async function loadIdentity(): Promise<GoogleIdentity> {
 	return identity;
 }
 
-function formWidth(target: GoogleButtonTarget): number {
-	const { minWidth, maxWidth } = GOOGLE_FORM_BUTTON;
-	return Math.min(maxWidth, Math.max(minWidth, Math.round(target.offsetWidth)));
-}
-
 export function configureGoogleSignIn(): void {}
 
 export async function renderGoogleButton(
@@ -86,20 +69,12 @@ export async function renderGoogleButton(
 	function listener(): void {
 		onCredential();
 	}
-	const form = variant === 'form';
-	identity.renderButton(target, {
-		type: 'standard',
-		theme: form ? 'filled_black' : 'outline',
-		size: form ? 'large' : 'medium',
-		text: 'continue_with',
-		shape: 'rectangular',
-		logo_alignment: form ? 'center' : 'left',
-		locale: 'fr',
-		...(form ? { width: formWidth(target) } : {}),
-		click_listener: () => {
+	identity.renderButton(
+		target,
+		googleButtonConfiguration(target, variant, () => {
 			clicked = listener;
-		},
-	});
+		})
+	);
 	rendered.push(listener);
 	return () => {
 		const index = rendered.indexOf(listener);

@@ -1,45 +1,14 @@
 import { useEffect } from 'react';
+import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import {
-	useSharedValue,
-	useAnimatedStyle,
-	withTiming,
-	runOnJS,
-	Easing,
-} from 'react-native-reanimated';
-import { Gesture } from 'react-native-gesture-handler';
-import {
-	DISMISS_THRESHOLD,
-	SCREEN_HEIGHT,
-} from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
+	modalDismissGesture,
+	sliderNativeGesture,
+} from '@/features/playback/features/player-modal/lib/modalDismissGesture';
 
 export function usePlayerModalGestures(isModalOpen: boolean, onClose: () => void) {
 	const translateY = useSharedValue(0);
-
-	const sliderGesture = Gesture.Native().withTestId('player-seek-native');
-
-	const panGesture = Gesture.Pan()
-		.withTestId('player-modal-pan')
-		.requireExternalGestureToFail(sliderGesture)
-		.activeOffsetY(10)
-		.failOffsetX([-15, 15])
-		.onUpdate(event => {
-			if (event.translationY > 0) {
-				translateY.value = event.translationY;
-			}
-		})
-		.onEnd(event => {
-			if (event.translationY > DISMISS_THRESHOLD || event.velocityY > 500) {
-				translateY.value = withTiming(
-					SCREEN_HEIGHT,
-					{ duration: 250, easing: Easing.out(Easing.cubic) },
-					() => {
-						runOnJS(onClose)();
-					}
-				);
-			} else {
-				translateY.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) });
-			}
-		});
+	const sliderGesture = sliderNativeGesture();
+	const panGesture = modalDismissGesture(translateY, sliderGesture, onClose);
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [{ translateY: translateY.value }],

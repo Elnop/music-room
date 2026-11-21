@@ -1,42 +1,13 @@
-import { PermissionsAndroid, Platform } from 'react-native';
 import { BleManager, ScanMode, State } from 'react-native-ble-plx';
 import { logger } from '@/shared/logging/logger';
-import { base64ToBytes } from '@/features/events/features/nearby/lib/base64';
-import { parseIBeacon, zumikBeaconMinor } from '@/features/events/shared/beacon/ibeacon';
-
-type BeaconFrame = {
-	minor: number;
-	rssi: number;
-	measuredPower: number;
-};
-
-export type ScannerState = 'on' | 'off' | 'unsupported';
+import { base64ToBytes } from '@/features/events/features/nearby/lib/base64ToBytes';
+import { zumikBeaconMinor } from '@/features/events/shared/beacon/ibeacon';
+import { parseIBeacon } from '@/features/events/features/nearby/lib/parseIBeacon';
+import type { BeaconFrame, ScannerState } from '@/features/events/features/nearby/nearbyTypes';
 
 let manager: BleManager | null = null;
 function bleManager() {
 	return (manager ??= new BleManager());
-}
-
-export async function requestScanPermission(): Promise<boolean> {
-	if (Platform.OS !== 'android') return false;
-	const wanted =
-		Number(Platform.Version) >= 31
-			? [
-					PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-					PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-				]
-			: [PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION];
-	const results = await PermissionsAndroid.requestMultiple(wanted);
-	return wanted.every(permission => results[permission] === PermissionsAndroid.RESULTS.GRANTED);
-}
-
-export async function hasScanPermission(): Promise<boolean> {
-	if (Platform.OS !== 'android') return false;
-	const checks = [PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)];
-	if (Number(Platform.Version) >= 31) {
-		checks.push(PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN));
-	}
-	return (await Promise.all(checks)).every(Boolean);
 }
 
 export function watchBluetoothState(listener: (state: ScannerState) => void): () => void {

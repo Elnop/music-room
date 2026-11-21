@@ -1,80 +1,25 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Avatar } from '@/shared/theme/components/Avatar';
-import { Pressable } from '@/shared/theme/components/Pressable';
 import { useSession } from '@/shared/backend/hooks/useSession';
-import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { Theme } from '@/shared/theme/types/themeTypes';
-import { Text } from '@/shared/theme/components/Text';
+import { SidebarAccount } from '@/features/shell/components/presenters/SidebarAccount';
 
-type SidebarAccountProps = {
+type SidebarAccountContainerProps = {
 	active: boolean;
 	onPress: () => void;
 };
 
-export function SidebarAccountContainer({ active, onPress }: SidebarAccountProps) {
-	const { theme } = useTheme();
-	const separator = useSeparatorColor();
-	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
+export function SidebarAccountContainer({ active, onPress }: SidebarAccountContainerProps) {
 	const user = useSession(s => s.user);
 	if (!user) return null;
-	const name = user.displayName || user.username;
 
 	return (
-		<View style={styles.container}>
-			<Pressable
-				style={[styles.account, active && styles.active]}
-				onPress={onPress}
-				accessibilityRole="button"
-				accessibilityLabel={`Profil, ${name}`}
-				accessibilityState={{ selected: active }}
-			>
-				<Avatar size="sm" name={name} uri={user.avatarUrl} />
-				<View style={styles.info}>
-					<Text style={styles.name} numberOfLines={1}>
-						{name}
-					</Text>
-					<Text style={styles.username} numberOfLines={1}>
-						@{user.username}
-					</Text>
-				</View>
-			</Pressable>
-		</View>
+		<SidebarAccount
+			account={{
+				name: user.displayName || user.username,
+				username: user.username,
+				avatarUrl: user.avatarUrl,
+			}}
+			active={active}
+			onPress={onPress}
+		/>
 	);
-}
-
-function createStyles(theme: Theme, separator: string) {
-	const styles = StyleSheet.create({
-		container: {
-			marginHorizontal: theme.spacing.sm,
-			paddingVertical: theme.spacing.sm,
-			borderTopWidth: 1,
-			borderTopColor: separator,
-		},
-		account: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			gap: theme.spacing.sm,
-			paddingHorizontal: theme.spacing.sm,
-			paddingVertical: theme.spacing.sm,
-		},
-		active: {
-			backgroundColor: theme.colors.surfaceAlt,
-		},
-		info: {
-			flex: 1,
-			minWidth: 0,
-		},
-		name: {
-			fontSize: theme.typography.sizes.md,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-		},
-		username: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-		},
-	});
-	return styles;
 }

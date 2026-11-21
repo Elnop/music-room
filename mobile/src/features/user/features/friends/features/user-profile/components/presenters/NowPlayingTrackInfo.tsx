@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import { Text } from '@/shared/theme/components/Text';
+import { ArtistLine } from '@/shared/theme/components/ArtistLine';
 import type { NowPlayingTrack } from '@/features/user/features/friends/features/user-profile/userProfileTypes';
 import { NowPlayingTitle } from '@/features/user/features/friends/features/user-profile/components/presenters/NowPlayingTitle';
 
@@ -17,9 +17,7 @@ export function NowPlayingTrackInfo({ track, isPlaying }: NowPlayingTrackInfoPro
 	return (
 		<View style={styles.trackInfo}>
 			<NowPlayingTitle title={track.title} isPlaying={isPlaying} />
-			<Text style={styles.artist} numberOfLines={1}>
-				{track.artist}
-			</Text>
+			<ArtistLine artist={track.artist} size="small" />
 		</View>
 	);
 }
@@ -30,11 +28,6 @@ function createStyles(theme: Theme) {
 			flex: 1,
 			marginLeft: theme.spacing.sm,
 			marginRight: theme.spacing.sm,
-		},
-		artist: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			marginTop: theme.spacing.hairline,
 		},
 	});
 	return styles;

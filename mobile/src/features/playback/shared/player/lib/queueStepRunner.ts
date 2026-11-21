@@ -1,21 +1,45 @@
 import { trackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import { currentItem } from '@/features/playback/shared/player/lib/queueSelectors';
+import { currentItem } from '@/features/playback/shared/player/lib/queueNavigation';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
 import { actionScope, handleRemoteRefusal } from '@/features/playback/shared/player/lib/queueScope';
-import type { StepOptions } from '@/features/playback/shared/player/lib/queueScope';
 import type {
+	ActionScope,
+	StepOptions,
 	QueueCallTarget,
 	QueueState,
 	QueueStepOutcome,
 	QueueStepResult,
-} from '@/features/playback/shared/player/lib/queue.types';
-import {
-	getPlayerState,
-	usePlayerStore,
-} from '@/features/playback/shared/player/stores/playerStore';
+} from '@/features/playback/shared/player/types/queueTypes';
+import { getPlayerState } from '@/features/playback/shared/player/lib/getPlayerState';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 
 let stepPending = false;
+
+function reportFailure(label: string, scope: ActionScope, error: unknown, options: StepOptions) {
+	logger.error(`[queueStore] ${label} failed:`, error);
+	if (!handleRemoteRefusal(scope, error) && options.errorMessage) {
+		const msg = options.errorMessage;
+		showError(typeof msg === 'function' ? msg(error) : msg);
+	}
+}
+
+function playStepState(
+	state: QueueState,
+	scope: ActionScope,
+	loadCounter: number,
+	options: StepOptions
+): QueueStepOutcome {
+	const item = currentItem(state);
+	if (scope.remote) return item ? 'played' : 'stopped';
+	if (getPlayerState().loadCounter !== loadCounter) return 'played';
+	if (item) {
+		playerStore.getState().playTrack(trackToSoundCloud(item), item.id);
+		return 'played';
+	}
+	if (options.stopWhenEmpty) playerStore.getState().stop();
+	return 'stopped';
+}
 
 export async function runStep(
 	request: (call: QueueCallTarget) => Promise<QueueStepResult>,
@@ -31,29 +55,14 @@ export async function runStep(
 	try {
 		result = await request(scope.call);
 	} catch (error) {
-		logger.error(`[queueStore] ${label} failed:`, error);
-		if (!handleRemoteRefusal(scope, error) && options.errorMessage) {
-			const msg = options.errorMessage;
-			showError(typeof msg === 'function' ? msg(error) : msg);
-		}
+		reportFailure(label, scope, error, options);
 		return 'error';
 	} finally {
 		stepPending = false;
 	}
 	if (!result.ok) return 'boundary';
-
 	applyState(result.state);
-	const item = currentItem(result.state);
-	if (scope.remote) return item ? 'played' : 'stopped';
-
-	const player = getPlayerState();
-	if (player.loadCounter !== loadCounter) return 'played';
-	if (item) {
-		usePlayerStore.getState().playTrack(trackToSoundCloud(item), item.id);
-		return 'played';
-	}
-	if (options.stopWhenEmpty) usePlayerStore.getState().stop();
-	return 'stopped';
+	return playStepState(result.state, scope, loadCounter, options);
 }
 
 export function asStep(request: (call: QueueCallTarget) => Promise<QueueState>) {

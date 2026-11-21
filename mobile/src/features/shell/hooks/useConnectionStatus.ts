@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNetworkState } from 'expo-network';
 import { useSocketState } from '@/shared/backend/hooks/useSocketState';
-
-export type ConnectionStatus = 'offline' | 'reconnecting' | 'failed' | null;
+import type { ConnectionStatus } from '@/features/shell/types/connectionTypes';
 
 export function useConnectionStatus(): ConnectionStatus {
 	const network = useNetworkState();
