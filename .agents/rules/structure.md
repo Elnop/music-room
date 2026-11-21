@@ -78,6 +78,6 @@ Mobile: the folders of `src/` follow the layout of [brutalway](https://brutalway
 - a folder the layout does not name: `src/` holds `app/`, `features/` and `shared/`, `shared/` holds one folder per slice named after its concept, and a feature or a slice holds kind folders, `features/` and `shared/`;
 - a file of a `shared/` slice that a single feature uses (move it into that feature), and a slice whose files form groups that never import each other (split it).
 
-The violations that existed when the rule arrived are listed in `mobile/.check-tree-known-violations.json`, which check-tree skips. It fails on a violation that is not listed and on a listed one that no longer happens. After fixing folders, rewrite the list with `npx check-tree src --write-known-violations` (from `mobile/`) and check the diff: it may only lose lines, and `check:exceptions` fails if it gains one. When you move files, the entries of the folders they leave may come back under the folder they reach: that is accepted as long as the list does not grow ([exception-lists](guardrails.md#exception-lists)).
+check-tree has no exception list: every violation fails `npm run check` ([exception-lists](guardrails.md#exception-lists)).
 
 Since #622 the role of a component comes from its name, so `components/orchestrators/` and `components/presenters/` follow the grouping rule like any category folder: a single orchestrator or presenter sits in `components/`, and a role folder exists once it holds two of them.

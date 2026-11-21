@@ -9,11 +9,11 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | Check | Tool | Config | What fails |
 | --- | --- | --- | --- |
 | type-check | tsc | `tsconfig.json` | a type error |
-| lint | ESLint (`eslint . --quiet`) | `eslint.config.*`, `eslint-suppressions.json` | an ESLint error (warnings do not fail) |
+| lint | ESLint (`eslint . --quiet`) | `eslint.config.*` | an ESLint error (warnings do not fail) |
 | oxlint | oxlint (mobile), `tools/guardrails/check-oxlint.mjs` | `oxlint.config.mjs`, `.oxlint-suppressions.json` | a violation of the brutalway oxlint presets beyond the suppressions ([oxlint](#oxlint)) |
 | dead-code | knip | `knip.json` | an unused file, export, type or dependency |
-| deps | dependency-cruiser | `.dependency-cruiser.cjs` (mobile: preset `@brutalway/dependency-cruiser-config/layers`), `.dependency-cruiser-known-violations.json` | a layer violation, a cross-feature import or a cycle ([architecture.md](architecture.md), mobile: [mobile-layers](architecture.md#mobile-layers)) |
-| tree | check-tree (mobile) | `.check-tree-known-violations.json` | a folder outside the layout, an empty folder, a category folder with a single child ([structure.md](structure.md#check-tree)) |
+| deps | dependency-cruiser | `.dependency-cruiser.cjs` (mobile: preset `@brutalway/dependency-cruiser-config/layers`), backend: `.dependency-cruiser-known-violations.json` | a layer violation, a cross-feature import or a cycle ([architecture.md](architecture.md), mobile: [mobile-layers](architecture.md#mobile-layers)) |
+| tree | check-tree (mobile) | | a folder outside the layout, an empty folder, a category folder with a single child ([structure.md](structure.md#check-tree)) |
 | duplication | jscpd | `.jscpd.json` | a clone of 5 lines and 50 tokens or more in `src/` (tests excluded) |
 | semgrep | semgrep (Docker) | `tools/semgrep/rules.yml` | a pattern rule below |
 | ast-grep | ast-grep | `sgconfig.yml`, `ast-grep/rules/` | a pattern rule below |
@@ -25,13 +25,11 @@ Every tool is a devDependency installed by `make install`, except semgrep and gi
 
 ## exception-lists
 
-The rules block from day one; the violations that existed when a rule arrived are recorded in versioned exception lists, so `check` stays green while later stories clean them:
+The rules block from day one; the violations that existed when a rule arrived are recorded in versioned exception lists, so `check` stays green while later stories clean them. A list that reaches zero is deleted with its tooling, and `check:exceptions` fails if it comes back: the ESLint lists of both projects and the dependency-cruiser and check-tree lists of the mobile are gone (#655), so a violation of those tools fails outright. The lists left:
 
 | Tool | Exception list | Entry |
 | --- | --- | --- |
-| ESLint | `<project>/eslint-suppressions.json` (native bulk suppressions) | a (file, rule) pair, with its count |
-| dependency-cruiser | `<project>/.dependency-cruiser-known-violations.json` | a violation |
-| check-tree | `mobile/.check-tree-known-violations.json` | a message of check-tree, compared without its counts and file lists |
+| dependency-cruiser | `backend/.dependency-cruiser-known-violations.json` | a violation |
 | oxlint | `mobile/.oxlint-suppressions.json` (same format as ESLint's) | a (file, rule) pair, with its count |
 | jscpd | the `ignore` globs of `<project>/.jscpd.json` | a glob (the first globs, tests and generated files, are permanent) |
 | semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (`backendUrl.ts`, `api.ts` and the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
@@ -39,9 +37,7 @@ The rules block from day one; the violations that existed when a rule arrived ar
 
 An exception list only shrinks. `check:exceptions` counts the entries of each list per rule and fails when a count is higher than at the fork point from `origin/develop` or than at `HEAD`. A story that cleans files then shrinks the list:
 
-- ESLint: `npx eslint . --prune-suppressions` (ESLint itself fails while a suppression is no longer needed).
-- dependency-cruiser: `npx depcruise <targets of check:deps> --config .dependency-cruiser.cjs --output-type baseline --output-to .dependency-cruiser-known-violations.json`.
-- check-tree: `npx check-tree src --write-known-violations` from `mobile/`.
+- dependency-cruiser: `npx depcruise src --config .dependency-cruiser.cjs --output-type baseline --output-to .dependency-cruiser-known-violations.json` from `backend/`.
 - oxlint: `npm run check:oxlint -- --prune` from `mobile/` (`check:oxlint` fails while a suppression allows more than what is left).
 - jscpd, semgrep, gitleaks: delete the entries by hand.
 
@@ -49,9 +45,7 @@ For jscpd `ignore`, semgrep `exclude` and every string of the `.gitleaks.toml` a
 
 A semgrep rule whose scope is a naming convention declares it in `metadata.allowed-paths` and repeats each glob in `paths.exclude`, since semgrep reads only `paths`. `check:exceptions` does not count an exclude entry that the same rule declares there, under these constraints: `allowed-paths` is read only directly under the rule's `metadata:`; only a suffix glob `*<Suffix>.<ext>` qualifies, Suffix being a capitalised word of 4 letters or more (`*Storage.ts`; not `*.ts`, not a file name), and any other value leaves its exclude entry counted as an exception; and each rule's `allowed-paths` is compared with the reference like an exception list, so a new glob fails unless it is recorded for that rule under `allowedPaths` in `tools/guardrails/new-rule-baselines.json`. Such a glob allows every file whose name ends that way, existing or future. Adding one changes the rule and takes a dedicated ticket ([append-only-rules](#append-only-rules)).
 
-The check-tree list is compared without the counts and file lists of its messages (`src/test holds 7 lib files (...)` and `src/test holds 6 lib files (...)` are one entry), and an entry follows its folder when a file of that folder is renamed. A restructuring moves files, which changes the text of their violations although no violation was added. So, for this list only, a new entry is accepted when the list does not grow and a file renamed with git landed in the folder it names: the violation comes from code that moved, not from new code (#621, epic #616). `check:exceptions` prints `moved code, entry accepted`. If the list grows, every new entry fails, moved or not.
-
-Two changes are not growth. A file moved with git (a rename) keeps its entries and inline escapes under its new path: update the path in the list, nothing else. A new rule lands with exceptions only through the versioned allowlist `tools/guardrails/new-rule-baselines.json` (`{ "<project>": { "<rule id>": <max entries> } }`): a rule listed there, with no entry in the reference list, may record up to that many entries (ESLint: occurrences; dependency-cruiser: violations), and `check:exceptions` prints `new rule, baseline accepted`. Adding the rule to the allowlist, with today's count, is part of the ticket that creates the rule. A baseline only counts while it is absent from `develop`'s copy of the allowlist: once on `develop`, the rule only shrinks like any other, even after its last entry is gone, and `check:exceptions` fails until the next ticket removes the stale baseline. A rule not in the allowlist (a renamed one included) starts at 0. The rename logic is in `tools/guardrails/renames.mjs`; the tests of `tools/guardrails/` (`*.test.mjs`) run in the mobile's `npm test`.
+Two changes are not growth. A file moved with git (a rename) keeps its entries and inline escapes under its new path: update the path in the list, nothing else. A new rule lands with exceptions only through the versioned allowlist `tools/guardrails/new-rule-baselines.json` (`{ "<project>": { "<rule id>": <max entries> } }`): a rule listed there, with no entry in the reference list, may record up to that many entries (oxlint: occurrences; dependency-cruiser: violations), and `check:exceptions` prints `new rule, baseline accepted`. Adding the rule to the allowlist, with today's count, is part of the ticket that creates the rule. A baseline only counts while it is absent from `develop`'s copy of the allowlist: once on `develop`, the rule only shrinks like any other, even after its last entry is gone, and `check:exceptions` fails until the next ticket removes the stale baseline. A rule not in the allowlist (a renamed one included) starts at 0. The rename logic is in `tools/guardrails/renames.mjs`; the tests of `tools/guardrails/` (`*.test.mjs`) run in the mobile's `npm test`.
 
 Inline escapes count too: `check:exceptions` counts `eslint-disable`, `oxlint-disable`, `nosemgrep`, `ast-grep-ignore` and `jscpd:ignore-start` per file under the project's `src/`, and fails when a file has more than on `develop` (a new file starts at 0).
 

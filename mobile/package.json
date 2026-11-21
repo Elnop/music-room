@@ -17,7 +17,7 @@
 		"check:lint": "eslint . --quiet",
 		"check:oxlint": "node ../tools/guardrails/check-oxlint.mjs",
 		"check:dead-code": "knip",
-		"check:deps": "depcruise src index.ts --config .dependency-cruiser.cjs --ignore-known --output-type err-long",
+		"check:deps": "depcruise src index.ts --config .dependency-cruiser.cjs --output-type err-long",
 		"check:tree": "check-tree src",
 		"check:duplication": "jscpd",
 		"check:semgrep": "node ../tools/guardrails/docker-scan.mjs semgrep mobile",

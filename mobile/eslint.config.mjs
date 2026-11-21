@@ -49,8 +49,8 @@ const NAMED_COLORS = [
   'whitesmoke', 'yellow', 'yellowgreen',
 ];
 
-// Each no-restricted-syntax rule gets its own name, so its exceptions are counted apart in
-// eslint-suppressions.json. See .agents/rules/guardrails.md#append-only-rules
+// Each no-restricted-syntax rule gets its own name, so its errors name the rule they break.
+// See .agents/rules/guardrails.md#append-only-rules
 const restrictedSyntax = builtinRules.get('no-restricted-syntax');
 const guardrailsPlugin = {
   rules: {
