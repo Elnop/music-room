@@ -1,104 +1,40 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { Theme } from '@/shared/theme/types/themeTypes';
-import { displayText } from '@/shared/theme/lib/pixelFrame';
-import type {
-	GoogleButtonSlot,
-	LinkedProvider,
-	OAuthProvider,
-} from '@/features/user/features/auth/types';
 import { Text } from '@/shared/theme/components/Text';
-
-type MethodType = LinkedProvider['type'];
-
-const PROVIDER_LABELS: Record<OAuthProvider, string> = {
-	google: 'Google',
-	facebook: 'Facebook',
-};
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import { MethodBadge } from '@/features/user/features/auth/features/linked-accounts/components/presenters/MethodBadge';
+import { ProviderLinkAction } from '@/features/user/features/auth/features/linked-accounts/components/presenters/ProviderLinkAction';
+import type { LinkedProvider } from '@/features/user/features/auth/authTypes';
+import type {
+	LinkActions,
+	SignInMethod,
+} from '@/features/user/features/auth/features/linked-accounts/linkedAccountsTypes';
 
 type LinkedAccountRowProps = {
-	method: {
-		type: MethodType;
-		label: string;
-		icon: PixelIconSource;
-	};
+	method: SignInMethod;
 	linked?: LinkedProvider;
-	pending: OAuthProvider | null;
-	onLink: (provider: OAuthProvider) => void;
-	onUnlink: (provider: OAuthProvider) => void;
-	googleButton?: GoogleButtonSlot;
+	actions: LinkActions;
 };
 
-export function LinkedAccountRow({
-	method,
-	linked,
-	pending,
-	onLink,
-	onUnlink,
-	googleButton,
-}: LinkedAccountRowProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+function linkStatus(linked: LinkedProvider | undefined): string {
+	if (!linked) return 'Non lié';
+	return linked.isPrimary ? 'Lié · Principal' : 'Lié';
+}
 
-	const isLinked = Boolean(linked);
-	const type = method.type;
-
-	function renderAction() {
-		if (type === 'password') return null;
-		const provider = type;
-
-		const label = isLinked ? 'Délier' : 'Lier';
-		const disabled = pending !== null;
-		function onPress() {
-			return isLinked ? onUnlink(provider) : onLink(provider);
-		}
-
-		if (googleButton && !isLinked && pending !== type) {
-			return (
-				<View
-					ref={googleButton}
-					style={disabled && styles.actionDisabled}
-					testID="google-button-slot"
-				/>
-			);
-		}
-
-		return (
-			<Pressable
-				style={[
-					styles.actionButton,
-					isLinked ? styles.unlinkButton : styles.linkButton,
-					disabled && styles.actionDisabled,
-				]}
-				onPress={onPress}
-				disabled={disabled}
-				accessibilityRole="button"
-				accessibilityLabel={`${label} ${PROVIDER_LABELS[type]}`}
-				accessibilityState={{ disabled, busy: pending === type }}
-			>
-				<Text style={[styles.actionText, isLinked ? styles.unlinkText : styles.linkText]}>
-					{pending === type ? '...' : label}
-				</Text>
-			</Pressable>
-		);
-	}
+export function LinkedAccountRow({ method, linked, actions }: LinkedAccountRowProps) {
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.accountItem} testID={`linked-account-${method.type}`}>
-			<View style={styles.methodBadge}>
-				<PixelIcon icon={method.icon} size={20} color={theme.colors.primary} />
-			</View>
+			<MethodBadge icon={method.icon} />
 			<View style={styles.methodInfo}>
 				<Text style={styles.rowTitle}>{method.label}</Text>
-				<Text style={styles.rowStatus}>
-					{linked ? (linked.isPrimary ? 'Lié · Principal' : 'Lié') : 'Non lié'}
-				</Text>
+				<Text style={styles.rowStatus}>{linkStatus(linked)}</Text>
 			</View>
-			{renderAction()}
+			{method.type !== 'password' && (
+				<ProviderLinkAction provider={method.type} linked={Boolean(linked)} actions={actions} />
+			)}
 		</View>
 	);
 }
@@ -110,55 +46,18 @@ function createStyles(theme: Theme) {
 			alignItems: 'center',
 			paddingVertical: theme.spacing.md,
 		},
-		methodBadge: {
-			width: 40,
-			height: 40,
-			backgroundColor: theme.colors.primary + '15',
-			alignItems: 'center',
-			justifyContent: 'center',
-			marginRight: theme.spacing.md,
-		},
 		methodInfo: {
 			flex: 1,
 		},
 		rowTitle: {
-			fontSize: 16,
+			fontSize: theme.typography.sizes.lg,
 			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		rowStatus: {
-			fontSize: 13,
+			fontSize: theme.typography.sizes.smd,
 			color: theme.colors.textSecondary,
-			marginTop: 2,
-		},
-		actionButton: {
-			paddingVertical: theme.spacing.xs,
-			paddingHorizontal: theme.spacing.md,
-			borderWidth: 1,
-			minWidth: 72,
-			alignItems: 'center',
-		},
-		linkButton: {
-			borderColor: theme.colors.primary,
-			backgroundColor: theme.colors.primary,
-		},
-		unlinkButton: {
-			borderColor: theme.colors.error,
-			backgroundColor: 'transparent',
-		},
-		actionDisabled: {
-			opacity: 0.5,
-			pointerEvents: 'none',
-		},
-		actionText: {
-			...displayText(theme, 14, 'button'),
-			textTransform: 'uppercase',
-		},
-		linkText: {
-			color: theme.colors.textInverse,
-		},
-		unlinkText: {
-			color: theme.colors.error,
+			marginTop: theme.spacing.xxs,
 		},
 	});
 	return styles;

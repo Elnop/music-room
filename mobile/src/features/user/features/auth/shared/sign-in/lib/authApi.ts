@@ -1,25 +1,22 @@
 import { apiRequest } from '@/shared/backend/lib/api';
+import { postJson } from '@/features/user/features/auth/shared/sign-in/lib/postJson';
 import type {
 	LoginInput,
 	RegisterInput,
-} from '@/features/user/features/auth/shared/sign-in/lib/validators';
-import type { AuthResponse, MessageResponse } from '@/features/user/features/auth/types';
-
-function post<T>(endpoint: string, body: object, headers?: Record<string, string>): Promise<T> {
-	return apiRequest<T>(endpoint, { method: 'POST', headers, body: JSON.stringify(body) });
-}
+} from '@/features/user/features/auth/shared/sign-in/types/authInputTypes';
+import type { AuthResponse } from '@/features/user/features/auth/authTypes';
 
 export function register(data: RegisterInput): Promise<AuthResponse> {
 	const { email, password, username, displayName } = data;
-	return post('/api/auth/register', { email, password, username, displayName });
+	return postJson('/api/auth/register', { email, password, username, displayName });
 }
 
 export function login({ email, password }: LoginInput): Promise<AuthResponse> {
-	return post('/api/auth/login', { email, password });
+	return postJson('/api/auth/login', { email, password });
 }
 
 export function refreshToken(refreshToken: string): Promise<AuthResponse> {
-	return post('/api/auth/refresh', { refreshToken });
+	return postJson('/api/auth/refresh', { refreshToken });
 }
 
 export async function logout(accessToken: string): Promise<void> {
@@ -27,20 +24,4 @@ export async function logout(accessToken: string): Promise<void> {
 		method: 'POST',
 		headers: { Authorization: `Bearer ${accessToken}` },
 	});
-}
-
-export function loginWithGoogle(idToken: string): Promise<AuthResponse> {
-	return post('/api/auth/google', { idToken });
-}
-
-export function loginWithFacebook(accessToken: string): Promise<AuthResponse> {
-	return post('/api/auth/facebook', { accessToken });
-}
-
-export function verifyEmail(userId: string, code: string): Promise<AuthResponse> {
-	return post('/api/auth/verify-email', { userId, code });
-}
-
-export function resendVerificationCode(userId: string, email: string): Promise<MessageResponse> {
-	return post('/api/auth/resend-verification', { userId, email });
 }

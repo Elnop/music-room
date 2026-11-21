@@ -1,23 +1,25 @@
 import { ApiError } from '@/shared/backend/lib/api';
 import { logger } from '@/shared/logging/logger';
-import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
+import { authStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import type {
 	LoginInput,
 	RegisterInput,
-} from '@/features/user/features/auth/shared/sign-in/lib/validators';
+} from '@/features/user/features/auth/shared/sign-in/types/authInputTypes';
 import type {
 	AuthResponse,
 	OAuthProvider,
 	RegisterResult,
-} from '@/features/user/features/auth/types';
+} from '@/features/user/features/auth/authTypes';
 import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
+import * as providerAuthApi from '@/features/user/features/auth/shared/sign-in/lib/providerAuthApi';
+import * as emailVerificationApi from '@/features/user/features/auth/shared/sign-in/lib/emailVerificationApi';
 import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
 import { signInWithFacebook } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
-import { isSignInCancelled } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
+import { isSignInCancelled } from '@/features/user/features/auth/shared/sign-in/lib/isSignInCancelled';
 
 async function open(response: AuthResponse): Promise<void> {
 	if (!response.session) throw new Error('The backend did not return a session');
-	await useAuthStore.getState().startSession(response.user, response.session);
+	await authStore.getState().startSession(response.user, response.session);
 }
 
 export async function login(input: LoginInput): Promise<void> {
@@ -35,11 +37,14 @@ export async function register(input: RegisterInput): Promise<RegisterResult> {
 }
 
 export async function verifyEmail(userId: string, code: string): Promise<void> {
-	await open(await authApi.verifyEmail(userId, code));
+	await open(await emailVerificationApi.verifyEmail(userId, code));
 }
 
 const NATIVE_SIGN_IN = { google: signInWithGoogle, facebook: signInWithFacebook };
-const BACKEND_SIGN_IN = { google: authApi.loginWithGoogle, facebook: authApi.loginWithFacebook };
+const BACKEND_SIGN_IN = {
+	google: providerAuthApi.loginWithGoogle,
+	facebook: providerAuthApi.loginWithFacebook,
+};
 
 export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
 	try {

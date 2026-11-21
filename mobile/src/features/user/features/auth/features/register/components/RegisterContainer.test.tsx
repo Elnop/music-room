@@ -2,8 +2,8 @@ import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import { authStore } from '@/features/user/features/auth/shared/sign-in/authStore';
+import type { AuthStackParamList } from '@/features/user/features/auth/authTypes';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
@@ -60,7 +60,7 @@ beforeEach(async () => {
 	jest.mocked(showSuccess).mockReset();
 	await AsyncStorage.clear();
 	await resetBackendUrl();
-	useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false });
+	authStore.setState({ user: null, accessToken: null, isAuthenticated: false });
 });
 
 afterEach(() => {
@@ -99,7 +99,7 @@ describe('RegisterContainer', () => {
 			password: 'Secret1!',
 			username: 'newbie',
 		});
-		expect(useAuthStore.getState().isAuthenticated).toBe(false);
+		expect(authStore.getState().isAuthenticated).toBe(false);
 	});
 
 	it('signs in when the backend returns a session', async () => {
@@ -108,7 +108,7 @@ describe('RegisterContainer', () => {
 
 		fillAndSubmit();
 
-		await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true));
+		await waitFor(() => expect(authStore.getState().isAuthenticated).toBe(true));
 		expect(navigate).not.toHaveBeenCalled();
 	});
 

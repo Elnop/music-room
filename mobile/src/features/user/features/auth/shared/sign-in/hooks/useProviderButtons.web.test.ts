@@ -81,6 +81,8 @@ describe('useProviderButtons (web)', () => {
 		await act(async () => undefined);
 
 		expect(result.current).toBeUndefined();
-		expect(logger.warn).toHaveBeenCalled();
+		expect(logger.warn).toHaveBeenCalledWith('[OAuth] Google button not rendered:', {
+			errorMessage: 'Could not load https://accounts.google.com/gsi/client',
+		});
 	});
 });

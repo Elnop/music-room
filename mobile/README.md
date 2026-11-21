@@ -251,7 +251,7 @@ Expo supports hot reload: change any file and the app updates within 1-2 seconds
 Types, validators and versions match the backend:
 
 - **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their slice, such as `src/shared/tracks/types/trackTypes.ts`) match the backend's schemas.
-- **Zod validators** (`src/features/playlists/shared/playlist/lib/validators.ts`, `src/features/user/features/auth/shared/sign-in/lib/validators.ts`) use the same rules.
+- **Zod validators** (`src/features/playlists/shared/playlist/lib/validators.ts`, `src/features/user/features/auth/shared/sign-in/authSchemas.ts`) use the same rules.
 - **Versions**: Socket.io and Zod are the same as the backend's.
 
 ## Tests

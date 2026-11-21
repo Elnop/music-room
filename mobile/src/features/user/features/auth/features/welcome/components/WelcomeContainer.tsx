@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import type { AuthStackParamList } from '@/features/user/features/auth/authTypes';
 import { getBuildLabel } from '@/shared/backend/deviceService';
 import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
 import { showError } from '@/shared/theme/lib/toast';
@@ -19,13 +19,17 @@ export function WelcomeContainer({ navigation, backendUrlField }: WelcomeOrchest
 		<WelcomeView
 			icons={icons}
 			buildLabel={getBuildLabel()}
-			showServer={showServer}
-			onToggleServer={() => setShowServer(value => !value)}
-			onStart={() => navigation.navigate('Register')}
-			onLogin={() => navigation.navigate('Login')}
-			onOpenPrivacyPolicy={() => navigation.navigate('PrivacyPolicy')}
-			onOpenLink={url => openExternalUrl(url, showError)}
-			backendUrlField={backendUrlField}
+			server={{
+				shown: showServer,
+				onToggle: () => setShowServer(value => !value),
+				field: backendUrlField,
+			}}
+			actions={{
+				onStart: () => navigation.navigate('Register'),
+				onLogin: () => navigation.navigate('Login'),
+				onOpenPrivacyPolicy: () => navigation.navigate('PrivacyPolicy'),
+				onOpenLink: url => openExternalUrl(url, showError),
+			}}
 		/>
 	);
 }

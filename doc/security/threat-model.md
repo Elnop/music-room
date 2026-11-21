@@ -108,7 +108,7 @@ The thresholds come from `backend/src/shared/config/rate-limit.config.ts` (envir
 - `POST /api/auth/logout` puts the SHA-256 hash of the access token in a Redis revocation list until its `exp` (`revoke`, `backend/src/features/auth/services/token-revocation.service.ts`), then ends the Supabase session with `signOut(token, 'local')`, which invalidates the refresh token (`logout`, `backend/src/features/auth/services/session.service.ts`). The user's other devices stay signed in.
 - Every request checks the revocation list before Supabase (`verifyToken`, `session.service.ts`); without Redis, `503 REVOCATION_UNAVAILABLE`, never an acceptance.
 - `POST /api/auth/refresh` answers 401 to a refused refresh token and 503 if Supabase is unavailable (#126): the app does not sign the user out because of an outage.
-- Mobile: `endSessionLocally` (`mobile/src/features/user/features/auth/shared/sign-in/lib/sessionActions.ts`) clears the session even if the backend call fails.
+- Mobile: `endSessionLocally` (`mobile/src/features/user/features/auth/shared/sign-in/lib/createSessionWriter.ts`) clears the session even if the backend call fails.
 
 **Tests.**
 - `backend/src/features/auth/services/logout.int.test.ts`: "rejects the old access token and the old refresh token", "keeps the same user's other session signed in".
@@ -128,7 +128,7 @@ The thresholds come from `backend/src/shared/config/rate-limit.config.ts` (envir
 
 **Protection.**
 - At the handshake, a revoked token is refused (`authenticateSocket` goes through `verifyToken` in `session.service.ts`): #71.
-- The app closes its socket at every session end: `useAuthStore.subscribe` subscription in `mobile/src/shared/backend/socketStore.ts` (#70).
+- The app closes its socket at every session end: `authStore.subscribe` subscription in `mobile/src/shared/backend/socketStore.ts` (#70).
 
 **Tests.**
 - `backend/src/realtime/socket-auth.int.test.ts`: "refuses a token revoked by logout with INVALID_TOKEN (#71)".
