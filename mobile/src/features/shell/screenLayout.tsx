@@ -1,12 +1,12 @@
 import React from 'react';
-import { ScreenContent } from '@/features/shell/ScreenContent';
+import { ScreenContentContainer } from '@/features/shell/components/orchestrators/ScreenContentContainer';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { AlignedHeader } from '@/features/shell/components/presenters/AlignedHeader';
 import {
 	EDGE_SCROLL_SCREENS,
 	FULL_BLEED_SCREENS,
 	SCREEN_WIDTHS,
-} from '@/features/shell/lib/screenWidths';
+} from '@/features/shell/configs/screenWidthsConfig';
 
 type ScreenLayoutArgs = {
 	route: { name: string };
@@ -18,13 +18,13 @@ export function screenLayout(besideSidebar: boolean) {
 		const width = SCREEN_WIDTHS[route.name];
 		if (!width || FULL_BLEED_SCREENS.has(route.name)) return children;
 		return (
-			<ScreenContent
+			<ScreenContentContainer
 				width={width}
 				besideSidebar={besideSidebar}
 				scrollsAtEdge={EDGE_SCROLL_SCREENS.has(route.name)}
 			>
 				{children}
-			</ScreenContent>
+			</ScreenContentContainer>
 		);
 	};
 }

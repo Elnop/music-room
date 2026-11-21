@@ -1,62 +1,15 @@
 import { useState } from 'react';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQueryClient } from '@tanstack/react-query';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { logger } from '@/shared/logging/logger';
-import { showError, showSuccess } from '@/shared/theme/lib/toast';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { useCappedField } from '@/shared/theme/hooks/useCappedField';
-import type { CappedField } from '@/shared/theme/types/cappedFieldTypes';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
-import type { MusicGenre } from '@/shared/users/userTypes';
-import {
-	useCreateEvent,
-	useUpdateEvent,
-} from '@/features/events/shared/events/hooks/useEventMutations';
 import { usePlaylistChoices } from '@/features/events/shared/events/hooks/useEventQueries';
-import { useEventPlace } from '@/features/events/features/event-form/hooks/useEventPlace';
-import type { EventPlace } from '@/features/events/features/event-form/hooks/useEventPlace';
-import { pickDateTime } from '@/features/events/features/event-form/lib/pickDateTime';
-import { defaultSchedule, scheduleError } from '@/features/events/shared/event-dates/eventDates';
-import {
-	EVENT_LIMITS,
-	eventFormSchema,
-} from '@/features/events/features/event-form/lib/validators';
-import type { EventFormInput } from '@/features/events/features/event-form/lib/validators';
+import { useEventDraft } from '@/features/events/features/event-form/hooks/useEventDraft';
+import { useEventFields } from '@/features/events/features/event-form/hooks/useEventFields';
+import { useEventSubmit } from '@/features/events/features/event-form/hooks/useEventSubmit';
 import type {
-	EventInput,
-	EventStackParamList,
-	MusicEvent,
-	PlaylistChoice,
-} from '@/features/events/lib/types';
-
-type Navigation = NativeStackNavigationProp<EventStackParamList, 'EventForm'>;
-
-export type EventForm = {
-	isEditing: boolean;
-	name: CappedField;
-	description: CappedField;
-	address: CappedField;
-	accessInfo: CappedField;
-	place: EventPlace;
-	genres: MusicGenre[];
-	toggleGenre: (genre: MusicGenre) => void;
-	genresError?: string;
-	startsAt: Date;
-	endsAt: Date;
-	pickStart: () => void;
-	pickEnd: () => void;
-	playlists: PlaylistChoice[];
-	playlistId: string | null;
-	selectPlaylist: (id: string | null) => void;
-	submit: () => void;
-	isSubmitting: boolean;
-};
-
-function orNull(text: string) {
-	return text.trim() || null;
-}
+	EventForm,
+	EventFormNavigation,
+} from '@/features/events/features/event-form/types/eventFormTypes';
+import type { MusicEvent } from '@/features/events/eventTypes';
 
 function useEditedEvent(eventId: string | undefined): MusicEvent | undefined {
 	const client = useQueryClient();
@@ -69,103 +22,23 @@ function useEditedEvent(eventId: string | undefined): MusicEvent | undefined {
 	return edited;
 }
 
-export function useEventForm(navigation: Navigation, eventId: string | undefined): EventForm {
+export function useEventForm(
+	navigation: EventFormNavigation,
+	eventId: string | undefined
+): EventForm {
 	const edited = useEditedEvent(eventId);
-	const [schedule] = useState(defaultSchedule);
-	const [genres, setGenres] = useState<MusicGenre[]>(edited?.genres ?? []);
-	const [genresError, setGenresError] = useState<string>();
-	const [startsAt, setStartsAt] = useState(() =>
-		edited ? new Date(edited.startsAt) : schedule.startsAt
-	);
-	const [endsAt, setEndsAt] = useState(() => (edited ? new Date(edited.endsAt) : schedule.endsAt));
-	const [playlistId, setPlaylistId] = useState(edited?.playlist?.id ?? null);
+	const draft = useEventDraft(edited);
+	const entry = useEventFields(edited);
 	const playlists = usePlaylistChoices(true);
-	const create = useCreateEvent();
-	const update = useUpdateEvent();
-	const { control, handleSubmit, formState, setValue } = useForm<EventFormInput>({
-		resolver: zodResolver(eventFormSchema),
-		defaultValues: {
-			name: edited?.name ?? '',
-			description: edited?.description ?? '',
-			address: edited?.address ?? '',
-			accessInfo: edited?.accessInfo ?? '',
-		},
-	});
-	const place = useEventPlace(edited, address =>
-		setValue('address', address, { shouldValidate: true })
-	);
-
-	function toggleGenre(genre: MusicGenre) {
-		setGenresError(undefined);
-		setGenres(current => {
-			if (current.includes(genre)) return current.filter(g => g !== genre);
-			return current.length < EVENT_LIMITS.GENRES_MAX ? [...current, genre] : current;
-		});
-	}
-
-	function moveStart(date: Date) {
-		const length = endsAt.getTime() - startsAt.getTime();
-		setStartsAt(date);
-		if (endsAt.getTime() <= date.getTime()) setEndsAt(new Date(date.getTime() + length));
-	}
-
-	async function onSubmit(data: EventFormInput) {
-		if (genres.length === 0) {
-			setGenresError('Choisissez au moins un genre');
-			return;
-		}
-		const invalidSchedule = scheduleError(startsAt, endsAt);
-		if (invalidSchedule) {
-			showError(invalidSchedule);
-			return;
-		}
-		const coordinates = await place.resolve(data.address);
-		if (!coordinates) return;
-
-		const input: EventInput = {
-			name: data.name.trim(),
-			description: orNull(data.description),
-			address: data.address.trim(),
-			...coordinates,
-			accessInfo: orNull(data.accessInfo),
-			genres,
-			startsAt: startsAt.toISOString(),
-			endsAt: endsAt.toISOString(),
-			playlistId,
-		};
-		try {
-			if (eventId !== undefined) {
-				await update.mutateAsync({ id: eventId, changes: input });
-				showSuccess('Événement modifié');
-				navigation.goBack();
-			} else {
-				const event = await create.mutateAsync(input);
-				navigation.replace('EventDetail', { id: event.id });
-			}
-		} catch (error) {
-			logger.error('[EventForm] Save failed:', error);
-			showError(apiErrorMessage(error, "Impossible d'enregistrer l'événement"));
-		}
-	}
+	const onSubmit = useEventSubmit({ navigation, eventId, place: entry.place, draft });
 
 	return {
 		isEditing: eventId !== undefined,
-		name: useCappedField(control, 'name', EVENT_LIMITS.NAME_MAX),
-		description: useCappedField(control, 'description', EVENT_LIMITS.TEXT_MAX),
-		address: useCappedField(control, 'address', EVENT_LIMITS.ADDRESS_MAX),
-		accessInfo: useCappedField(control, 'accessInfo', EVENT_LIMITS.TEXT_MAX),
-		place,
-		genres,
-		toggleGenre,
-		genresError,
-		startsAt,
-		endsAt,
-		pickStart: () => void pickDateTime(startsAt).then(date => date && moveStart(date)),
-		pickEnd: () => void pickDateTime(endsAt).then(date => date && setEndsAt(date)),
+		...entry.fields,
+		place: entry.place,
+		...draft,
 		playlists: playlists.data ?? [],
-		playlistId,
-		selectPlaylist: setPlaylistId,
-		submit: handleSubmit(onSubmit),
-		isSubmitting: formState.isSubmitting,
+		submit: entry.form.handleSubmit(onSubmit),
+		isSubmitting: entry.form.formState.isSubmitting,
 	};
 }

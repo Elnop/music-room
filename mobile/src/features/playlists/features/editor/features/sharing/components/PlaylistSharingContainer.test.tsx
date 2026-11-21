@@ -9,7 +9,7 @@ import { logger } from '@/shared/logging/logger';
 import type {
 	PlaylistStackParamList,
 	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
@@ -56,6 +56,7 @@ jest.mock(
 type Props = NativeStackScreenProps<PlaylistStackParamList, 'PlaylistSharing'>;
 
 const PLAYLIST = 'GET /api/playlists/p1';
+const SERVER_ERROR = 'Le serveur a rencontré un problème. Réessayez plus tard.';
 const SEARCH = 'GET /api/profile/search?q=bo&limit=20';
 let routes: ReturnType<typeof mockFetchRoutes>;
 let clear: () => void = noop;
@@ -168,7 +169,7 @@ describe('PlaylistSharingContainer', () => {
 		await screen.findByText('vic (viewer)');
 		await searchBo();
 		fireEvent.press(screen.getByLabelText('Ajouter bob'));
-		await waitFor(() => expect(showError).toHaveBeenCalled());
+		await waitFor(() => expect(showError).toHaveBeenCalledWith(SERVER_ERROR));
 		expect(screen.queryByText('bob (viewer)')).toBeNull();
 	});
 
@@ -183,7 +184,7 @@ describe('PlaylistSharingContainer', () => {
 		routes.routes['DELETE /api/playlists/p1/collaborators/c1'] = fail(500, 'INTERNAL');
 		await renderScreen();
 		fireEvent.press(await screen.findByText('cora (collaborator)'));
-		await waitFor(() => expect(showError).toHaveBeenCalled());
+		await waitFor(() => expect(showError).toHaveBeenCalledWith(SERVER_ERROR));
 		expect(screen.getByText('cora (collaborator)')).toBeTruthy();
 	});
 
@@ -204,6 +205,6 @@ describe('PlaylistSharingContainer', () => {
 		const editMode = screen.UNSAFE_getAllByType(ThemedSwitch)[1];
 		await act(async () => fireEvent(editMode, 'valueChange', false));
 		expect(showWarning).toHaveBeenCalledWith('Tous les membres pourront éditer');
-		await waitFor(() => expect(showError).toHaveBeenCalled());
+		await waitFor(() => expect(showError).toHaveBeenCalledWith(SERVER_ERROR));
 	});
 });

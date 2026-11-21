@@ -1,19 +1,17 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import {
-	PlaylistCardSkeleton,
-	SkeletonBlock,
-	SkeletonList,
-} from '@/shared/theme/components/Skeleton';
-import type { Theme } from '@/shared/theme/types/themeTypes';
+import { View } from 'react-native';
+import { PlaylistCardSkeleton, SkeletonList } from '@/shared/theme/components/Skeleton';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
-import { FriendCardSkeleton } from '@/features/playlists/features/browse/features/home/components/presenters/FriendCardSkeleton';
-import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
+import { HomeSkeletonHeader } from '@/features/playlists/features/browse/features/home/components/presenters/HomeSkeletonHeader';
+import {
+	createGridStyles,
+	createListStyles,
+} from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
 
 export function HomeSkeleton() {
 	const { styles: list } = useThemedStyles(createListStyles);
-	const { styles } = useThemedStyles(createStyles);
+	const { styles: grid } = useThemedStyles(createGridStyles);
 	const column = useContentColumn();
 
 	return (
@@ -21,35 +19,9 @@ export function HomeSkeleton() {
 			<SkeletonList
 				count={4}
 				row={PlaylistCardSkeleton}
-				style={[list.list, list.grid, column]}
-				header={
-					<View style={styles.header}>
-						<SkeletonBlock width={180} height={18} style={styles.title} />
-						<View style={[list.friendsSkeleton, styles.carousel]}>
-							<FriendCardSkeleton />
-							<FriendCardSkeleton />
-							<FriendCardSkeleton />
-						</View>
-						<SkeletonBlock width={140} height={18} style={styles.title} />
-					</View>
-				}
+				style={[list.list, grid.grid, column]}
+				header={<HomeSkeletonHeader />}
 			/>
 		</View>
 	);
-}
-
-function createStyles(theme: Theme) {
-	const styles = StyleSheet.create({
-		header: {
-			width: '100%',
-		},
-		title: {
-			marginBottom: theme.spacing.md,
-		},
-		carousel: {
-			paddingHorizontal: 0,
-			marginBottom: theme.spacing.md * 2 + theme.spacing.sm,
-		},
-	});
-	return styles;
 }

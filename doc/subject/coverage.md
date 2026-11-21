@@ -120,7 +120,7 @@ Details: [events.md](../features/events.md). Music Track Vote's "event" is not r
 
 | Subject | Where |
 | --- | --- |
-| *a mechanism such as IBeacon* | The organiser's phone broadcasts an iBeacon frame (Zumik UUID, the event's minor): `mobile/src/features/events/shared/beacon/ibeacon.ts`, `mobile/modules/beacon-advertiser/`. Other phones scan and decode it in project code (`mobile/src/features/events/features/nearby/lib/beaconScanner.ts`, `ibeacon.ts` above, `mobile/src/features/events/features/nearby/lib/beaconDistance.ts`); GPS distance as a fallback (`mobile/src/features/events/features/nearby/lib/geo.ts`) |
+| *a mechanism such as IBeacon* | The organiser's phone broadcasts an iBeacon frame (Zumik UUID, the event's minor): `mobile/src/features/events/shared/beacon/ibeacon.ts`, `mobile/modules/beacon-advertiser/`. Other phones scan and decode it in project code (`mobile/src/features/events/features/nearby/lib/beaconScanner.ts`, `mobile/src/features/events/features/nearby/lib/parseIBeacon.ts`, `mobile/src/features/events/features/nearby/lib/beaconDistance.ts`); GPS distance as a fallback (`mobile/src/features/events/features/nearby/lib/geo.ts`) |
 | *a public event registered on your service* | `events` table (migration `032_events.sql`), `backend/src/features/events/`, `GET/POST/PATCH/DELETE /api/events`; every event is public |
 | *how to access it, the kind of music* | `accessInfo` and `genres` of the event, on its page (`features/events/features/detail/`), with its address, dates and linked playlist |
 | *automatically receive* | The event appears in « Événements à proximité » on **Accueil** with no action, and leaves on its own (`features/events/features/nearby/`, `lib/nearbyEvents.ts`); `event:*` Socket.io events keep the list current |

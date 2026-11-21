@@ -3,6 +3,10 @@ import { StyleSheet, useWindowDimensions } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { SwipeableTrackItem } from '@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem';
 import type { Track } from '@/shared/tracks/types/trackTypes';
+import type {
+	TrackItemHandlers,
+	TrackItemState,
+} from '@/features/playlists/features/editor/features/detail/types/trackRowTypes';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
@@ -14,6 +18,32 @@ jest.mock('@/shared/theme/hooks/useTheme', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
+type TrackItemProps = TrackItemHandlers &
+	TrackItemState & {
+		track: Track;
+		position?: number;
+	};
+
+function TrackItem({
+	track,
+	position,
+	onDelete,
+	onAddToQueue,
+	onDragStart,
+	onShowActions,
+	onPress,
+	...state
+}: TrackItemProps) {
+	return (
+		<SwipeableTrackItem
+			track={track}
+			position={position}
+			state={state}
+			handlers={{ onDelete, onAddToQueue, onDragStart, onShowActions, onPress }}
+		/>
+	);
+}
+
 function mockWidth(width: number) {
 	return jest
 		.mocked(useWindowDimensions)
@@ -22,9 +52,9 @@ function mockWidth(width: number) {
 
 const track = { id: 't1', title: 'Song', artist: 'Artist', durationMs: 125000 } as Track;
 
-function renderRow(props: Partial<React.ComponentProps<typeof SwipeableTrackItem>> = {}) {
+function renderRow(props: Partial<TrackItemProps> = {}) {
 	return render(
-		<SwipeableTrackItem
+		<TrackItem
 			track={track}
 			onDelete={jest.fn()}
 			position={3}

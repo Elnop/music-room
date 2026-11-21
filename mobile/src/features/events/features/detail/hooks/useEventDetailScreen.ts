@@ -1,63 +1,23 @@
-import { useEffect, useRef } from 'react';
 import { showAlert } from '@/shared/alerts/showAlert';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSession } from '@/shared/backend/hooks/useSession';
 import { ApiError } from '@/shared/backend/lib/api';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { logger } from '@/shared/logging/logger';
-import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { useEvent } from '@/features/events/shared/events/hooks/useEventQueries';
-import { useDeleteEvent } from '@/features/events/shared/events/hooks/useEventMutations';
-import { useBeaconStore } from '@/features/events/features/detail/beaconStore';
-import type { EventStackParamList, MusicEvent } from '@/features/events/lib/types';
+import { useEventDeletion } from '@/features/events/features/detail/hooks/useEventDeletion';
+import type {
+	EventDetailNavigation,
+	EventDetailScreen,
+} from '@/features/events/features/detail/eventDetailTypes';
+import type { MusicEvent } from '@/features/events/eventTypes';
 
-type Navigation = NativeStackNavigationProp<EventStackParamList, 'EventDetail'>;
-
-export type EventDetailScreen = {
+type DetailActionsArgs = {
+	navigation: EventDetailNavigation;
+	id: string;
 	event: MusicEvent | undefined;
-	isLoading: boolean;
-	failed: boolean;
-	isOrganizer: boolean;
-	isDeleting: boolean;
-	openPlaylist: () => void;
-	edit: () => void;
-	remove: () => void;
+	confirmDelete: () => Promise<void>;
 };
 
-export function useEventDetailScreen(navigation: Navigation, id: string): EventDetailScreen {
-	const userId = useSession(session => session.user?.id);
-	const query = useEvent(id);
-	const deleteEvent = useDeleteEvent();
-	const deletingRef = useRef(false);
-	const event = query.data;
-	const gone = query.error instanceof ApiError && query.error.status === 404;
-
-	useEffect(() => {
-		if (!gone || deletingRef.current) return;
-		showInfo('Cet événement a été supprimé');
-		navigation.goBack();
-	}, [gone, navigation]);
-
-	async function confirmDelete() {
-		deletingRef.current = true;
-		try {
-			await deleteEvent.mutateAsync(id);
-			if (useBeaconStore.getState().eventId === id) useBeaconStore.getState().stop();
-			showSuccess('Événement supprimé');
-			navigation.goBack();
-		} catch (error) {
-			deletingRef.current = false;
-			logger.error('[EventDetail] Delete failed:', error);
-			showError(apiErrorMessage(error, "Impossible de supprimer l'événement"));
-		}
-	}
-
+function detailActions({ navigation, id, event, confirmDelete }: DetailActionsArgs) {
 	return {
-		event,
-		isLoading: query.isLoading,
-		failed: query.isError && !gone && !event,
-		isOrganizer: event !== undefined && event.organizer.id === userId,
-		isDeleting: deleteEvent.isPending,
 		openPlaylist: () => {
 			if (event?.playlist) navigation.navigate('PlaylistDetail', { id: event.playlist.id });
 		},
@@ -71,5 +31,25 @@ export function useEventDetailScreen(navigation: Navigation, id: string): EventD
 					{ text: 'Supprimer', style: 'destructive', onPress: () => void confirmDelete() },
 				]
 			),
+	};
+}
+
+export function useEventDetailScreen(
+	navigation: EventDetailNavigation,
+	id: string
+): EventDetailScreen {
+	const userId = useSession(session => session.user?.id);
+	const query = useEvent(id);
+	const gone = query.error instanceof ApiError && query.error.status === 404;
+	const deletion = useEventDeletion({ navigation, id, gone });
+	const event = query.data;
+
+	return {
+		event,
+		isLoading: query.isLoading,
+		failed: query.isError && !gone && !event,
+		isOrganizer: event !== undefined && event.organizer.id === userId,
+		isDeleting: deletion.isDeleting,
+		...detailActions({ navigation, id, event, confirmDelete: deletion.confirmDelete }),
 	};
 }

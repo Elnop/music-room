@@ -37,7 +37,7 @@ function createStyles(theme: Theme) {
 			justifyContent: 'space-between',
 			padding: theme.spacing.md,
 			backgroundColor: theme.colors.surface,
-			borderWidth: 1,
+			borderWidth: theme.borders.hairline,
 			borderColor: theme.colors.border,
 		},
 		label: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
@@ -45,7 +45,7 @@ function createStyles(theme: Theme) {
 			fontSize: theme.typography.sizes.lg,
 			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
-			marginTop: 2,
+			marginTop: theme.spacing.xxs,
 		},
 	});
 	return styles;

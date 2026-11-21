@@ -1,6 +1,6 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/playlistTypes';
 import { HomeContainer } from '@/features/playlists/features/browse/features/home/components/HomeContainer';
 import { NearbyEventsContainer } from '@/features/events/features/nearby/components/NearbyEventsContainer';
 import { SimilarProfilesContainer } from '@/features/user/features/friends/features/similar-profiles/components/SimilarProfilesContainer';
@@ -17,7 +17,7 @@ export function HomeScreen(props: HomeScreenProps) {
 					{actionsFor => (
 						<HomeContainer
 							{...props}
-							actionsFor={actionsFor}
+							onPlaylistActions={actionsFor}
 							nearbyEvents={<NearbyEventsContainer />}
 							similarProfiles={<SimilarProfilesContainer />}
 						/>

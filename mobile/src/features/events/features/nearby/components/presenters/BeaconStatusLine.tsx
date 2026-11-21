@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import type { Theme } from '@/shared/theme/types/themeTypes';
+import { createBeaconLineStyles } from '@/features/events/features/nearby/components/presenters/createBeaconLineStyles';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { BeaconScanStatus } from '@/features/events/features/nearby/hooks/useBeaconScan';
+import type { BeaconScanStatus } from '@/features/events/features/nearby/nearbyTypes';
+import { BeaconPermissionLink } from '@/features/events/features/nearby/components/presenters/BeaconPermissionLink';
 import { Text } from '@/shared/theme/components/Text';
 import WifiOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/wifi.svg';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
@@ -20,21 +20,9 @@ const TEXTS: Partial<Record<BeaconScanStatus, string>> = {
 };
 
 export function BeaconStatusLine({ status, onRequestPermission }: BeaconStatusLineProps) {
-	const { styles, theme } = useThemedStyles(createStyles);
+	const { styles, theme } = useThemedStyles(createBeaconLineStyles);
 
-	if (status === 'needs-permission') {
-		return (
-			<Pressable
-				style={styles.row}
-				onPress={onRequestPermission}
-				accessibilityLabel="Détecter aussi les balises Bluetooth"
-			>
-				<PixelIcon icon={WifiOutline} size={16} color={theme.colors.primary} />
-				<Text style={styles.link}>Détecter aussi les balises Bluetooth</Text>
-			</Pressable>
-		);
-	}
-
+	if (status === 'needs-permission') return <BeaconPermissionLink onPress={onRequestPermission} />;
 	const text = TEXTS[status];
 	if (!text) return null;
 	return (
@@ -47,23 +35,4 @@ export function BeaconStatusLine({ status, onRequestPermission }: BeaconStatusLi
 			<Text style={styles.text}>{text}</Text>
 		</View>
 	);
-}
-
-function createStyles(theme: Theme) {
-	const styles = StyleSheet.create({
-		row: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			gap: theme.spacing.xs,
-			paddingHorizontal: theme.spacing.md,
-			paddingVertical: theme.spacing.xs,
-		},
-		text: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
-		link: {
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.primary,
-		},
-	});
-	return styles;
 }

@@ -3,53 +3,57 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSession } from '@/shared/backend/hooks/useSession';
 import { logger } from '@/shared/logging/logger';
-import { NEARBY_CLOCK_MS } from '@/features/events/features/nearby/lib/constants';
+import { NEARBY_CLOCK_MS } from '@/features/events/features/nearby/configs/nearbyConfig';
 import { useEvents } from '@/features/events/shared/events/hooks/useEventQueries';
 import { useNow } from '@/features/events/features/nearby/hooks/useNow';
 import { useForegroundPosition } from '@/features/events/features/nearby/hooks/useForegroundPosition';
 import { useBeaconScan } from '@/features/events/features/nearby/hooks/useBeaconScan';
-import type { BeaconScanStatus } from '@/features/events/features/nearby/hooks/useBeaconScan';
 import { nearbyNotice } from '@/features/events/features/nearby/lib/nearbyNotice';
-import type { NearbyNotice } from '@/features/events/features/nearby/lib/nearbyNotice';
 import { mergeNearby } from '@/features/events/features/nearby/lib/nearbyEvents';
-import type { NearbyItem } from '@/features/events/features/nearby/lib/nearbyEvents';
-import type { EventStackParamList, MusicEvent } from '@/features/events/lib/types';
+import type {
+	BeaconSighting,
+	NearbyEvents,
+	NearbyItem,
+	PositionState,
+} from '@/features/events/features/nearby/nearbyTypes';
+import type { EventStackParamList, MusicEvent } from '@/features/events/eventTypes';
 
-export type NearbyEvents = {
-	items: NearbyItem[];
-	notice: NearbyNotice;
-	mine: MusicEvent[];
-	openEvent: (id: string) => void;
-	createEvent: () => void;
-	requestPermission: () => void;
-	openSettings: () => void;
-	beaconStatus: BeaconScanStatus;
-	requestBeaconPermission: () => void;
-};
-
-export function useNearbyEvents(): NearbyEvents {
-	const navigation = useNavigation<NativeStackNavigationProp<EventStackParamList>>();
+function useEventLists() {
 	const userId = useSession(session => session.user?.id);
 	const events = useEvents();
-	const position = useForegroundPosition();
-	const beacons = useBeaconScan();
-	const now = useNow(NEARBY_CLOCK_MS);
 
 	useEffect(() => {
 		if (events.error) logger.error('[NearbyEvents] Failed to load events:', events.error);
 	}, [events.error]);
 
 	const all = events.data;
-	const located = position.state.status === 'located' ? position.state.position : null;
-	const items = useMemo(
-		() => (all ? mergeNearby(all, beacons.sightings, located, now) : []),
-		[all, beacons.sightings, located, now]
+	return { all, mine: (all ?? []).filter(event => event.organizer.id === userId) };
+}
+
+function useNearbyItems(
+	all: MusicEvent[] | undefined,
+	sightings: ReadonlyMap<number, BeaconSighting>,
+	position: PositionState
+): NearbyItem[] {
+	const now = useNow(NEARBY_CLOCK_MS);
+	const located = position.status === 'located' ? position.position : null;
+	return useMemo(
+		() => (all ? mergeNearby(all, sightings, located, now) : []),
+		[all, sightings, located, now]
 	);
+}
+
+export function useNearbyEvents(): NearbyEvents {
+	const navigation = useNavigation<NativeStackNavigationProp<EventStackParamList>>();
+	const lists = useEventLists();
+	const position = useForegroundPosition();
+	const beacons = useBeaconScan();
+	const items = useNearbyItems(lists.all, beacons.sightings, position.state);
 
 	return {
 		items,
 		notice: nearbyNotice(position.state),
-		mine: (all ?? []).filter(event => event.organizer.id === userId),
+		mine: lists.mine,
 		openEvent: id => navigation.navigate('EventDetail', { id }),
 		createEvent: () => navigation.navigate('EventForm'),
 		requestPermission: position.requestPermission,

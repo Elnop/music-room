@@ -35,7 +35,7 @@ function createStyles(theme: Theme) {
 		},
 		requirementText: {
 			fontSize: theme.typography.sizes.sm,
-			lineHeight: theme.typography.lineHeights.sm,
+			lineHeight: theme.typography.lineHeights.xs,
 			color: theme.colors.textSecondary,
 		},
 	});

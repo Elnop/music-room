@@ -1,4 +1,4 @@
-import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
+import type { UserSummary } from '@/features/playlists/shared/playlist/playlistTypes';
 
 export function ownerName(owner: UserSummary) {
 	return owner.displayName || owner.username;

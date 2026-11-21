@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen } from '@testing-library/react-native';
 import { RootNavigator } from '@/app/RootNavigator';
 import { authStore } from '@/features/user/features/auth/shared/sign-in/authStore';
-import { clearPendingLink } from '@/features/shell/lib/linking';
+import { clearPendingLink } from '@/features/shell/lib/pendingLink';
 import { silenceLogger } from '@test-utils/silenceLogger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';

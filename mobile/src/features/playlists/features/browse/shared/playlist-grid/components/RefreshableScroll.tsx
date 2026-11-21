@@ -4,6 +4,7 @@ import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
+import { bottomPaddingStyle } from '@/features/playlists/features/browse/shared/playlist-grid/lib/sizedStyles';
 
 type RefreshableScrollProps = {
 	isRefreshing: boolean;
@@ -24,7 +25,7 @@ export function RefreshableScroll({
 	return (
 		<ScrollView
 			style={styles.container}
-			contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }, column]}
+			contentContainerStyle={[styles.list, bottomPaddingStyle(bottomPadding), column]}
 			refreshControl={
 				<ThemedRefreshControl
 					refreshing={isRefreshing}

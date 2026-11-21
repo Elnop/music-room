@@ -1,30 +1,12 @@
 import { useState } from 'react';
-import { logger } from '@/shared/logging/logger';
-import { showError } from '@/shared/theme/lib/toast';
 import {
-	currentPlace,
-	requestLocationPermission,
-} from '@/features/events/shared/events/lib/eventLocation';
-import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
-import {
-	geocodeAddress,
-	geocoderNeedsLocationPermission,
-} from '@/features/events/shared/events/lib/geocoder';
-
-type Located = Coordinates & {
-	address: string;
-};
-
-export type EventPlace = {
-	isLocating: boolean;
-	locateHere: () => void;
-	resolve: (address: string) => Promise<Coordinates | null>;
-};
-
-const POSITION_PERMISSION_NEEDED =
-	"Autorisez la localisation pour utiliser votre position : Zumik ne l'envoie jamais au serveur";
-const PERMISSION_NEEDED =
-	"Autorisez la localisation pour situer l'adresse : Zumik ne l'envoie jamais au serveur";
+	locateCurrentPlace,
+	resolveAddress,
+} from '@/features/events/features/event-form/lib/eventPlace';
+import type {
+	EventPlace,
+	Located,
+} from '@/features/events/features/event-form/types/eventFormTypes';
 
 export function useEventPlace(
 	edited: Located | undefined,
@@ -39,44 +21,17 @@ export function useEventPlace(
 
 	async function locateHere() {
 		setIsLocating(true);
-		try {
-			if (!(await requestLocationPermission())) {
-				showError(POSITION_PERMISSION_NEEDED);
-				return;
-			}
-			const place = await currentPlace();
+		const place = await locateCurrentPlace();
+		if (place) {
 			setLocated(place);
 			setAddress(place.address);
-		} catch (error) {
-			logger.warn('[EventForm] Current position unavailable:', error);
-			showError('Position introuvable : vérifiez que la localisation est activée');
-		} finally {
-			setIsLocating(false);
 		}
-	}
-
-	async function resolve(address: string): Promise<Coordinates | null> {
-		if (located && located.address.trim() === address.trim()) {
-			return { latitude: located.latitude, longitude: located.longitude };
-		}
-		if (geocoderNeedsLocationPermission && !(await requestLocationPermission())) {
-			showError(PERMISSION_NEEDED);
-			return null;
-		}
-		try {
-			const coordinates = await geocodeAddress(address);
-			if (!coordinates) showError('Adresse introuvable : précisez la ville ou le code postal');
-			return coordinates;
-		} catch (error) {
-			logger.warn('[EventForm] Geocoding failed:', error);
-			showError("Impossible de situer l'adresse pour le moment");
-			return null;
-		}
+		setIsLocating(false);
 	}
 
 	return {
 		isLocating,
 		locateHere: () => void locateHere(),
-		resolve,
+		resolve: address => resolveAddress(located, address),
 	};
 }

@@ -2,13 +2,13 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SearchContainer } from '@/features/search/components/SearchContainer';
-import { searchApi } from '@/features/search/lib/searchApi';
+import { searchApi } from '@/features/search/searchApi';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { testPlayback } from '@test-utils/testPlaybackConfig';
 
 const mockPlayListTrack = testPlayback.playListTrack;
 
-jest.mock('@/features/search/lib/searchApi', () => ({
+jest.mock('@/features/search/searchApi', () => ({
 	searchApi: {
 		search: jest.fn(),
 		searchTracks: jest.fn(),

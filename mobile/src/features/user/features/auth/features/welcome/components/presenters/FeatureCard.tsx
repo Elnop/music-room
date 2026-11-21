@@ -37,7 +37,7 @@ function createStyles(theme: Theme) {
 		},
 		description: {
 			fontSize: theme.typography.sizes.md,
-			lineHeight: theme.typography.lineHeights.md,
+			lineHeight: theme.typography.lineHeights.sm,
 			color: theme.colors.textSecondary,
 		},
 	});

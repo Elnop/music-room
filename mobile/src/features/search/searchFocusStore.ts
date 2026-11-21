@@ -1,13 +1,14 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand/vanilla';
 
 type SearchFocusState = {
 	pending: boolean;
-	request: () => void;
-	consume: () => void;
 };
 
-export const useSearchFocusStore = create<SearchFocusState>(set => ({
+export const searchFocusStore = createStore<SearchFocusState>(() => ({
 	pending: false,
-	request: () => set({ pending: true }),
-	consume: () => set({ pending: false }),
 }));
+
+export const searchFocusActions = {
+	request: () => searchFocusStore.setState({ pending: true }),
+	consume: () => searchFocusStore.setState({ pending: false }),
+};

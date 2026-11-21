@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
+import type { UserSummary } from '@/features/playlists/shared/playlist/playlistTypes';
 
 export async function addCollaborator(playlistId: string, userId: string): Promise<void> {
 	await apiRequest(`/api/playlists/${playlistId}/collaborators`, {

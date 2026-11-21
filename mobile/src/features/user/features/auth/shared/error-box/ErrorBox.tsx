@@ -27,7 +27,7 @@ function createStyles(theme: Theme) {
 		},
 		errorText: {
 			fontSize: theme.typography.sizes.md,
-			lineHeight: theme.typography.lineHeights.md,
+			lineHeight: theme.typography.lineHeights.sm,
 			color: theme.colors.error,
 		},
 	});

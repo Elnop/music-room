@@ -23,7 +23,7 @@ function keydown(key: string) {
 		target: { tagName: 'BODY' },
 		preventDefault: jest.fn(),
 	};
-	listeners.forEach(listener => listener(event));
+	for (const listener of listeners) listener(event);
 	return event;
 }
 
@@ -57,7 +57,7 @@ describe('useKeyboardShortcuts (web)', () => {
 
 		expect(latest.run).toHaveBeenCalledTimes(1);
 		expect(first.run).not.toHaveBeenCalled();
-		expect(event.preventDefault).toHaveBeenCalled();
+		expect(event.preventDefault).toHaveBeenCalledWith();
 	});
 
 	it('lets every key through while a dialog is open', () => {

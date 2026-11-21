@@ -1,13 +1,11 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Pressable } from '@/shared/theme/components/Pressable';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { FriendPlaylists } from '@/features/playlists/shared/playlist/lib/types';
-import { playlistCardLabel } from '@/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels';
-import { PlaylistCassette } from '@/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCassette';
-
-export const FRIEND_CARD_WIDTH = 120;
+import type { FriendPlaylists } from '@/features/playlists/shared/playlist/playlistTypes';
+import { FriendPlaylistCard } from '@/features/playlists/features/browse/features/home/components/presenters/FriendPlaylistCard';
+import { friendCards } from '@/features/playlists/features/browse/features/home/friendCards';
+import { FRIEND_CARD_WIDTH } from '@/features/playlists/features/browse/features/home/friendCardConfig';
 
 type FriendPlaylistCarouselProps = {
 	friendsPlaylists: FriendPlaylists[];
@@ -18,10 +16,7 @@ export function FriendPlaylistCarousel({
 	friendsPlaylists,
 	onPlaylistPress,
 }: FriendPlaylistCarouselProps) {
-	const { styles } = useThemedStyles(createStyles);
-	const cards = friendsPlaylists.flatMap(({ friend, playlists }) =>
-		playlists.map(playlist => ({ friend, playlist }))
-	);
+	const { styles, theme } = useThemedStyles(createStyles);
 
 	return (
 		<ScrollView
@@ -29,17 +24,15 @@ export function FriendPlaylistCarousel({
 			showsHorizontalScrollIndicator={false}
 			contentContainerStyle={styles.scrollContent}
 			decelerationRate="fast"
-			snapToInterval={FRIEND_CARD_WIDTH + 16}
+			snapToInterval={FRIEND_CARD_WIDTH + theme.spacing.md}
 		>
-			{cards.map(({ friend, playlist }) => (
-				<Pressable
+			{friendCards(friendsPlaylists).map(({ friend, playlist }) => (
+				<FriendPlaylistCard
 					key={`${friend.id}-${playlist.id}`}
-					style={styles.card}
+					friend={friend}
+					playlist={playlist}
 					onPress={() => onPlaylistPress(playlist.id)}
-					accessibilityLabel={playlistCardLabel(playlist.name, friend)}
-				>
-					<PlaylistCassette playlist={playlist} owner={friend} width={FRIEND_CARD_WIDTH} />
-				</Pressable>
+				/>
 			))}
 		</ScrollView>
 	);
@@ -51,7 +44,6 @@ function createStyles(theme: Theme) {
 			paddingHorizontal: theme.spacing.md,
 			paddingBottom: theme.spacing.sm,
 		},
-		card: { marginRight: theme.spacing.md },
 	});
 	return styles;
 }

@@ -27,7 +27,7 @@ function createStyles(theme: Theme) {
 		passwordHintText: {
 			fontSize: theme.typography.sizes.xs,
 			color: theme.colors.textSecondary,
-			lineHeight: theme.typography.lineHeights.xs,
+			lineHeight: theme.typography.lineHeights.xxs,
 		},
 	});
 	return styles;

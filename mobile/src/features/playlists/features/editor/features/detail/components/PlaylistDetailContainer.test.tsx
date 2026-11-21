@@ -11,7 +11,7 @@ import { logger } from '@/shared/logging/logger';
 import type {
 	PlaylistStackParamList,
 	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
@@ -82,22 +82,19 @@ jest.mock('@/shared/theme/components/ReorderableList', () => {
 jest.mock(
 	'@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem',
 	() => {
-		const { Text: MockText } = jest.requireActual('react-native');
+		const { Text } = jest.requireActual('react-native');
 		return {
 			SwipeableTrackItem: (props: {
 				track: { title: string };
-				isCurrent: boolean;
-				isPending: boolean;
-				onDelete: () => void;
-				onAddToQueue: () => void;
-				onPress: () => void;
+				state: { isCurrent: boolean; isPending: boolean };
+				handlers: { onDelete: () => void; onAddToQueue: () => void; onPress: () => void };
 			}) => (
 				<>
-					<MockText onPress={props.onPress}>
-						{`${props.track.title}${props.isCurrent ? ' (current)' : ''}${props.isPending ? ' (pending)' : ''}`}
-					</MockText>
-					<MockText onPress={props.onDelete}>{`Supprimer ${props.track.title}`}</MockText>
-					<MockText onPress={props.onAddToQueue}>{`File ${props.track.title}`}</MockText>
+					<Text onPress={props.handlers.onPress}>
+						{`${props.track.title}${props.state.isCurrent ? ' (current)' : ''}${props.state.isPending ? ' (pending)' : ''}`}
+					</Text>
+					<Text onPress={props.handlers.onDelete}>{`Supprimer ${props.track.title}`}</Text>
+					<Text onPress={props.handlers.onAddToQueue}>{`File ${props.track.title}`}</Text>
 				</>
 			),
 		};
@@ -155,11 +152,9 @@ function renderHeaderRight() {
 
 function openOwnerSheet() {
 	const options = navigation.setOptions.mock.calls.at(-1)?.[0] as {
-		headerRight: () => React.ReactElement<{
-			children: React.ReactElement<{ onPress: () => void }>;
-		}>;
+		headerRight: () => React.ReactElement<{ onPress: () => void }>;
 	};
-	act(() => options.headerRight().props.children.props.onPress());
+	act(() => options.headerRight().props.onPress());
 }
 
 beforeEach(async () => {
@@ -404,7 +399,7 @@ describe('PlaylistDetailContainer owner actions (#342)', () => {
 		await renderScreen();
 		pressAction('Supprimer');
 		await act(async () => alertButton('Supprimer')?.onPress?.());
-		await waitFor(() => expect(showError).toHaveBeenCalled());
+		await waitFor(() => expect(showError).toHaveBeenCalledWith(expect.any(String)));
 		expect(navigation.popToTop).not.toHaveBeenCalled();
 	});
 });

@@ -6,7 +6,7 @@ import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { MUSIC_GENRES } from '@/shared/users/userConfig';
 import type { MusicGenre } from '@/shared/users/userTypes';
-import { EVENT_LIMITS } from '@/features/events/features/event-form/lib/validators';
+import { EVENT_LIMITS } from '@/features/events/features/event-form/eventFormConfig';
 import { FieldLabel } from '@/features/events/features/event-form/components/presenters/FieldLabel';
 
 type GenreSelectorProps = {
@@ -21,7 +21,7 @@ export function GenreSelector({ selected, onToggle, error }: GenreSelectorProps)
 
 	return (
 		<View>
-			<FieldLabel>{`Genres (${selected.length}/${EVENT_LIMITS.GENRES_MAX})`}</FieldLabel>
+			<FieldLabel label={`Genres (${selected.length}/${EVENT_LIMITS.GENRES_MAX})`} />
 			<View style={styles.chips}>
 				{MUSIC_GENRES.map(genre => {
 					const isSelected = selected.includes(genre);

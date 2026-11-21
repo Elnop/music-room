@@ -2,7 +2,7 @@ import {
 	applyPlaylistEvent,
 	sortByRank,
 } from '@/features/playlists/shared/playlist/lib/playlistSync';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
 
 function track(id: string, rank: string): TrackInPlaylist {

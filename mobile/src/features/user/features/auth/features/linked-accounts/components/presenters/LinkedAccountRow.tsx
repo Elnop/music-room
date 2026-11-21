@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import { MethodBadge } from '@/features/user/features/auth/features/linked-accounts/components/presenters/MethodBadge';
+import { IconTile } from '@/shared/theme/components/IconTile';
 import { ProviderLinkAction } from '@/features/user/features/auth/features/linked-accounts/components/presenters/ProviderLinkAction';
 import type { LinkedProvider } from '@/features/user/features/auth/authTypes';
 import type {
@@ -27,7 +27,7 @@ export function LinkedAccountRow({ method, linked, actions }: LinkedAccountRowPr
 
 	return (
 		<View style={styles.accountItem} testID={`linked-account-${method.type}`}>
-			<MethodBadge icon={method.icon} />
+			<IconTile icon={method.icon} size="badge" />
 			<View style={styles.methodInfo}>
 				<Text style={styles.rowTitle}>{method.label}</Text>
 				<Text style={styles.rowStatus}>{linkStatus(linked)}</Text>
