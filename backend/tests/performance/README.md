@@ -27,7 +27,7 @@ Requirements: a running backend (`make dev-docker` or `make backend-local`), Doc
    - `login-read.yml`: 1 new user per second for 10 s; login, list playlists, read `perf-shared`.
    - `track-edit.yml`: 2 users/s for 10 s, ramp to 10 users/s over 30 s, 10 users/s for 30 s; with a pre-issued token, add a uniquely named track to `perf-shared`, move it to the first place, delete it. A 409 on the move is expected under contention (another user changed the playlist after the add).
 4. Runs the real-time scenario, `backend/src/test/perf-socket.ts` (see below), into `socket.json` and `socket.log`.
-5. `summarize.mjs` turns the reports into `results/<timestamp>/summary.md`: requests, req/s, latency min/median/p95/p99/max for each Artillery scenario and endpoint, status codes, errors, the socket section, and the run conditions. The raw reports (`<scenario>.json`, `socket.json`) and logs (`<scenario>.log`, `socket.log`) sit next to it. `results/` is git-ignored.
+5. `backend/src/test/perf-summary.ts` (run with tsx) turns the reports into `results/<timestamp>/summary.md`: requests, req/s, latency min/median/p95/p99/max for each Artillery scenario and endpoint, status codes, errors, the socket section, and the run conditions. The raw reports (`<scenario>.json`, `socket.json`) and logs (`<scenario>.log`, `socket.log`) sit next to it. `results/` is git-ignored.
 
 ## Real-time scenario (Socket.io)
 

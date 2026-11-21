@@ -217,7 +217,7 @@ export default [
 
   // Project guardrails, on the app code and its tests.
   {
-    files: ['src/**/*.{ts,tsx}', 'App.tsx'],
+    files: ['src/**/*.{ts,tsx}'],
     plugins: {
       guardrails: guardrailsPlugin,
       components: componentsPlugin,

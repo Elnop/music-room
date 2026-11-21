@@ -18,7 +18,7 @@ const CONNECT_BATCH = 20;
 /** playlist:join has no ack: time left to its handlers before the load starts. */
 const JOIN_SETTLE_MS = 1_000;
 
-const fixturesDir = new URL('../../../tests/performance/fixtures/', import.meta.url);
+const fixturesDir = new URL('../../tests/performance/fixtures/', import.meta.url);
 
 const envSchema = z.object({
 	sharedPlaylistId: z.uuid(),

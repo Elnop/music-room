@@ -1,4 +1,4 @@
-// Fixtures for the HTTP load tests (`make perf-fixtures`): writes tests/performance/fixtures/users.csv
+// Fixtures for the HTTP load tests (`make perf-fixtures`): writes backend/tests/performance/fixtures/users.csv
 // and env.json, both git-ignored. Run from backend/: `npx tsx src/test/perf-fixtures.ts`.
 
 import { randomBytes } from 'node:crypto';
@@ -12,7 +12,7 @@ const printError = (line: string) => process.stderr.write(`${line}\n`);
 
 const PLAYLIST_NAME = 'perf-shared';
 const DEVICE_ID = 'perf-device-0';
-/** Added by the track-edit scenario (tests/performance/scenarios). */
+/** Added by the track-edit scenario (backend/tests/performance/scenarios). */
 const PERF_TRACK_URI_PREFIX = 'https://soundcloud.com/zumik-perf/';
 /** Connected by the socket scenario (perf-socket.ts). */
 const PERF_SOCKET_DEVICE_PREFIX = 'perf-socket-';
@@ -25,7 +25,7 @@ const userCount = z.coerce
 	.max(500)
 	.parse(process.env.PERF_USERS ?? '20');
 
-const fixturesDir = new URL('../../../tests/performance/fixtures/', import.meta.url);
+const fixturesDir = new URL('../../tests/performance/fixtures/', import.meta.url);
 
 interface PerfUser {
 	index: number;
@@ -219,7 +219,7 @@ async function main(): Promise<void> {
 	const env = { sharedPlaylistId, ownerId: owner.id, deviceId: DEVICE_ID, userCount };
 	await writeFile(new URL('env.json', fixturesDir), `${JSON.stringify(env, null, 2)}\n`);
 
-	print(`Fixtures written to tests/performance/fixtures/ (playlist ${sharedPlaylistId})`);
+	print(`Fixtures written to backend/tests/performance/fixtures/ (playlist ${sharedPlaylistId})`);
 }
 
 main().then(

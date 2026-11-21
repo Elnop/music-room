@@ -38,7 +38,7 @@ semgrep and gitleaks run from Docker images, so Docker must be running. Details:
   - `lint`, `type-check`, `test` and `check` for both projects;
   - `test-int`: the integration tests, on a full VM that starts the local Supabase stack and Redis (`scripts/test-db.sh`). Docker images are cached between runs (#327).
 - **Release** (`.github/workflows/release-apk.yml`): on every push to `main`, builds the release APK and publishes a GitHub Release.
-- **Pages** (`.github/workflows/pages.yml`): on a push to `main` touching `site/` or `mobile/`, publishes the web build of `mobile/` at `https://elnop.github.io/music-room/`, with the static pages of `site/` (`privacy.html`, `404.html`) at the same root; the job fails when a file is in both.
+- **Pages** (`.github/workflows/pages.yml`): on a push to `main` touching `mobile/`, publishes the web build of `mobile/` at `https://elnop.github.io/music-room/`, with the static pages of `mobile/site/` (`privacy.html`, `404.html`) at the same root; the job fails when a file is in both.
 
 ## Tests
 
@@ -50,4 +50,4 @@ Strategy, mocks and single-test commands: [testing.md](testing.md). Security tes
 
 ## Load tests
 
-`make perf-test` runs Artillery HTTP scenarios and a Socket.io scenario against a running backend and writes a summary; see [tests/performance/README.md](../../tests/performance/README.md). The reference machine and the capacity report (subject IV.7) are tracked in #103 and #106.
+`make perf-test` runs Artillery HTTP scenarios and a Socket.io scenario against a running backend and writes a summary; see [backend/tests/performance/README.md](../../backend/tests/performance/README.md). The reference machine and the capacity report (subject IV.7) are tracked in #103 and #106.

@@ -17,8 +17,8 @@
 
 ## Où regarder
 
-- [tests/performance/README.md](../../../tests/performance/README.md) : déroulé, variables, conditions qui changent les chiffres
-- `tests/performance/scenarios/`, `backend/src/test/perf-socket.ts`
+- [backend/tests/performance/README.md](../../../backend/tests/performance/README.md) : déroulé, variables, conditions qui changent les chiffres
+- `backend/tests/performance/scenarios/`, `backend/src/test/perf-socket.ts`
 
 ## Scénario
 

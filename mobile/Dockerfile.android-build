@@ -14,7 +14,7 @@
 #          -e EXPO_PUBLIC_WS_URL=wss://xxx.ngrok-free.app \
 #          zumik-apk-builder
 #        REACT_NATIVE_ARCHITECTURES=arm64-v8a (-e) builds one ABI; GRADLE_WORKERS
-#        (default 2) bounds Gradle on a modest machine. scripts/build-apk-docker.sh
+#        (default 2) bounds Gradle on a modest machine. mobile/scripts/build-apk-docker.sh
 #        keeps the Gradle cache in the zumik-gradle-cache volume.
 # ==============================================================================
 
@@ -69,10 +69,6 @@ RUN npm ci --ignore-scripts && npm run postinstall && npm cache clean --force
 # Copy mobile source code
 COPY mobile/ ./
 
-# Copy scripts
-COPY scripts/ /scripts/
-RUN chmod +x /scripts/*.sh
-
 # Build arguments with defaults
 ARG EXPO_PUBLIC_API_URL=https://placeholder.ngrok-free.app
 ARG EXPO_PUBLIC_WS_URL=wss://placeholder.ngrok-free.app
@@ -112,7 +108,7 @@ npx expo prebuild --clean --platform android\n\
 \n\
 echo ""\n\
 echo "Generating network security config..."\n\
-/scripts/generate-network-config.sh\n\
+./scripts/generate-docker-network-config.sh\n\
 \n\
 echo ""\n\
 echo "Building APK with Gradle..."\n\

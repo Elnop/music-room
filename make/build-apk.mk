@@ -242,7 +242,7 @@ build-apk-docker:
 	@echo ""
 	@echo "$(YELLOW)⚠️  Note: Uses placeholder URL if no tunnel is running$(NC)"
 	@echo ""
-	@./scripts/build-apk-docker.sh
+	@./mobile/scripts/build-apk-docker.sh
 
 # The APK build never runs supabase-up: keep its backend on the hosted project (#251).
 build-apk-docker-with-tunnel: SUPABASE_MODE := hosted
