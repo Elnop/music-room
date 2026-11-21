@@ -40,4 +40,4 @@ Everything a human needs to understand Zumik. Start with the [project README](..
 - [development/tunnel-mode.md](development/tunnel-mode.md) - Running the app on a phone on another network.
 - [development/wsl2.md](development/wsl2.md) - Developing on Windows with WSL2: JDK 17, the Windows adb for a USB phone, memory limits.
 - [development/demo-accounts.md](development/demo-accounts.md) - The demo accounts and playlists of the local stack.
-- [../tests/performance/README.md](../tests/performance/README.md) - Load tests (`make perf-test`).
+- [../backend/tests/performance/README.md](../backend/tests/performance/README.md) - Load tests (`make perf-test`).

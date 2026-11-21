@@ -18,4 +18,3 @@ rule:
   regex: "@ts-(ignore|nocheck)"
 files:
   - src/**/*.tsx
-  - App.tsx

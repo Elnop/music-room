@@ -3,7 +3,7 @@
 # Generate Network Security Configuration for Android
 # ==============================================================================
 # Purpose: Allow cleartext HTTP connections to localhost and ngrok domains
-# Usage: ./scripts/generate-network-config.sh
+# Usage: ./scripts/generate-docker-network-config.sh (from mobile/, inside the APK build image)
 # ==============================================================================
 
 set -e

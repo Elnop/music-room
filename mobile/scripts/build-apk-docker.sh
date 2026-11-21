@@ -2,8 +2,8 @@
 # ==============================================================================
 # Build APK with Docker - Simplified Script
 # ==============================================================================
-# Usage: ./scripts/build-apk-docker.sh [tunnel-url]
-# Example: ./scripts/build-apk-docker.sh https://abc123.ngrok-free.app
+# Usage: ./mobile/scripts/build-apk-docker.sh [tunnel-url]
+# Example: ./mobile/scripts/build-apk-docker.sh https://abc123.ngrok-free.app
 # ==============================================================================
 
 set -e
@@ -21,7 +21,7 @@ ICON_ERROR="✗"
 ICON_INFO="ℹ"
 ICON_ROCKET="🚀"
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MOBILE_DIR="$PROJECT_ROOT/mobile"
 OUTPUT_DIR="$PROJECT_ROOT/build"
 

@@ -1,14 +1,14 @@
 name: Pages
 
 # Publishes the web build of mobile/ at https://elnop.github.io/music-room/,
-# with site/ next to it: the static privacy policy (required by the Google OAuth
+# with mobile/site/ next to it: the static privacy policy (required by the Google OAuth
 # consent screen and the Play Store) and the 404 page that sends app paths back
 # to the app.
 
 on:
   push:
     branches: [main]
-    paths: [site/**, mobile/**, .github/workflows/pages.yml]
+    paths: [mobile/**, .github/workflows/pages.yml]
   workflow_dispatch:
 
 concurrency:
@@ -63,15 +63,15 @@ jobs:
 
       - run: npx expo export -p web --clear --output-dir dist
 
-      # The export and site/ share the root: a file in both would be overwritten
+      # The export and mobile/site/ share the root: a file in both would be overwritten
       - name: Assemble the site
         working-directory: .
         run: |
-          clash=$(cd site && find . -type f | while read -r file; do [ ! -e "../mobile/dist/$file" ] || echo "$file"; done)
-          if [ -n "$clash" ]; then echo "::error::In both site/ and the export: $clash"; exit 1; fi
+          clash=$(cd mobile/site && find . -type f | while read -r file; do [ ! -e "../dist/$file" ] || echo "$file"; done)
+          if [ -n "$clash" ]; then echo "::error::In both mobile/site/ and the export: $clash"; exit 1; fi
           mkdir _site
           cp -R mobile/dist/. _site/
-          cp -R site/. _site/
+          cp -R mobile/site/. _site/
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

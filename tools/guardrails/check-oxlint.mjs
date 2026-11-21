@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const SUPPRESSIONS = '.oxlint-suppressions.json';
-const TARGETS = ['src', 'App.tsx', 'index.ts', 'test-utils'];
+const TARGETS = ['src', 'index.ts', 'test-utils'];
 export function countViolations(diagnostics) {
   const counts = {};
   for (const { filename, code } of diagnostics) {

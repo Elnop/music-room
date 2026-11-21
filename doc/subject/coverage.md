@@ -21,7 +21,7 @@ The subject asks for two of the three services of IV.2. Zumik delivers **Music P
 | IV.4 API | ✅ | Swagger UI `/api-docs`; [mobile-api.md](../features/mobile-api.md) |
 | IV.5 Mobile application | ✅ | `mobile/src/shared/backend/lib/api.ts`, `backendUrl.ts` |
 | IV.6 Security | ✅ | [threat-model.md](../security/threat-model.md) |
-| IV.7 Scaling | ⏳ | `make perf-test`, [tests/performance/README.md](../../tests/performance/README.md); reference machine and report: #103, #106 |
+| IV.7 Scaling | ⏳ | `make perf-test`, [backend/tests/performance/README.md](../../backend/tests/performance/README.md); reference machine and report: #103, #106 |
 | IV.8 Agility, quality, CI | ✅ | [quality-and-ci.md](../development/quality-and-ci.md), [testing.md](../development/testing.md) |
 
 ## Details
@@ -86,7 +86,7 @@ Details: [playlist-editor.md](../features/playlist-editor.md), [playlist-concurr
 
 ### IV.7 Scaling
 
-- Load tests run from the repository: `make perf-test` (Artillery HTTP scenarios and a Socket.io scenario), described in [tests/performance/README.md](../../tests/performance/README.md).
+- Load tests run from the repository: `make perf-test` (Artillery HTTP scenarios and a Socket.io scenario), described in [backend/tests/performance/README.md](../../backend/tests/performance/README.md).
 - Still open: the reference machine (#103) and the capacity report with the maximum number of simultaneous users (#106). Music Track Vote is not implemented, so it is not measured.
 
 ### IV.8 Agility, quality, continuous integration

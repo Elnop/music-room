@@ -1,7 +1,7 @@
 # Login, then playlist reads (make perf-test).
 # Every virtual user takes the next row of fixtures/users.csv, signs in with its
 # password and reads with the token it gets back. The arrival rate stays low:
-# hosted Supabase caps password sign-ins per IP (tests/performance/README.md).
+# hosted Supabase caps password sign-ins per IP (backend/tests/performance/README.md).
 # The target comes from `--target`; sharedPlaylistId from fixtures/env.json.
 config:
   phases:

@@ -39,9 +39,9 @@ npm-debug.log*
 # Testing
 coverage/
 # Load tests: fixtures hold passwords and tokens; results are per run
-tests/performance/fixtures/
-tests/performance/results/*
-!tests/performance/results/.gitkeep
+backend/tests/performance/fixtures/
+backend/tests/performance/results/*
+!backend/tests/performance/results/.gitkeep
 
 # Misc
 *.tsbuildinfo

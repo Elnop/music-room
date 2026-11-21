@@ -73,7 +73,7 @@ Build image, started by `scripts/build-apk-docker.sh` (`make build-apk-docker`),
 - Base `node:22-bookworm-slim`. **No `USER`: everything runs as root**, installation and build alike.
 - Installs through `apt-get --no-install-recommends`: `openjdk-17-jdk-headless`, `build-essential`, `python3`, `git`, `curl`, `wget`, `unzip`, `ca-certificates`. No global npm package.
 - Downloads the Android tools (`commandlinetools-linux-9477386_latest.zip`, `platform-tools-latest-linux.zip`) from `dl.google.com` with `wget`, without checksum verification, and accepts the licenses (`yes | sdkmanager --licenses`).
-- Build context: the repository root. The root `.dockerignore` excludes `**/.env*`, `**/node_modules` and `.git`. Copies `mobile/` into `/app` and `scripts/` into `/scripts`.
+- Build context: the repository root. The root `.dockerignore` excludes `**/.env*`, `**/node_modules` and `.git`. Copies `mobile/` into `/app`; the network config comes from `mobile/scripts/generate-docker-network-config.sh`.
 - `npm ci --ignore-scripts && npm run postinstall && npm cache clean --force`: a failing `patch-package` stops the build.
 - `EXPO_PUBLIC_API_URL` / `EXPO_PUBLIC_WS_URL`: `ARG` with a dummy value, replaced at `docker run` by the tunnel URL; `NODE_ENV=production`.
 - No `EXPOSE`. `CMD ["bash", "/build.sh"]`: `expo prebuild`, `scripts/generate-network-config.sh` (cleartext HTTP allowed for `localhost`, `10.0.2.2`, `127.0.0.1` and the tunnel domain), `./gradlew assembleRelease` with `--max-workers=${GRADLE_WORKERS:-2}` (the 2 GB heap comes from the generated `gradle.properties`); `REACT_NATIVE_ARCHITECTURES` (passed by `make build-apk-docker REACT_NATIVE_ARCHITECTURES=arm64-v8a`) limits the ABIs.

@@ -1,14 +1,6 @@
 {
-  "App.tsx": {
-    "import(no-default-export)": {
-      "count": 1
-    }
-  },
   "index.ts": {
     "check-file(no-index)": {
-      "count": 1
-    },
-    "eslint(no-restricted-imports)": {
       "count": 1
     }
   },

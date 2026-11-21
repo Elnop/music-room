@@ -5,14 +5,14 @@
 # manifest). The real-time scenario (Socket.io) is backend/src/test/perf-socket.ts,
 # run with tsx on the backend's socket.io-client. Fixtures (users, tokens,
 # shared playlist) are written by backend/src/test/perf-fixtures.ts to
-# tests/performance/fixtures/ (git-ignored).
-# See tests/performance/README.md.
+# backend/tests/performance/fixtures/ (git-ignored).
+# See backend/tests/performance/README.md.
 
 .PHONY: perf-fixtures perf-test
 
 PERF_TARGET ?= $(BACKEND_URL)
 PERF_USERS ?= 20
-PERF_DIR := tests/performance
+PERF_DIR := $(BACKEND_DIR)/tests/performance
 PERF_SCENARIOS := login-read track-edit
 PERF_SOCKET_CLIENTS ?=
 PERF_SOCKET_DURATION ?= 30
@@ -62,7 +62,7 @@ perf-test: ## Run the HTTP and real-time load scenarios and write a summary [PER
 		PERF_SOCKET_DURATION="$(PERF_SOCKET_DURATION)" \
 		npx tsx src/test/perf-socket.ts --out "$(CURDIR)/$$run_dir/socket.json" ) > "$$run_dir/socket.log" 2>&1 \
 		|| { rc=1; echo "$(RED)$(ICON_ERROR) Scenario socket failed, see $$run_dir/socket.log$(NC)"; }; \
-	PERF_TARGET="$(PERF_TARGET)" PERF_USERS="$(PERF_USERS)" \
+	( cd $(BACKEND_DIR) && PERF_TARGET="$(PERF_TARGET)" PERF_USERS="$(PERF_USERS)" \
 		PERF_RATE_LIMIT_ENABLED="$$rl_enabled" PERF_RATE_LIMIT_WHITELIST_IPS="$$rl_whitelist" \
-		node $(PERF_DIR)/summarize.mjs "$$run_dir" || rc=1; \
+		npx tsx src/test/perf-summary.ts "$(CURDIR)/$$run_dir" ) || rc=1; \
 	exit $$rc
