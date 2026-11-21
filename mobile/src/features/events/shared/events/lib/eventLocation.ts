@@ -6,13 +6,11 @@ export interface Coordinates {
 	longitude: number;
 }
 
-/** Foreground only: Zumik never tracks the position in the background. */
 export async function requestLocationPermission(): Promise<boolean> {
 	const { status } = await Location.requestForegroundPermissionsAsync();
 	return status === 'granted';
 }
 
-/** Needs the permission. Falls back to the coordinates when the place has no address. */
 export async function currentPlace(): Promise<Coordinates & { address: string }> {
 	const { coords } = await Location.getCurrentPositionAsync({
 		accuracy: Location.Accuracy.Balanced,

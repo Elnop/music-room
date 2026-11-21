@@ -26,7 +26,6 @@ export function removeTrack(playlistId: string, trackId: string): Promise<Remove
 	});
 }
 
-/** Checked against the displayed version; see doc/features/playlist-concurrency.md, "Move". */
 export function moveTrack(
 	playlistId: string,
 	trackId: string,

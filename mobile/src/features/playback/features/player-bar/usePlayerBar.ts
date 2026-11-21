@@ -29,13 +29,11 @@ export function usePlayerBar() {
 		isRemote: nowPlaying.isRemote,
 		isPlaying: nowPlaying.isPlaying,
 		isLoading: nowPlaying.isLoading,
-		/** The track's button says what it shows; the bar's own toggle beside the queue says less. */
 		trackLabel: [panelLabel, ...trackSummary(track, deviceLabel)].join(', '),
 		panelLabel,
 		isPanelOpen,
 		onTogglePanel: togglePanel,
 		seek,
-		/** The volume is the local player's: a remote device keeps its own. */
 		volume: muted ? 0 : volume,
 		volumeDisabled: nowPlaying.isRemote,
 		onVolumeChange: setVolume,

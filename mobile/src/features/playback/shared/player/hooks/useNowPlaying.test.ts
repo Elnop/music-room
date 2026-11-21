@@ -215,7 +215,6 @@ describe('useNowPlaying remote', () => {
 			},
 		});
 		useConnectStore.setState({ remoteStatus: status });
-		// Local audio is ignored in remote mode.
 		usePlayerStore.setState({ currentTrack: localTrack, playbackState: 'playing' });
 
 		const { result } = renderHook(() => useNowPlaying());

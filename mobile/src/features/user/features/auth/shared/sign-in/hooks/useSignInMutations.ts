@@ -3,7 +3,6 @@ import * as signIn from '@/features/user/features/auth/shared/sign-in/lib/signIn
 import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
 import type { RegisterInput } from '@/features/user/features/auth/shared/sign-in/lib/validators';
 
-/** RootNavigator shows the app once the session opens. */
 export function useLoginMutation() {
 	return useMutation({ mutationFn: signIn.login });
 }

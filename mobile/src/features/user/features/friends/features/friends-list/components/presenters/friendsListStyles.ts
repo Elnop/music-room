@@ -111,7 +111,6 @@ export const createFriendsListStyles = (theme: Theme) =>
 			gap: theme.spacing.sm,
 			paddingHorizontal: theme.spacing.sm,
 		},
-		// Each cell grows by 1/columns, so a last row that is not full keeps the cell width.
 		gridCell: {
 			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,

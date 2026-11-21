@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
 interface VolumeState {
-	/** From 0 to 1; kept while muted, so unmuting restores it. */
 	volume: number;
 	muted: boolean;
 	setVolume: (volume: number) => void;

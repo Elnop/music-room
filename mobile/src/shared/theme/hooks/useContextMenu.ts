@@ -1,4 +1,3 @@
-/** Web only: a right click or the menu key opens the item's menu. */
 export interface ContextMenuProps {
 	onContextMenu?: unknown;
 	onKeyDown?: unknown;
@@ -6,7 +5,6 @@ export interface ContextMenuProps {
 
 const NONE: ContextMenuProps = {};
 
-/** Native: a long press or the « ⋯ » button opens the menu instead. */
 export function useContextMenu(_onOpen: (() => void) | undefined): ContextMenuProps {
 	return NONE;
 }

@@ -7,7 +7,6 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Text } from '@/shared/theme/components/Text';
 
 interface WideProfileHeaderProps {
-	/** The line above the name: whose profile this is. */
 	kind: string;
 	name: string;
 	username: string;

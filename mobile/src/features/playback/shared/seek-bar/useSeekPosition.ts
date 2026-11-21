@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 
-/** The player has caught up with a seek once its position is this close to the target. */
 const CAUGHT_UP_S = 1;
-/** A seek the player never reports (failed, or a new track) stops holding the thumb after this. */
 const HOLD_MS = 3000;
 
 export interface SeekPosition {
@@ -12,7 +10,6 @@ export interface SeekPosition {
 	onSlidingComplete: (value: number) => void;
 }
 
-/** Keeps the thumb under the finger while dragging, then on the target until the player reaches it. */
 export function useSeekPosition(
 	currentTime: number,
 	onSeek: (value: number) => void

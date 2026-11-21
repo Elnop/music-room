@@ -41,7 +41,6 @@ const CODE_MESSAGES: Record<string, string> = {
 	PREMIUM_REQUIRED: 'Cette fonction est réservée au Premium',
 };
 
-/** Never the raw English message: unknown errors get `fallback`. */
 export function apiErrorMessage(error: unknown, fallback: string): string {
 	if (!(error instanceof ApiError)) return fallback;
 

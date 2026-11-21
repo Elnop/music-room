@@ -2,7 +2,7 @@ export interface SoundCloudTrack {
 	id: number;
 	title: string;
 	description: string | null;
-	duration: number; // milliseconds
+	duration: number;
 	genre: string | null;
 	artwork_url: string | null;
 	permalink_url: string;
@@ -15,7 +15,6 @@ export interface SoundCloudTrack {
 	stream_url?: string;
 	streamable?: boolean;
 	playable: boolean;
-	/** 'SNIP' marks a 30-second preview. */
 	policy?: string;
 	media?: {
 		transcodings?: Array<{

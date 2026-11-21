@@ -24,7 +24,6 @@ export function useSimilarProfilesSection(): SimilarProfilesSection {
 	const navigation = useNavigation<NavigationProp<ParamListBase>>();
 	const query = useSimilarProfiles();
 
-	// The profiles live in other tabs; Home sits in a stack under the tab navigator.
 	const tabs = () => navigation.getParent() ?? navigation;
 
 	return {

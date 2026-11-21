@@ -6,17 +6,18 @@ import {
 	requestLocationPermission,
 	type Coordinates,
 } from '@/features/events/shared/events/lib/eventLocation';
-import { geocodeAddress, geocoderNeedsLocationPermission } from '@/features/events/shared/events/lib/geocoder';
+import {
+	geocodeAddress,
+	geocoderNeedsLocationPermission,
+} from '@/features/events/shared/events/lib/geocoder';
 
 interface Located extends Coordinates {
-	/** The address these coordinates belong to: typing another one geocodes it again. */
 	address: string;
 }
 
 export interface EventPlace {
 	isLocating: boolean;
 	locateHere: () => void;
-	/** The coordinates of `address`, or null after telling the user why there are none. */
 	resolve: (address: string) => Promise<Coordinates | null>;
 }
 

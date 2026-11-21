@@ -1,7 +1,6 @@
 import { apiRequest } from '@/shared/backend/lib/api';
 import type { UserSummary } from './types';
 
-/** Friends: the people the user follows who follow them back. */
 export function getFriends(): Promise<UserSummary[]> {
 	return apiRequest<UserSummary[]>('/api/friends', { method: 'GET' });
 }

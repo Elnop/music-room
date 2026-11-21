@@ -6,7 +6,6 @@ import { createBeaconCardStyles } from './beaconCardStyles';
 import { Text } from '@/shared/theme/components/Text';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
-/** Shown instead of the card in a browser, which cannot broadcast over Bluetooth. */
 export function BeaconUnavailableCard() {
 	const { styles, theme } = useThemedStyles(createBeaconCardStyles);
 

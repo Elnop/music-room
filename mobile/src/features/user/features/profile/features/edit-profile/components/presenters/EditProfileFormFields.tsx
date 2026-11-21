@@ -2,7 +2,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { PROFILE_LIMITS, type UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
+import {
+	PROFILE_LIMITS,
+	type UpdateProfileInput,
+} from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import { Input } from '@/shared/theme/components/Input';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
@@ -11,7 +14,6 @@ import { Text } from '@/shared/theme/components/Text';
 interface EditProfileFormFieldsProps {
 	control: Control<UpdateProfileInput>;
 	errors: FieldErrors<UpdateProfileInput>;
-	/** Undefined while saving is not possible. */
 	onSubmit?: () => void;
 }
 

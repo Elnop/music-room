@@ -17,8 +17,12 @@ import { fail, ok } from '@test-utils/fetchResponses';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
+	signInWithGoogle: jest.fn(),
+}));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn', () => ({
+	signInWithFacebook: jest.fn(),
+}));
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showWarning: jest.fn() }));
@@ -40,7 +44,6 @@ function renderLogin() {
 	const props = { navigation: { navigate }, route: {} } as unknown as Props;
 	const view = renderWithQuery(<LoginContainer {...props} />);
 	clear = () => view.client.clear();
-	/** Another screen goes on top (false) or leaves (true). */
 	const setFocused = (focused: boolean) => {
 		mockFocused = focused;
 		view.rerender(

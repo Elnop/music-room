@@ -5,10 +5,7 @@ import type { AudioPlayer, AudioPlayerStatus } from './types';
 import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 import { HtmlAudioPlayer, type PlaybackEvents } from './htmlAudioPlayer';
 
-// Browser variant of audioPlayer.ts: expo-audio's web player cannot read HLS outside Safari.
-
 const playbackEvents: PlaybackEvents = {
-	// Paused in the store, so the delegation status never reports a playback the browser refused.
 	onPlayBlocked: () => {
 		useAutoplayStore.getState().setBlocked(true);
 		usePlayerStore.getState().pause();
@@ -28,7 +25,6 @@ export function useAudioPlayer(source: string, protocol: StreamProtocol): AudioP
 	return player;
 }
 
-/** The player always comes from useAudioPlayer above, so it is a browser player. */
 export function useAudioPlayerStatus(player: AudioPlayer): AudioPlayerStatus {
 	const browserPlayer = player as HtmlAudioPlayer;
 	return useSyncExternalStore(browserPlayer.subscribe, browserPlayer.getStatus);

@@ -1,4 +1,3 @@
-// The project compiles without the DOM library, so the audio element is typed here.
 export interface MediaElement {
 	src: string;
 	currentTime: number;
@@ -36,7 +35,6 @@ const MEDIA_EVENTS = [
 	'volumechange',
 ];
 
-// One element for the whole page: Safari unlocks sound per element, after a click on the page.
 let element: MediaElement | null = null;
 let eventHandler: ((type: string) => void) | null = null;
 
@@ -52,7 +50,6 @@ export function mediaElement(): MediaElement {
 	return created;
 }
 
-/** The element's events go to the player attached to it only. */
 export function setMediaEventHandler(handler: ((type: string) => void) | null): void {
 	eventHandler = handler;
 }

@@ -8,7 +8,6 @@ import { useHomeScreen } from '@/features/playlists/features/browse/features/hom
 import { HomeView } from '@/features/playlists/features/browse/features/home/components/presenters/HomeView';
 
 type HomeOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'> & {
-	/** Sections of other features: the navigation layer passes them in. */
 	nearbyEvents?: React.ReactNode;
 	similarProfiles?: React.ReactNode;
 	actionsFor: (playlist: Playlist) => (() => void) | undefined;

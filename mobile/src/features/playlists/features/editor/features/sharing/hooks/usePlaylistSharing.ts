@@ -9,7 +9,6 @@ import { useUserSearch, type UserSearch } from './useUserSearch';
 
 export interface PlaylistSharing {
 	mode: SharingMode;
-	/** Public and open: everyone edits, nothing to manage. */
 	isInfoOnly: boolean;
 	members: SharingMembers;
 	settings: SharingSettings;

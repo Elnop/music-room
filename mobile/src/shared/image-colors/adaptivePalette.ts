@@ -32,7 +32,6 @@ export const compositeOver = (color: Rgb, alpha: number, base: Rgb): Rgb => [
 	color[2] * alpha + base[2] * (1 - alpha),
 ];
 
-/** WCAG AA for normal text. */
 export const MIN_TEXT_CONTRAST = 4.5;
 
 export const GRADIENT_ALPHAS = [0.95, 0.7, 0.5, 0.4] as const;
@@ -40,7 +39,6 @@ export const GRADIENT_ALPHAS = [0.95, 0.7, 0.5, 0.4] as const;
 const WHITE: Rgb = [255, 255, 255];
 const BLACK: Rgb = [0, 0, 0];
 
-/** Below it, secondary text no longer reads as text. */
 const SECONDARY_MIN_ALPHA = 0.7;
 const SECONDARY_ALPHA_STEP = 0.05;
 
@@ -54,7 +52,6 @@ interface AdaptivePalette {
 	gradient: [string, string, string, string];
 }
 
-/** Samples between the stops too: luminance along a blend is not always monotonic. */
 const gradientSamples = (): number[] => {
 	const low = Math.min(...GRADIENT_ALPHAS);
 	const high = Math.max(...GRADIENT_ALPHAS);
@@ -67,7 +64,6 @@ const gradientSamples = (): number[] => {
 const worstContrast = (fg: Rgb, backgrounds: Rgb[]) =>
 	Math.min(...backgrounds.map(bg => contrastRatio(fg, bg)));
 
-/** Below WCAG AA on the gradient, it turns opaque, where black or white always passes. */
 export const getAdaptiveColors = (dominantColor: string, base: string): AdaptivePalette | null => {
 	const dominant = parseHex(dominantColor);
 	const baseRgb = parseHex(base);

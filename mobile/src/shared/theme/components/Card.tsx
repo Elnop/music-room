@@ -5,7 +5,6 @@ import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Pressable } from './Pressable';
 
-/** A pressable card names its action for screen readers. */
 type CardPress =
 	| { onPress?: undefined; accessibilityLabel?: undefined }
 	| { onPress: () => void; accessibilityLabel: string };

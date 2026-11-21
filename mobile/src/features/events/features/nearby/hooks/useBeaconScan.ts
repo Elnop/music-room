@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useIsFocused } from '@react-navigation/native';
-import { BEACON_PRUNE_MS, BEACON_TIMEOUT_MS } from '@/features/events/features/nearby/lib/constants';
+import {
+	BEACON_PRUNE_MS,
+	BEACON_TIMEOUT_MS,
+} from '@/features/events/features/nearby/lib/constants';
 import { useAppActive } from './useAppActive';
 import * as beaconScanner from '@/features/events/features/nearby/lib/beaconScanner';
 import {
@@ -19,7 +22,6 @@ interface BeaconScan {
 
 const NONE: ReadonlyMap<number, BeaconSighting> = new Map();
 
-/** Scans only while the screen is shown and the app in the foreground, to spare the battery. */
 export function useBeaconScan(): BeaconScan {
 	const isFocused = useIsFocused();
 	const appActive = useAppActive();

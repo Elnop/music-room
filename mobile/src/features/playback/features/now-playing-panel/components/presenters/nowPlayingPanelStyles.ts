@@ -61,7 +61,6 @@ export const createStyles = (theme: Theme, separator: string) =>
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 		},
-		// ShareLinkButton centres itself in its column by default.
 		shareButton: { alignSelf: 'auto' },
 		pillLabel: {
 			fontSize: theme.typography.sizes.sm,

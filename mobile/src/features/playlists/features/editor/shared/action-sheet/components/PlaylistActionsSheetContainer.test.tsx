@@ -35,7 +35,6 @@ const renderSheet = (visible = true, cover = { hasCover: false, coverLocked: fal
 		/>
 	);
 
-// jest-expo runs as iOS; the immediate run below is Android's.
 const defaultOS = Platform.OS;
 
 beforeEach(() => {

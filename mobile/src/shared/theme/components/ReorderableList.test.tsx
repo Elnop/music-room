@@ -15,7 +15,6 @@ type LibProps = {
 	onDragEnd?: (event: { from: number; to: number }) => void;
 };
 
-// The library needs native drag; render its rows plainly and keep its props to fire drops.
 let libProps: LibProps;
 jest.mock('react-native-reorderable-list', () => {
 	const { Fragment } = jest.requireActual('react');

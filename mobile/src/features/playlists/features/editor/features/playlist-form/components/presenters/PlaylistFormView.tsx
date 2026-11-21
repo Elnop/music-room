@@ -41,7 +41,6 @@ export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps)
 								multiline
 							/>
 
-							{/* Visibility and edit rights are changed on « Visibilité et droits ». */}
 							{!form.isEditing && (
 								<>
 									<ToggleCard

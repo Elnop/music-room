@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Keyboard } from 'react-native';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showSuccess } from '@/shared/theme/lib/toast';
-import { useCodeInput, type CodeInput } from '@/features/user/features/auth/shared/code-input/useCodeInput';
+import {
+	useCodeInput,
+	type CodeInput,
+} from '@/features/user/features/auth/shared/code-input/useCodeInput';
 import { useCountdown } from '@/features/user/features/auth/shared/countdown/useCountdown';
 import {
 	useResendVerificationMutation,
@@ -13,19 +16,16 @@ const RESEND_COOLDOWN_S = 60;
 
 export interface EmailVerification {
 	code: CodeInput;
-	/** Applies a box's text; a complete code is verified at once. */
 	changeDigit: (index: number, text: string) => void;
 	verify: () => void;
 	isVerifying: boolean;
 	resend: () => void;
 	isResending: boolean;
 	cooldown: number;
-	/** The last verify or resend failure, or a code that is too short. */
 	error: string | null;
 	codeError: string | null;
 }
 
-/** A valid code opens the session; a wrong one empties the boxes. */
 export function useEmailVerification(userId: string, email: string): EmailVerification {
 	const code = useCodeInput();
 	const cooldown = useCountdown();

@@ -18,9 +18,7 @@ import type { PlanState } from '@/features/subscription/lib/subscription';
 
 export interface PlaylistCardMenu {
 	visible: boolean;
-	/** The last playlist, still rendered while the menu closes. */
 	playlist: Playlist | null;
-	/** Owner's playlists only; the others keep the browser's menu. */
 	actionsFor: (playlist: Playlist) => (() => void) | undefined;
 	close: () => void;
 	edit: () => void;

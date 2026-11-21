@@ -13,7 +13,6 @@ interface PixelIconProps {
 	testID?: string;
 }
 
-/** Decorative unless labelled: the control around it usually carries the label. */
 export function PixelIcon({
 	icon: Icon,
 	color,

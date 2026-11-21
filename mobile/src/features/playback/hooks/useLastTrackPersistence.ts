@@ -50,7 +50,6 @@ function persist(userId: string): void {
 	void write.catch(error => logger.warn('[lastTrackStorage] Save failed', error));
 }
 
-/** Keeps the last track across restarts, per device and user; it comes back paused, without a stream. */
 export function useLastTrackPersistence(): void {
 	const userId = useSession(session => session?.user?.id ?? null);
 	const local = useIsLocalTarget();

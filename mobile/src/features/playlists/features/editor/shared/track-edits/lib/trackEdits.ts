@@ -8,7 +8,6 @@ import {
 	settleTrackEvent,
 } from '@/features/playlists/shared/playlist/lib/playlistCache';
 
-/** Adds a track; the answer is applied like its own `playlist:updated` event. */
 export async function addTrack(
 	client: QueryClient,
 	playlistId: string,
@@ -24,7 +23,6 @@ export async function addTrack(
 	});
 }
 
-/** Optimistic: a refusal reloads the track, then rethrows. */
 export async function removeTrack(
 	client: QueryClient,
 	playlistId: string,

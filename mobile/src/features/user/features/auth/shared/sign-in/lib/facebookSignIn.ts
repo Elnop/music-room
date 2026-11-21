@@ -11,7 +11,6 @@ if (!FACEBOOK_APP_ID) {
 	logger.warn('EXPO_PUBLIC_FACEBOOK_APP_ID is not defined. Facebook login will not work.');
 }
 
-/** Called once at app start. */
 export function initializeFacebookSDK(): void {
 	if (FACEBOOK_APP_ID) {
 		Settings.setAppID(FACEBOOK_APP_ID);
@@ -19,7 +18,6 @@ export function initializeFacebookSDK(): void {
 	}
 }
 
-/** Rejects with Error(SIGN_IN_CANCELLED) when the user cancels. */
 export async function signInWithFacebook(): Promise<string> {
 	try {
 		if (!FACEBOOK_APP_ID) {

@@ -49,7 +49,6 @@ export function WelcomeView({
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { height } = useWindowDimensions();
-	// The landing's first title peeks above the fold, so the page reads as scrollable.
 	const heroHeight = LANDING_SHOWN ? height - LANDING_PEEK : undefined;
 
 	return (
@@ -86,11 +85,7 @@ export function WelcomeView({
 										color={showServer ? theme.colors.primary : theme.colors.textSecondary}
 									/>
 								</Pressable>
-								{showServer && (
-									<View style={styles.serverPanel}>
-										{backendUrlField}
-									</View>
-								)}
+								{showServer && <View style={styles.serverPanel}>{backendUrlField}</View>}
 							</>
 						</View>
 					</View>
@@ -153,7 +148,6 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.text,
 			textAlign: 'center',
 		},
-		// As wide as the sign-in form's fields on wide screens.
 		buttonContainer: {
 			width: '100%',
 			maxWidth: CONTENT_MAX_WIDTH.form - 2 * theme.spacing.lg,

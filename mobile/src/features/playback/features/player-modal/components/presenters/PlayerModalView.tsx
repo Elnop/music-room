@@ -32,7 +32,6 @@ export function PlayerModalView({
 	QueueModal,
 	DevicePicker,
 }: PlayerModalViewProps) {
-	// Desktop has the now playing panel instead; a tablet browser centres the player over the app.
 	const { isDesktop, width } = useBreakpoint();
 	const dialog = isPlayerDialog(width);
 

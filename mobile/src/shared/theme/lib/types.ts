@@ -16,18 +16,15 @@ export interface ThemeColors {
 
 	border: string;
 	borderLight: string;
-	/** Quieter than `borderLight`, for wide-screen separators. */
 	borderSubtle: string;
 
 	error: string;
 	success: string;
 	warning: string;
 	info: string;
-	/** Friends and the other people of a playlist. */
 	people: string;
 	radar: string;
 
-	// FIXED_COLORS: the same in every theme.
 	divider: string;
 	googleSurface: string;
 	googleBorder: string;

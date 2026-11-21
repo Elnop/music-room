@@ -2,7 +2,6 @@ const pathOf = (url: string) => url.replace(/^[a-z]+:\/\/[^/]+/i, '');
 
 type Route = Response | ((body: unknown) => Response | Promise<Response>);
 
-/** Any request missing from `routes` fails the test. */
 export function mockFetchRoutes(routes: Record<string, Route>) {
 	const fetchMock = jest.fn(async (url: string, init?: RequestInit) => {
 		const key = `${init?.method ?? 'GET'} ${pathOf(url)}`;

@@ -36,7 +36,6 @@ export function useNowPlayingPanel() {
 	usePanelFocus(close);
 
 	const next = useMemo(() => upNext(queue, UP_NEXT_COUNT), [queue]);
-	// The queue item names the track on any device; a track played outside the queue is the local one's.
 	const source = next.current?.track ?? (nowPlaying.isRemote ? null : localTrack);
 	const artworkUrl = largeArtwork(nowPlaying.track?.artworkUrl);
 	const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
@@ -50,7 +49,6 @@ export function useNowPlayingPanel() {
 	);
 
 	const openActions = (start: TrackActionsStart) => {
-		// A new body each time: the sheet keeps its step for the track it already shows.
 		if (source) setActions({ track: toTrackInput(source), start });
 	};
 

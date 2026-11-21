@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 import type { QueueTrack } from './queue.types';
 
-/** No stream URL (they expire) and no token: only what rebuilds a paused player. */
 export interface LastTrackEntry {
 	track: QueueTrack;
 	queueItemId: string | null;
@@ -26,7 +25,6 @@ const keyFor = (userId: string) => `zumik:lastTrack:${userId}`;
 
 async function save(userId: string, entry: LastTrackEntry): Promise<void> {
 	const parsed = entrySchema.safeParse(entry);
-	// An invalid snapshot must not leave an older track to restore.
 	if (!parsed.success) return clear(userId);
 	await AsyncStorage.setItem(keyFor(userId), JSON.stringify(parsed.data));
 }
@@ -44,14 +42,18 @@ async function load(userId: string): Promise<LastTrackEntry | null> {
 		throw error;
 	}
 	if (raw === null) return null;
-	try {
-		const parsed = entrySchema.safeParse(JSON.parse(raw));
-		if (parsed.success) return parsed.data;
-	} catch {
-		// Invalid JSON: deleted below.
-	}
+	const parsed = entrySchema.safeParse(parseJsonOrUndefined(raw));
+	if (parsed.success) return parsed.data;
 	await clear(userId);
 	return null;
+}
+
+function parseJsonOrUndefined(raw: string): unknown {
+	try {
+		return JSON.parse(raw);
+	} catch {
+		return undefined;
+	}
 }
 
 export const lastTrackStorage = { save, load, clear };

@@ -8,7 +8,6 @@ import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/s
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 
 interface LoadFailureProps {
-	/** 403 or 404: no retry. */
 	notFound: boolean;
 	onRetry: () => void;
 }

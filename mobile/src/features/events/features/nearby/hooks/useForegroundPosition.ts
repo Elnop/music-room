@@ -4,17 +4,17 @@ import { useIsFocused } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { logger } from '@/shared/logging/logger';
 import { useAppActive } from './useAppActive';
-import { requestLocationPermission, type Coordinates } from '@/features/events/shared/events/lib/eventLocation';
+import {
+	requestLocationPermission,
+	type Coordinates,
+} from '@/features/events/shared/events/lib/eventLocation';
 
 export type PositionState =
 	| { status: 'checking' }
-	/** Not asked yet, or refused once: the section offers to ask. */
 	| { status: 'needs-permission' }
-	/** Refused for good: only the system settings can grant it. */
 	| { status: 'denied' }
 	| { status: 'disabled' }
 	| { status: 'waiting' }
-	/** The browser gave no position in time; asking again restarts the search. */
 	| { status: 'timed-out' }
 	| { status: 'located'; position: Coordinates };
 
@@ -30,16 +30,13 @@ const WATCH_OPTIONS: Location.LocationOptions = {
 	timeInterval: 10_000,
 };
 
-/** A browser may never answer (no location source), and expo-location registers no error callback. */
 const WEB_POSITION_TIMEOUT_MS = 15_000;
 
-/** A browser does not prompt again once refused, though expo-location reports `canAskAgain`. */
 function isRefusedForGood(permission: Location.LocationPermissionResponse): boolean {
 	if (Platform.OS === 'web') return permission.status === Location.PermissionStatus.DENIED;
 	return !permission.canAskAgain;
 }
 
-/** Follows the position while the screen is shown and the app in the foreground, never in the background. */
 export function useForegroundPosition(): ForegroundPosition {
 	const isFocused = useIsFocused();
 	const appActive = useAppActive();

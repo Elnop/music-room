@@ -14,7 +14,6 @@ interface PlayerBarButtonProps {
 	size?: number;
 	disabled?: boolean;
 	busy?: boolean;
-	/** For a toggle (the device picker while playing elsewhere): announced as selected. */
 	selected?: boolean;
 }
 

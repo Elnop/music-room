@@ -1,8 +1,6 @@
 import { apiRequest } from '@/shared/backend/lib/api';
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 
-/** The collaborators (editors) and viewers (invited to a private playlist). */
-
 export async function addCollaborator(playlistId: string, userId: string): Promise<void> {
 	await apiRequest(`/api/playlists/${playlistId}/collaborators`, {
 		method: 'POST',

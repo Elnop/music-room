@@ -32,7 +32,6 @@ describe('getAdaptiveColors', () => {
 			const palette = getAdaptiveColors(dominant, base);
 			if (!palette) throw new Error('no palette');
 
-			// The gradient as drawn: each stop composited over the theme background.
 			const ends = [palette.gradient[0], palette.gradient[3]].map(stop => {
 				const { rgb, alpha } = rgba(stop);
 				return compositeOver(rgb, alpha, hex(base));
@@ -55,7 +54,6 @@ describe('getAdaptiveColors', () => {
 	});
 
 	it('turns the gradient opaque when no text colour reaches AA on both ends', () => {
-		// Light artwork fading into a dark theme: black fails at the bottom, white at the top.
 		const palette = getAdaptiveColors('#F5F5F5', '#0D0D0D');
 		expect(palette?.gradient.map(stop => rgba(stop).alpha)).toEqual([1, 1, 1, 1]);
 		expect(palette?.text).toBe('#000000');

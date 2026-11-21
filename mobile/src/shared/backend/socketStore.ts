@@ -19,7 +19,6 @@ const HANDSHAKE_CODES = [
 	TOO_MANY_ATTEMPTS,
 ];
 
-// Socket.io never retries a middleware refusal, so a failed device registration is retried here.
 export const DEVICE_RETRY_DELAY_MS = 5000;
 export const DEVICE_RETRY_MAX = 3;
 
@@ -72,7 +71,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			reconnectionDelayMax: 5000,
 			timeout: 20000,
 			forceNew: true,
-			// A function, so every attempt sends the current session's token.
 			auth: cb => {
 				void buildHandshake().then(cb);
 			},
@@ -120,11 +118,9 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		socket.on('disconnect', reason => {
 			if (get().socket !== socket) return;
 			if (reason === 'io client disconnect') {
-				// disconnect() and connect() set the status themselves.
 				set({ isConnected: false });
 				return;
 			}
-			// The Manager retries every loss but a server kick.
 			set({
 				isConnected: false,
 				status: reason === 'io server disconnect' ? 'failed' : 'reconnecting',
@@ -144,7 +140,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			});
 		});
 
-		// reconnect* events fire on the Manager, never on the socket.
 		const manager = socket.io;
 
 		manager.on('reconnect_attempt', () => {
@@ -172,7 +167,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
 	retry: () => {
 		get().connect();
-		// A retry follows a lost connection: the banner stays on « Reconnexion… ».
 		if (get().status === 'connecting') set({ status: 'reconnecting' });
 	},
 }));

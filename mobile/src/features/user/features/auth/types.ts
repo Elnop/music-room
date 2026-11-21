@@ -2,7 +2,6 @@ import type { UserProfile } from '@/shared/users/user.types';
 import type { RefCallback } from 'react';
 import type { View } from 'react-native';
 
-// Mirrors the backend response types (backend/src/features/auth/auth.types.ts).
 export type OAuthProvider = 'google' | 'facebook';
 
 export interface LinkedProvider {
@@ -13,14 +12,12 @@ export interface LinkedProvider {
 
 export type GoogleButtonVariant = 'form' | 'row';
 
-/** Set on the web only. */
 export type GoogleButtonSlot = RefCallback<View>;
 
 export interface LinkedProvidersResponse {
 	providers: LinkedProvider[];
 }
 
-/** Tokens of a backend session; `expiresAt` is in seconds. */
 export interface AuthSessionTokens {
 	accessToken: string;
 	refreshToken: string;

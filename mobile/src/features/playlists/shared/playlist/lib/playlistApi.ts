@@ -46,13 +46,11 @@ export async function deletePlaylist(id: string): Promise<void> {
 	await apiRequest(`/api/playlists/${id}`, { method: 'DELETE' });
 }
 
-/** Premium only: a free plan gets 403 PREMIUM_REQUIRED. `uri` is a local JPEG. */
 export async function uploadCover(id: string, uri: string): Promise<CoverResponse> {
 	const form = await jpegFormData('cover', uri, 'cover.jpg');
 	return apiRequest<CoverResponse>(`/api/playlists/${id}/cover`, { method: 'PUT', body: form });
 }
 
-/** Allowed on any plan, so a cover kept after a downgrade can still be removed. */
 export async function removeCover(id: string): Promise<CoverResponse> {
 	return apiRequest<CoverResponse>(`/api/playlists/${id}/cover`, { method: 'DELETE' });
 }

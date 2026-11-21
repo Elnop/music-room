@@ -39,7 +39,6 @@ export function HeaderIconButton({
 	);
 }
 
-/** The size of the button, for a placeholder that keeps its place. */
 export const headerButtonStyles = StyleSheet.create({
 	button: {
 		width: 36,

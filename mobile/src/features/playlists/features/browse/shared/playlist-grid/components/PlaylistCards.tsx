@@ -12,7 +12,6 @@ import { PlaylistCassette } from './PlaylistCassette';
 interface PlaylistGridCardProps {
 	playlist: Playlist;
 	onPress: () => void;
-	/** Web only: a right click or the Menu key. */
 	onShowActions?: () => void;
 }
 

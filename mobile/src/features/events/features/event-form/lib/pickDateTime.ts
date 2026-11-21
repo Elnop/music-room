@@ -11,7 +11,6 @@ function pick(mode: 'date' | 'time', value: Date): Promise<Date | null> {
 	});
 }
 
-/** Android's picker shows the date, then the time. Null when either is dismissed. */
 export async function pickDateTime(current: Date): Promise<Date | null> {
 	const day = await pick('date', current);
 	if (!day) return null;

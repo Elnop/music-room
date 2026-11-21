@@ -2,9 +2,6 @@
   "App.tsx": {
     "import(no-default-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "index.ts": {
@@ -50,9 +47,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/app/RootNavigator.tsx": {
@@ -71,11 +65,6 @@
       "count": 1
     }
   },
-  "src/app/screens/HomeScreen.tsx": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/app/stacks/FriendsStack.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
@@ -85,18 +74,12 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/app/stacks/ProfileStack.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -117,9 +100,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "react-native(split-platform-components)": {
       "count": 1
@@ -151,9 +131,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     },
     "store-layout(store-layout)": {
       "count": 2
@@ -190,9 +167,6 @@
   "src/features/events/features/detail/components/presenters/BeaconUnavailableCard.tsx": {
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/events/features/detail/components/presenters/EventDetailView.tsx": {
@@ -204,9 +178,6 @@
     },
     "eslint(no-restricted-imports)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 8
@@ -256,9 +227,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -274,9 +242,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -395,9 +360,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -408,9 +370,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/events/features/event-form/hooks/useEventPlace.ts": {
@@ -429,16 +388,8 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
-    }
-  },
-  "src/features/events/features/event-form/lib/pickDateTime.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/events/features/event-form/lib/pickDateTime.web.test.ts": {
@@ -468,9 +419,6 @@
     "function-size(max-functions)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 5
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 4
     }
@@ -478,9 +426,6 @@
   "src/features/events/features/event-form/lib/validators.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/events/features/nearby/components/NearbyEventsContainer.test.tsx": {
@@ -538,9 +483,6 @@
     "eslint(no-restricted-imports)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 12
     },
@@ -574,9 +516,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/events/features/nearby/hooks/useBeaconScan.ts": {
@@ -593,9 +532,6 @@
       "count": 1
     },
     "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react(set-state-in-effect)": {
@@ -623,9 +559,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 6
     },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
@@ -669,9 +602,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "unicorn(prefer-string-replace-all)": {
       "count": 1
     }
@@ -688,9 +618,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 6
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -704,9 +631,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "react-native(split-platform-components)": {
       "count": 1
@@ -724,18 +648,12 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/events/features/nearby/lib/constants.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 4
-    },
-    "no-comments(disallowComments)": {
       "count": 4
     }
   },
@@ -746,9 +664,6 @@
   },
   "src/features/events/features/nearby/lib/geo.ts": {
     "eslint(func-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -773,9 +688,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     },
@@ -790,9 +702,6 @@
   },
   "src/features/events/features/nearby/lib/nearbyNotice.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -819,9 +728,6 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -857,9 +763,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "query-conventions(query-key-factory)": {
       "count": 4
     }
@@ -870,9 +773,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 8
-    },
-    "no-comments(disallowComments)": {
-      "count": 6
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 7
@@ -907,9 +807,6 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 6
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -948,11 +845,6 @@
       "count": 1
     }
   },
-  "src/features/events/shared/events/hooks/useEventQueries.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/features/events/shared/events/lib/eventCache.test.ts": {
     "eslint(func-style)": {
       "count": 1
@@ -968,9 +860,6 @@
     "eslint(func-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "unicorn(no-array-sort)": {
       "count": 1
     }
@@ -982,9 +871,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -993,18 +879,12 @@
     "function-size(max-functions)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/events/shared/events/lib/geocoder.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -1021,14 +901,6 @@
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
-    }
-  },
-  "src/features/events/useEventsSync.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -1100,9 +972,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 7
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -1298,9 +1167,6 @@
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/orchestrators/RenameDeviceModalContainer.tsx": {
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -1448,9 +1314,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 4
     },
@@ -1561,9 +1424,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
     }
@@ -1588,9 +1448,6 @@
   "src/features/playback/features/control-delegation/shared/delegation/lib/device.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 12
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 12
@@ -1633,18 +1490,12 @@
     "jest(prefer-called-with)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "unicorn(no-array-for-each)": {
       "count": 1
     }
   },
   "src/features/playback/features/media-session/MediaSessionBridgeContainer.tsx": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -1691,9 +1542,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "sonarjs(cognitive-complexity)": {
       "count": 1
@@ -1789,11 +1637,6 @@
       "count": 1
     }
   },
-  "src/features/playback/features/now-playing-panel/components/NowPlayingPanelContainer.tsx": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/now-playing-panel/components/presenters/NowPlayingPanelView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
@@ -1856,9 +1699,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 7
     }
@@ -1879,15 +1719,7 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/now-playing-panel/hooks/usePanelFocus.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -1918,9 +1750,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 3
     },
@@ -1940,9 +1769,6 @@
     }
   },
   "src/features/playback/features/now-playing-panel/upNext.ts": {
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -1976,9 +1802,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     },
@@ -2007,9 +1830,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 10
     }
@@ -2023,9 +1843,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/playback/features/player-modal/components/orchestrators/PlayerErrorToastContainer.tsx": {
@@ -2045,9 +1862,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 6
     }
   },
   "src/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer.tsx": {
@@ -2121,9 +1935,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
     },
@@ -2137,9 +1948,6 @@
     },
     "eslint(no-restricted-imports)": {
       "count": 6
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -2165,9 +1973,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    },
-    "no-comments(disallowComments)": {
-      "count": 5
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 33
@@ -2218,11 +2023,6 @@
       "count": 2
     }
   },
-  "src/features/playback/features/player-modal/hooks/useArtworkSize.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/player-modal/hooks/usePlayerModal.ts": {
     "eslint(max-lines-per-function)": {
       "count": 2
@@ -2236,9 +2036,6 @@
   },
   "src/features/playback/features/player-modal/hooks/usePlayerModalGestures.ts": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react(capitalized-calls)": {
@@ -2284,9 +2081,6 @@
       "count": 2
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -2340,18 +2134,10 @@
     },
     "function-size(max-variables)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playback/hooks/useBackgroundKeepAlive.test.ts": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/hooks/useBackgroundKeepAlive.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -2383,9 +2169,6 @@
       "count": 2
     },
     "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react(exhaustive-effect-dependencies)": {
@@ -2420,19 +2203,6 @@
     },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/hooks/usePlayerVolume.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/hooks/useQueueAutoAdvance.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playback/hooks/useQueueSync.test.ts": {
@@ -2466,9 +2236,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/features/playback/hooks/useRemoteTarget.ts": {
@@ -2491,16 +2258,10 @@
     },
     "function-size(max-variables)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playback/lib/audioMode.ts": {
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -2512,15 +2273,9 @@
   "src/features/playback/lib/audioMode.web.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playback/lib/jsKeepAlive.ts": {
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     },
@@ -2530,11 +2285,6 @@
   },
   "src/features/playback/lib/jsKeepAlive.web.test.ts": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/lib/jsKeepAlive.web.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -2557,9 +2307,6 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/playback/shared/full-screen-sheet/FullScreenSheet.test.tsx": {
@@ -2579,17 +2326,11 @@
     }
   },
   "src/features/playback/shared/listening-rooms/listeningRooms.ts": {
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/shared/panel/nowPlayingPanelStore.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 2
     },
@@ -2630,9 +2371,6 @@
   "src/features/playback/shared/player/hooks/useAutoplayPrompt.ts": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/playback/shared/player/hooks/useNowPlaying.test.ts": {
@@ -2643,9 +2381,6 @@
       "count": 1
     },
     "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -2680,9 +2415,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -2729,9 +2461,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "sonarjs(cognitive-complexity)": {
       "count": 1
     }
@@ -2756,9 +2485,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/features/playback/shared/player/lib/audioPlayer.web.test.ts": {
@@ -2781,17 +2507,11 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/features/playback/shared/player/lib/constants.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 9
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/features/playback/shared/player/lib/htmlAudioPlayer.ts": {
@@ -2810,9 +2530,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     },
@@ -2824,9 +2541,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     }
@@ -2834,9 +2548,6 @@
   "src/features/playback/shared/player/lib/mediaElement.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -2854,15 +2565,7 @@
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/player/lib/positionReader.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -2882,9 +2585,6 @@
       "count": 2
     },
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -2913,9 +2613,6 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -2991,9 +2688,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "unicorn(prefer-number-properties)": {
       "count": 1
     }
@@ -3015,9 +2709,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     }
   },
   "src/features/playback/shared/player/lib/streamSource.ts": {
@@ -3032,17 +2723,11 @@
     },
     "import(no-named-as-default-member)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/lib/trackToSoundCloud.ts": {
     "eslint(func-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -3058,9 +2743,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 7
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 7
     },
@@ -3069,9 +2751,6 @@
     }
   },
   "src/features/playback/shared/player/stores/autoplayStore.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 2
     },
@@ -3151,9 +2830,6 @@
     "jest(prefer-strict-equal)": {
       "count": 17
     },
-    "no-comments(disallowComments)": {
-      "count": 5
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -3188,9 +2864,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -3216,9 +2889,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "react(set-state-in-effect)": {
       "count": 1
     },
@@ -3238,17 +2908,11 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/shared/volume/volumeStore.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 2
     },
@@ -3265,16 +2929,10 @@
     },
     "eslint(require-unicode-regexp)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/browse/features/home/components/HomeContainer.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -3397,9 +3055,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -3423,9 +3078,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -3488,9 +3140,6 @@
   "src/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels.ts": {
     "eslint(func-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/card-menu/PlaylistCardMenuContainer.tsx": {
@@ -3537,9 +3186,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -3563,9 +3209,6 @@
     "jest(prefer-strict-equal)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 6
-    },
     "react-native(no-raw-text)": {
       "count": 3
     },
@@ -3582,9 +3225,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "react(no-unstable-nested-components)": {
       "count": 1
@@ -3619,9 +3259,6 @@
     "eslint(func-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -3631,9 +3268,6 @@
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/PlayPlaylistButton.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -3661,9 +3295,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 1
     }
@@ -3677,9 +3308,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
@@ -3760,9 +3388,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 16
     },
@@ -3814,9 +3439,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 14
     },
@@ -3836,9 +3458,6 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/useAnchoredPress.test.ts": {
@@ -3852,11 +3471,6 @@
       "count": 1
     },
     "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/features/detail/hooks/useHover.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -3901,9 +3515,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -3927,9 +3538,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -3943,9 +3551,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -3963,9 +3568,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -3995,9 +3597,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "query-conventions(query-key-factory)": {
       "count": 5
     }
@@ -4007,9 +3606,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
@@ -4038,9 +3634,6 @@
       "count": 1
     },
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -4083,9 +3676,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -4102,9 +3692,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/components/presenters/AddableTrackRow.tsx": {
@@ -4116,9 +3703,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 7
@@ -4176,9 +3760,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "react(memo-dependencies)": {
       "count": 1
     },
@@ -4198,9 +3779,6 @@
     },
     "jest(prefer-called-with)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/MembersSection.tsx": {
@@ -4341,9 +3919,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -4363,9 +3938,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     },
     "query-conventions(named-cache-windows)": {
       "count": 1
@@ -4404,9 +3976,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -4416,11 +3985,6 @@
       "count": 1
     },
     "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/features/sharing/lib/membersApi.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -4435,9 +3999,6 @@
   "src/features/playlists/features/editor/features/sharing/lib/sharingTexts.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -4512,9 +4073,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -4541,9 +4099,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 5
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -4564,9 +4119,6 @@
       "count": 2
     },
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -4605,9 +4157,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 8
     },
@@ -4624,9 +4173,6 @@
     },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 6
@@ -4667,9 +4213,6 @@
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/hooks/useDeferredSheetAction.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -4680,11 +4223,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 3
-    }
-  },
-  "src/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchor.ts": {
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/playlists/features/editor/shared/cover-actions/useCoverActions.test.tsx": {
@@ -4711,9 +4249,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -4728,15 +4263,7 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/shared/delete-confirmation/confirmPlaylistDelete.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -4754,9 +4281,6 @@
   "src/features/playlists/features/editor/shared/permissions/playlistPermissions.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/shared/playlist-mutations/usePlaylistMutations.ts": {
@@ -4767,9 +4291,6 @@
   "src/features/playlists/features/editor/shared/track-edits/lib/trackEdits.ts": {
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/playlists/features/editor/shared/track-edits/lib/trackMoves.test.ts": {
@@ -4787,9 +4308,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 10
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "query-conventions(named-cache-windows)": {
       "count": 2
@@ -4810,9 +4328,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     }
   },
   "src/features/playlists/features/editor/shared/track-edits/lib/tracksApi.test.ts": {
@@ -4823,15 +4338,7 @@
       "count": 7
     }
   },
-  "src/features/playlists/features/editor/shared/track-edits/lib/tracksApi.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/editor/shared/track-edits/pendingMovesStore.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 2
     },
@@ -4840,18 +4347,12 @@
     }
   },
   "src/features/playlists/features/editor/shared/track-edits/useTrackEdits.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/shared/header-button/HeaderIconButton.tsx": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react(only-export-components)": {
@@ -4870,9 +4371,6 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/playlists/shared/playlist/lib/playlistCache.ts": {
@@ -4881,9 +4379,6 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 7
     },
     "query-conventions(named-cache-windows)": {
       "count": 1
@@ -4913,9 +4408,6 @@
     "eslint(no-restricted-imports)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "unicorn(no-array-sort)": {
       "count": 1
     }
@@ -4927,9 +4419,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 15
     },
-    "no-comments(disallowComments)": {
-      "count": 8
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 13
     }
@@ -4940,9 +4429,6 @@
     },
     "hook-naming(no-restricted-syntax)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/playlists/shared/playlist/lib/validators.test.ts": {
@@ -4962,16 +4448,8 @@
     "function-size(max-functions)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 5
-    },
     "tanstack-query(exhaustive-deps)": {
       "count": 2
-    }
-  },
-  "src/features/playlists/shared/refetch-on-focus/useRefetchOnFocus.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/search/components/SearchContainer.tsx": {
@@ -5025,9 +4503,6 @@
     },
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/search/components/presenters/SoundCloudTrackItem.tsx": {
@@ -5036,9 +4511,6 @@
     },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 8
@@ -5074,9 +4546,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react(memo-dependencies)": {
       "count": 2
     },
@@ -5103,9 +4572,6 @@
     }
   },
   "src/features/search/searchFocusStore.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 2
     },
@@ -5140,9 +4606,6 @@
       "count": 1
     },
     "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react(no-array-index-key)": {
@@ -5191,9 +4654,6 @@
       "count": 1
     },
     "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -5254,9 +4714,6 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 6
     },
@@ -5310,9 +4767,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react(no-unstable-nested-components)": {
       "count": 1
     },
@@ -5322,9 +4776,6 @@
   },
   "src/features/shell/components/presenters/ConnectionBanner.test.tsx": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -5363,9 +4814,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -5379,16 +4827,10 @@
   "src/features/shell/components/presenters/ErrorBoundary.test.tsx": {
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/shell/components/presenters/ErrorBoundary.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
@@ -5436,9 +4878,6 @@
     }
   },
   "src/features/shell/components/presenters/ThemedSystemUI.tsx": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "unicorn(filename-case)": {
       "count": 1
     }
@@ -5446,21 +4885,10 @@
   "src/features/shell/hooks/useConnectionStatus.test.ts": {
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/shell/hooks/useConnectionStatus.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
-    }
-  },
-  "src/features/shell/hooks/useFocusRing.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -5476,19 +4904,11 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     },
     "typescript(method-signature-style)": {
       "count": 3
-    }
-  },
-  "src/features/shell/hooks/useKeyboardShortcuts.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/shell/hooks/useKeyboardShortcuts.web.test.ts": {
@@ -5514,9 +4934,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -5555,9 +4972,6 @@
   "src/features/shell/lib/documentTitle.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/shell/lib/linking.test.ts": {
@@ -5583,9 +4997,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/features/shell/lib/navigationFonts.ts": {
@@ -5593,9 +5004,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -5632,9 +5040,6 @@
     "function-size(max-variables)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 7
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 6
     },
@@ -5645,9 +5050,6 @@
   "src/features/shell/lib/screenWidths.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/features/shell/lib/textContrast.ts": {
@@ -5673,9 +5075,6 @@
     "eslint(require-unicode-regexp)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 4
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     },
@@ -5688,9 +5087,6 @@
       "count": 2
     },
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -5709,9 +5105,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 4
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     }
@@ -5723,9 +5116,6 @@
   },
   "src/features/subscription/lib/subscriptionApi.ts": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -5757,9 +5147,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/email-verification/components/EmailVerificationContainer.tsx": {
@@ -5799,9 +5186,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -5883,9 +5267,6 @@
     "eslint(no-nested-ternary)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 12
     },
@@ -5931,18 +5312,12 @@
     }
   },
   "src/features/user/features/auth/features/linked-accounts/hooks/useLinkedProviders.ts": {
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "query-conventions(query-key-factory)": {
       "count": 3
     }
   },
   "src/features/user/features/auth/features/linked-accounts/providersApi.ts": {
     "eslint(func-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -5958,9 +5333,6 @@
     },
     "jest(prefer-called-with)": {
       "count": 4
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/login/components/LoginContainer.tsx": {
@@ -5986,9 +5358,6 @@
     }
   },
   "src/features/user/features/auth/features/login/hooks/useFocusedErrorToast.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react(set-state-in-effect)": {
       "count": 1
     }
@@ -6008,9 +5377,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -6062,9 +5428,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -6112,9 +5475,6 @@
     "eslint(func-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -6141,9 +5501,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -6153,9 +5510,6 @@
       "count": 3
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -6205,9 +5559,6 @@
     "eslint(no-restricted-imports)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 10
     },
@@ -6226,9 +5577,6 @@
       "count": 2
     },
     "eslint(no-restricted-imports)": {
-      "count": 2
-    },
-    "no-comments(disallowComments)": {
       "count": 2
     },
     "react(no-array-index-key)": {
@@ -6296,9 +5644,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react(no-array-index-key)": {
       "count": 1
     },
@@ -6327,9 +5672,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 6
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     },
@@ -6352,9 +5694,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -6417,9 +5756,6 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 12
     },
@@ -6445,25 +5781,14 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 4
-    },
-    "no-comments(disallowComments)": {
-      "count": 5
     }
   },
   "src/features/user/features/auth/shared/sign-in/authStore.ts": {
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 2
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/hooks/useProviderButtons.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web.test.ts": {
@@ -6486,21 +5811,10 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/user/features/auth/shared/sign-in/hooks/useProviderSignIn.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/hooks/useSignInMutations.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -6516,9 +5830,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 6
     },
-    "no-comments(disallowComments)": {
-      "count": 4
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     }
@@ -6529,9 +5840,6 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/facebookSignIn.ts": {
@@ -6540,15 +5848,9 @@
     },
     "eslint(preserve-caught-error)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.test.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "typescript(consistent-type-imports)": {
       "count": 2
     }
@@ -6556,9 +5858,6 @@
   "src/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.ts": {
     "eslint(no-restricted-imports)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 5
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -6569,19 +5868,11 @@
       "count": 1
     }
   },
-  "src/features/user/features/auth/shared/sign-in/lib/googleIosClientId.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.test.ts": {
     "eslint(func-style)": {
       "count": 1
     },
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -6594,9 +5885,6 @@
     },
     "eslint(preserve-caught-error)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 5
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.web.test.ts": {
@@ -6623,9 +5911,6 @@
     "function-size(max-functions)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 6
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 3
     }
@@ -6642,9 +5927,6 @@
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/loadScript.ts": {
-    "no-comments(disallowComments)": {
-      "count": 4
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     },
@@ -6675,9 +5957,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/sessionStorage.ts": {
@@ -6689,9 +5968,6 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 5
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -6712,17 +5988,11 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 9
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/signIn.ts": {
     "eslint(no-restricted-imports)": {
       "count": 5
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/signInCancelled.ts": {
@@ -6743,9 +6013,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 4
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -6756,9 +6023,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/types.ts": {
@@ -6767,9 +6031,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 11
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 6
@@ -6834,9 +6095,6 @@
     "eslint(no-restricted-imports)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
     },
@@ -6887,9 +6145,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 5
     }
@@ -6910,9 +6165,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -6950,15 +6202,7 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/friends/features/similar-profiles/similarProfileLabels.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -6971,9 +6215,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -7017,9 +6258,6 @@
     },
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 9
@@ -7147,9 +6385,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 4
     },
@@ -7216,9 +6451,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 9
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 8
     }
@@ -7244,9 +6476,6 @@
       "count": 1
     },
     "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -7607,9 +6836,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/shared/profile/lib/privacyApi.test.ts": {
@@ -7699,9 +6925,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react(only-export-components)": {
       "count": 1
     },
@@ -7762,9 +6985,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react(only-export-components)": {
       "count": 1
     },
@@ -7800,15 +7020,9 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/alerts/alertStore.ts": {
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "store-layout(store-layout)": {
       "count": 2
     },
@@ -7835,9 +7049,6 @@
       "count": 1
     },
     "import(no-unassigned-import)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -7874,9 +7085,6 @@
     "function-size(max-variables)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 6
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     }
@@ -7888,9 +7096,6 @@
   },
   "src/shared/backend/lib/apiErrorMessage.ts": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -7924,9 +7129,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
     },
@@ -7958,9 +7160,6 @@
     "function-size(max-functions)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "unicorn(no-array-for-each)": {
       "count": 1
     }
@@ -7973,18 +7172,10 @@
   "src/shared/backend/lib/deviceIdentity.web.ts": {
     "eslint(require-unicode-regexp)": {
       "count": 11
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/shared/backend/lib/deviceStorage.test.ts": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/backend/lib/jpegFormData.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -7998,9 +7189,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -8040,9 +7228,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 4
-    },
     "query-conventions(query-key-factory)": {
       "count": 3
     },
@@ -8058,9 +7243,6 @@
   "src/shared/backend/queryClient.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/shared/backend/socketStore.test.ts": {
@@ -8078,9 +7260,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -8104,9 +7283,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 6
     },
     "store-layout(store-layout)": {
       "count": 5
@@ -8189,9 +7365,6 @@
     "jest(prefer-strict-equal)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "unicorn(prefer-number-properties)": {
       "count": 3
     }
@@ -8214,9 +7387,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -8252,9 +7422,6 @@
   "src/shared/image-colors/useImageColors.web.ts": {
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/image-picker/imagePicker.ts": {
@@ -8283,9 +7450,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 3
     }
@@ -8299,17 +7463,11 @@
     },
     "eslint(no-underscore-dangle)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/logging/logger.ts": {
     "eslint(no-console)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/shared/platform/platform.test.ts": {
@@ -8323,9 +7481,6 @@
   "src/shared/platform/platform.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     }
   },
   "src/shared/playback/lib/lastTrackStorage.test.ts": {
@@ -8349,9 +7504,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -8359,9 +7511,6 @@
   "src/shared/playback/lib/playback.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 6
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 4
@@ -8384,9 +7533,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 9
-    },
-    "no-comments(disallowComments)": {
-      "count": 5
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 6
@@ -8414,9 +7560,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/query-keys/keys.ts": {
@@ -8424,9 +7567,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -8441,21 +7581,10 @@
   "src/shared/refresh-control/ThemedRefreshControl.tsx": {
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
-  "src/shared/screen-title/useScreenTitle.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/screen-title/useScreenTitle.web.ts": {
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -8464,9 +7593,6 @@
       "count": 2
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -8477,9 +7603,6 @@
   },
   "src/shared/square-image/squareImage.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -8500,9 +7623,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 3
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/Artwork.test.tsx": {
@@ -8522,9 +7642,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
@@ -8557,9 +7674,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -8586,9 +7700,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
@@ -8664,9 +7775,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     }
@@ -8676,9 +7784,6 @@
       "count": 1
     },
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -8704,9 +7809,6 @@
       "count": 5
     },
     "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
-    "no-comments(disallowComments)": {
       "count": 2
     },
     "react-native(no-unused-styles)": {
@@ -8793,9 +7895,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 12
     },
@@ -8817,9 +7916,6 @@
       "count": 3
     },
     "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
-    "no-comments(disallowComments)": {
       "count": 2
     },
     "react-native(no-unused-styles)": {
@@ -8872,9 +7968,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     },
@@ -8905,9 +7998,6 @@
     },
     "eslint(no-restricted-imports)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "react-native(no-unused-styles)": {
       "count": 2
@@ -8946,9 +8036,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 5
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "react(only-export-components)": {
       "count": 3
     },
@@ -8983,9 +8070,6 @@
     "eslint(no-restricted-imports)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "react-native(no-unused-styles)": {
       "count": 2
     },
@@ -9005,9 +8089,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 4
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/ReorderableList.tsx": {
@@ -9022,9 +8103,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 6
     },
     "react(capitalized-calls)": {
       "count": 1
@@ -9102,9 +8180,6 @@
     "eslint(no-restricted-imports)": {
       "count": 4
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "react-native(no-unused-styles)": {
       "count": 3
     },
@@ -9146,9 +8221,6 @@
     },
     "jest(prefer-strict-equal)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/Skeleton.tsx": {
@@ -9166,9 +8238,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 3
     },
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     },
@@ -9179,9 +8248,6 @@
   "src/shared/theme/components/SkeletonList.tsx": {
     "import(consistent-type-specifier-style)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -9209,19 +8275,11 @@
       "count": 3
     }
   },
-  "src/shared/theme/components/Text.tsx": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/TextInput.tsx": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "import(consistent-type-specifier-style)": {
-      "count": 2
-    },
-    "no-comments(disallowComments)": {
       "count": 2
     }
   },
@@ -9242,9 +8300,6 @@
     },
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/ThemedToast.tsx": {
@@ -9261,9 +8316,6 @@
       "count": 4
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "react-native(no-unused-styles)": {
@@ -9302,11 +8354,6 @@
       "count": 1
     }
   },
-  "src/shared/theme/hooks/useBottomPadding.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/hooks/useBreakpoint.test.ts": {
     "eslint(func-style)": {
       "count": 1
@@ -9323,9 +8370,6 @@
       "count": 1
     },
     "hook-naming(no-restricted-syntax)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
@@ -9346,17 +8390,11 @@
   "src/shared/theme/hooks/useContentWidth.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/hooks/useContextMenu.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
@@ -9386,9 +8424,6 @@
     "eslint(no-restricted-imports)": {
       "count": 2
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 4
     },
@@ -9410,9 +8445,6 @@
   "src/shared/theme/hooks/useFieldFocus.ts": {
     "import(consistent-type-specifier-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/hooks/useGridTileWidth.ts": {
@@ -9420,19 +8452,11 @@
       "count": 2
     }
   },
-  "src/shared/theme/hooks/useIconTooltip.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/hooks/useIconTooltip.web.test.ts": {
     "eslint(func-style)": {
       "count": 1
     },
     "eslint(no-restricted-imports)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -9446,9 +8470,6 @@
     "import(consistent-type-specifier-style)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 4
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     },
@@ -9456,11 +8477,6 @@
       "count": 3
     },
     "unicorn(prefer-string-replace-all)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useLoop.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -9483,14 +8499,6 @@
   "src/shared/theme/hooks/useSeparatorColor.ts": {
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useShareLink.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/avatarInitials.test.ts": {
@@ -9507,9 +8515,6 @@
     },
     "eslint(require-unicode-regexp)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/avatarUri.test.ts": {
@@ -9523,9 +8528,6 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/fieldFocus.ts": {
@@ -9537,17 +8539,11 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/fonts.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/genres.ts": {
@@ -9557,11 +8553,6 @@
   },
   "src/shared/theme/lib/gridLayout.test.ts": {
     "eslint(no-restricted-imports)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/lib/gridLayout.ts": {
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -9576,17 +8567,11 @@
   "src/shared/theme/lib/haptics.ts": {
     "eslint(func-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/layout.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 8
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/theme/lib/menuPlacement.test.ts": {
@@ -9603,9 +8588,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -9666,9 +8648,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 8
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     }
   },
   "src/shared/theme/lib/types.ts": {
@@ -9681,9 +8660,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 4
     },
-    "no-comments(disallowComments)": {
-      "count": 3
-    },
     "type-definitions(no-restricted-syntax)": {
       "count": 3
     },
@@ -9692,9 +8668,6 @@
     }
   },
   "src/shared/theme/menuAnchorStore.ts": {
-    "no-comments(disallowComments)": {
-      "count": 1
-    },
     "store-layout(store-layout)": {
       "count": 3
     },
@@ -9710,17 +8683,11 @@
   "src/shared/tracks/lib/moveTarget.ts": {
     "eslint(no-restricted-imports)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 3
     }
   },
   "src/shared/tracks/lib/soundcloud.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    },
-    "no-comments(disallowComments)": {
-      "count": 2
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 3
@@ -9737,17 +8704,11 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/tracks/lib/track.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "no-comments(disallowComments)": {
-      "count": 4
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 2
@@ -9767,17 +8728,11 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "src/shared/users/user.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 13
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
     },
     "type-definitions(no-restricted-syntax)": {
       "count": 9
@@ -9793,9 +8748,6 @@
     "jest(prefer-strict-equal)": {
       "count": 1
     },
-    "no-comments(disallowComments)": {
-      "count": 2
-    },
     "unicorn(filename-case)": {
       "count": 1
     }
@@ -9807,9 +8759,6 @@
   },
   "test-utils/fakeMediaElement.ts": {
     "eslint(func-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     },
     "unicorn(no-array-for-each)": {
@@ -9832,9 +8781,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },
@@ -9859,14 +8805,6 @@
   "test-utils/renderWithClient.tsx": {
     "eslint(func-style)": {
       "count": 1
-    },
-    "no-comments(disallowComments)": {
-      "count": 1
-    }
-  },
-  "test-utils/renderWithQuery.tsx": {
-    "no-comments(disallowComments)": {
-      "count": 1
     }
   },
   "test-utils/session.ts": {
@@ -9874,9 +8812,6 @@
       "count": 1
     },
     "import(consistent-type-specifier-style)": {
-      "count": 1
-    },
-    "no-comments(disallowComments)": {
       "count": 1
     }
   },

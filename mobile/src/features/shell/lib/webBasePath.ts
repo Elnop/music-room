@@ -1,4 +1,3 @@
-/** Inlined by babel-preset-expo from experiments.baseUrl. */
 export function webBasePath(): string {
 	return (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
 }
@@ -20,12 +19,10 @@ interface BrowserHistory {
 	replaceState(data: unknown, unused: string, url: string): void;
 }
 
-/** Read by hand: React Native's URLSearchParams type has no `get`. */
 const REDIRECT_PARAM = /[?&]redirect=([^&]*)/;
 
 const browser = globalThis as { location?: BrowserLocation; history?: BrowserHistory };
 
-/** GitHub Pages' 404.html sends an unknown path to the app root as `?redirect=`: put it back. */
 export function restoreRedirectedPath(
 	location = browser.location,
 	history = browser.history,
@@ -39,7 +36,6 @@ export function restoreRedirectedPath(
 	} catch {
 		return;
 	}
-	// `//host` would leave the origin.
 	if (!redirect.startsWith('/') || redirect.startsWith('//')) return;
 	history.replaceState(null, '', `${base}${redirect}${location.hash}`);
 }

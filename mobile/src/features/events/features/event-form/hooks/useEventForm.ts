@@ -9,12 +9,19 @@ import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { useCappedField, type CappedField } from '@/shared/theme/hooks/useCappedField';
 import { queryKeys } from '@/shared/query-keys/keys';
 import type { MusicGenre } from '@/shared/users/user.types';
-import { useCreateEvent, useUpdateEvent } from '@/features/events/shared/events/hooks/useEventMutations';
+import {
+	useCreateEvent,
+	useUpdateEvent,
+} from '@/features/events/shared/events/hooks/useEventMutations';
 import { usePlaylistChoices } from '@/features/events/shared/events/hooks/useEventQueries';
 import { useEventPlace, type EventPlace } from './useEventPlace';
 import { pickDateTime } from '@/features/events/features/event-form/lib/pickDateTime';
 import { defaultSchedule, scheduleError } from '@/features/events/shared/event-dates/eventDates';
-import { EVENT_LIMITS, eventFormSchema, type EventFormInput } from '@/features/events/features/event-form/lib/validators';
+import {
+	EVENT_LIMITS,
+	eventFormSchema,
+	type EventFormInput,
+} from '@/features/events/features/event-form/lib/validators';
 import type {
 	EventInput,
 	EventStackParamList,
@@ -49,7 +56,6 @@ const orNull = (text: string) => text.trim() || null;
 
 function useEditedEvent(eventId: string | undefined): MusicEvent | undefined {
 	const client = useQueryClient();
-	// Prefilled once: later socket updates must not reset what the user is typing.
 	const [edited] = useState(() =>
 		eventId === undefined
 			? undefined
@@ -93,7 +99,6 @@ export function useEventForm(navigation: Navigation, eventId: string | undefined
 		});
 	};
 
-	// Moving the start past the end keeps the event's length.
 	const moveStart = (date: Date) => {
 		const length = endsAt.getTime() - startsAt.getTime();
 		setStartsAt(date);

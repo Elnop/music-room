@@ -16,7 +16,6 @@ import { useQueueStore } from '@/features/playback/shared/player/stores/queueSto
 
 type ControlCommand = DeviceCommand | { action: 'play'; fromUserId: string };
 
-/** Mount once, at the app root. */
 export function useMusicControlEmitter() {
 	const socket = useSocketStore(state => state.socket);
 	const isConnected = useSocketStore(state => state.isConnected);

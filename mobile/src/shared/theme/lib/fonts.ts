@@ -5,7 +5,6 @@ import { PixelifySans_700Bold } from '@expo-google-fonts/pixelify-sans/700Bold';
 import { Jersey10_400Regular } from '@expo-google-fonts/jersey-10/400Regular';
 import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen/400Regular';
 
-/** One family per weight: Android picks the weight by family. Pixelify Sans stops at bold. */
 export const FONT_FAMILIES = {
 	regular: 'PixelifySans_400Regular',
 	medium: 'PixelifySans_500Medium',

@@ -10,13 +10,11 @@ interface PlaylistRoom {
 	deleted: boolean;
 }
 
-/** Re-joining after a reconnect reloads the playlist: events sent while disconnected are lost. */
 export function usePlaylistRoom(playlistId: string): PlaylistRoom {
 	const socket = useSocketStore(state => state.socket);
 	const isConnected = useSocketStore(state => state.isConnected);
 	const client = useQueryClient();
 	const [deletedId, setDeletedId] = useState<string | null>(null);
-	/** Playlist whose room this hook already joined once. */
 	const joinedRef = useRef<string | null>(null);
 
 	useSocketCache(PLAYLIST_SOCKET_RULES);
