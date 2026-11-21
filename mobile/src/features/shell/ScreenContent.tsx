@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContentFrame } from '@/features/shell/components/presenters/ContentFrame';
 import { usePanelOpen } from '@/features/shell/components/orchestrators/PanelOpenContainer';
-import type { ContentWidth } from '@/shared/theme/lib/layout';
+import type { ContentWidth } from '@/shared/theme/types/layoutTypes';
 
 type ScreenContentProps = {
 	width: ContentWidth;

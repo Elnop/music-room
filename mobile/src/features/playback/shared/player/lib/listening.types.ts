@@ -1,4 +1,4 @@
-import type { DeviceInfo } from '@/shared/backend/deviceService';
+import type { DeviceInfo } from '@/shared/backend/types/deviceTypes';
 
 export type ListeningStatus = {
 	ownerId: string;

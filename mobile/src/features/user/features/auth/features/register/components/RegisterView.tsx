@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '@/shared/theme/components/Button';
 import { Input } from '@/shared/theme/components/Input';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { AuthFormFrame } from '@/features/user/features/auth/shared/auth-form/AuthFormFrame';
 import { SocialSignInButtons } from '@/features/user/features/auth/shared/sign-in/SocialSignInButtons';
 import type { FieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
@@ -52,14 +52,14 @@ export function RegisterView({
 				placeholder="vous@exemple.com"
 				keyboardType="email-address"
 				autoCapitalize="none"
-				submitOnEnter={isLoading ? undefined : onSubmit}
+				onEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Nom d'utilisateur"
 				{...username}
 				placeholder="votre_pseudo"
 				autoCapitalize="none"
-				submitOnEnter={isLoading ? undefined : onSubmit}
+				onEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Mot de passe"
@@ -67,7 +67,7 @@ export function RegisterView({
 				placeholder="Choisissez un mot de passe robuste"
 				secureTextEntry
 				autoCapitalize="none"
-				submitOnEnter={isLoading ? undefined : onSubmit}
+				onEnter={isLoading ? undefined : onSubmit}
 			/>
 
 			<View style={styles.passwordHint}>

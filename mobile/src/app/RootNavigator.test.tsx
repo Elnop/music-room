@@ -5,7 +5,7 @@ import { act, render, screen } from '@testing-library/react-native';
 import { RootNavigator } from '@/app/RootNavigator';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { clearPendingLink } from '@/features/shell/lib/linking';
-import { silenceLogger } from '@test-utils/logger';
+import { silenceLogger } from '@test-utils/silenceLogger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
@@ -17,8 +17,8 @@ jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -27,9 +27,9 @@ jest.mock('@/shared/backend/lib/backendUrl', () => ({
 	getBackendUrl: () => 'http://backend.test',
 }));
 
-jest.mock('@/shared/backend/socketStore', () => {
+jest.mock('@/shared/backend/hooks/useSocketState', () => {
 	const state = { connect: jest.fn(), disconnect: jest.fn() };
-	return { useSocketStore: (select: (s: typeof state) => unknown) => select(state) };
+	return { useSocketState: (select: (s: typeof state) => unknown) => select(state) };
 });
 
 jest.mock('@/features/playback/features/control-delegation/hooks/useMusicControlEmitter', () => ({

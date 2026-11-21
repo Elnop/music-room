@@ -2,7 +2,7 @@ import type {
 	PlaylistUpdatedEvent,
 	PlaylistWithTracks,
 } from '@/features/playlists/shared/playlist/lib/types';
-import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
+import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
 
 export function sortByRank(tracks: TrackInPlaylist[]): TrackInPlaylist[] {
 	return [...tracks].sort((a, b) => (a.rank < b.rank ? -1 : a.rank > b.rank ? 1 : 0));

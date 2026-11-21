@@ -1,10 +1,8 @@
 import React from 'react';
-import type { ComponentType } from 'react';
 import { View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
-import type { SvgProps } from 'react-native-svg';
-
-export type PixelIconSource = ComponentType<SvgProps>;
+import { squareStyle } from '@/shared/theme/lib/squareStyle';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 
 type PixelIconProps = {
 	icon: PixelIconSource;
@@ -25,7 +23,7 @@ export function PixelIcon({
 }: PixelIconProps) {
 	return (
 		<View
-			style={[{ width: size, height: size }, style]}
+			style={[squareStyle(size), style]}
 			pointerEvents="none"
 			testID={testID}
 			accessible={Boolean(accessibilityLabel)}

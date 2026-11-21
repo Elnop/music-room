@@ -1,7 +1,7 @@
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
-import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
-import { signIn } from '@test-utils/session';
+import { signIn } from '@test-utils/signIn';
 import {
 	geocodeAddress,
 	geocoderNeedsLocationPermission,

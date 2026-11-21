@@ -2,15 +2,15 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import type { TextInput } from 'react-native';
 import { debounce } from '@/shared/debounce/debounce';
 import { showError } from '@/shared/theme/lib/toast';
-import { toTrackInput } from '@/shared/tracks/lib/trackInput';
-import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
+import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
+import type { PlaybackActions } from '@/shared/playback/types/playbackActionsTypes';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useSoundCloudSearch } from '@/features/search/hooks/useSoundCloudSearch';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
-import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
+import { menuAnchorActions } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 export function useSoundCloudSearchScreen(playback: PlaybackActions) {
 	const bottomPadding = useBottomPadding();
@@ -85,7 +85,7 @@ export function useSoundCloudSearchScreen(playback: PlaybackActions) {
 	}, []);
 
 	const handleShowActions = useCallback((track: SoundCloudTrack, anchor?: MenuAnchor) => {
-		recordMenuAnchor(anchor);
+		menuAnchorActions.record(anchor);
 		setActionTrack(toTrackInput(track));
 	}, []);
 

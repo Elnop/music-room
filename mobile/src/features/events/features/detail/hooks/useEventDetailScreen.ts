@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { showAlert } from '@/shared/alerts/alert';
+import { showAlert } from '@/shared/alerts/showAlert';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { ApiError } from '@/shared/backend/lib/api';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';

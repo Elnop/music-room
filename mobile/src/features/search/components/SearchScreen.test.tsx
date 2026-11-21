@@ -3,8 +3,8 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SearchContainer } from '@/features/search/components/SearchContainer';
 import { searchApi } from '@/features/search/lib/searchApi';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
-import { testPlayback } from '@test-utils/playback';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
+import { testPlayback } from '@test-utils/testPlaybackConfig';
 
 const mockPlayListTrack = testPlayback.playListTrack;
 
@@ -23,8 +23,8 @@ jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

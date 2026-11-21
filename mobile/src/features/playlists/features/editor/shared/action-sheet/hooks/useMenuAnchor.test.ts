@@ -1,10 +1,10 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
+import { menuAnchorActions, menuAnchorStore } from '@/shared/theme/menuAnchorStore';
 import { useMenuAnchor } from '@/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchor';
 
 const anchor = { x: 10, y: 20, width: 30, height: 40 };
 
-afterEach(() => useMenuAnchorStore.setState({ anchor: null }));
+afterEach(() => menuAnchorStore.setState({ anchor: null }));
 
 describe('useMenuAnchor', () => {
 	it('takes the recorded anchor as the menu opens and keeps it until it closes', () => {
@@ -14,11 +14,11 @@ describe('useMenuAnchor', () => {
 				initialProps: { visible: false },
 			}
 		);
-		act(() => useMenuAnchorStore.getState().setAnchor(anchor));
+		act(() => menuAnchorActions.set(anchor));
 		rerender({ visible: true });
 
 		expect(result.current).toStrictEqual(anchor);
-		expect(useMenuAnchorStore.getState().anchor).toBeNull();
+		expect(menuAnchorStore.getState().anchor).toBeNull();
 		rerender({ visible: false });
 		expect(result.current).toStrictEqual(anchor);
 	});
@@ -35,9 +35,9 @@ describe('useMenuAnchor', () => {
 	});
 
 	it('takes the anchor of a menu mounted already open', () => {
-		useMenuAnchorStore.getState().setAnchor(anchor);
+		menuAnchorActions.set(anchor);
 		const { result } = renderHook(() => useMenuAnchor(true));
 		expect(result.current).toStrictEqual(anchor);
-		expect(useMenuAnchorStore.getState().anchor).toBeNull();
+		expect(menuAnchorStore.getState().anchor).toBeNull();
 	});
 });

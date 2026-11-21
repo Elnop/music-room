@@ -3,8 +3,9 @@ import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { useMeasuredPress } from '@/shared/theme/hooks/useMeasuredPress';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 
 type TrackActionsButtonProps = {
@@ -12,7 +13,7 @@ type TrackActionsButtonProps = {
 };
 
 export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
-	const { theme } = useTheme();
+	const { styles, theme } = useThemedStyles(createStyles);
 	const button = useRef<View>(null);
 	const press = useMeasuredPress(button, onPress);
 	return (
@@ -24,12 +25,15 @@ export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
 	);
 }
 
-const styles = StyleSheet.create({
-	button: {
-		width: 32,
-		height: 32,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginLeft: 4,
-	},
-});
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		button: {
+			width: theme.controls.iconButton,
+			height: theme.controls.iconButton,
+			alignItems: 'center',
+			justifyContent: 'center',
+			marginLeft: theme.spacing.xs,
+		},
+	});
+	return styles;
+}

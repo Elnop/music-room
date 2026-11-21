@@ -2,11 +2,11 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { VisibilityLevel } from '@/shared/users/user.types';
-import { VISIBILITY_LABELS } from '@/shared/users/user.types';
-import { VISIBILITY_ICONS } from '@/shared/theme/lib/genres';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { VisibilityLevel } from '@/shared/users/userTypes';
+import { VISIBILITY_LABELS } from '@/shared/users/userConfig';
+import { VISIBILITY_ICONS } from '@/shared/theme/configs/genresConfig';
 import { Text } from '@/shared/theme/components/Text';
 
 type VisibilityToggleProps = {

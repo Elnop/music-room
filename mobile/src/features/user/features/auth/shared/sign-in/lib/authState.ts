@@ -1,5 +1,5 @@
 import type { StoreApi } from 'zustand';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 import type { AuthSessionTokens } from '@/features/user/features/auth/types';
 
 export type SessionState = {

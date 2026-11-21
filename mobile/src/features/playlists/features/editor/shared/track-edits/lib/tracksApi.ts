@@ -4,7 +4,7 @@ import type {
 	MoveTrackResult,
 	RemoveTrackResult,
 } from '@/features/playlists/shared/playlist/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 
 export function addTrack(playlistId: string, track: AddQueueItemBody): Promise<AddTrackResult> {
 	return apiRequest<AddTrackResult>(`/api/playlists/${playlistId}/tracks`, {

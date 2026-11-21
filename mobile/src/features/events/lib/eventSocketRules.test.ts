@@ -1,7 +1,7 @@
 import { createQueryClient } from '@/shared/backend/queryClient';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import type { MusicEvent } from '@/features/events/lib/types';
-import { musicEvent } from '@test-utils/eventFixtures';
+import { musicEvent } from '@test-utils/musicEvent';
 import { EVENT_SOCKET_RULES } from '@/features/events/lib/eventSocketRules';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

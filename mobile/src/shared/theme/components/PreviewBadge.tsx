@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 export function PreviewBadge() {
@@ -22,9 +22,9 @@ function createStyles(theme: Theme) {
 			fontSize: theme.typography.sizes.xs,
 			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.warning,
-			borderWidth: 1,
+			borderWidth: theme.borders.hairline,
 			borderColor: theme.colors.warning,
-			paddingHorizontal: 4,
+			paddingHorizontal: theme.spacing.xs,
 			overflow: 'hidden',
 		},
 	});

@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import type { StreamUrlResponse } from '@/shared/tracks/lib/soundcloud.types';
+import type { StreamUrlResponse } from '@/shared/tracks/types/soundcloudTypes';
 import type { StreamFetchResult } from '@/features/playback/shared/player/lib/types';
 
 export async function fetchStreamUrl(

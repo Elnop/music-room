@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
-import type { Theme } from '@/shared/theme/lib/types';
+import { CONTENT_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 export function createDetailStyles(theme: Theme, topInset: number) {
 	const styles = StyleSheet.create({

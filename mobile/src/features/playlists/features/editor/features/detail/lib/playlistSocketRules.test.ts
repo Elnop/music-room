@@ -1,5 +1,5 @@
 import { createQueryClient } from '@/shared/backend/queryClient';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import type { Playlist, PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
 import { PLAYLIST_SOCKET_RULES } from '@/features/playlists/features/editor/features/detail/lib/playlistSocketRules';

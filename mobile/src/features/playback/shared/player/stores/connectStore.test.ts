@@ -3,12 +3,13 @@ import {
 	activeOwnerId,
 	useConnectStore,
 } from '@/features/playback/shared/player/stores/connectStore';
-import { registerAuthSession, notifySessionEnd } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { showInfo } from '@/shared/theme/lib/toast';
 import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { FriendsStackParamList } from '@/features/user/features/friends/types';
 import { useUserProfileScreen } from '@/features/user/features/friends/features/user-profile/useUserProfileScreen';
 import { UserProfileView } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileView';

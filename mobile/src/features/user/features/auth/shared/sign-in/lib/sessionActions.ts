@@ -1,8 +1,8 @@
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 import type { AuthSessionTokens } from '@/features/user/features/auth/types';
 import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
 import { storedSession } from '@/features/user/features/auth/shared/sign-in/lib/sessionStorage';
-import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
+import { lastTrackStorage } from '@/shared/playback/lastTrackStorage';
 import { logger } from '@/shared/logging/logger';
 import { createTokenRefresh } from '@/features/user/features/auth/shared/sign-in/lib/tokenRefresh';
 import { SIGNED_OUT } from '@/features/user/features/auth/shared/sign-in/lib/authState';

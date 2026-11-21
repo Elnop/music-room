@@ -1,4 +1,4 @@
-import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
+import type { StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
 
 export type AudioPlayer = {
 	readonly id: number;

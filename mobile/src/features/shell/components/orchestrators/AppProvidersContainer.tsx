@@ -8,9 +8,9 @@ import { AlertHostContainer } from '@/features/shell/components/orchestrators/Al
 import { AppToast } from '@/shared/theme/components/AppToast';
 import { ErrorBoundary } from '@/features/shell/components/presenters/ErrorBoundary';
 import { ThemedSystemUI } from '@/features/shell/components/presenters/ThemedSystemUI';
-import { ThemeProvider } from '@/shared/theme/components/ThemeContext';
+import { ThemeProvider } from '@/features/shell/components/presenters/ThemeProvider';
 import { createQueryClient } from '@/shared/backend/queryClient';
-import { onSessionEnd } from '@/shared/backend/lib/authSession';
+import { onSessionEnd } from '@/shared/backend/lib/sessionEnd';
 
 type AppProvidersProps = {
 	children: React.ReactNode;

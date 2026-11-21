@@ -1,4 +1,4 @@
-import type { QueueItem } from '@/shared/playback/lib/playback';
+import type { QueueItem } from '@/shared/playback/types/playbackTypes';
 
 export const RESTART_THRESHOLD_S = 3;
 

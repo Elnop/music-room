@@ -22,8 +22,8 @@ jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

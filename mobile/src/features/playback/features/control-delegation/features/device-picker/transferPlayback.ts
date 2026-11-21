@@ -5,14 +5,14 @@ import { useConnectStore } from '@/features/playback/shared/player/stores/connec
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { selectQueue } from '@/features/playback/shared/player/lib/queueSelectors';
 import { estimatePositionMs } from '@/features/playback/shared/player/lib/remotePosition';
-import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
 import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import { showError } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import type { DevicePickerOwner } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
-import type { QueueTrack, TransferRequest } from '@/shared/playback/lib/queue.types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { QueueTrack, TransferRequest } from '@/shared/playback/types/queueTypes';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import { logger } from '@/shared/logging/logger';
 import { getPlayerState } from '@/features/playback/shared/player/stores/playerStore';
 

@@ -1,4 +1,4 @@
-import { showAlert } from '@/shared/alerts/alert';
+import { showAlert } from '@/shared/alerts/showAlert';
 
 export function confirmPlaylistDelete(name: string, onConfirm: () => void): void {
 	showAlert(

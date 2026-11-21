@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import type { DevicePickerOwner } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { createPickerStyles } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/devicePickerStyles';
 import { Text } from '@/shared/theme/components/Text';
 import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';

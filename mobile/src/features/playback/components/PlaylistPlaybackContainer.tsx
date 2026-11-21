@@ -4,7 +4,10 @@ import { usePlayerStore } from '@/features/playback/shared/player/stores/playerS
 import { useActiveQueue } from '@/features/playback/shared/player/stores/queueStore';
 import { selectPlaysPlaylist } from '@/features/playback/shared/player/lib/queueSelectors';
 import { playbackActions } from '@/features/playback/lib/playbackActions';
-import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
+import type {
+	PlaybackActions,
+	PlaylistPlayback,
+} from '@/shared/playback/types/playbackActionsTypes';
 
 interface PlaylistPlaybackContainerProps {
 	playlistId: string;

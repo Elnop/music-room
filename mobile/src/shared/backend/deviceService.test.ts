@@ -2,25 +2,23 @@ jest.mock('uuid', () => ({
 	v4: () => 'generated-uuid-1234',
 }));
 
-jest.mock('expo-constants', () => {
-	const data = {
-		expoConfig: { version: '2.5.0' } as { version: string } | undefined,
-		manifest: undefined as { version: string } | undefined,
-		manifest2: undefined as { extra?: { expoClient?: { version: string } } } | undefined,
-	};
-	return {
-		get expoConfig() {
-			return data.expoConfig;
-		},
-		get manifest() {
-			return data.manifest;
-		},
-		get manifest2() {
-			return data.manifest2;
-		},
-		__data: data,
-	};
-});
+const mockConstants: {
+	expoConfig?: { version: string };
+	manifest?: { version: string };
+	manifest2?: { extra?: { expoClient?: { version: string } } };
+} = { expoConfig: { version: '2.5.0' } };
+
+jest.mock('expo-constants', () => ({
+	get expoConfig() {
+		return mockConstants.expoConfig;
+	},
+	get manifest() {
+		return mockConstants.manifest;
+	},
+	get manifest2() {
+		return mockConstants.manifest2;
+	},
+}));
 
 let mockDeviceName: string | null = 'My Device';
 let mockModelName: string | null = 'My Model';
@@ -35,20 +33,9 @@ jest.mock('expo-device', () => ({
 	},
 }));
 
-import Constants from 'expo-constants';
 import { deviceService, formatBuildLabel, getAppVersion } from '@/shared/backend/deviceService';
 import { deviceStorage } from '@/shared/backend/lib/deviceStorage';
 import { Platform } from 'react-native';
-
-const mockConstants = (
-	Constants as unknown as {
-		__data: {
-			expoConfig?: { version: string };
-			manifest?: { version: string };
-			manifest2?: { extra?: { expoClient?: { version: string } } };
-		};
-	}
-).__data;
 
 jest.mock('@/shared/backend/lib/deviceStorage', () => ({
 	deviceStorage: {
@@ -148,7 +135,7 @@ describe('deviceService', () => {
 	describe('clearDeviceId', () => {
 		it('delegates to deviceStorage.clearDeviceId', async () => {
 			await deviceService.clearDeviceId();
-			expect(deviceStorage.clearDeviceId).toHaveBeenCalled();
+			expect(deviceStorage.clearDeviceId).toHaveBeenCalledWith();
 		});
 	});
 });

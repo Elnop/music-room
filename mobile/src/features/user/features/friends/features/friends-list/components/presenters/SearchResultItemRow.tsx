@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Avatar } from '@/shared/theme/components/Avatar';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { UserProfile } from '@/features/user/features/friends/types';
 import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 import { Text } from '@/shared/theme/components/Text';

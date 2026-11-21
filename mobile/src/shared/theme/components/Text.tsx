@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { Text as NativeText } from 'react-native';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 const BASE_FONT = { fontFamily: FONT_FAMILIES.regular };
 

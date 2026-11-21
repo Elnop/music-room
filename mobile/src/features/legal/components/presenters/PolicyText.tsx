@@ -1,7 +1,7 @@
 import React from 'react';
 import type { StyleProp, TextStyle } from 'react-native';
 import { Text } from '@/shared/theme/components/Text';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { PolicySpan } from '@/features/legal/privacyPolicyContent';
 
 type PolicyTextProps = {

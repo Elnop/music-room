@@ -5,8 +5,8 @@ import {
 	wideProfileActionStyle,
 } from '@/features/user/shared/wide-profile-header/WideProfileHeader';
 import { Button } from '@/shared/theme/components/Button';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { UserProfile } from '@/shared/users/user.types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { UserProfile } from '@/shared/users/userTypes';
 import type { UserStats } from '@/features/user/features/profile/types';
 import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';

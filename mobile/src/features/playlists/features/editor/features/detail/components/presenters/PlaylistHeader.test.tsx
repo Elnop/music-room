@@ -3,10 +3,10 @@ import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { PlaylistHeader } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistHeader';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

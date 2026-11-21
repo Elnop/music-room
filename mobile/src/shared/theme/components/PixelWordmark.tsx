@@ -1,16 +1,24 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import type { TextStyle } from 'react-native';
 import { Text } from '@/shared/theme/components/Text';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
-export function PixelWordmark({ size = 24 }: { size?: number }) {
-	const { styles, theme } = useThemedStyles(createStyles);
-	const shadow = { width: theme.borders.thick, height: theme.borders.thick };
+type PixelWordmarkProps = {
+	size?: number;
+};
+
+function fontSizeStyle(size: number): TextStyle {
+	return { fontSize: size };
+}
+
+export function PixelWordmark({ size = 24 }: PixelWordmarkProps) {
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<Text
-			style={[styles.word, { fontSize: size, textShadowOffset: shadow }]}
+			style={[styles.word, fontSizeStyle(size)]}
 			accessibilityRole="header"
 			accessibilityLabel="Zumik"
 		>
@@ -25,6 +33,7 @@ function createStyles(theme: Theme) {
 			fontFamily: theme.typography.families.mono,
 			color: theme.colors.primary,
 			textShadowColor: theme.colors.shadow,
+			textShadowOffset: { width: theme.borders.thick, height: theme.borders.thick },
 			textShadowRadius: 0,
 		},
 	});

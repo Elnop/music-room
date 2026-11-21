@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { testTheme } from '@test-utils/theme';
+import { testTheme } from '@test-utils/testThemeConfig';
 import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
 import type { Subscription } from '@/features/subscription/lib/subscription';
 import { SettingsContainer } from '@/features/user/features/settings/components/SettingsContainer';
@@ -12,8 +12,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -23,7 +23,7 @@ jest.mock('@/features/shell/components/orchestrators/BackendUrlFieldContainer', 
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (s: { isAuthenticated: boolean }) => unknown) =>
 		selector({ isAuthenticated: true }),
 }));

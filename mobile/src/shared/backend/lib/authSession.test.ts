@@ -1,14 +1,14 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import type { UserProfile } from '@/shared/users/user.types';
-import {
-	getSession,
-	notifySessionEnd,
-	onSessionEnd,
-	registerAuthSession,
-	useSession,
-} from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { UserProfile } from '@/shared/users/userTypes';
+import { getSession, registerAuthSession } from '@/shared/backend/lib/authSession';
+import { notifySessionEnd, onSessionEnd } from '@/shared/backend/lib/sessionEnd';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
+
+function selectUserId(session: SessionView): string | null {
+	return session.user?.id ?? null;
+}
 
 describe('authSession', () => {
 	it('reads signed out before the auth store registers', () => {
@@ -26,7 +26,7 @@ describe('authSession', () => {
 			isTokenExpiringSoon: () => false,
 			refreshAccessToken: async () => true,
 		});
-		const { result } = renderHook(() => useSession(session => session.user?.id ?? null));
+		const { result } = renderHook(() => useSession(selectUserId));
 		expect(result.current).toBeNull();
 
 		act(() =>

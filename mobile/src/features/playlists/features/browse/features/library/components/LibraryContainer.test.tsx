@@ -10,9 +10,9 @@ import type {
 	PlaylistStackParamList,
 } from '@/features/playlists/shared/playlist/lib/types';
 import { renderWithClient } from '@test-utils/renderWithClient';
-import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
-import { signIn } from '@test-utils/session';
+import { signIn } from '@test-utils/signIn';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -20,8 +20,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 let mockFocus: () => void = noop;

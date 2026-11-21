@@ -9,7 +9,7 @@ import { Button } from '@/shared/theme/components/Button';
 import { useShareLink } from '@/shared/theme/hooks/useShareLink';
 import { userLink } from '@/shared/share-links/shareLinks';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { UserProfileHeaderProps } from '@/features/user/features/friends/types';
 import { HiddenFieldNote } from '@/features/user/features/friends/features/user-profile/components/presenters/HiddenFieldNote';
 import { UserProfileBadges } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileBadges';

@@ -8,12 +8,10 @@ export function PlayPlaylistButton({ play }: { play: PlayPlaylist }) {
 	return (
 		<KeyButton
 			icon={play.playing ? PauseSolid : PlaySolid}
-			tone="primary"
-			size={66}
-			iconSize={36}
 			onPress={play.press}
-			loading={play.loading}
 			accessibilityLabel={play.playing ? 'Mettre la playlist en pause' : 'Lire la playlist'}
+			appearance={{ tone: 'primary', size: 66, iconSize: 36 }}
+			state={{ loading: play.loading }}
 		/>
 	);
 }

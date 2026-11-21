@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useKeyboardShortcuts } from '@/features/shell/hooks/useKeyboardShortcuts';
-import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 import { ShortcutsHelpDialog } from '@/features/shell/components/presenters/ShortcutsHelpDialog';
 
 export function ShortcutsContainer({ shortcuts }: { shortcuts: KeyboardShortcut[] }) {

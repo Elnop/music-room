@@ -6,7 +6,7 @@ import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
 import { KeyButton } from '@/shared/theme/components/KeyButton';
 import { Text } from '@/shared/theme/components/Text';
 import { displayText, pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { playlistLink } from '@/shared/share-links/shareLinks';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';

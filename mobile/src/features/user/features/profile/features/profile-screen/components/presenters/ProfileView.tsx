@@ -8,8 +8,8 @@ import { ProfileWideHeader } from '@/features/user/features/profile/features/pro
 import type { UserStats } from '@/features/user/features/profile/types';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { MusicGenre, UserProfile } from '@/shared/users/user.types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { MusicGenre, UserProfile } from '@/shared/users/userTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 interface ProfileViewProps {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { getBuildLabel } from '@/shared/backend/deviceService';
-import { OPEN_LINK_FAILED, openExternalUrl } from '@/shared/external-links/openExternalUrl';
+import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
 import { showError } from '@/shared/theme/lib/toast';
 import { useFloatingIcons } from '@/features/user/features/auth/features/welcome/useFloatingIcons';
 import { WelcomeView } from '@/features/user/features/auth/features/welcome/components/presenters/WelcomeView';
@@ -24,7 +24,7 @@ export function WelcomeContainer({ navigation, backendUrlField }: WelcomeOrchest
 			onStart={() => navigation.navigate('Register')}
 			onLogin={() => navigation.navigate('Login')}
 			onOpenPrivacyPolicy={() => navigation.navigate('PrivacyPolicy')}
-			onOpenLink={url => openExternalUrl(url, () => showError(OPEN_LINK_FAILED))}
+			onOpenLink={url => openExternalUrl(url, showError)}
 			backendUrlField={backendUrlField}
 		/>
 	);

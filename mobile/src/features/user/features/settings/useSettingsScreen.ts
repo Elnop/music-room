@@ -3,7 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ProfileStackParamList } from '@/features/user/features/profile/types';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import type { PlanState } from '@/features/subscription/lib/subscription';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
 

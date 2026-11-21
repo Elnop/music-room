@@ -5,8 +5,8 @@ import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAu
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
 import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
-import { showAlert } from '@/shared/alerts/alert';
-import type { DeviceCommand } from '@/shared/playback/lib/queue.types';
+import { showAlert } from '@/shared/alerts/showAlert';
+import type { DeviceCommand } from '@/shared/playback/types/queueTypes';
 import {
 	FakeMediaElement,
 	autoplayRefusal,
@@ -21,7 +21,7 @@ jest.mock('@/features/playback/shared/player/lib/streamApi', () => ({
 	fetchStreamUrl: () =>
 		Promise.resolve({ streamUrl: 'https://cdn/stream.m3u8', expiresAt: Date.now() + 1_800_000 }),
 }));
-jest.mock('@/shared/alerts/alert', () => ({ showAlert: jest.fn() }));
+jest.mock('@/shared/alerts/showAlert', () => ({ showAlert: jest.fn() }));
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
@@ -29,13 +29,17 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 const mockSocket = { connected: true, on: jest.fn(), off: jest.fn(), emit: jest.fn() };
 const mockSession = { user: { id: 'owner' }, accessToken: 'token', isAuthenticated: true };
 
-jest.mock('@/shared/backend/socketStore', () => ({
-	useSocketStore: (selector: (state: object) => unknown) =>
+jest.mock('@/shared/backend/hooks/useSocketState', () => ({
+	useSocketState: (selector: (state: object) => unknown) =>
 		selector({ socket: mockSocket, isConnected: true }),
 }));
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (state: object) => unknown) => selector(mockSession),
+}));
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	getSession: () => mockSession,
+}));
+jest.mock('@/shared/backend/lib/sessionEnd', () => ({
 	onSessionEnd: () => () => undefined,
 }));
 jest.mock('@/shared/backend/deviceService', () => ({

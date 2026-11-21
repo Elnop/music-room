@@ -1,7 +1,7 @@
 import React from 'react';
 import { Animated } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { FloatingIconMotion } from '@/features/user/features/auth/features/welcome/useFloatingIcons';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 

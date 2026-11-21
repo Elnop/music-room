@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { displayText } from '@/shared/theme/lib/pixelFrame';
 import type {
 	GoogleButtonSlot,

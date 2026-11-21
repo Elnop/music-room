@@ -1,4 +1,4 @@
-import type { QueueItem } from '@/shared/playback/lib/playback';
+import type { QueueItem } from '@/shared/playback/types/playbackTypes';
 import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import { displayedQueueIndex } from '@/features/playback/features/player-modal/displayedQueueIndex';
 

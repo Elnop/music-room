@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { GenreChip } from '@/shared/theme/components/GenreChip';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type {
 	FilteredProfile,
 	FollowStatus,

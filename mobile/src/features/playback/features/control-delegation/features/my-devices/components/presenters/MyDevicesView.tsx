@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import type {
 	UserDeviceWithLicenses,

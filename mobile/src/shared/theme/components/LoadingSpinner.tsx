@@ -1,15 +1,16 @@
-import React, { useMemo } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { EqualizerBars } from '@/shared/theme/components/EqualizerBars';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { LoadingIndicator } from '@/shared/theme/components/LoadingIndicator';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { LoadingSize, LoadingVariant } from '@/shared/theme/types/loadingTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 type LoadingSpinnerProps = {
-	size?: 'small' | 'large';
+	size?: LoadingSize;
 	message?: string;
 	fullScreen?: boolean;
-	variant?: 'logo' | 'spinner';
+	variant?: LoadingVariant;
 };
 
 export function LoadingSpinner({
@@ -18,29 +19,11 @@ export function LoadingSpinner({
 	fullScreen = false,
 	variant = 'logo',
 }: LoadingSpinnerProps) {
-	const { theme } = useTheme();
-	const styles = useMemo(() => createStyles(theme), [theme]);
-
-	if (variant === 'spinner') {
-		return (
-			<View style={[styles.container, fullScreen && styles.fullScreen]}>
-				<ActivityIndicator
-					size={size === 'small' ? 'small' : 'large'}
-					color={theme.colors.primary}
-				/>
-				{message && <Text style={styles.message}>{message}</Text>}
-			</View>
-		);
-	}
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={[styles.container, fullScreen && styles.fullScreen]}>
-			<EqualizerBars
-				color={theme.colors.primary}
-				bars={size === 'small' ? 3 : 5}
-				barWidth={size === 'small' ? 3 : 9}
-				height={size === 'small' ? 18 : 48}
-			/>
+			<LoadingIndicator size={size} variant={variant} />
 			{message && <Text style={styles.message}>{message}</Text>}
 		</View>
 	);

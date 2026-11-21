@@ -1,15 +1,15 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { afterItemIdForDrop } from '@/shared/tracks/lib/moveTarget';
-import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
 import { createModalStyles } from '@/features/playback/features/queue-modal/components/presenters/queueModalStyles';
 import type { QueueItem } from '@/features/playback/shared/player/lib/queue.types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
-import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import { menuAnchorActions } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 export function useQueueModal() {
 	const { theme } = useTheme();
@@ -28,7 +28,7 @@ export function useQueueModal() {
 	const [actionTrack, setActionTrack] = React.useState<AddQueueItemBody | null>(null);
 
 	const showActions = React.useCallback((item: QueueItem, anchor?: MenuAnchor) => {
-		recordMenuAnchor(anchor);
+		menuAnchorActions.record(anchor);
 		setActionTrack(toTrackInput(item.track));
 	}, []);
 

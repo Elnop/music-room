@@ -1,6 +1,6 @@
 import React from 'react';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
-import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
+import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
+import type { PlaybackActions } from '@/shared/playback/types/playbackActionsTypes';
 import { useSoundCloudSearchScreen } from '@/features/search/hooks/useSoundCloudSearchScreen';
 import { SearchView } from '@/features/search/components/presenters/SearchView';
 

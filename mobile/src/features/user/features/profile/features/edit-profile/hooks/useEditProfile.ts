@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { AlertButton } from 'react-native';
-import { showAlert } from '@/shared/alerts/alert';
+import { showAlert } from '@/shared/alerts/showAlert';
 import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,11 +9,11 @@ import { useUpdateProfileMutation } from '@/features/user/features/profile/share
 import { updateProfileSchema } from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { useSession } from '@/shared/backend/lib/authSession';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
-import type { UpdateProfileData } from '@/shared/users/user.types';
+import type { UpdateProfileData } from '@/shared/users/userTypes';
 
 export function useEditProfile() {
 	const { theme } = useTheme();

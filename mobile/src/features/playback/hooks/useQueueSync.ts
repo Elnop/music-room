@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import type { QueueState } from '@/features/playback/shared/player/lib/queue.types';
 
@@ -11,8 +11,8 @@ function remoteOwnerId(): string | null {
 }
 
 export function useQueueSync(): void {
-	const socket = useSocketStore(state => state.socket);
-	const isConnected = useSocketStore(state => state.isConnected);
+	const socket = useSocketState(state => state.socket);
+	const isConnected = useSocketState(state => state.isConnected);
 	const load = useQueueStore(state => state.load);
 	const applyState = useQueueStore(state => state.applyState);
 	const reset = useQueueStore(state => state.reset);

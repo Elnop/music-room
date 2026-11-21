@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
-import { STALE } from '@/shared/backend/queryClient';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { STALE } from '@/shared/backend/configs/staleQueryConfig';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 
 const ON_EVERY_VISIT = { staleTime: STALE.none, retry: false } as const;

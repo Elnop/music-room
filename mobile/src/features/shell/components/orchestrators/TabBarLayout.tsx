@@ -4,10 +4,10 @@ import { BottomTabBar } from '@react-navigation/bottom-tabs';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
-import { PIXEL } from '@/shared/theme/lib/tokens';
-import { SIDEBAR_WIDTH } from '@/shared/theme/lib/layout';
+import { PIXEL } from '@/shared/theme/configs/tokensConfig';
+import { SIDEBAR_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { SidebarAccountContainer } from '@/features/shell/components/orchestrators/SidebarAccountContainer';
 
 export function TabBarLayout({

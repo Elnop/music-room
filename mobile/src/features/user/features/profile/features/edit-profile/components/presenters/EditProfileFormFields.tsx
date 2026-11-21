@@ -5,8 +5,8 @@ import { Controller } from 'react-hook-form';
 import { PROFILE_LIMITS } from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
 import { Input } from '@/shared/theme/components/Input';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 type EditProfileFormFieldsProps = {
@@ -35,7 +35,7 @@ export function EditProfileFormFields({ control, errors, onSubmit }: EditProfile
 							error={errors.displayName?.message}
 							autoCapitalize="words"
 							returnKeyType="next"
-							submitOnEnter={onSubmit}
+							onEnter={onSubmit}
 							maxLength={PROFILE_LIMITS.DISPLAY_NAME_MAX}
 						/>
 						<Text style={styles.charCount}>

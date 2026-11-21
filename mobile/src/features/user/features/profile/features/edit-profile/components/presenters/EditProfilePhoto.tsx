@@ -2,9 +2,9 @@ import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { Button } from '@/shared/theme/components/Button';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { UserProfile } from '@/shared/users/user.types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { UserProfile } from '@/shared/users/userTypes';
 
 type EditProfilePhotoProps = {
 	user: UserProfile | null;

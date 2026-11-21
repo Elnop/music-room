@@ -99,7 +99,7 @@ From the root: `make dev-phone` (USB phone, any network), `make dev-docker` (Doc
 
 The player hooks reach the audio through `features/playback/shared/player/lib/audioPlayer.ts` (expo-audio). Its browser variant `audioPlayer.web.ts` plays the SoundCloud HLS stream in one `<audio>` element for the page: natively when the browser reads HLS (Safari), through `hls.js` otherwise, which only feeds the element; the queue, auto-advance, prefetch and the expired-URL watchdog stay the shared hooks. `useMediaSession.web.ts` drives the media keys and the browser's media notification through the Media Session API. A playback the browser refuses before any click on the page (a friend's remote command, typically) leaves the player paused, so the controller never sees it playing, and asks "Cliquer pour activer le son" (`hooks/useAutoplayPrompt.ts`).
 
-To test the responsive layout, resize the browser window (or use the browser's device toolbar) across the breakpoints of `shared/theme/lib/layout.ts`: under 768 px the phone layout, which is Android's; from 768 px a left icon rail; from 1024 px the desktop side bar. The layout follows the window live, no reload. `npx expo export -p web --clear` builds the static site into `dist/` (`--clear`: the Metro cache can hold another checkout's paths); the backend address is the `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL` of the build. Everything the web client changes or lacks, and the demo scenario: [web-client.md](../doc/features/web-client.md).
+To test the responsive layout, resize the browser window (or use the browser's device toolbar) across the breakpoints of `shared/theme/configs/layoutConfig.ts`: under 768 px the phone layout, which is Android's; from 768 px a left icon rail; from 1024 px the desktop side bar. The layout follows the window live, no reload. `npx expo export -p web --clear` builds the static site into `dist/` (`--clear`: the Metro cache can hold another checkout's paths); the backend address is the `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL` of the build. Everything the web client changes or lacks, and the demo scenario: [web-client.md](../doc/features/web-client.md).
 
 ## Scripts
 
@@ -202,7 +202,7 @@ mobile/src/
 ## State, real time and playback
 
 - **HTTP calls**: always through `shared/backend/lib/api.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
-- **Server data**: TanStack Query (`AppProvidersContainer` provides the client). A query key is built with `queryKeys` (`shared/query-keys/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/lib/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
+- **Server data**: TanStack Query (`AppProvidersContainer` provides the client). A query key is built with `queryKeys` (`shared/query-keys/queryKeys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/configs/staleQueryConfig.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/hooks/useSocketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
 - **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/backend/lib/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
 - **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`lib/playlistSocketRules.ts` next to it); `features/playback/features/control-delegation/hooks/` handles friends' listening and delegated control commands.
 - **Playback contract**: playlists and search start playback through the `PlaybackActions` they receive as a prop (`features/playback/lib/playbackActions.ts`), and the playlist screen gets what it plays from `features/playback/components/PlaylistPlaybackContainer.tsx`; the navigation passes both, so no feature imports the player or the queue.
@@ -228,7 +228,7 @@ import { Button } from '@/shared/theme/components/Button';
 
 Every pressable element goes through `Pressable` or `Button` from `@/shared/theme/components/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden elsewhere (ESLint `guardrails/ui-primitives`). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
 
-The app has a single theme, `original` (`src/shared/theme/lib/original.theme.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/lib/tokens.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
+The app has a single theme, `original` (`src/shared/theme/configs/originalThemeConfig.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/configs/tokensConfig.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
 
 Icons are `PixelIcon` (`src/shared/theme/components/PixelIcon.tsx`), which draws an SVG of the [HackerNoon Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) with `react-native-svg`, filled with the requested colour. Each file imports the SVGs it uses straight from the npm package (`import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg'`) and passes the component: `<PixelIcon icon={PlaySolid} color={...} />`. `react-native-svg-transformer` (`metro.config.cjs`) turns each import into a component. There is no central list: only the icons a screen imports end up in the bundle.
 
@@ -250,7 +250,7 @@ Expo supports hot reload: change any file and the app updates within 1-2 seconds
 
 Types, validators and versions match the backend:
 
-- **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their slice, such as `src/shared/tracks/lib/track.types.ts`) match the backend's schemas.
+- **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their slice, such as `src/shared/tracks/types/trackTypes.ts`) match the backend's schemas.
 - **Zod validators** (`src/features/playlists/shared/playlist/lib/validators.ts`, `src/features/user/features/auth/shared/sign-in/lib/validators.ts`) use the same rules.
 - **Versions**: Socket.io and Zod are the same as the backend's.
 

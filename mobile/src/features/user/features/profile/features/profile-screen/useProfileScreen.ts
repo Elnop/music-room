@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { showAlert } from '@/shared/alerts/alert';
+import { showAlert } from '@/shared/alerts/showAlert';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
@@ -8,9 +8,10 @@ import {
 } from '@/features/user/features/profile/shared/profile/hooks/useProfileQueries';
 import type { ProfileStackParamList } from '@/features/user/features/profile/types';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { logout, useSession } from '@/shared/backend/lib/authSession';
+import { logout } from '@/features/user/features/profile/shared/profile/lib/sessionActions';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { getBuildLabel } from '@/shared/backend/deviceService';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { logger } from '@/shared/logging/logger';
 
 export function useProfileScreen() {

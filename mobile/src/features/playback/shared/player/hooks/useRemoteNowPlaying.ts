@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useSession } from '@/shared/backend/lib/authSession';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import { socketStore } from '@/shared/backend/socketStore';
 import type { OwnerQueue } from '@/features/playback/shared/player/lib/queue.types';
 import {
 	selectHasNext,
@@ -57,7 +57,7 @@ export function useRemoteNowPlaying(): NowPlaying | null {
 
 	function toggle() {
 		if (!track) return;
-		const socket = useSocketStore.getState().socket;
+		const socket = socketStore.getState().socket;
 		if (!socket) return;
 		useConnectStore.getState().setControlPending(true);
 		socket.emit('control:action', {

@@ -34,27 +34,24 @@ export function PlayerControls({
 		<View style={styles.controls}>
 			<KeyButton
 				icon={ArrowLeftSolid}
-				size={57}
 				onPress={onPrevious}
-				disabled={!canGoPrevious}
 				accessibilityLabel="Piste précédente"
+				appearance={{ size: 57 }}
+				state={{ disabled: !canGoPrevious }}
 			/>
 			<KeyButton
 				icon={isPlaying ? PauseSolid : PlaySolid}
-				tone="primary"
-				size={90}
-				iconSize={48}
 				onPress={onPlayPause}
-				disabled={playDisabled}
-				loading={isLoading}
 				accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
+				appearance={{ tone: 'primary', size: 90, iconSize: 48 }}
+				state={{ disabled: playDisabled, loading: isLoading }}
 			/>
 			<KeyButton
 				icon={ArrowRightSolid}
-				size={57}
 				onPress={onNext}
-				disabled={!canGoNext}
 				accessibilityLabel="Piste suivante"
+				appearance={{ size: 57 }}
+				state={{ disabled: !canGoNext }}
 			/>
 		</View>
 	);

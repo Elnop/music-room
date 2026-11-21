@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
-import { STALE } from '@/shared/backend/queryClient';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { STALE } from '@/shared/backend/configs/staleQueryConfig';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
 import * as usersApi from '@/features/playlists/shared/playlist/lib/usersApi';
 import { loadPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import type { FriendUserSummary } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';

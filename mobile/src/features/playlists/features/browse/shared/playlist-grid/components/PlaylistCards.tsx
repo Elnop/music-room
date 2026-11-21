@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { useGridTileWidth } from '@/shared/theme/hooks/useGridTileWidth';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import { playlistCardLabel } from '@/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels';

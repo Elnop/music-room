@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import { pixelCaption, pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { pixelCaption } from '@/shared/theme/lib/pixelCaption';
+import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 type ProfileSectionProps = {

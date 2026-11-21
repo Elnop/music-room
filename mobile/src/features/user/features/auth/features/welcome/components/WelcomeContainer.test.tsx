@@ -6,8 +6,8 @@ import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
 import { WelcomeContainer } from '@/features/user/features/auth/features/welcome/components/WelcomeContainer';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -17,7 +17,7 @@ jest.mock('@/shared/backend/deviceService', () => ({
 jest.mock('@/shared/external-links/openExternalUrl', () => ({ openExternalUrl: jest.fn() }));
 
 let mockLandingShown = false;
-jest.mock('@/shared/platform/platform', () => ({
+jest.mock('@/shared/platform/platformConfig', () => ({
 	get LANDING_SHOWN() {
 		return mockLandingShown;
 	},

@@ -1,4 +1,4 @@
-import type { OwnerQueue, QueueItem } from '@/shared/playback/lib/playback';
+import type { OwnerQueue, QueueItem } from '@/shared/playback/types/playbackTypes';
 import { upNext } from '@/features/playback/features/now-playing-panel/upNext';
 
 function item(id: string): QueueItem {

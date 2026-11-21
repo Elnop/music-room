@@ -1,10 +1,10 @@
 import React from 'react';
 import Toast from 'react-native-toast-message';
 import type { ToastConfig, ToastConfigParams } from 'react-native-toast-message';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { ThemedToast } from '@/shared/theme/components/ThemedToast';
-import type { ToastKind } from '@/shared/theme/components/ThemedToast';
+import type { ToastKind } from '@/shared/theme/types/toastTypes';
 
 function buildConfig(theme: Theme): ToastConfig {
 	function render(kind: ToastKind) {

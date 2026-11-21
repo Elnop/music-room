@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { FriendPlaylistSummary } from '@/features/user/features/friends/types';
 import { FriendPlaylistCard } from '@/features/user/features/friends/features/user-profile/components/presenters/FriendPlaylistCard';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';

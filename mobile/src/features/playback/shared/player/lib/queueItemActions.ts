@@ -2,14 +2,14 @@ import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { actionScope, handleRemoteRefusal } from '@/features/playback/shared/player/lib/queueScope';
 import { asStep, mutate, runStep } from '@/features/playback/shared/player/lib/queueStepRunner';
-import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
 import { logger } from '@/shared/logging/logger';
 import type { QueueState } from '@/features/playback/shared/player/lib/queue.types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import {
 	getPlayerState,
 	usePlayerStore,

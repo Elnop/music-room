@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
@@ -10,12 +10,12 @@ import { PreviewBadge } from '@/shared/theme/components/PreviewBadge';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { formatDuration } from '@/shared/formatting/formatters';
-import { isPreviewOnly } from '@/shared/tracks/lib/soundcloudPreview';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import { isPreviewOnly } from '@/shared/tracks/lib/isPreviewOnly';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { Text } from '@/shared/theme/components/Text';
 import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 type AddableTrackRowProps = {
 	track: SoundCloudTrack;

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useSocketStore } from '@/shared/backend/socketStore';
-import { useSession, getSession } from '@/shared/backend/lib/authSession';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
+import { useSession } from '@/shared/backend/hooks/useSession';
+import { getSession } from '@/shared/backend/lib/authSession';
 import { deviceService } from '@/shared/backend/deviceService';
-import type { DeviceInfo } from '@/shared/backend/deviceService';
+import type { DeviceInfo } from '@/shared/backend/types/deviceTypes';
 import {
 	queueTrackToSoundCloud,
 	trackToSoundCloud,
 } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import type { DeviceCommand } from '@/shared/playback/lib/queue.types';
+import type { DeviceCommand } from '@/shared/playback/types/queueTypes';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import {
 	readPositionMs,
@@ -18,8 +19,8 @@ import { useQueueStore } from '@/features/playback/shared/player/stores/queueSto
 type ControlCommand = DeviceCommand | { action: 'play'; fromUserId: string };
 
 export function useMusicControlEmitter() {
-	const socket = useSocketStore(state => state.socket);
-	const isConnected = useSocketStore(state => state.isConnected);
+	const socket = useSocketState(state => state.socket);
+	const isConnected = useSocketState(state => state.isConnected);
 	const user = useSession(state => state.user);
 
 	const currentTrack = usePlayerStore(state => state.currentTrack);

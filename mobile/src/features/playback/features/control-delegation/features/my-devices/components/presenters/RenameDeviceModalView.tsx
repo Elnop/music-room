@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, Modal, KeyboardAvoidingView, Platform } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Input } from '@/shared/theme/components/Input';
 import { Button } from '@/shared/theme/components/Button';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { DIALOG_MAX_WIDTH } from '@/shared/theme/lib/layout';
+import { DIALOG_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import { Text } from '@/shared/theme/components/Text';
 
 const DEVICE_NAME_MAX_LENGTH = 40;

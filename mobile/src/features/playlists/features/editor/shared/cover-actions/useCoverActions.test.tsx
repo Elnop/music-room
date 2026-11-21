@@ -17,10 +17,10 @@ jest.mock('@tanstack/react-query', () => ({ useQueryClient: jest.fn(() => ({})) 
 const mockPlan = { isPremium: true, refetch: jest.fn() };
 
 const mockPickImage = jest.fn();
-jest.mock('@/shared/image-picker/imagePicker', () => ({
+jest.mock('@/shared/image-picker/pickImage', () => ({
 	pickImage: (...args: unknown[]) => mockPickImage(...args),
 }));
-jest.mock('@/shared/square-image/squareImage', () => ({
+jest.mock('@/shared/square-image/prepareSquareImage', () => ({
 	prepareSquareImage: () => Promise.resolve('file:///cover-512.jpg'),
 }));
 jest.mock('@/features/playlists/shared/playlist/lib/playlistApi', () => ({

@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { trackTableColumns as columns } from '@/features/playlists/features/editor/features/detail/lib/trackTableLayout';
 import { Text } from '@/shared/theme/components/Text';
 import ClockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/clock-solid.svg';

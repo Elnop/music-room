@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
-import { INK } from '@/shared/theme/lib/tokens';
+import { INK } from '@/shared/theme/configs/tokensConfig';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 
 describe('PixelIcon', () => {

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Platform } from 'react-native';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { headerTitle } from '@/shared/theme/lib/pixelFrame';
 import { screenHeader } from '@/features/shell/screenLayout';

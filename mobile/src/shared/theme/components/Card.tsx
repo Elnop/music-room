@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import type { ViewStyle, StyleProp } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
 
 type CardPress =

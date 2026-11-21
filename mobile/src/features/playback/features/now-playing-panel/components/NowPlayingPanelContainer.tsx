@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
 import { useNowPlayingPanel } from '@/features/playback/features/now-playing-panel/hooks/useNowPlayingPanel';
 import { NowPlayingPanelView } from '@/features/playback/features/now-playing-panel/components/presenters/NowPlayingPanelView';

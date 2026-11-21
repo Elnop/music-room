@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { displayText } from '@/shared/theme/lib/pixelFrame';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { playlistLink } from '@/shared/share-links/shareLinks';

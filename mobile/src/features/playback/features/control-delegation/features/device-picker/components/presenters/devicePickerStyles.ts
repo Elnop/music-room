@@ -1,8 +1,9 @@
 import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/playback/shared/sheet-header/sheetHeaderStyles';
-import { keycap, pixelCaption, pixelRow } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { keycap, pixelRow } from '@/shared/theme/lib/pixelFrame';
+import { pixelCaption } from '@/shared/theme/lib/pixelCaption';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 export function createPickerStyles(
 	theme: Theme,

@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { useFriendListening } from '@/features/playback/features/control-delegation/hooks/useFriendListening';
 import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
-import { controlErrorMessage } from '@/shared/control-error/controlError';
+import { controlErrorMessage } from '@/shared/control-error/controlErrorMessage';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
 import { logger } from '@/shared/logging/logger';
 
@@ -30,13 +30,15 @@ function setPositionReader(r: (() => number) | null) {
 	mockReader = r;
 }
 
-jest.mock('@/shared/backend/socketStore', () => ({
-	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
+jest.mock('@/shared/backend/hooks/useSocketState', () => ({
+	useSocketState: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
+}));
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	getSession: () => mockAuthState,
 }));
 

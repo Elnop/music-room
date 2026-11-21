@@ -15,10 +15,7 @@ export function formatDate(date: string | Date): string {
 }
 
 export function formatRelativeTime(date: string | Date): string {
-	const now = new Date();
-	const past = new Date(date);
-	const diffMs = now.getTime() - past.getTime();
-	const diffMins = Math.floor(diffMs / 60000);
+	const diffMins = Math.floor((Date.now() - new Date(date).getTime()) / 60000);
 
 	if (diffMins < 1) return "à l'instant";
 	if (diffMins < 60) return `il y a ${diffMins} min`;

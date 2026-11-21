@@ -6,7 +6,7 @@ import { ReorderableList } from '@/shared/theme/components/ReorderableList';
 import { SwipeableTrackItem } from '@/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem';
 import { TrackTableHeader } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackTableHeader';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { PlaylistTracks } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistTracks';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import { createDetailStyles } from '@/features/playlists/features/editor/features/detail/components/presenters/detailStyles';

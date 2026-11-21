@@ -1,6 +1,6 @@
-import type { Track } from '@/shared/tracks/lib/track.types';
-import type { QueueItem, QueueTrack } from '@/shared/playback/lib/queue.types';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { Track } from '@/shared/tracks/types/trackTypes';
+import type { QueueItem, QueueTrack } from '@/shared/playback/types/queueTypes';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 
 export function hashStringToNumber(str: string): number {
 	let hash = 0;

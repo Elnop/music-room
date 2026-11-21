@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, View } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import { SkeletonList, UserRowSkeleton } from '@/shared/theme/components/Skeleton';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { rowColumns } from '@/shared/theme/lib/gridLayout';
 import type { FriendProfile } from '@/features/user/features/friends/types';

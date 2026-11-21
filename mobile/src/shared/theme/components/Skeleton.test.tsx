@@ -3,8 +3,8 @@ import { AccessibilityInfo, Animated } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
 import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -54,7 +54,7 @@ describe('SkeletonBlock', () => {
 		const loop = jest.spyOn(Animated, 'loop');
 		render(<SkeletonBlock />);
 		await act(async () => {});
-		expect(loop).toHaveBeenCalled();
+		expect(loop).toHaveBeenCalledWith(expect.any(Object));
 	});
 
 	it('stays static when reduce motion is on', async () => {

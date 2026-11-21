@@ -1,18 +1,13 @@
 import { io } from 'socket.io-client';
-import {
-	DEVICE_RETRY_DELAY_MS,
-	DEVICE_RETRY_MAX,
-	useSocketStore,
-} from '@/shared/backend/socketStore';
-import {
-	DEFAULT_BACKEND_URL,
-	resetBackendUrl,
-	setBackendUrl,
-} from '@/shared/backend/lib/backendUrl';
+import { DEVICE_RETRY_DELAY_MS, DEVICE_RETRY_MAX } from '@/shared/backend/configs/socketConfig';
+import { socketStore } from '@/shared/backend/socketStore';
+import { DEFAULT_BACKEND_URL } from '@/shared/backend/configs/backendUrlConfig';
+import { resetBackendUrl, setBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { onBackendError } from '@/shared/backend/lib/backendErrors';
 import { createStore } from 'zustand';
-import { notifySessionEnd, registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import { registerAuthSession } from '@/shared/backend/lib/authSession';
+import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 
 type Handler = (...args: unknown[]) => void;
 
@@ -42,7 +37,9 @@ function createFakeEmitter(): FakeEmitter {
 			(emitter.handlers[event] ??= []).push(handler);
 			return emitter;
 		}),
-		trigger: (event, ...args) => emitter.handlers[event]?.forEach(h => h(...args)),
+		trigger: (event, ...args) => {
+			for (const handler of emitter.handlers[event] ?? []) handler(...args);
+		},
 	};
 	return emitter;
 }
@@ -61,7 +58,9 @@ function createFakeSocket(): FakeSocket {
 		emit: jest.fn(),
 		connect: jest.fn(),
 		disconnect: jest.fn(),
-		trigger: (event, ...args) => socket.handlers[event]?.forEach(h => h(...args)),
+		trigger: (event, ...args) => {
+			for (const handler of socket.handlers[event] ?? []) handler(...args);
+		},
 	};
 	return socket;
 }
@@ -120,15 +119,15 @@ const backendError = jest.fn();
 onBackendError(backendError);
 
 beforeEach(async () => {
-	useSocketStore.setState({ socket: null, isConnected: false, status: 'idle' });
+	socketStore.setState({ socket: null, isConnected: false, status: 'idle' });
 	await resetBackendUrl();
 	jest.clearAllMocks();
 	mockAuthState.accessToken = 'token-1';
 	mockAuthState.refreshAccessToken.mockResolvedValue(true);
 	socket = createFakeSocket();
 	ioMock.mockReturnValue(socket);
-	useSocketStore.setState({ socket: null, isConnected: false, status: 'idle' });
-	useSocketStore.getState().connect();
+	socketStore.setState({ socket: null, isConnected: false, status: 'idle' });
+	socketStore.getState().connect();
 });
 
 afterEach(() => {
@@ -163,7 +162,7 @@ describe('socketStore connect_error', () => {
 	});
 
 	it('disconnects without retrying when the refresh fails', async () => {
-		useSocketStore.setState({ isConnected: true });
+		socketStore.setState({ isConnected: true });
 		mockAuthState.refreshAccessToken.mockResolvedValue(false);
 
 		socket.trigger('connect_error', new Error('INVALID_TOKEN'));
@@ -171,8 +170,8 @@ describe('socketStore connect_error', () => {
 
 		expect(mockAuthState.refreshAccessToken).toHaveBeenCalledTimes(1);
 		expect(socket.connect).not.toHaveBeenCalled();
-		expect(socket.disconnect).toHaveBeenCalled();
-		expect(useSocketStore.getState()).toMatchObject({ socket: null, isConnected: false });
+		expect(socket.disconnect).toHaveBeenCalledWith();
+		expect(socketStore.getState()).toMatchObject({ socket: null, isConnected: false });
 	});
 
 	it('disconnects without a second refresh when still refused after a refresh', async () => {
@@ -183,8 +182,8 @@ describe('socketStore connect_error', () => {
 
 		expect(mockAuthState.refreshAccessToken).toHaveBeenCalledTimes(1);
 		expect(socket.connect).toHaveBeenCalledTimes(1);
-		expect(socket.disconnect).toHaveBeenCalled();
-		expect(useSocketStore.getState().socket).toBeNull();
+		expect(socket.disconnect).toHaveBeenCalledWith();
+		expect(socketStore.getState().socket).toBeNull();
 		expect(backendError).toHaveBeenCalledWith(
 			'error',
 			'[Socket] Handshake refused, staying disconnected:',
@@ -200,8 +199,8 @@ describe('socketStore connect_error', () => {
 
 			expect(mockAuthState.refreshAccessToken).not.toHaveBeenCalled();
 			expect(socket.connect).not.toHaveBeenCalled();
-			expect(socket.disconnect).toHaveBeenCalled();
-			expect(useSocketStore.getState().socket).toBeNull();
+			expect(socket.disconnect).toHaveBeenCalledWith();
+			expect(socketStore.getState().socket).toBeNull();
 			expect(backendError).toHaveBeenCalledWith(
 				'error',
 				'[Socket] Handshake refused, staying disconnected:',
@@ -246,8 +245,8 @@ describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
 		jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
 
 		expect(socket.connect).toHaveBeenCalledTimes(DEVICE_RETRY_MAX);
-		expect(socket.disconnect).toHaveBeenCalled();
-		expect(useSocketStore.getState().socket).toBeNull();
+		expect(socket.disconnect).toHaveBeenCalledWith();
+		expect(socketStore.getState().socket).toBeNull();
 		expect(backendError).toHaveBeenCalledWith(
 			'error',
 			'[Socket] Handshake refused, staying disconnected:',
@@ -271,7 +270,7 @@ describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
 
 	it('does not reconnect a socket the store has replaced', () => {
 		refuseDevice();
-		useSocketStore.getState().disconnect();
+		socketStore.getState().disconnect();
 
 		jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
 		expect(socket.connect).not.toHaveBeenCalled();
@@ -294,34 +293,34 @@ describe('socketStore backend address', () => {
 
 		await setBackendUrl('http://192.168.1.20:3000/');
 
-		expect(oldSocket.disconnect).toHaveBeenCalled();
+		expect(oldSocket.disconnect).toHaveBeenCalledWith();
 		expect(ioMock).toHaveBeenCalledTimes(2);
 		expect(lastUrl()).toBe('http://192.168.1.20:3000');
-		expect(useSocketStore.getState().socket).toBe(newSocket);
+		expect(socketStore.getState().socket).toBe(newSocket);
 	});
 
 	it('only records the address when no socket exists; the next connect uses it', async () => {
-		useSocketStore.getState().disconnect();
+		socketStore.getState().disconnect();
 		ioMock.mockClear();
 
 		await setBackendUrl('http://192.168.1.20:3000');
 		expect(ioMock).not.toHaveBeenCalled();
 
-		useSocketStore.getState().connect();
+		socketStore.getState().connect();
 		expect(lastUrl()).toBe('http://192.168.1.20:3000');
 	});
 });
 
 describe('socketStore status', () => {
 	function status() {
-		return useSocketStore.getState().status;
+		return socketStore.getState().status;
 	}
 
 	it('is connecting until the first connect, then connected', () => {
 		expect(status()).toBe('connecting');
 		socket.connected = true;
 		socket.trigger('connect');
-		expect(useSocketStore.getState()).toMatchObject({ status: 'connected', isConnected: true });
+		expect(socketStore.getState()).toMatchObject({ status: 'connected', isConnected: true });
 	});
 
 	it('listens to the reconnect events on the Manager, not the socket', () => {
@@ -336,7 +335,7 @@ describe('socketStore status', () => {
 	it('is reconnecting after a lost connection and on each reconnect attempt', () => {
 		socket.trigger('connect');
 		socket.trigger('disconnect', 'transport close');
-		expect(useSocketStore.getState()).toMatchObject({ status: 'reconnecting', isConnected: false });
+		expect(socketStore.getState()).toMatchObject({ status: 'reconnecting', isConnected: false });
 
 		socket.trigger('connect');
 		socket.io.trigger('reconnect_attempt', 1);
@@ -346,7 +345,7 @@ describe('socketStore status', () => {
 	it('is failed once the Manager gives up, and back to connected on connect', () => {
 		socket.io.trigger('reconnect_attempt', 10);
 		socket.io.trigger('reconnect_failed');
-		expect(useSocketStore.getState()).toMatchObject({ status: 'failed', isConnected: false });
+		expect(socketStore.getState()).toMatchObject({ status: 'failed', isConnected: false });
 
 		socket.trigger('connect');
 		expect(status()).toBe('connected');
@@ -360,8 +359,8 @@ describe('socketStore status', () => {
 
 	it('is idle after disconnect()', () => {
 		socket.trigger('connect');
-		useSocketStore.getState().disconnect();
-		expect(useSocketStore.getState()).toMatchObject({
+		socketStore.getState().disconnect();
+		expect(socketStore.getState()).toMatchObject({
 			socket: null,
 			isConnected: false,
 			status: 'idle',
@@ -377,11 +376,11 @@ describe('socketStore status', () => {
 	it('ignores the events of a socket the store has replaced', () => {
 		const oldSocket = socket;
 		ioMock.mockReturnValue(createFakeSocket());
-		useSocketStore.getState().retry();
+		socketStore.getState().retry();
 
 		oldSocket.io.trigger('reconnect_failed');
 		oldSocket.trigger('connect');
-		expect(useSocketStore.getState()).toMatchObject({
+		expect(socketStore.getState()).toMatchObject({
 			status: 'reconnecting',
 			isConnected: false,
 		});
@@ -395,24 +394,24 @@ describe('socketStore retry', () => {
 		ioMock.mockReturnValue(newSocket);
 		oldSocket.io.trigger('reconnect_failed');
 
-		useSocketStore.getState().retry();
+		socketStore.getState().retry();
 
-		expect(oldSocket.disconnect).toHaveBeenCalled();
+		expect(oldSocket.disconnect).toHaveBeenCalledWith();
 		expect(ioMock).toHaveBeenCalledTimes(2);
-		expect(useSocketStore.getState()).toMatchObject({ socket: newSocket, status: 'reconnecting' });
+		expect(socketStore.getState()).toMatchObject({ socket: newSocket, status: 'reconnecting' });
 
 		newSocket.trigger('connect');
-		expect(useSocketStore.getState().status).toBe('connected');
+		expect(socketStore.getState().status).toBe('connected');
 	});
 
 	it('keeps a socket that is connected', () => {
 		socket.connected = true;
 		socket.trigger('connect');
 
-		useSocketStore.getState().retry();
+		socketStore.getState().retry();
 
 		expect(ioMock).toHaveBeenCalledTimes(1);
-		expect(useSocketStore.getState().status).toBe('connected');
+		expect(socketStore.getState().status).toBe('connected');
 	});
 });
 
@@ -420,7 +419,7 @@ describe('end of session', () => {
 	it('closes the socket when the session ends', () => {
 		notifySessionEnd();
 
-		expect(socket.disconnect).toHaveBeenCalled();
-		expect(useSocketStore.getState()).toMatchObject({ socket: null, status: 'idle' });
+		expect(socket.disconnect).toHaveBeenCalledWith();
+		expect(socketStore.getState()).toMatchObject({ socket: null, status: 'idle' });
 	});
 });

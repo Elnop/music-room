@@ -1,6 +1,6 @@
 import { afterItemIdForDrop, afterRankForDrop } from '@/shared/tracks/lib/moveTarget';
-import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
-import type { QueueItem } from '@/shared/playback/lib/queue.types';
+import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
+import type { QueueItem } from '@/shared/playback/types/queueTypes';
 
 const tracks = ['a', 'h', 'p', 't'].map((rank, i) => ({ id: `${i}`, rank }) as TrackInPlaylist);
 

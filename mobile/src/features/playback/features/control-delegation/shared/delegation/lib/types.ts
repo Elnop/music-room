@@ -1,5 +1,5 @@
 import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
-import type { ControlError } from '@/shared/control-error/controlError';
+import type { ControlError } from '@/shared/control-error/controlErrorTypes';
 import type {
 	ControllableDevicesResponse,
 	DevicePickerResponse,

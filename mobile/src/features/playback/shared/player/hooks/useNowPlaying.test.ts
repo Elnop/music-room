@@ -2,21 +2,21 @@ import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { useNowPlaying } from '@/features/playback/shared/player/hooks/useNowPlaying';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
-import type { QueueItem } from '@/shared/playback/lib/queue.types';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { QueueItem } from '@/shared/playback/types/queueTypes';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
+import type { UserProfile } from '@/shared/users/userTypes';
 
 const mockSocket = { connected: true, on: jest.fn(), off: jest.fn(), emit: jest.fn() };
 const mockSeekTo = jest.fn();
 let mockProgress = { currentTime: 0, duration: 0, progress: 0 };
 
 jest.mock('@/shared/backend/socketStore', () => ({
-	useSocketStore: { getState: () => ({ socket: mockSocket }) },
+	socketStore: { getState: () => ({ socket: mockSocket }) },
 }));
 
 jest.mock('@/features/playback/shared/player/lib/PlayerContext', () => ({

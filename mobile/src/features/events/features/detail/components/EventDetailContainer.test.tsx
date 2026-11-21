@@ -8,10 +8,10 @@ import { showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
 import type { EventStackParamList } from '@/features/events/lib/types';
 import { renderWithClient } from '@test-utils/renderWithClient';
-import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
-import { signIn } from '@test-utils/session';
-import { musicEvent } from '@test-utils/eventFixtures';
+import { signIn } from '@test-utils/signIn';
+import { musicEvent } from '@test-utils/musicEvent';
 import {
 	startEventBeacon,
 	stopEventBeacon,
@@ -23,8 +23,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('@/features/events/features/detail/beaconAdvertiser', () => ({
@@ -32,7 +32,7 @@ jest.mock('@/features/events/features/detail/beaconAdvertiser', () => ({
 	stopEventBeacon: jest.fn(),
 }));
 let mockBroadcastAvailable = true;
-jest.mock('@/shared/platform/platform', () => ({
+jest.mock('@/shared/platform/platformConfig', () => ({
 	get BEACON_BROADCAST_AVAILABLE() {
 		return mockBroadcastAvailable;
 	},

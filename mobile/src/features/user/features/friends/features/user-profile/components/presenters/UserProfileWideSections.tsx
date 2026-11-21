@@ -8,7 +8,7 @@ import {
 import type { ProfileInfoRow } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
 import { GenreChip } from '@/shared/theme/components/GenreChip';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type {
 	FilteredProfile,
 	FriendPlaylistSummary,

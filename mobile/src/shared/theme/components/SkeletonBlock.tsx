@@ -1,29 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing } from 'react-native';
+import React from 'react';
+import { Animated, StyleSheet } from 'react-native';
 import type { DimensionValue, StyleProp, ViewStyle } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-
-function useReduceMotion(): boolean | null {
-	const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
-
-	useEffect(() => {
-		let mounted = true;
-		AccessibilityInfo.isReduceMotionEnabled()
-			.then(enabled => {
-				if (mounted) setReduceMotion(enabled);
-			})
-			.catch(() => {});
-		const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', enabled => {
-			setReduceMotion(enabled);
-		});
-		return () => {
-			mounted = false;
-			subscription?.remove();
-		};
-	}, []);
-
-	return reduceMotion;
-}
+import { useSkeletonPulse } from '@/shared/theme/hooks/useSkeletonPulse';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 type SkeletonBlockProps = {
 	width?: DimensionValue;
@@ -32,56 +12,39 @@ type SkeletonBlockProps = {
 	style?: StyleProp<ViewStyle>;
 };
 
+function blockStyle(
+	width: DimensionValue,
+	height: DimensionValue,
+	radius: number,
+	opacity: Animated.Value
+) {
+	return { width, height, borderRadius: radius, opacity };
+}
+
 export function SkeletonBlock({
 	width = '100%',
 	height = 16,
 	radius = 4,
 	style,
 }: SkeletonBlockProps) {
-	const { theme } = useTheme();
-	const reduceMotion = useReduceMotion();
-	const opacity = useMemo(() => new Animated.Value(1), []);
-
-	useEffect(() => {
-		if (reduceMotion !== false) {
-			opacity.setValue(1);
-			return undefined;
-		}
-		const pulse = Animated.loop(
-			Animated.sequence([
-				Animated.timing(opacity, {
-					toValue: 0.4,
-					duration: 800,
-					easing: Easing.inOut(Easing.ease),
-					useNativeDriver: true,
-				}),
-				Animated.timing(opacity, {
-					toValue: 1,
-					duration: 800,
-					easing: Easing.inOut(Easing.ease),
-					useNativeDriver: true,
-				}),
-			])
-		);
-		pulse.start();
-		return () => pulse.stop();
-	}, [reduceMotion, opacity]);
+	const { styles } = useThemedStyles(createStyles);
+	const opacity = useSkeletonPulse();
 
 	return (
 		<Animated.View
 			testID="skeleton-block"
 			accessibilityElementsHidden
 			importantForAccessibility="no-hide-descendants"
-			style={[
-				{
-					width,
-					height,
-					borderRadius: radius,
-					backgroundColor: theme.colors.surfaceAlt,
-					opacity,
-				},
-				style,
-			]}
+			style={[styles.block, blockStyle(width, height, radius, opacity), style]}
 		/>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		block: {
+			backgroundColor: theme.colors.surfaceAlt,
+		},
+	});
+	return styles;
 }

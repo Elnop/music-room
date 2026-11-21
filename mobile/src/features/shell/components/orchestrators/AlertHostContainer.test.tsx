@@ -1,23 +1,21 @@
 import React from 'react';
 import { Modal } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { useAlertStore } from '@/shared/alerts/alertStore';
+import { alertStore } from '@/shared/alerts/alertStore';
 import { AlertHostContainer } from '@/features/shell/components/orchestrators/AlertHostContainer';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme: theme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme: theme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme }) };
 });
 
-function push(
-	buttons: Parameters<ReturnType<typeof useAlertStore.getState>['push']>[0]['buttons']
-) {
+function push(buttons: Parameters<ReturnType<typeof alertStore.getState>['push']>[0]['buttons']) {
 	return act(() =>
-		useAlertStore.getState().push({ title: 'Supprimer ?', message: 'Définitif.', buttons })
+		alertStore.getState().push({ title: 'Supprimer ?', message: 'Définitif.', buttons })
 	);
 }
 
-beforeEach(() => useAlertStore.setState({ queue: [] }));
+beforeEach(() => alertStore.setState({ queue: [] }));
 
 describe('AlertHostContainer', () => {
 	it('renders nothing without an alert, as on native platforms', () => {
@@ -67,7 +65,7 @@ describe('AlertHostContainer', () => {
 	it('shows queued alerts one after the other', () => {
 		render(<AlertHostContainer />);
 		push([{ text: 'Premier' }]);
-		act(() => useAlertStore.getState().push({ title: 'Deuxième', message: '', buttons: [] }));
+		act(() => alertStore.getState().push({ title: 'Deuxième', message: '', buttons: [] }));
 		fireEvent.press(screen.getByRole('button', { name: 'Premier' }));
 		expect(screen.getByText('Deuxième')).toBeTruthy();
 	});

@@ -12,14 +12,14 @@ import {
 } from '@/features/playback/shared/player/stores/connectStore';
 import type { OwnerQueue } from '@/features/playback/shared/player/lib/queue.types';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 import { useImageColors } from '@/shared/image-colors/useImageColors';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { hapticTap } from '@/shared/theme/lib/haptics';
 import { Text } from '@/shared/theme/components/Text';
 
@@ -32,8 +32,8 @@ jest.mock('@/shared/theme/lib/haptics', () => ({
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

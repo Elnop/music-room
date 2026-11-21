@@ -6,7 +6,7 @@ import type {
 	ProfilePrivacy,
 	UpdateMusicPreferencesData,
 	UpdatePrivacyData,
-} from '@/shared/users/user.types';
+} from '@/shared/users/userTypes';
 
 export const privacyApi = {
 	async getPrivacySettings(accessToken?: string): Promise<ProfilePrivacy> {

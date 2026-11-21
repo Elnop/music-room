@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
 import { LinkedAccountRow } from '@/features/user/features/auth/features/linked-accounts/components/presenters/LinkedAccountRow';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type {
 	GoogleButtonSlot,
 	LinkedProvider,

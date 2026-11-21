@@ -4,9 +4,9 @@ import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { ProfileSection } from '@/features/user/shared/profile-section/ProfileSection';
 import { GenreChip } from '@/shared/theme/components/GenreChip';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { MusicGenre } from '@/shared/users/user.types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { MusicGenre } from '@/shared/users/userTypes';
 import { Text } from '@/shared/theme/components/Text';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 

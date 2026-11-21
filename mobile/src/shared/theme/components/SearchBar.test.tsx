@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { originalTheme } from '@/shared/theme/lib/original.theme';
+import { originalTheme } from '@/shared/theme/configs/originalThemeConfig';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

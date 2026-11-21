@@ -1,12 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-
-export type AvatarPhotoProps = {
-	uri: string;
-	size: number;
-	onLoad: () => void;
-	onError: () => void;
-};
+import { squareStyle } from '@/shared/theme/lib/squareStyle';
+import type { AvatarPhotoProps } from '@/shared/theme/types/avatarPhotoTypes';
 
 export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 	return (
@@ -14,7 +9,7 @@ export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 			source={{ uri }}
 			onLoad={onLoad}
 			onError={onError}
-			style={[styles.image, { width: size, height: size }]}
+			style={[styles.image, squareStyle(size)]}
 		/>
 	);
 }

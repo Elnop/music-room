@@ -4,13 +4,13 @@ import { Button } from '@/shared/theme/components/Button';
 import { Input } from '@/shared/theme/components/Input';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import type { Theme } from '@/shared/theme/lib/types';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { AuthFormFrame } from '@/features/user/features/auth/shared/auth-form/AuthFormFrame';
 import { SocialSignInButtons } from '@/features/user/features/auth/shared/sign-in/SocialSignInButtons';
 import type { FieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
 import type { GoogleButtonSlot } from '@/features/user/features/auth/types';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
 interface LoginViewProps {
 	email: FieldBinding;
@@ -51,7 +51,7 @@ export function LoginView({
 				placeholder="demo@zumik.com"
 				keyboardType="email-address"
 				autoCapitalize="none"
-				submitOnEnter={isLoading ? undefined : onSubmit}
+				onEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Mot de passe"
@@ -59,7 +59,7 @@ export function LoginView({
 				placeholder="Saisissez votre mot de passe"
 				secureTextEntry
 				autoCapitalize="none"
-				submitOnEnter={isLoading ? undefined : onSubmit}
+				onEnter={isLoading ? undefined : onSubmit}
 			/>
 
 			<Button

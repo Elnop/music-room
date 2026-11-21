@@ -1,73 +1,89 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { KeyGlyph } from '@/shared/theme/components/KeyGlyph';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { keycap } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Pressable } from '@/shared/theme/components/Pressable';
 
 type KeyTone = 'primary' | 'surface' | 'device';
 
-interface KeyButtonProps {
-	icon: PixelIconSource;
-	onPress: () => void;
-	accessibilityLabel: string;
+type KeyAppearance = {
 	tone?: KeyTone;
 	size?: number;
 	iconSize?: number;
+	style?: StyleProp<ViewStyle>;
+};
+
+type KeyState = {
 	disabled?: boolean;
 	loading?: boolean;
+};
+
+type KeyButtonProps = {
+	icon: PixelIconSource;
+	onPress: () => void;
+	accessibilityLabel: string;
+	appearance?: KeyAppearance;
+	state?: KeyState;
 	children?: React.ReactNode;
-	style?: StyleProp<ViewStyle>;
-}
+};
 
 export function KeyButton({
 	icon,
 	onPress,
 	accessibilityLabel,
-	tone = 'surface',
-	size = 48,
-	iconSize = 24,
-	disabled,
-	loading,
+	appearance = {},
+	state = {},
 	children,
-	style,
 }: KeyButtonProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
-	const ink = {
-		primary: theme.colors.onColor,
-		surface: theme.colors.text,
-		device: theme.colors.info,
-	}[tone];
+	const ink = keyInk(theme, appearance.tone ?? 'surface');
+	const blocked = state.disabled || state.loading;
 
 	return (
 		<Pressable
-			style={[
-				styles.key,
-				styles[tone],
-				children ? { height: size } : { width: size, height: size },
-				disabled && styles.disabled,
-				style,
-			]}
+			style={keyStyle(styles, appearance, state.disabled, Boolean(children))}
 			onPress={onPress}
-			disabled={disabled || loading}
+			disabled={blocked}
 			accessibilityLabel={accessibilityLabel}
-			accessibilityState={{ disabled: disabled || loading, busy: loading }}
+			accessibilityState={{ disabled: blocked, busy: state.loading }}
 		>
-			{loading ? (
-				<ActivityIndicator color={ink} />
-			) : (
-				<PixelIcon icon={icon} size={iconSize} color={ink} />
-			)}
+			<KeyGlyph icon={icon} size={appearance.iconSize ?? 24} color={ink} loading={state.loading} />
 			{children}
 		</Pressable>
 	);
 }
 
+function keyInk(theme: Theme, tone: KeyTone): string {
+	return {
+		primary: theme.colors.onColor,
+		surface: theme.colors.text,
+		device: theme.colors.info,
+	}[tone];
+}
+
+function keyStyle(
+	styles: ReturnType<typeof createStyles>,
+	appearance: KeyAppearance,
+	disabled: boolean | undefined,
+	withLabel: boolean
+): StyleProp<ViewStyle> {
+	const size = appearance.size ?? 48;
+	const tone = { primary: styles.primary, surface: styles.surface, device: styles.device };
+	return [
+		styles.key,
+		tone[appearance.tone ?? 'surface'],
+		disabled && styles.disabled,
+		withLabel ? { height: size } : { width: size, height: size },
+		appearance.style,
+	];
+}
+
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		key: {
 			...keycap(theme),
 			flexDirection: 'row',
@@ -80,4 +96,5 @@ function createStyles(theme: Theme) {
 		device: { backgroundColor: theme.colors.surfaceAlt, paddingHorizontal: theme.spacing.md },
 		disabled: { opacity: 0.4 },
 	});
+	return styles;
 }

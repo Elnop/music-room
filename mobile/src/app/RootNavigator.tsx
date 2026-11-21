@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigationContainerRef } from '@react-navigation/native';
 import { AuthNavigator } from '@/app/AuthNavigator';
 import { AppNavigator } from '@/app/AppNavigator';
@@ -10,22 +10,22 @@ import { NavigationRootLayout } from '@/features/shell/components/orchestrators/
 import { useAppStartup } from '@/features/shell/hooks/useAppStartup';
 import { useSocketConnection } from '@/features/shell/hooks/useSocketConnection';
 
+function isSignedIn(): boolean {
+	return useAuthStore.getState().isAuthenticated;
+}
+
+async function loadSession(): Promise<void> {
+	await useAuthStore.getState().loadFromStorage();
+	const { isAuthenticated, isTokenExpiringSoon, refreshAccessToken } = useAuthStore.getState();
+	if (isAuthenticated && isTokenExpiringSoon()) {
+		await refreshAccessToken();
+	}
+}
+
 export function RootNavigator() {
 	const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-	const loadFromStorage = useAuthStore(state => state.loadFromStorage);
 	const navigationRef = useNavigationContainerRef<AppTabsParamList>();
-	const linking = useMemo(() => createLinking(() => useAuthStore.getState().isAuthenticated), []);
-	const loadSession = useCallback(async () => {
-		await loadFromStorage();
-		const {
-			isAuthenticated: signedIn,
-			isTokenExpiringSoon,
-			refreshAccessToken,
-		} = useAuthStore.getState();
-		if (signedIn && isTokenExpiringSoon()) {
-			await refreshAccessToken();
-		}
-	}, [loadFromStorage]);
+	const linking = useMemo(() => createLinking(isSignedIn), []);
 	const ready = useAppStartup(loadSession);
 	useSocketConnection(isAuthenticated);
 	useMusicControlEmitter();

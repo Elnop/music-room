@@ -4,11 +4,11 @@ import { createStore } from 'zustand';
 import { MiniPlayerContainer } from '@/features/playback/features/mini-player/components/MiniPlayerContainer';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import type { UserProfile } from '@/shared/users/user.types';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { UserProfile } from '@/shared/users/userTypes';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { hapticTap } from '@/shared/theme/lib/haptics';
 
 jest.mock('@/shared/theme/lib/haptics', () => ({
@@ -17,8 +17,8 @@ jest.mock('@/shared/theme/lib/haptics', () => ({
 	hapticSuccess: jest.fn(),
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

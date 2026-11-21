@@ -8,17 +8,17 @@ import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { AppToast } from '@/shared/theme/components/AppToast';
 import { ReorderableList } from '@/shared/theme/components/ReorderableList';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
 import { QueueItemRow } from '@/features/playback/features/queue-modal/components/presenters/QueueItemRow';
 import type { createModalStyles } from '@/features/playback/features/queue-modal/components/presenters/queueModalStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { QueueItem } from '@/features/playback/shared/player/lib/queue.types';
-import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import { Text } from '@/shared/theme/components/Text';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 interface QueueModalViewProps {
 	TrackActionsSheet: TrackActionsSheetComponent;

@@ -5,16 +5,16 @@ import * as Location from 'expo-location';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { EventFormContainer } from '@/features/events/features/event-form/components/EventFormContainer';
 import { createQueryClient } from '@/shared/backend/queryClient';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
 import type { EventStackParamList } from '@/features/events/lib/types';
 import { renderWithClient } from '@test-utils/renderWithClient';
-import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { ok } from '@test-utils/fetchResponses';
-import { signIn } from '@test-utils/session';
-import { musicEvent } from '@test-utils/eventFixtures';
+import { signIn } from '@test-utils/signIn';
+import { musicEvent } from '@test-utils/musicEvent';
 import { formatEventDate } from '@/features/events/shared/event-dates/eventDates';
 import { noop } from '@test-utils/noop';
 
@@ -22,8 +22,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('@/shared/theme/lib/toast', () => ({

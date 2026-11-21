@@ -16,12 +16,12 @@ jest.mock('react-native-safe-area-context', () => ({
 	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (s: { user: object }) => unknown) =>
 		selector({ user: { id: 'me', username: 'bob', displayName: 'Bob' } }),
 }));

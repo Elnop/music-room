@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
-import { useSocketCache } from '@/shared/backend/lib/socketCache';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { useSocketCache } from '@/shared/backend/hooks/useSocketCache';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 import type { PlaylistDeletedEvent } from '@/features/playlists/shared/playlist/lib/types';
 import { PLAYLIST_SOCKET_RULES } from '@/features/playlists/features/editor/features/detail/lib/playlistSocketRules';
 
@@ -11,8 +11,8 @@ type PlaylistRoom = {
 };
 
 export function usePlaylistRoom(playlistId: string): PlaylistRoom {
-	const socket = useSocketStore(state => state.socket);
-	const isConnected = useSocketStore(state => state.isConnected);
+	const socket = useSocketState(state => state.socket);
+	const isConnected = useSocketState(state => state.isConnected);
 	const client = useQueryClient();
 	const [deletedId, setDeletedId] = useState<string | null>(null);
 	const joinedRef = useRef<string | null>(null);

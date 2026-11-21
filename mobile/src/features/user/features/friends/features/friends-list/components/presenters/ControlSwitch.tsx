@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 
 type ControlSwitchProps = {

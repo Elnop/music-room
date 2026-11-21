@@ -1,4 +1,4 @@
-import type { MusicGenre } from '@/shared/users/user.types';
+import type { MusicGenre } from '@/shared/users/userTypes';
 
 export type EventOrganizer = {
 	id: string;

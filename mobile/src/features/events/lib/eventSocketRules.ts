@@ -1,4 +1,4 @@
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { socketCacheRule } from '@/shared/backend/lib/socketCache';
 import { removeEvent, upsertEvent } from '@/features/events/shared/events/lib/eventCache';
 import type { EventDeletedPayload, MusicEvent } from '@/features/events/lib/types';

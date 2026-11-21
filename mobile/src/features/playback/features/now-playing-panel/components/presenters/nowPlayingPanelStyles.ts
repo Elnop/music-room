@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
-import { NOW_PLAYING_PANEL_WIDTH } from '@/shared/theme/lib/layout';
-import type { Theme } from '@/shared/theme/lib/types';
+import { NOW_PLAYING_PANEL_WIDTH } from '@/shared/theme/configs/layoutConfig';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { displayText } from '@/shared/theme/lib/pixelFrame';
-import { SPACING } from '@/shared/theme/lib/spacing';
+import { SPACING } from '@/shared/theme/configs/tokensConfig';
 
 const GUTTER = SPACING.md;
 

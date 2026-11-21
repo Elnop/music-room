@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useMeasuredPress } from '@/shared/theme/hooks/useMeasuredPress';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
 import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';

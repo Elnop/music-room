@@ -1,108 +1,59 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
-import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
-import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';
+import { SearchBarField } from '@/shared/theme/components/SearchBarField';
+import { SearchBarTrailing } from '@/shared/theme/components/SearchBarTrailing';
 import { useFieldFocus } from '@/shared/theme/hooks/useFieldFocus';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { TextInput } from '@/shared/theme/components/TextInput';
-import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
-import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { focusedFieldStyle } from '@/shared/theme/lib/focusedFieldStyle';
+import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import type { SearchBarInput } from '@/shared/theme/types/searchBarTypes';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
-interface SearchBarProps {
+type SearchBarProps = {
 	value: string;
 	onChangeText: (text: string) => void;
 	placeholder?: string;
 	style?: StyleProp<ViewStyle>;
-	autoFocus?: boolean;
 	loading?: boolean;
-	inputRef?: React.Ref<TextInput>;
-}
-
-const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
+	input?: SearchBarInput;
+};
 
 export function SearchBar({
 	value,
 	onChangeText,
 	placeholder = 'Rechercher…',
 	style,
-	autoFocus = false,
 	loading = false,
-	inputRef,
+	input = {},
 }: SearchBarProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { styles, theme } = useThemedStyles(createStyles);
 	const { focused, focusProps } = useFieldFocus();
 
 	return (
 		<View style={[styles.container, style, focused && focusedFieldStyle(theme.colors.primary)]}>
-			<PixelIcon
-				icon={SearchSolid}
-				size={20}
-				color={theme.colors.textSecondary}
-				style={styles.icon}
-				testID="search-bar-icon"
-			/>
-			<TextInput
-				ref={inputRef}
-				style={styles.input}
+			<SearchBarField
 				value={value}
 				onChangeText={onChangeText}
 				placeholder={placeholder}
-				placeholderTextColor={theme.colors.textSecondary}
-				autoFocus={autoFocus}
-				autoCapitalize="none"
-				autoCorrect={false}
-				returnKeyType="search"
+				input={input}
 				{...focusProps}
 			/>
-			{loading && (
-				<ActivityIndicator
-					size="small"
-					color={theme.colors.textSecondary}
-					style={styles.trailing}
-					testID="search-bar-loading"
-				/>
-			)}
-			{value.length > 0 && (
-				<Pressable
-					onPress={() => onChangeText('')}
-					hitSlop={HIT_SLOP}
-					style={[styles.trailing, styles.clear]}
-					accessibilityLabel="Effacer la recherche"
-				>
-					<PixelIcon icon={TimesSolid} size={20} color={theme.colors.textSecondary} />
-				</Pressable>
-			)}
+			<SearchBarTrailing value={value} loading={loading} onClear={() => onChangeText('')} />
 		</View>
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
 		container: {
 			...pixelFrame(theme),
 			flexDirection: 'row',
 			alignItems: 'center',
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.md,
-			height: 44,
+			height: theme.controls.searchBar,
 		},
-		icon: {
-			marginRight: theme.spacing.sm,
-		},
-		input: {
-			flex: 1,
-			fontSize: theme.typography.sizes.md,
-			color: theme.colors.text,
-			padding: 0,
-			fontFamily: theme.typography.families.regular,
-		},
-		trailing: {
-			marginLeft: theme.spacing.sm,
-		},
-		clear: {},
 	});
+	return styles;
+}

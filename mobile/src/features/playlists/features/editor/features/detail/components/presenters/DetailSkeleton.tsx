@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createDetailStyles } from '@/features/playlists/features/editor/features/detail/components/presenters/detailStyles';

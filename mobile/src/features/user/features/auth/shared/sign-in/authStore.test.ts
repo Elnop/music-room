@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Socket } from 'socket.io-client';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { socketStore } from '@/shared/backend/socketStore';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { storedSession } from '@/features/user/features/auth/shared/sign-in/lib/sessionStorage';
 import { login } from '@/features/user/features/auth/shared/sign-in/lib/signIn';
@@ -35,7 +35,7 @@ jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 const socketDisconnect = jest.fn();
 
 function withOpenSocket(): void {
-	useSocketStore.setState({
+	socketStore.setState({
 		socket: { disconnect: socketDisconnect } as unknown as Socket,
 		isConnected: true,
 	});
@@ -220,7 +220,7 @@ describe('logout', () => {
 		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBeNull();
 		expect(await AsyncStorage.getItem('@zumik/is_authenticated')).toBeNull();
 		expect(socketDisconnect).toHaveBeenCalledTimes(1);
-		expect(useSocketStore.getState()).toMatchObject({ socket: null, isConnected: false });
+		expect(socketStore.getState()).toMatchObject({ socket: null, isConnected: false });
 	}
 
 	it('revokes the session on the backend, disconnects the socket and clears the session', async () => {

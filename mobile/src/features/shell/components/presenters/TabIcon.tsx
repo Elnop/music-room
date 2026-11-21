@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
 import HomeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/home-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { showAlert } from '@/shared/alerts/alert';
+import { showAlert } from '@/shared/alerts/showAlert';
 import { useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '@/shared/backend/lib/api';
 import type { PlanState } from '@/features/subscription/lib/subscription';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { pickImage } from '@/shared/image-picker/imagePicker';
-import { prepareSquareImage } from '@/shared/square-image/squareImage';
+import { pickImage } from '@/shared/image-picker/pickImage';
+import { prepareSquareImage } from '@/shared/square-image/prepareSquareImage';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
 import { patchPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';

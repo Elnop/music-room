@@ -1,4 +1,4 @@
-import { AVATAR_COLORS } from '@/shared/theme/lib/tokens';
+import { AVATAR_COLORS } from '@/shared/theme/configs/tokensConfig';
 
 export function avatarInitials(name?: string): string {
 	const words = name?.trim().split(/\s+/u).filter(Boolean) ?? [];

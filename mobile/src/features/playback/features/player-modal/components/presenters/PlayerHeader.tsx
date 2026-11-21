@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { HEADER_HIT_SLOP } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
 import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';

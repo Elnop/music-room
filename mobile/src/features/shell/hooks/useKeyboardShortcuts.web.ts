@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { matchShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import { matchShortcut } from '@/features/shell/lib/matchShortcut';
 import type {
 	KeyboardShortcut,
 	ShortcutKeyEvent,
-} from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+} from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 
 type BrowserKeyEvent = ShortcutKeyEvent & {
 	defaultPrevented: boolean;

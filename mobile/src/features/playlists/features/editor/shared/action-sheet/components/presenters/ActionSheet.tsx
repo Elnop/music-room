@@ -8,12 +8,12 @@ import { AnchoredMenu } from '@/features/playlists/features/editor/shared/action
 import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 import AngleLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-left-solid.svg';
 
 interface ActionSheetProps {

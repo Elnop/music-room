@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useMemo, useState } from 'react';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 import {
 	acquireListening,
 	releaseListening,
@@ -16,8 +16,8 @@ import type {
 import { useControllableDevices } from '@/features/playback/features/control-delegation/hooks/useControllableDevices';
 
 export function useFriendListening(targetUserId: string | null): FriendListeningResult {
-	const socket = useSocketStore(state => state.socket);
-	const isConnected = useSocketStore(state => state.isConnected);
+	const socket = useSocketState(state => state.socket);
+	const isConnected = useSocketState(state => state.isConnected);
 
 	const { canControl, isControllable, controlError } = useControllableDevices(targetUserId);
 

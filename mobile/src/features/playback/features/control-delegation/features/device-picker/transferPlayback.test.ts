@@ -4,7 +4,7 @@ import { useConnectStore } from '@/features/playback/shared/player/stores/connec
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
-import type { SessionView } from '@/shared/backend/lib/authSession';
+import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import {
 	setPositionReader,
 	usePlayerStore,
@@ -13,10 +13,10 @@ import { ApiError } from '@/shared/backend/lib/api';
 import { showError } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
 import type { DevicePickerOwner } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
-import type { QueueItem, QueueState } from '@/shared/playback/lib/queue.types';
+import type { QueueItem, QueueState } from '@/shared/playback/types/queueTypes';
 import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
+import type { UserProfile } from '@/shared/users/userTypes';
 import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import { logger } from '@/shared/logging/logger';
 

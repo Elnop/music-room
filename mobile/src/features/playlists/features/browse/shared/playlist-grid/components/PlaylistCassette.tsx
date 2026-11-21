@@ -5,7 +5,7 @@ import { Avatar } from '@/shared/theme/components/Avatar';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Text } from '@/shared/theme/components/Text';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Playlist, UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 import { ownerName } from '@/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels';

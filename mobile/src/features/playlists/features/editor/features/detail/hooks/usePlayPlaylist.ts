@@ -1,5 +1,8 @@
 import { useRef, useState } from 'react';
-import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
+import type {
+	PlaybackActions,
+	PlaylistPlayback,
+} from '@/shared/playback/types/playbackActionsTypes';
 import { showInfo } from '@/shared/theme/lib/toast';
 
 export type PlayPlaylist = {

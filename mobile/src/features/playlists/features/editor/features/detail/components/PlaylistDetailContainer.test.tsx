@@ -3,8 +3,8 @@ import { Alert, Platform } from 'react-native';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PlaylistDetailContainer } from '@/features/playlists/features/editor/features/detail/components/PlaylistDetailContainer';
-import { testPlayback } from '@test-utils/playback';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { testPlayback } from '@test-utils/testPlaybackConfig';
+import { socketStore } from '@/shared/backend/socketStore';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
@@ -13,9 +13,9 @@ import type {
 	PlaylistWithTracks,
 } from '@/features/playlists/shared/playlist/lib/types';
 import { renderWithClient } from '@test-utils/renderWithClient';
-import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
-import { signIn } from '@test-utils/session';
+import { signIn } from '@test-utils/signIn';
 import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
 import { noop } from '@test-utils/noop';
 
@@ -24,8 +24,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('react-native-safe-area-context', () => ({
@@ -169,7 +169,7 @@ beforeEach(async () => {
 	signIn('me');
 	testPlayback.playingUri = null;
 	testPlayback.state = null;
-	useSocketStore.setState({ socket: null, isConnected: false });
+	socketStore.setState({ socket: null, isConnected: false });
 	routes = mockFetchRoutes({
 		'GET /api/subscription': () => ok({ plan: 'free', premiumFeatures: ['playlist_cover'] }),
 	});
@@ -418,7 +418,7 @@ describe('PlaylistDetailContainer deleted while viewing (#342)', () => {
 			on: jest.fn((event: string, handler: (data: unknown) => void) => (handlers[event] = handler)),
 			off: jest.fn(),
 		};
-		useSocketStore.setState({ socket: socket as never, isConnected: true });
+		socketStore.setState({ socket: socket as never, isConnected: true });
 		return { socket, handlers };
 	}
 

@@ -1,6 +1,4 @@
-export const LINK_PREFIX = 'zumik://';
-
-const SHARE_URL = 'https://elnop.github.io/music-room/';
+import { SHARE_URL } from '@/shared/share-links/shareLinksConfig';
 
 export function playlistLink(id: string): string {
 	return `${SHARE_URL}playlist/${id}`;

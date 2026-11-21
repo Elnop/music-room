@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState } from 'react';
-import { useSocketStore } from '@/shared/backend/socketStore';
+import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
-import type { ControlError } from '@/shared/control-error/controlError';
+import type { ControlError } from '@/shared/control-error/controlErrorTypes';
 import { logger } from '@/shared/logging/logger';
 
 type PermissionChangedEvent = {
@@ -19,8 +19,8 @@ type ControllableIds = {
 const NO_IDS: string[] = [];
 
 export function useControllableDevices(targetUserId: string | null) {
-	const socket = useSocketStore(state => state.socket);
-	const isConnected = useSocketStore(state => state.isConnected);
+	const socket = useSocketState(state => state.socket);
+	const isConnected = useSocketState(state => state.isConnected);
 
 	const [controllable, setControllable] = useState<ControllableIds | null>(null);
 	const [reloadCount, setReloadCount] = useState(0);

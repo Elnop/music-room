@@ -87,10 +87,5 @@ rules:
         - /mobile/App.tsx
       exclude:
         - "*Storage.ts"
-        # A storage module named before the convention.
-        - /mobile/src/shared/backend/lib/backendUrl.ts
         - "*.test.ts"
         - "*.test.tsx"
-        # Known exceptions: remove each line once the file goes through a
-        # storage module. This list only shrinks.
-        - /mobile/src/shared/theme/components/ThemeContext.tsx

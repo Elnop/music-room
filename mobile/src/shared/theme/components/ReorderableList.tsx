@@ -1,22 +1,16 @@
 import React from 'react';
 import type { FlatListProps } from 'react-native';
-import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
-import type { SharedValue } from 'react-native-reanimated';
-import LibReorderableList, {
-	reorderItems,
-	useIsActive,
-	useReorderableDrag,
-} from 'react-native-reorderable-list';
-import type { ReorderableListReorderEvent } from 'react-native-reorderable-list';
+import { runOnJS } from 'react-native-reanimated';
+import LibReorderableList from 'react-native-reorderable-list';
+import { ReorderableCell } from '@/shared/theme/components/ReorderableCell';
+import { useDragDecisionGesture } from '@/shared/theme/hooks/useDragDecisionGesture';
+import { useOptimisticReorder } from '@/shared/theme/hooks/useOptimisticReorder';
 import { hapticSelection } from '@/shared/theme/lib/haptics';
-
-interface ReorderableRenderItemInfo<T> {
-	item: T;
-	index: number;
-	drag: () => void;
-	isActive: boolean;
-}
+import type {
+	ReorderableKeyExtractor,
+	ReorderableRenderItem,
+	ReorderHandler,
+} from '@/shared/theme/types/reorderableTypes';
 
 type PassThroughProps<T> = Pick<
 	FlatListProps<T>,
@@ -28,105 +22,40 @@ type PassThroughProps<T> = Pick<
 	| 'extraData'
 >;
 
-interface ReorderableListProps<T> extends PassThroughProps<T> {
+type ReorderableListProps<T> = PassThroughProps<T> & {
 	data: T[];
-	keyExtractor: (item: T, index: number) => string;
-	renderItem: (info: ReorderableRenderItemInfo<T>) => React.ReactElement | null;
-	onReorder: (from: number, to: number) => void | Promise<unknown>;
+	keyExtractor: ReorderableKeyExtractor<T>;
+	renderItem: ReorderableRenderItem<T>;
+	onReorder: ReorderHandler;
 	dragEnabled?: boolean;
-}
+};
 
-interface CellProps<T> {
-	item: T;
-	index: number;
-	renderItem: ReorderableListProps<T>['renderItem'];
-	dragRequested: SharedValue<boolean>;
+function handleDragEdge() {
+	'worklet';
+	runOnJS(hapticSelection)();
 }
-
-function Cell<T>({ item, index, renderItem, dragRequested }: CellProps<T>) {
-	const startDrag = useReorderableDrag();
-	const isActive = useIsActive();
-	function drag() {
-		dragRequested.set(true);
-		startDrag();
-	}
-	return renderItem({ item, index, drag, isActive });
-}
-
-const DRAG_DECISION_SLOP = 10;
 
 export function ReorderableList<T>({
 	data,
-	keyExtractor,
 	renderItem,
 	onReorder,
-	dragEnabled = true,
 	...listProps
 }: ReorderableListProps<T>) {
-	const [override, setOverride] = React.useState<{ base: T[]; items: T[] } | null>(null);
-	const items = override && override.base === data ? override.items : data;
-
-	const dragRequested = useSharedValue(false);
-	const touchStart = useSharedValue({ x: 0, y: 0 });
-	const panGesture = React.useMemo(
-		() =>
-			Gesture.Pan()
-				.manualActivation(true)
-				.onTouchesDown(event => {
-					touchStart.set({ x: event.allTouches[0].absoluteX, y: event.allTouches[0].absoluteY });
-				})
-				.onTouchesMove((event, manager) => {
-					if (dragRequested.get()) {
-						manager.activate();
-						return;
-					}
-					const touch = event.allTouches[0];
-					const start = touchStart.get();
-					const moved = Math.max(
-						Math.abs(touch.absoluteX - start.x),
-						Math.abs(touch.absoluteY - start.y)
-					);
-					if (moved > DRAG_DECISION_SLOP) manager.fail();
-				})
-				.onTouchesUp(() => {
-					dragRequested.set(false);
-				})
-				.onTouchesCancelled(() => {
-					dragRequested.set(false);
-				}),
-		[dragRequested, touchStart]
-	);
-
-	function handleReorder({ from, to }: ReorderableListReorderEvent) {
-		if (from === to) return;
-		setOverride({ base: data, items: reorderItems(items, from, to) });
-		const result = onReorder(from, to);
-		if (result) {
-			function clear() {
-				return setOverride(null);
-			}
-			result.then(clear, clear);
-		}
-	}
-
-	function handleDragEdge() {
-		'worklet';
-		runOnJS(hapticSelection)();
-	}
+	const { items, handleReorder } = useOptimisticReorder(data, onReorder);
+	const drag = useDragDecisionGesture();
 
 	return (
 		<LibReorderableList
 			{...listProps}
 			data={items}
-			keyExtractor={keyExtractor}
 			renderItem={({ item, index }) => (
-				<Cell item={item} index={index} renderItem={renderItem} dragRequested={dragRequested} />
+				<ReorderableCell item={item} index={index} renderItem={renderItem} drag={drag} />
 			)}
 			onReorder={handleReorder}
 			onDragStart={handleDragEdge}
 			onDragEnd={handleDragEdge}
-			dragEnabled={dragEnabled}
-			panGesture={panGesture}
+			dragEnabled={listProps.dragEnabled ?? true}
+			panGesture={drag.panGesture}
 			shouldUpdateActiveItem
 		/>
 	);

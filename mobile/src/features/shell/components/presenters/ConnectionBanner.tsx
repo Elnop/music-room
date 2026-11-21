@@ -4,10 +4,10 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import RefreshSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/refresh-solid.svg';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { ConnectionStatus } from '@/features/shell/hooks/useConnectionStatus';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { textColorOn } from '@/features/shell/lib/textContrast';
 import { Text } from '@/shared/theme/components/Text';
 

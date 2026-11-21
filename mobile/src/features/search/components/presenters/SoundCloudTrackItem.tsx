@@ -1,19 +1,19 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { PreviewBadge } from '@/shared/theme/components/PreviewBadge';
-import { isPreviewOnly } from '@/shared/tracks/lib/soundcloudPreview';
+import { isPreviewOnly } from '@/shared/tracks/lib/isPreviewOnly';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import { formatDuration } from '@/shared/formatting/formatters';
 import { pixelRow } from '@/shared/theme/lib/pixelFrame';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
 import { Text } from '@/shared/theme/components/Text';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 type SoundCloudTrackItemProps = {
 	track: SoundCloudTrack;

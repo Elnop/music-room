@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';

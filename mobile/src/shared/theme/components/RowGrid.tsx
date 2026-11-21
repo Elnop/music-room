@@ -1,11 +1,20 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { rowColumns } from '@/shared/theme/lib/gridLayout';
 
-export function RowGrid({ children }: { children: React.ReactNode }) {
+type RowGridProps = {
+	children: React.ReactNode;
+};
+
+function cellWidth(columns: number): ViewStyle {
+	return { width: `${100 / columns}%` };
+}
+
+export function RowGrid({ children }: RowGridProps) {
 	const { styles } = useThemedStyles(createStyles);
 	const columns = rowColumns(useBreakpoint().breakpoint);
 
@@ -14,7 +23,7 @@ export function RowGrid({ children }: { children: React.ReactNode }) {
 	return (
 		<View style={styles.grid}>
 			{React.Children.map(children, child => (
-				<View style={[styles.cell, { width: `${100 / columns}%` }]}>
+				<View style={[styles.cell, cellWidth(columns)]}>
 					<View style={styles.card}>{child}</View>
 				</View>
 			))}

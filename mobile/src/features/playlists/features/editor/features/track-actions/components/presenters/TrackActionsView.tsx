@@ -1,10 +1,10 @@
 import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { ActionSheet } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheet';
 import { ActionSheetRow } from '@/features/playlists/features/editor/shared/action-sheet/components/presenters/ActionSheetRow';
-import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 import type { TrackActions } from '@/features/playlists/features/editor/features/track-actions/hooks/useTrackActions';
 import { Text } from '@/shared/theme/components/Text';
 import { NewPlaylistForm } from '@/features/playlists/features/editor/features/track-actions/components/presenters/NewPlaylistForm';

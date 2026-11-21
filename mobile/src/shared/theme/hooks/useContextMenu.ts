@@ -1,7 +1,4 @@
-export type ContextMenuProps = {
-	onContextMenu?: unknown;
-	onKeyDown?: unknown;
-};
+import type { ContextMenuProps } from '@/shared/theme/types/menuTypes';
 
 const NONE: ContextMenuProps = {};
 

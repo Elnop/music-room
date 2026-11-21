@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { getHeaderTitle, Header, HeaderBackButton } from '@react-navigation/elements';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
-import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
+import { CONTENT_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import { SCREEN_WIDTHS } from '@/features/shell/lib/screenWidths';
 
 export function AlignedHeader({ options, back, route, navigation }: NativeStackHeaderProps) {

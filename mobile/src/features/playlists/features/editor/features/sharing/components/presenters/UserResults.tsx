@@ -5,7 +5,7 @@ import { EmptyState } from '@/shared/theme/components/EmptyState';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';

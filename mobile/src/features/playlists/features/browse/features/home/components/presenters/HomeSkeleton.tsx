@@ -5,7 +5,7 @@ import {
 	SkeletonBlock,
 	SkeletonList,
 } from '@/shared/theme/components/Skeleton';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { FriendCardSkeleton } from '@/features/playlists/features/browse/features/home/components/presenters/FriendCardSkeleton';

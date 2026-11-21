@@ -1,4 +1,4 @@
-import { FIXED_COLORS } from '@/shared/theme/lib/tokens';
+import { FIXED_COLORS } from '@/shared/theme/configs/tokensConfig';
 
 const DARK_TEXT = FIXED_COLORS.inkDark;
 const LIGHT_TEXT = FIXED_COLORS.inkLight;

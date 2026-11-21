@@ -16,8 +16,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-jest.mock('@/shared/theme/components/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
+jest.mock('@/shared/theme/hooks/useTheme', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -25,8 +25,10 @@ jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ goBack: jest.fn() }),
 }));
 
-jest.mock('@/shared/backend/lib/authSession', () => ({
+jest.mock('@/shared/backend/hooks/useSession', () => ({
 	useSession: (selector: (s: typeof mockSession) => unknown) => selector(mockSession),
+}));
+jest.mock('@/features/user/features/profile/shared/profile/lib/sessionActions', () => ({
 	setUser: jest.fn(),
 }));
 

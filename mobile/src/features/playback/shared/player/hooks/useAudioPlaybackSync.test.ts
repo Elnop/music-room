@@ -3,7 +3,7 @@ import type { useAudioPlayer } from 'expo-audio';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/playback/shared/player/lib/constants';
-import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { useAudioPlaybackSync } from '@/features/playback/shared/player/hooks/useAudioPlaybackSync';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

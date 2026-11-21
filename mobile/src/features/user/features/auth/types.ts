@@ -1,4 +1,4 @@
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 import type { RefCallback } from 'react';
 import type { View } from 'react-native';
 

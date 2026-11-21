@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { queryKeys } from '@/shared/query-keys/keys';
-import { useSession } from '@/shared/backend/lib/authSession';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { useSession } from '@/shared/backend/hooks/useSession';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';

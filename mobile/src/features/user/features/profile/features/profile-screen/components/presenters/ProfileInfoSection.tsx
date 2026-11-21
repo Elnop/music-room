@@ -4,7 +4,7 @@ import {
 	ProfileInfoRows,
 	memberSinceLabel,
 } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { UserProfile } from '@/shared/users/userTypes';
 
 type ProfileInfoSectionProps = {
 	user: UserProfile;

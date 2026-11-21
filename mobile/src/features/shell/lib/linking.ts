@@ -3,7 +3,7 @@ import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/n
 import { Platform } from 'react-native';
 import type { AppTabsParamList } from '@/app/AppNavigator';
 import { logger } from '@/shared/logging/logger';
-import { LINK_PREFIX } from '@/shared/share-links/shareLinks';
+import { LINK_PREFIX } from '@/shared/share-links/shareLinksConfig';
 import { stripBasePath, webBasePath } from '@/features/shell/lib/webBasePath';
 import { matchScreenPath, pathFromState, stateFromMatch } from '@/features/shell/lib/screenPaths';
 import type { ScreenPathMatch } from '@/features/shell/lib/screenPaths';

@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query-keys/keys';
+import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { ApiError } from '@/shared/backend/lib/api';
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import { usePendingMovesStore } from '@/features/playlists/features/editor/shared/track-edits/pendingMovesStore';

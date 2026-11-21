@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { usePlaybackControls } from '@/features/playback/shared/player/hooks/usePlaybackControls';
 import { useImageColors } from '@/shared/image-colors/useImageColors';
-import { getAdaptiveColors, hexToRgba } from '@/shared/image-colors/adaptivePalette';
+import { getAdaptiveColors, hexToRgba } from '@/shared/image-colors/lib/adaptivePalette';
 import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
 import { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
 import { useColorFade } from '@/features/playback/features/player-modal/hooks/useColorFade';

@@ -1,6 +1,6 @@
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
+import type { PlaybackActions } from '@/shared/playback/types/playbackActionsTypes';
 
 export const playbackActions: PlaybackActions = {
 	addToQueue: track => useQueueStore.getState().addItem(track),

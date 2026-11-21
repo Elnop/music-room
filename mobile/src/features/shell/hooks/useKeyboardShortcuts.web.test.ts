@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-native';
-import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 import { useKeyboardShortcuts } from '@/features/shell/hooks/useKeyboardShortcuts.web';
 
 type Listener = (event: object) => void;

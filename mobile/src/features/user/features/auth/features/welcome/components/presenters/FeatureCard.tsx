@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { LandingFeature } from '@/features/user/features/auth/features/welcome/landingContent';
 
 export function FeatureCard({ title, description, icon }: LandingFeature) {

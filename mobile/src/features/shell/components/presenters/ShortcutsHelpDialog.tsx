@@ -4,8 +4,8 @@ import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
 import { dialogStyles } from '@/features/shell/lib/dialogStyles';
 import { Button } from '@/shared/theme/components/Button';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/lib/types';
-import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 type ShortcutsHelpDialogProps = {

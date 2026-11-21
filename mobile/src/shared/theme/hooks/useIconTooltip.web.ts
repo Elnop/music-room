@@ -4,9 +4,9 @@ import type { View } from 'react-native';
 
 type TooltipElement = {
 	textContent: string | null;
-	getAttribute(name: string): string | null;
-	setAttribute(name: string, value: string): void;
-	removeAttribute(name: string): void;
+	getAttribute: (name: string) => string | null;
+	setAttribute: (name: string, value: string) => void;
+	removeAttribute: (name: string) => void;
 };
 
 const ICON_GLYPHS = /[-]/gu;

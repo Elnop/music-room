@@ -1,4 +1,4 @@
-import type { OwnerQueue, QueueItem } from '@/shared/playback/lib/playback';
+import type { OwnerQueue, QueueItem } from '@/shared/playback/types/playbackTypes';
 
 type UpNext = {
 	current: QueueItem | null;

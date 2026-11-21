@@ -1,5 +1,5 @@
-import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
-import type { UserProfile } from '@/shared/users/user.types';
+import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
+import type { UserProfile } from '@/shared/users/userTypes';
 
 export type EditMode = 'open' | 'restricted';
 

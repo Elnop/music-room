@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
-import type { SoundCloudTrack, StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
+import type { SoundCloudTrack, StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
 import {
 	FakeMediaElement,
 	autoplayRefusal,

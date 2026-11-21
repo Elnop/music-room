@@ -1,7 +1,7 @@
 import { logger } from '@/shared/logging/logger';
 
 function setDev(value: boolean) {
-	(globalThis as unknown as { __DEV__: boolean }).__DEV__ = value;
+	Object.assign(globalThis, { __DEV__: value });
 }
 
 describe('logger', () => {

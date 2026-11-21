@@ -29,6 +29,6 @@ describe('useFieldFocus', () => {
 		act(() => result.current.focusProps.onFocus?.(event));
 
 		expect(result.current.focused).toBe(false);
-		expect(onFocus).toHaveBeenCalled();
+		expect(onFocus).toHaveBeenCalledWith(event);
 	});
 });

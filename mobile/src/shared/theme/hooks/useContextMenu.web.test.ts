@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-native';
-import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
+import { menuAnchorStore } from '@/shared/theme/menuAnchorStore';
 import { useContextMenu, useContextMenuDismiss } from '@/shared/theme/hooks/useContextMenu.web';
 
 type Handler = (event: object) => void;
@@ -22,12 +22,12 @@ function handlers(onOpen: (() => void) | undefined) {
 	};
 }
 
-afterEach(() => useMenuAnchorStore.setState({ anchor: null }));
+afterEach(() => menuAnchorStore.setState({ anchor: null }));
 
 describe('useContextMenu (web)', () => {
 	it('opens the menu at the pointer instead of the browser menu', () => {
 		const onOpen = jest.fn(() =>
-			expect(useMenuAnchorStore.getState().anchor).toStrictEqual({
+			expect(menuAnchorStore.getState().anchor).toStrictEqual({
 				x: 320,
 				y: 410,
 				width: 0,
@@ -38,8 +38,8 @@ describe('useContextMenu (web)', () => {
 		const event = browserEvent({ clientX: 320, clientY: 410 });
 		handlers(onOpen).onContextMenu?.(event);
 		expect(onOpen).toHaveBeenCalledTimes(1);
-		expect(event.preventDefault).toHaveBeenCalled();
-		expect(event.stopPropagation).toHaveBeenCalled();
+		expect(event.preventDefault).toHaveBeenCalledWith();
+		expect(event.stopPropagation).toHaveBeenCalledWith();
 	});
 
 	it.each([
@@ -50,8 +50,8 @@ describe('useContextMenu (web)', () => {
 		const event = browserEvent(key);
 		handlers(onOpen).onKeyDown?.(event);
 		expect(onOpen).toHaveBeenCalledTimes(1);
-		expect(event.preventDefault).toHaveBeenCalled();
-		expect(useMenuAnchorStore.getState().anchor).toStrictEqual({
+		expect(event.preventDefault).toHaveBeenCalledWith();
+		expect(menuAnchorStore.getState().anchor).toStrictEqual({
 			x: 40,
 			y: 200,
 			width: 900,
@@ -82,6 +82,6 @@ describe('useContextMenuDismiss (web)', () => {
 		const event = browserEvent({});
 		onContextMenu(event);
 		expect(onClose).toHaveBeenCalledTimes(1);
-		expect(event.preventDefault).toHaveBeenCalled();
+		expect(event.preventDefault).toHaveBeenCalledWith();
 	});
 });

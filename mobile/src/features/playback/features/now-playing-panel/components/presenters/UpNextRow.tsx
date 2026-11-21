@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
 import { Artwork } from '@/shared/theme/components/Artwork';
-import type { QueueItem } from '@/shared/playback/lib/playback';
+import type { QueueItem } from '@/shared/playback/types/playbackTypes';
 import { UP_NEXT_ARTWORK_SIZE } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 
