@@ -23,7 +23,6 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkTreeEntry, followFolderRenames, movedIntoFolder } from './check-tree-entries.mjs';
 import { followRenames, parseRenames } from './renames.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '../../..');
@@ -63,10 +62,6 @@ function readDepcruise(text) {
 
 function readJscpd(text) {
   return { entries: new Set((JSON.parse(text).ignore ?? []).map((glob) => `ignore ${glob}`)) };
-}
-
-function readCheckTree(text) {
-  return { entries: new Set(JSON.parse(text).map(checkTreeEntry)) };
 }
 
 const unquote = (value) => value.trim().replace(/^(['"])(.*)\1$/, '$2');
@@ -164,22 +159,10 @@ function readGitleaks(text) {
 
 const lists = [
   ...projects.flatMap((project) => [
-    { project, path: `${project}/eslint-suppressions.json`, read: readEslint },
-    { project, path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise },
     { project, path: `${project}/.jscpd.json`, read: readJscpd },
-    ...(project === 'mobile'
-      ? [
-          {
-            project,
-            path: `${project}/.check-tree-known-violations.json`,
-            read: readCheckTree,
-            follow: followFolderRenames,
-            newRule: 'check-tree',
-            fromMovedCode: movedIntoFolder,
-          },
-          { project, path: `${project}/.oxlint-suppressions.json`, read: readEslint, newRule: 'oxlint' },
-        ]
-      : []),
+    ...(project === 'backend'
+      ? [{ project, path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise }]
+      : [{ project, path: `${project}/.oxlint-suppressions.json`, read: readEslint, newRule: 'oxlint' }]),
   ]),
   { path: 'tools/semgrep/rules.yml', read: readSemgrep },
   { path: '.gitleaks.toml', read: readGitleaks },
@@ -242,9 +225,20 @@ const newRuleBaselines = JSON.parse(
 // --- comparison --------------------------------------------------------------
 
 const newRules = new Set();
-const movedEntries = new Set();
 
 const growths = [];
+const REMOVED_BASELINES = projects.flatMap((project) =>
+  project === 'backend'
+    ? [`${project}/eslint-suppressions.json`]
+    : [
+        `${project}/eslint-suppressions.json`,
+        `${project}/.dependency-cruiser-known-violations.json`,
+        `${project}/.check-tree-known-violations.json`,
+      ]
+);
+for (const path of REMOVED_BASELINES.filter((p) => existsSync(join(root, p)))) {
+  growths.push(`${path}: this baseline was removed once empty; fix the violations instead of recording them`);
+}
 for (const [project, rules] of Object.entries(newRuleBaselines)) {
   if (project === 'allowedPaths') continue;
   for (const rule of Object.keys(rules).filter((r) => isLanded(project, r))) {
@@ -296,7 +290,7 @@ for (const list of lists) {
     const previousEntries = new Set(
       [...(previous.entries ?? [])].flatMap((entry) => [
         entry,
-        (list.follow ?? followRenames)(entry, renames, list.project),
+        followRenames(entry, renames, list.project),
       ])
     );
     for (const [key, value] of Object.entries(current.counts ?? {})) {
@@ -311,13 +305,8 @@ for (const list of lists) {
         growths.push(`${list.path}: ${key} grew from ${was} to ${value} (vs ${reference.label})`);
       }
     }
-    const listGrew = (current.entries?.size ?? 0) > (previous.entries?.size ?? 0);
     for (const entry of current.entries ?? []) {
       if (previousEntries.has(entry)) continue;
-      if (!listGrew && list.fromMovedCode?.(entry, renames, list.project)) {
-        movedEntries.add(`${list.path}: ${entry} (vs ${reference.label})`);
-        continue;
-      }
       growths.push(`${list.path}: new or changed entry ${entry} (vs ${reference.label})`);
     }
     // A rule's allowed-paths may grow only through new-rule-baselines.json.
@@ -374,7 +363,6 @@ if (growths.length > 0) {
   process.exit(1);
 }
 for (const rule of newRules) console.log(`new rule, baseline accepted: ${rule}`);
-for (const entry of movedEntries) console.log(`moved code, entry accepted: ${entry}`);
 console.log(
   `exception lists did not grow (${lists.length} files and inline escapes, vs ${references.map((r) => r.label).join(' and ') || 'nothing'})`
 );
