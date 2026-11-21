@@ -4,15 +4,8 @@ import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { useSession } from '@/shared/backend/hooks/useSession';
 import { logger } from '@/shared/logging/logger';
 import { useDebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
-import type { DebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/useDebouncedText';
-import { searchUsers } from '@/features/playlists/shared/playlist/lib/usersApi';
-import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
-
-export type UserSearch = {
-	search: DebouncedText;
-	results: UserSummary[];
-	isSearching: boolean;
-};
+import { searchUsers } from '@/features/playlists/shared/playlist/lib/peopleApi';
+import type { UserSearch } from '@/features/playlists/features/editor/features/sharing/sharingTypes';
 
 export function useUserSearch(excludedIds: string[]): UserSearch {
 	const search = useDebouncedText();

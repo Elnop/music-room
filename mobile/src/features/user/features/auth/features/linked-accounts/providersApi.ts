@@ -3,7 +3,7 @@ import type {
 	LinkedProvidersResponse,
 	MessageResponse,
 	OAuthProvider,
-} from '@/features/user/features/auth/types';
+} from '@/features/user/features/auth/authTypes';
 
 function bearer(accessToken: string) {
 	return { Authorization: `Bearer ${accessToken}` };

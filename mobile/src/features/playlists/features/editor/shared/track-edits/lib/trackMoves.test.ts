@@ -2,14 +2,15 @@ import { QueryObserver } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
+import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { ApiError } from '@/shared/backend/lib/api';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
-import { usePendingMovesStore } from '@/features/playlists/features/editor/shared/track-edits/pendingMovesStore';
+import { pendingMovesStore } from '@/features/playlists/features/editor/shared/track-edits/pendingMovesStore';
 import type {
 	MoveTrackResult,
 	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import { deferred } from '@test-utils/deferred';
 import { playlistTrack } from '@test-utils/playlistFixtures';
 import { loadPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
@@ -35,7 +36,6 @@ jest.mock('@/features/playlists/shared/playlist/lib/playlistApi', () => ({
 
 const api = jest.mocked(tracksApi);
 const fetchPlaylist = jest.mocked(playlistApi.fetchPlaylistById);
-const key = queryKeys.playlists.detail('p');
 
 function start(tracksVersion = 10): PlaylistWithTracks {
 	return {
@@ -59,21 +59,17 @@ let client: QueryClient;
 let unsubscribe: () => void;
 
 function shown() {
-	return client.getQueryData<PlaylistWithTracks>(key)!;
+	return client.getQueryData<PlaylistWithTracks>(queryKeys.playlists.detail('p'))!;
 }
 function order() {
 	return shown().tracks.map(t => t.id);
 }
-function pending() {
-	return usePendingMovesStore.getState().count;
-}
 
 function open() {
 	const observer = new QueryObserver(client, {
-		queryKey: key,
+		queryKey: queryKeys.playlists.detail('p'),
 		queryFn: () => loadPlaylist(client, 'p'),
-		staleTime: Infinity,
-		gcTime: Infinity,
+		staleTime: STALE.long,
 		retry: false,
 	});
 	unsubscribe = observer.subscribe(() => undefined);
@@ -82,7 +78,7 @@ function open() {
 beforeEach(() => {
 	jest.resetAllMocks();
 	client = createQueryClient();
-	client.setQueryData(key, start());
+	client.setQueryData(queryKeys.playlists.detail('p'), start());
 	open();
 });
 
@@ -170,7 +166,7 @@ describe('moveTrack', () => {
 		await expect(moveTrack(client, 'p', 'C', 'a')).resolves.toBe('moved');
 		expect(api.moveTrack).toHaveBeenCalledWith('p', 'C', 'a', 10);
 		expect(order()).toStrictEqual(['A', 'C', 'B']);
-		expect(pending()).toBe(0);
+		expect(pendingMovesStore.getState().count).toBe(0);
 	});
 
 	it('sends two quick moves one after the other with the returned version', async () => {
@@ -182,13 +178,13 @@ describe('moveTrack', () => {
 		]);
 		await Promise.resolve();
 		expect(api.moveTrack).toHaveBeenCalledTimes(1);
-		expect(pending()).toBe(2);
+		expect(pendingMovesStore.getState().count).toBe(2);
 
 		first.resolve(moved('C', 'c', 11));
 		await moves;
 		expect(api.moveTrack).toHaveBeenNthCalledWith(2, 'p', 'B', null, 11);
 		expect(order()).toStrictEqual(['B', 'A', 'C']);
-		expect(pending()).toBe(0);
+		expect(pendingMovesStore.getState().count).toBe(0);
 	});
 
 	it('reloads when another change landed before its answer', async () => {
@@ -205,7 +201,7 @@ describe('moveTrack', () => {
 			fetchPlaylist.mockResolvedValue(start(13));
 			await expect(moveTrack(client, 'p', 'C', 'a')).rejects.toMatchObject({ code });
 			expect(shown().tracksVersion).toBe(13);
-			expect(pending()).toBe(0);
+			expect(pendingMovesStore.getState().count).toBe(0);
 		}
 	);
 
@@ -242,7 +238,7 @@ describe('moveTrack', () => {
 		first.resolve(moved('C', 'c', 11));
 		await expect(moves).resolves.toStrictEqual(['moved', 'skipped']);
 		expect(api.moveTrack).toHaveBeenCalledTimes(1);
-		expect(pending()).toBe(0);
+		expect(pendingMovesStore.getState().count).toBe(0);
 		open();
 	});
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { LinkedAccountsContainer } from '@/features/user/features/auth/features/linked-accounts/components/LinkedAccountsContainer';
-import type { LinkedProvider } from '@/features/user/features/auth/types';
+import type { LinkedProvider } from '@/features/user/features/auth/authTypes';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { noop } from '@test-utils/noop';
 
@@ -87,7 +87,7 @@ describe('LinkedAccountsScreen', () => {
 		render(<LinkedAccountsContainer />);
 
 		expect(screen.getByText('Impossible de charger les comptes liés')).toBeTruthy();
-		expect(showError).toHaveBeenCalled();
+		expect(showError).toHaveBeenCalledWith('Impossible de charger les comptes liés');
 	});
 
 	it('links Google when pressing Lier Google', async () => {

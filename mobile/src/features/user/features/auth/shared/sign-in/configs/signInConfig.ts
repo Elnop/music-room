@@ -1,0 +1,1 @@
+export const SIGN_IN_CANCELLED = 'SIGN_IN_CANCELLED';

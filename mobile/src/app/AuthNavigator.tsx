@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { AuthStackParamList } from '@/features/user/features/auth/types';
+import type { AuthStackParamList } from '@/features/user/features/auth/authTypes';
 import { WelcomeScreen } from '@/app/screens/WelcomeScreen';
 import { LoginContainer } from '@/features/user/features/auth/features/login/components/LoginContainer';
 import { RegisterContainer } from '@/features/user/features/auth/features/register/components/RegisterContainer';

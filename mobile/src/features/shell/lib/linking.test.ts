@@ -1,13 +1,8 @@
 import type { NavigationContainerRef } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import type { AppTabsParamList } from '@/app/AppNavigator';
-import {
-	clearPendingLink,
-	createLinking,
-	openPendingLink,
-	stateFromLinkPath,
-	takePendingLink,
-} from '@/features/shell/lib/linking';
+import { createLinking, openPendingLink, stateFromLinkPath } from '@/features/shell/lib/linking';
+import { clearPendingLink, takePendingLink } from '@/features/shell/lib/pendingLink';
 import { playlistLink, userLink } from '@/shared/share-links/shareLinks';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
@@ -94,7 +89,7 @@ describe('createLinking', () => {
 	});
 });
 
-describe('createLinking in a browser', () => {
+function runInBrowser() {
 	const originalOS = Platform.OS;
 	const originalLocation = Object.getOwnPropertyDescriptor(globalThis, 'location');
 	beforeEach(() => {
@@ -109,6 +104,21 @@ describe('createLinking in a browser', () => {
 		if (originalLocation) Object.defineProperty(globalThis, 'location', originalLocation);
 		else Reflect.deleteProperty(globalThis, 'location');
 	});
+}
+
+function runUnderBasePath() {
+	const originalBase = process.env.EXPO_BASE_URL;
+	beforeEach(() => {
+		process.env.EXPO_BASE_URL = '/music-room';
+	});
+	afterEach(() => {
+		if (originalBase === undefined) delete process.env.EXPO_BASE_URL;
+		else process.env.EXPO_BASE_URL = originalBase;
+	});
+}
+
+describe('createLinking in a browser', () => {
+	runInBrowser();
 
 	it('adds the page origin to the zumik:// prefix', () => {
 		expect(createLinking(() => true).prefixes).toStrictEqual(['zumik://', 'http://localhost:8081']);
@@ -178,50 +188,41 @@ describe('createLinking in a browser', () => {
 		const state = stateFromLinkPath(`playlist/${ID}`)!;
 		expect(linking.getPathFromState!(state, linking.config)).toBe(`/playlist/${ID}`);
 	});
+});
 
-	describe('under a base path', () => {
-		const originalBase = process.env.EXPO_BASE_URL;
-		beforeEach(() => {
-			process.env.EXPO_BASE_URL = '/music-room';
-		});
-		afterEach(() => {
-			if (originalBase === undefined) delete process.env.EXPO_BASE_URL;
-			else process.env.EXPO_BASE_URL = originalBase;
-		});
+describe('createLinking in a browser under a base path', () => {
+	runInBrowser();
+	runUnderBasePath();
 
-		it('adds the base path to the origin prefix', () => {
-			expect(createLinking(() => true).prefixes).toStrictEqual([
-				'zumik://',
-				'http://localhost:8081/music-room',
-			]);
-		});
+	it('adds the base path to the origin prefix', () => {
+		expect(createLinking(() => true).prefixes).toStrictEqual([
+			'zumik://',
+			'http://localhost:8081/music-room',
+		]);
+	});
 
-		it.each(['playlist', 'user'])('opens a direct /music-room/%s/<id> address', kind => {
-			const linking = createLinking(() => true);
-			const state = linking.getStateFromPath!(
-				`/music-room/${kind}/${ID}`,
-				linking.config as Options
-			);
-			expect(state?.routes[0].name).toBe(kind === 'playlist' ? 'PlaylistsTab' : 'FriendsTab');
-		});
+	it.each(['playlist', 'user'])('opens a direct /music-room/%s/<id> address', kind => {
+		const linking = createLinking(() => true);
+		const state = linking.getStateFromPath!(`/music-room/${kind}/${ID}`, linking.config as Options);
+		expect(state?.routes[0].name).toBe(kind === 'playlist' ? 'PlaylistsTab' : 'FriendsTab');
+	});
 
-		it('keeps the app path of a link received signed out', () => {
-			const linking = createLinking(() => false);
-			linking.getStateFromPath!(`/music-room/playlist/${ID}`, linking.config as Options);
-			expect(takePendingLink()).toBe(`/playlist/${ID}`);
-		});
+	it('keeps the app path of a link received signed out', () => {
+		const linking = createLinking(() => false);
+		linking.getStateFromPath!(`/music-room/playlist/${ID}`, linking.config as Options);
+		expect(takePendingLink()).toBe(`/playlist/${ID}`);
+	});
 
-		it('writes the address under the base path', () => {
-			const linking = createLinking(() => true);
-			const state = stateFromLinkPath(`user/${ID}`)!;
-			expect(linking.getPathFromState!(state, linking.config)).toBe(`/music-room/user/${ID}`);
-			expect(linking.getPathFromState!({ routes: [{ name: 'Login' }] }, linking.config)).toBe(
-				'/music-room/login'
-			);
-			expect(linking.getPathFromState!({ routes: [{ name: 'Welcome' }] }, linking.config)).toBe(
-				'/music-room/'
-			);
-		});
+	it('writes the address under the base path', () => {
+		const linking = createLinking(() => true);
+		const state = stateFromLinkPath(`user/${ID}`)!;
+		expect(linking.getPathFromState!(state, linking.config)).toBe(`/music-room/user/${ID}`);
+		expect(linking.getPathFromState!({ routes: [{ name: 'Login' }] }, linking.config)).toBe(
+			'/music-room/login'
+		);
+		expect(linking.getPathFromState!({ routes: [{ name: 'Welcome' }] }, linking.config)).toBe(
+			'/music-room/'
+		);
 	});
 });
 

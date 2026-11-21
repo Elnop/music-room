@@ -1,11 +1,11 @@
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import { SwipeableUserItem } from '@/features/playlists/features/editor/features/sharing/components/presenters/SwipeableUserItem';
+import { MembersList } from '@/features/playlists/features/editor/features/sharing/components/presenters/MembersList';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { PlaylistMember } from '@/features/playlists/shared/playlist/lib/types';
-import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
+import type { PlaylistMember } from '@/features/playlists/shared/playlist/playlistTypes';
+import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/createSharingStyles';
 import { Text } from '@/shared/theme/components/Text';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
@@ -24,24 +24,7 @@ export function MembersSection({ title, members, emptyMessage, onRemove }: Membe
 		<View style={styles.section}>
 			<Text style={shared.sectionTitle}>{title}</Text>
 			{members.length > 0 ? (
-				<FlatList
-					data={members}
-					keyExtractor={item => item.id}
-					style={styles.section}
-					scrollEnabled={false}
-					renderItem={({ item }) => (
-						<SwipeableUserItem
-							user={{
-								id: item.id,
-								username: item.username,
-								display_name: item.displayName,
-								avatar_url: item.avatarUrl,
-							}}
-							role={item.canEdit ? 'collaborator' : 'viewer'}
-							onRemove={onRemove}
-						/>
-					)}
-				/>
+				<MembersList members={members} onRemove={onRemove} />
 			) : (
 				emptyMessage && <EmptyState icon={UsersSolid} style={styles.empty} message={emptyMessage} />
 			)}

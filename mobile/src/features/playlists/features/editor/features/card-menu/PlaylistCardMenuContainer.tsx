@@ -1,12 +1,16 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import { usePlaylistCardMenu } from '@/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu';
-import type { PlaylistCardMenu } from '@/features/playlists/features/editor/features/card-menu/usePlaylistCardMenu';
-import { PlaylistActionsSheetContainer } from '@/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheetContainer';
+import { usePlaylistCardMenu } from '@/features/playlists/features/editor/features/card-menu/hooks/usePlaylistCardMenu';
+import type {
+	CardMenuNavigation,
+	PlaylistCardMenu,
+} from '@/features/playlists/features/editor/features/card-menu/cardMenuTypes';
+import { PlaylistActionsSheet } from '@/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheet';
+import { useMenuAnchor } from '@/features/playlists/features/editor/shared/menu-anchor/hooks/useMenuAnchor';
 import type { PlanState } from '@/features/subscription/lib/subscription';
 
 interface PlaylistCardMenuContainerProps {
-	navigation: Parameters<typeof usePlaylistCardMenu>[0];
+	navigation: CardMenuNavigation;
 	premium: Pick<PlanState, 'isPremium' | 'refetch'>;
 	children: (actionsFor: PlaylistCardMenu['actionsFor']) => ReactNode;
 }
@@ -17,21 +21,16 @@ export function PlaylistCardMenuContainer({
 	children,
 }: PlaylistCardMenuContainerProps) {
 	const menu = usePlaylistCardMenu(navigation, premium);
+	const anchor = useMenuAnchor(menu.visible);
 	return (
 		<>
 			{children(menu.actionsFor)}
-			{menu.playlist && (
-				<PlaylistActionsSheetContainer
+			{menu.sheet && (
+				<PlaylistActionsSheet
 					visible={menu.visible}
-					playlistName={menu.playlist.name}
+					anchor={anchor}
 					onClose={menu.close}
-					onEdit={menu.edit}
-					onSharing={menu.sharing}
-					onDelete={menu.remove}
-					hasCover={Boolean(menu.playlist.coverUrl)}
-					coverLocked={menu.coverLocked}
-					onChangeCover={menu.changeCover}
-					onRemoveCover={menu.removeCover}
+					menu={menu.sheet}
 				/>
 			)}
 		</>

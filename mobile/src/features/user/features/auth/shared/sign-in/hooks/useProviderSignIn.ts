@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { signInWithProvider } from '@/features/user/features/auth/shared/sign-in/lib/signIn';
-import { oauthErrorMessage } from '@/features/user/features/auth/shared/sign-in/lib/oauthErrors';
-import { isSignInCancelled } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
-import type { OAuthProvider } from '@/features/user/features/auth/types';
+import { oauthErrorMessage } from '@/features/user/features/auth/shared/sign-in/lib/oauthErrorMessage';
+import { isSignInCancelled } from '@/features/user/features/auth/shared/sign-in/lib/isSignInCancelled';
+import type { OAuthProvider } from '@/features/user/features/auth/authTypes';
 
 type ProviderSignIn = {
 	signIn: (provider: OAuthProvider) => void;

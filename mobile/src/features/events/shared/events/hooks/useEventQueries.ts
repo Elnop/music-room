@@ -3,7 +3,8 @@ import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { useSession } from '@/shared/backend/hooks/useSession';
 import * as eventsApi from '@/features/events/shared/events/lib/eventsApi';
-import type { MusicEvent } from '@/features/events/lib/types';
+import { fetchPlaylistChoices } from '@/features/events/shared/events/lib/fetchPlaylistChoices';
+import type { MusicEvent } from '@/features/events/eventTypes';
 
 export function useEvents() {
 	const signedIn = useSession(session => session.isAuthenticated);
@@ -31,7 +32,7 @@ export function usePlaylistChoices(enabled: boolean) {
 	const userId = useSession(session => session.user?.id);
 	return useQuery({
 		queryKey: queryKeys.events.playlistChoices(userId ?? ''),
-		queryFn: () => eventsApi.fetchPlaylistChoices(userId ?? ''),
+		queryFn: () => fetchPlaylistChoices(userId ?? ''),
 		enabled: enabled && userId !== undefined,
 		staleTime: STALE.none,
 	});

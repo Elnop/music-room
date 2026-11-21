@@ -1,3 +1,5 @@
+import type { BeaconSighting } from '@/features/events/features/nearby/nearbyTypes';
+
 const PATH_LOSS_EXPONENT = 2.5;
 
 const SMOOTHING = 0.3;
@@ -9,12 +11,6 @@ export function estimateDistance(rssi: number, measuredPower: number): number {
 export function smoothRssi(previous: number | undefined, rssi: number): number {
 	return previous === undefined ? rssi : previous + SMOOTHING * (rssi - previous);
 }
-
-export type BeaconSighting = {
-	rssi: number;
-	measuredPower: number;
-	lastSeen: number;
-};
 
 export function recordSighting(
 	sightings: ReadonlyMap<number, BeaconSighting>,

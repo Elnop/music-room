@@ -1,5 +1,5 @@
 import { formatDuration } from '@/shared/formatting/formatters';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 
 export function headerFacts(playlist: PlaylistWithTracks) {
 	const trackCount = playlist.tracks.length;

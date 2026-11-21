@@ -7,8 +7,8 @@ import { useSwipeRemove } from '@/features/playback/features/queue-modal/hooks/u
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import { pixelRow } from '@/shared/theme/lib/pixelFrame';
 import { QueueRowMain } from '@/features/playback/features/queue-modal/components/presenters/QueueRowMain';
-import { QueueRowDeleteAction } from '@/features/playback/features/queue-modal/components/presenters/QueueRowDeleteAction';
-import { QueueDragHandle } from '@/features/playback/features/queue-modal/components/presenters/QueueDragHandle';
+import { TrackDeleteAction } from '@/shared/theme/components/TrackDeleteAction';
+import { TrackDragHandle } from '@/shared/theme/components/TrackDragHandle';
 import type { QueueItem } from '@/features/playback/shared/player/types/queueTypes';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import type {
@@ -32,7 +32,7 @@ export function QueueItemRow({ item, isCurrent = false, actions, drag }: QueueIt
 		<Swipeable
 			ref={swipeableRef}
 			renderRightActions={() => (
-				<QueueRowDeleteAction title={item.track.title} onRemove={handleRemove} />
+				<TrackDeleteAction title={item.track.title} actionLabel="Retirer" onDelete={handleRemove} />
 			)}
 			overshootRight={false}
 			friction={2}
@@ -43,7 +43,7 @@ export function QueueItemRow({ item, isCurrent = false, actions, drag }: QueueIt
 			>
 				<QueueRowMain item={item} isCurrent={isCurrent} actions={actions} />
 				<TrackActionsButton onPress={anchor => actions.onShowActions(item, anchor)} />
-				{drag?.onDragStart && <QueueDragHandle onDragStart={drag.onDragStart} />}
+				{drag?.onDragStart && <TrackDragHandle onDragStart={drag.onDragStart} />}
 			</View>
 		</Swipeable>
 	);

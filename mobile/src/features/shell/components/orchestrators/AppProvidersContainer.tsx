@@ -7,7 +7,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { AlertHostContainer } from '@/features/shell/components/orchestrators/AlertHostContainer';
 import { AppToast } from '@/shared/theme/components/AppToast';
 import { ErrorBoundary } from '@/features/shell/components/presenters/ErrorBoundary';
-import { ThemedSystemUI } from '@/features/shell/components/presenters/ThemedSystemUI';
+import { ThemedSystemUi } from '@/features/shell/components/presenters/ThemedSystemUi';
 import { ThemeProvider } from '@/features/shell/components/presenters/ThemeProvider';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { onSessionEnd } from '@/shared/backend/lib/sessionEnd';
@@ -34,7 +34,7 @@ export function AppProvidersContainer({ children, queryClient }: AppProvidersPro
 					<ThemeProvider>
 						<SafeAreaProvider>
 							{children}
-							<ThemedSystemUI />
+							<ThemedSystemUi />
 							<AppToast />
 							<AlertHostContainer />
 						</SafeAreaProvider>

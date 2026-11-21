@@ -1,8 +1,8 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
-import { searchApi } from '@/features/search/lib/searchApi';
-import type { SoundCloudTrack } from '@/features/search/lib/types';
+import { searchApi } from '@/features/search/searchApi';
+import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 
 export function useSoundCloudSearch(query: string) {
 	const trimmed = query.trim();

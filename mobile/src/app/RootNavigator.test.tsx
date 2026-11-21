@@ -3,8 +3,8 @@ import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen } from '@testing-library/react-native';
 import { RootNavigator } from '@/app/RootNavigator';
-import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
-import { clearPendingLink } from '@/features/shell/lib/linking';
+import { authStore } from '@/features/user/features/auth/shared/sign-in/authStore';
+import { clearPendingLink } from '@/features/shell/lib/pendingLink';
 import { silenceLogger } from '@test-utils/silenceLogger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
@@ -96,17 +96,17 @@ jest.mock('react-native-safe-area-context', () => {
 	};
 });
 
-const { loadFromStorage, isTokenExpiringSoon } = useAuthStore.getState();
+const { loadFromStorage, isTokenExpiringSoon } = authStore.getState();
 
 function signIn() {
 	return act(() => {
-		useAuthStore.setState({ isAuthenticated: true });
+		authStore.setState({ isAuthenticated: true });
 	});
 }
 
 async function renderWithUrl(url: string | null, signedIn: boolean) {
 	jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(url as string);
-	useAuthStore.setState({
+	authStore.setState({
 		isAuthenticated: signedIn,
 		loadFromStorage: jest.fn(async () => {}),
 		isTokenExpiringSoon: () => false,
@@ -187,7 +187,7 @@ describe('RootNavigator session restore', () => {
 
 	async function renderColdStart(): Promise<void> {
 		jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null as unknown as string);
-		useAuthStore.setState({
+		authStore.setState({
 			user: null,
 			accessToken: null,
 			refreshToken: null,
@@ -206,7 +206,7 @@ describe('RootNavigator session restore', () => {
 	afterEach(() => {
 		globalThis.fetch = realFetch;
 		jest.restoreAllMocks();
-		useAuthStore.setState({
+		authStore.setState({
 			user: null,
 			accessToken: null,
 			refreshToken: null,
@@ -250,7 +250,7 @@ describe('RootNavigator session restore', () => {
 		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
 		expect(url).toBe('http://backend.test/api/auth/refresh');
 		expect(JSON.parse(init.body as string)).toStrictEqual({ refreshToken: 'stored-refresh' });
-		expect(useAuthStore.getState()).toMatchObject({
+		expect(authStore.getState()).toMatchObject({
 			accessToken: 'new-access',
 			refreshToken: 'new-refresh',
 			tokenExpiresAt: expiresAt * 1000,
@@ -272,7 +272,7 @@ describe('RootNavigator session restore', () => {
 		expect(await screen.findByText('sign-in')).toBeTruthy();
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		expect(fetchMock.mock.calls[0][0]).toBe('http://backend.test/api/auth/refresh');
-		expect(useAuthStore.getState()).toMatchObject({
+		expect(authStore.getState()).toMatchObject({
 			user: null,
 			accessToken: null,
 			refreshToken: null,

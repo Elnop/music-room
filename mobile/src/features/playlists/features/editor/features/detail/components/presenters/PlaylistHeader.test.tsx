@@ -2,7 +2,7 @@ import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { PlaylistHeader } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistHeader';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 import type { UserProfile } from '@/shared/users/userTypes';
 
 jest.mock('@/shared/theme/hooks/useTheme', () => {
@@ -89,7 +89,7 @@ describe('PlaylistHeader', () => {
 			<PlaylistHeader playlist={playlist} playButton={null} canEdit onAddTrack={onAddTrack} />
 		);
 		fireEvent.press(screen.getByLabelText('Ajouter un titre'));
-		expect(onAddTrack).toHaveBeenCalled();
+		expect(onAddTrack).toHaveBeenCalledWith(undefined);
 	});
 });
 

@@ -5,12 +5,15 @@ import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/theme/co
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { createDetailStyles } from '@/features/playlists/features/editor/features/detail/components/presenters/detailStyles';
+import { createDetailStyles } from '@/features/playlists/features/editor/features/detail/lib/createDetailStyles';
 
 export function DetailSkeleton() {
 	const insets = useSafeAreaInsets();
 	const { styles, theme } = useThemedStyles(createStyles);
-	const layout = React.useMemo(() => createDetailStyles(theme, insets.top), [theme, insets.top]);
+	const layout = React.useMemo(
+		() => createDetailStyles(theme, { top: insets.top, bottom: theme.spacing.xxl }),
+		[theme, insets.top]
+	);
 	const { isWide } = useBreakpoint();
 
 	return (

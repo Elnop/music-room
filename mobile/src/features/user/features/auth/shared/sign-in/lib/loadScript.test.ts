@@ -6,8 +6,8 @@ import {
 type FakeScript = {
 	src: string;
 	async: boolean;
-	onload: (() => void) | null;
-	onerror: (() => void) | null;
+	listeners: Partial<Record<'load' | 'error', () => void>>;
+	addEventListener: (type: 'load' | 'error', listener: () => void) => void;
 	remove: jest.Mock;
 };
 
@@ -18,13 +18,18 @@ beforeEach(() => {
 	appended = [];
 	(globalThis as { document?: unknown }).document = {
 		head: { appendChild: (node: FakeScript) => appended.push(node) },
-		createElement: (): FakeScript => ({
-			src: '',
-			async: false,
-			onload: null,
-			onerror: null,
-			remove: jest.fn(),
-		}),
+		createElement: (): FakeScript => {
+			const listeners: FakeScript['listeners'] = {};
+			return {
+				src: '',
+				async: false,
+				listeners,
+				addEventListener: (type, listener) => {
+					listeners[type] = listener;
+				},
+				remove: jest.fn(),
+			};
+		},
 	};
 });
 
@@ -38,14 +43,14 @@ describe('loadScript', () => {
 		expect(appended).toHaveLength(1);
 		expect(appended[0]).toMatchObject({ src: 'https://example.com/ok.js', async: true });
 
-		appended[0].onload?.();
+		appended[0].listeners.load?.();
 		await expect(load).resolves.toBeUndefined();
 	});
 
 	it('loads a URL once', async () => {
 		const first = loadScript('https://example.com/once.js');
 		const second = loadScript('https://example.com/once.js');
-		appended[0].onload?.();
+		appended[0].listeners.load?.();
 
 		expect(second).toBe(first);
 		await first;
@@ -55,11 +60,11 @@ describe('loadScript', () => {
 
 	it('rejects when the script does not load, and retries on the next call', async () => {
 		const load = loadScript('https://example.com/blocked.js');
-		appended[0].onerror?.();
+		appended[0].listeners.error?.();
 
 		const error = await load.catch((reason: unknown) => reason);
 		expect(isScriptLoadError(error)).toBe(true);
-		expect(appended[0].remove).toHaveBeenCalled();
+		expect(appended[0].remove).toHaveBeenCalledWith();
 
 		void loadScript('https://example.com/blocked.js');
 		expect(appended).toHaveLength(2);

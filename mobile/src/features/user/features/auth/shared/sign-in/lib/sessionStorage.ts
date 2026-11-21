@@ -25,7 +25,7 @@ async function removeLegacySdkSession(): Promise<void> {
 	if (legacy.length > 0) await AsyncStorage.multiRemove(legacy);
 }
 
-async function load(): Promise<StoredSession | null> {
+export async function load(): Promise<StoredSession | null> {
 	await removeLegacySdkSession();
 	const [userJson, accessToken, refreshToken, isAuthenticated, expiresAt] = await Promise.all([
 		AsyncStorage.getItem(KEYS.user),
@@ -43,7 +43,7 @@ async function load(): Promise<StoredSession | null> {
 	};
 }
 
-async function save(session: StoredSession): Promise<void> {
+export async function save(session: StoredSession): Promise<void> {
 	try {
 		await Promise.all([
 			AsyncStorage.setItem(KEYS.user, JSON.stringify(session.user)),
@@ -57,7 +57,7 @@ async function save(session: StoredSession): Promise<void> {
 	}
 }
 
-async function clear(): Promise<void> {
+export async function clear(): Promise<void> {
 	try {
 		await Promise.all([
 			...Object.values(KEYS).map(key => AsyncStorage.removeItem(key)),
@@ -67,5 +67,3 @@ async function clear(): Promise<void> {
 		logger.error('Failed to clear auth storage:', error);
 	}
 }
-
-export const storedSession = { load, save, clear };

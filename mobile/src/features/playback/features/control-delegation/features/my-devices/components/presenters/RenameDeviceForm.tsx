@@ -17,7 +17,7 @@ type RenameDeviceFormProps = {
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		title: {
-			fontSize: theme.typography.sizes.lgx,
+			fontSize: theme.typography.sizes.lgxl,
 			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.md,

@@ -1,11 +1,17 @@
 import type {
 	PlaylistUpdatedEvent,
 	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
 
+function compareRank(a: TrackInPlaylist, b: TrackInPlaylist): number {
+	if (a.rank < b.rank) return -1;
+	if (a.rank > b.rank) return 1;
+	return 0;
+}
+
 export function sortByRank(tracks: TrackInPlaylist[]): TrackInPlaylist[] {
-	return [...tracks].sort((a, b) => (a.rank < b.rank ? -1 : a.rank > b.rank ? 1 : 0));
+	return tracks.toSorted(compareRank);
 }
 
 export function applyPlaylistEvent(

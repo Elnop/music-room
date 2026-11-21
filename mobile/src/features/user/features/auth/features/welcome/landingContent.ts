@@ -1,14 +1,8 @@
-import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
+import type { LandingFeature } from '@/features/user/features/auth/features/welcome/welcomeTypes';
 import LoginSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/login-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
-
-export type LandingFeature = {
-	title: string;
-	description: string;
-	icon: PixelIconSource;
-};
 
 export const LANDING_INTRO =
 	'Zumik est une application musicale collaborative pour Android, iOS et le web. Construisez des playlists ensemble en temps réel et partagez avec vos amis le contrôle de la musique qui joue sur vos appareils.';

@@ -7,7 +7,11 @@ import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
-export function AddTrackRow({ onPress }: { onPress: () => void }) {
+type AddTrackRowProps = {
+	onPress: () => void;
+};
+
+export function AddTrackRow({ onPress }: AddTrackRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 
 	return (
@@ -21,18 +25,17 @@ export function AddTrackRow({ onPress }: { onPress: () => void }) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			alignSelf: 'stretch',
-			paddingVertical: 8,
+			paddingVertical: theme.spacing.sm,
 			paddingHorizontal: theme.spacing.md,
-			marginHorizontal: -theme.spacing.lg,
 		},
 		icon: {
-			width: 48,
-			height: 48,
+			width: theme.controls.addTrackTile,
+			height: theme.controls.addTrackTile,
 			backgroundColor: theme.colors.surfaceAlt,
 			justifyContent: 'center',
 			alignItems: 'center',
@@ -44,4 +47,5 @@ function createStyles(theme: Theme) {
 			marginLeft: theme.spacing.md,
 		},
 	});
+	return styles;
 }

@@ -1,15 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { debounce } from '@/shared/debounce/debounce';
 
-const SEARCH_DELAY_MS = 500;
+import type { DebouncedText } from '@/features/playlists/features/editor/shared/debounced-text/debouncedTextTypes';
 
-export type DebouncedText = {
-	text: string;
-	settled: string;
-	pending: boolean;
-	change: (text: string) => void;
-	clear: () => void;
-};
+const SEARCH_DELAY_MS = 500;
 
 export function useDebouncedText(): DebouncedText {
 	const [text, setText] = useState('');

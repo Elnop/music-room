@@ -19,7 +19,7 @@ export function createCarouselTextStyles(theme: Theme) {
 			textShadowRadius: 0,
 		},
 		artist: {
-			fontSize: theme.typography.sizes.lgm,
+			fontSize: theme.typography.sizes.lxl,
 			lineHeight: ARTIST_LINE_HEIGHT,
 			fontFamily: theme.typography.families.medium,
 			textAlign: 'center',

@@ -7,7 +7,7 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { logger } from '@/shared/logging/logger';
 import { googleIosClientId } from '@/features/user/features/auth/shared/sign-in/lib/googleIosClientId';
-import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/lib/signInCancelled';
+import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/configs/signInConfig';
 
 const NO_ID_TOKEN = 'No ID token received from Google Sign-In. Please try again.';
 
@@ -42,6 +42,29 @@ export function configureGoogleSignIn(): void {
 	});
 }
 
+function rethrowGoogleError(error: unknown): never {
+	const googleError = error as { code?: string; message?: string };
+
+	if (
+		googleError.code === statusCodes.SIGN_IN_CANCELLED ||
+		googleError.message === SIGN_IN_CANCELLED
+	) {
+		throw new Error(SIGN_IN_CANCELLED, { cause: error });
+	}
+	if (googleError.code === statusCodes.IN_PROGRESS) {
+		throw new Error('Sign-in already in progress', { cause: error });
+	}
+	if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+		throw new Error('Google Play Services not available', { cause: error });
+	}
+	logger.error('[OAuth] Google Sign-In failed:', {
+		errorCode: googleError.code,
+		errorMessage: googleError.message,
+		...(__DEV__ ? { errorType: error?.constructor?.name, fullError: error } : {}),
+	});
+	throw error;
+}
+
 export async function signInWithGoogle(): Promise<string> {
 	if (!WEB_CLIENT_ID) {
 		throw new Error(
@@ -55,25 +78,6 @@ export async function signInWithGoogle(): Promise<string> {
 		if (isCancelledResponse(userInfo)) throw new Error(SIGN_IN_CANCELLED);
 		return extractIdToken(userInfo);
 	} catch (error: unknown) {
-		const googleError = error as { code?: string; message?: string };
-
-		if (
-			googleError.code === statusCodes.SIGN_IN_CANCELLED ||
-			googleError.message === SIGN_IN_CANCELLED
-		) {
-			throw new Error(SIGN_IN_CANCELLED, { cause: error });
-		}
-		if (googleError.code === statusCodes.IN_PROGRESS) {
-			throw new Error('Sign-in already in progress', { cause: error });
-		}
-		if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-			throw new Error('Google Play Services not available', { cause: error });
-		}
-		logger.error('[OAuth] Google Sign-In failed:', {
-			errorCode: googleError.code,
-			errorMessage: googleError.message,
-			...(__DEV__ ? { errorType: error?.constructor?.name, fullError: error } : {}),
-		});
-		throw error;
+		return rethrowGoogleError(error);
 	}
 }

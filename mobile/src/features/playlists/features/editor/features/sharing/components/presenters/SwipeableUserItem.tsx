@@ -1,15 +1,13 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Pressable } from '@/shared/theme/components/Pressable';
 import { Swipeable } from 'react-native-gesture-handler';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Avatar } from '@/shared/theme/components/Avatar';
-import { Text } from '@/shared/theme/components/Text';
-import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
-import UserMinusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-minus-solid.svg';
+import { UserIdentity } from '@/features/playlists/features/editor/features/sharing/components/presenters/UserIdentity';
+import { UserRemoveAction } from '@/features/playlists/features/editor/features/sharing/components/presenters/UserRemoveAction';
+import { UserRoleBadge } from '@/features/playlists/features/editor/features/sharing/components/presenters/UserRoleBadge';
 
 type SwipeableUserItemProps = {
 	user: {
@@ -28,16 +26,7 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 
 	function renderRightActions() {
-		return (
-			<Pressable
-				style={styles.removeButton}
-				onPress={() => onRemove(user.id)}
-				accessibilityLabel="Retirer"
-			>
-				<PixelIcon icon={UserMinusSolid} size={24} color={theme.colors.onColor} />
-				<Text style={styles.removeText}>Retirer</Text>
-			</Pressable>
-		);
+		return <UserRemoveAction onRemove={() => onRemove(user.id)} />;
 	}
 
 	return (
@@ -49,26 +38,8 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 					name={user.username}
 					style={styles.avatar}
 				/>
-
-				<View style={styles.userInfo}>
-					<Text style={styles.displayName} numberOfLines={1}>
-						{user.display_name || user.username}
-					</Text>
-					<Text style={styles.username} numberOfLines={1}>
-						@{user.username}
-					</Text>
-				</View>
-
-				<View
-					style={[
-						styles.roleBadge,
-						role === 'collaborator' ? styles.roleBadge_collaborator : styles.roleBadge_viewer,
-					]}
-				>
-					<Text style={styles.roleText}>
-						{role === 'collaborator' ? 'Collaborateur' : 'Lecteur'}
-					</Text>
-				</View>
+				<UserIdentity username={user.username} displayName={user.display_name} />
+				<UserRoleBadge role={role} />
 			</View>
 		</Swipeable>
 	);
@@ -79,55 +50,13 @@ function createStyles(theme: Theme, separator: string) {
 		userContainer: {
 			flexDirection: 'row',
 			alignItems: 'center',
-			padding: 12,
+			padding: theme.spacing.smd,
 			backgroundColor: theme.colors.surface,
-			borderBottomWidth: 1,
+			borderBottomWidth: theme.borders.hairline,
 			borderBottomColor: separator,
 		},
 		avatar: {
-			marginRight: 12,
-		},
-		userInfo: {
-			flex: 1,
-			marginRight: 8,
-		},
-		displayName: {
-			fontSize: 15,
-			fontFamily: FONT_FAMILIES.semibold,
-			color: theme.colors.text,
-			marginBottom: 2,
-		},
-		username: {
-			fontSize: 13,
-			color: theme.colors.textSecondary,
-		},
-		roleBadge: {
-			paddingHorizontal: 10,
-			paddingVertical: 4,
-		},
-		roleBadge_collaborator: {
-			backgroundColor: theme.colors.primary + '30',
-		},
-		roleBadge_viewer: {
-			backgroundColor: theme.colors.border,
-		},
-		roleText: {
-			fontSize: 11,
-			fontFamily: FONT_FAMILIES.semibold,
-			color: theme.colors.text,
-		},
-		removeButton: {
-			backgroundColor: theme.colors.error,
-			justifyContent: 'center',
-			alignItems: 'center',
-			width: 100,
-			height: '100%',
-		},
-		removeText: {
-			color: theme.colors.onColor,
-			fontSize: 12,
-			fontFamily: FONT_FAMILIES.semibold,
-			marginTop: 4,
+			marginRight: theme.spacing.smd,
 		},
 	});
 	return styles;

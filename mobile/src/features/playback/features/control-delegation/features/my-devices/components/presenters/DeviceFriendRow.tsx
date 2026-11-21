@@ -18,7 +18,7 @@ type DeviceFriendRowProps = {
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		...friendRowLayout(theme),
-		friendName: { fontSize: theme.typography.sizes.mdl, color: theme.colors.text },
+		friendName: { fontSize: theme.typography.sizes.mlg, color: theme.colors.text },
 		hint: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,

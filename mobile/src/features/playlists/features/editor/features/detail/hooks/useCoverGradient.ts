@@ -1,8 +1,7 @@
 import { hexToRgba, useImageColors } from '@/shared/image-colors/useImageColors';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
-
-type GradientColors = readonly [string, string, ...string[]];
+import type { GradientColors } from '@/features/playlists/features/editor/features/detail/types/detailPageTypes';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 
 export function useCoverGradient(playlist: PlaylistWithTracks | undefined): GradientColors {
 	const { theme } = useTheme();

@@ -4,7 +4,7 @@ import { PlanContainer } from '@/features/subscription/PlanContainer';
 import { PlaylistPlaybackContainer } from '@/features/playback/components/PlaylistPlaybackContainer';
 import { PlaylistDetailContainer } from '@/features/playlists/features/editor/features/detail/components/PlaylistDetailContainer';
 import { TrackActionsSheet } from '@/app/TrackActionsSheet';
-import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/playlistTypes';
 
 type PlaylistDetailScreenProps = NativeStackScreenProps<PlaylistStackParamList, 'PlaylistDetail'>;
 

@@ -1,87 +1,39 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ApiError } from '@/shared/backend/lib/api';
+import { useCallback } from 'react';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useScreenTitle } from '@/shared/screen-title/useScreenTitle';
-import { showError, showInfo } from '@/shared/theme/lib/toast';
 import { usePlaylistDetail } from '@/features/playlists/shared/playlist/usePlaylistQueries';
-import { usePlaylistRoom } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistRoom';
 import { useRefetchOnFocus } from '@/features/playlists/shared/refetch-on-focus/useRefetchOnFocus';
-import { forgetPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
+import { useDeletedPlaylist } from '@/features/playlists/features/editor/features/detail/hooks/useDeletedPlaylist';
+import { useDetailRefresh } from '@/features/playlists/features/editor/features/detail/hooks/useDetailRefresh';
+import { loadFailure } from '@/features/playlists/features/editor/features/detail/lib/loadFailure';
 import type {
-	PlaylistStackParamList,
-	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
-
-export type DetailNavigation = NativeStackNavigationProp<PlaylistStackParamList, 'PlaylistDetail'>;
-
-export type PlaylistDetailScreen = {
-	id: string;
-	playlist: PlaylistWithTracks | undefined;
-	failure: 'notFound' | 'error' | null;
-	retry: () => void;
-	isRefreshing: boolean;
-	refresh: () => void;
-	markDeleting: (deleting: boolean) => void;
-	leaveDeleted: () => void;
-	bottomPadding: number;
-};
+	DetailNavigation,
+	PlaylistDetailScreen,
+} from '@/features/playlists/features/editor/features/detail/types/detailScreenTypes';
 
 export function usePlaylistDetailScreen(
 	navigation: DetailNavigation,
 	id: string
 ): PlaylistDetailScreen {
-	const client = useQueryClient();
-	const bottomPadding = useBottomPadding();
-	const { deleted } = usePlaylistRoom(id);
-	const [gone, setGone] = useState(false);
-	const deletingRef = useRef(false);
-	const detail = usePlaylistDetail(id, !deleted && !gone);
-	const [isRefreshing, setIsRefreshing] = useState(false);
-
-	const { refetch, isFetching, error, data } = detail;
-	useScreenTitle(data?.name);
-	const active = !deleted && !gone;
+	const room = useDeletedPlaylist(navigation, id);
+	const detail = usePlaylistDetail(id, room.active);
+	const { refetch } = detail;
+	const { active } = room;
+	useScreenTitle(detail.data?.name);
 	useRefetchOnFocus(
 		useCallback(() => {
 			if (active) void refetch();
 		}, [active, refetch])
 	);
 
-	const leaveDeleted = useCallback(() => {
-		setGone(true);
-		navigation.popToTop();
-		forgetPlaylist(client, id);
-	}, [navigation, client, id]);
-
-	useEffect(() => {
-		if (!deleted || deletingRef.current) return;
-		showInfo('Cette playlist a été supprimée');
-		if (navigation.canGoBack()) navigation.goBack();
-		else navigation.navigate('Playlists');
-		forgetPlaylist(client, id);
-	}, [deleted, navigation, client, id]);
-
-	async function refresh() {
-		setIsRefreshing(true);
-		const result = await refetch();
-		setIsRefreshing(false);
-		if (result.isError) showError('Impossible de charger la playlist');
-	}
-
-	const notFound = error instanceof ApiError && (error.status === 403 || error.status === 404);
 	return {
 		id,
-		playlist: data,
-		failure: error && !data && !isFetching ? (notFound ? 'notFound' : 'error') : null,
+		playlist: detail.data,
+		failure: loadFailure(detail),
 		retry: () => void refetch(),
-		isRefreshing,
-		refresh: () => void refresh(),
-		markDeleting: deleting => {
-			deletingRef.current = deleting;
-		},
-		leaveDeleted,
-		bottomPadding,
+		...useDetailRefresh(refetch),
+		markDeleting: room.markDeleting,
+		leaveDeleted: room.leaveDeleted,
+		bottomPadding: useBottomPadding(),
 	};
 }

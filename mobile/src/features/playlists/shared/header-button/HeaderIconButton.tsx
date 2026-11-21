@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { INK, PIXEL } from '@/shared/theme/configs/tokensConfig';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 
 type HeaderIconButtonProps = {
 	icon: PixelIconSource;
@@ -21,30 +21,27 @@ export function HeaderIconButton({
 	accessibilityLabel,
 	ref,
 }: HeaderIconButtonProps) {
-	const { theme } = useTheme();
+	const { styles, theme } = useThemedStyles(createStyles);
 	return (
 		<View ref={ref} collapsable={false}>
-			<Pressable
-				onPress={onPress}
-				accessibilityLabel={accessibilityLabel}
-				style={[
-					headerButtonStyles.button,
-					headerButtonStyles.frame,
-					{ backgroundColor: theme.colors.background },
-				]}
-			>
+			<Pressable onPress={onPress} accessibilityLabel={accessibilityLabel} style={styles.button}>
 				<PixelIcon icon={icon} size={size} color={theme.colors.text} />
 			</Pressable>
 		</View>
 	);
 }
 
-export const headerButtonStyles = StyleSheet.create({
-	button: {
-		width: 36,
-		height: 36,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	frame: { borderWidth: PIXEL, borderColor: INK },
-});
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		button: {
+			width: theme.controls.headerButton,
+			height: theme.controls.headerButton,
+			alignItems: 'center',
+			justifyContent: 'center',
+			borderWidth: theme.borders.thin,
+			borderColor: theme.colors.border,
+			backgroundColor: theme.colors.background,
+		},
+	});
+	return styles;
+}

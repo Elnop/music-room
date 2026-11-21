@@ -1,113 +1,44 @@
 import React from 'react';
-import {
-	KeyboardAvoidingView,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	useWindowDimensions,
-	View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { Button } from '@/shared/theme/components/Button';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { CONTENT_MAX_WIDTH } from '@/shared/theme/configs/layoutConfig';
 import { LANDING_SHOWN } from '@/shared/platform/platformConfig';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { FloatingIconMotion } from '@/features/user/features/auth/features/welcome/useFloatingIcons';
-import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
-import { LANDING_INTRO } from '@/features/user/features/auth/features/welcome/landingContent';
 import { FloatingIcon } from '@/features/user/features/auth/features/welcome/components/presenters/FloatingIcon';
+import { WelcomeHero } from '@/features/user/features/auth/features/welcome/components/presenters/WelcomeHero';
+import { WelcomeFooter } from '@/features/user/features/auth/features/welcome/components/presenters/WelcomeFooter';
 import { LandingSections } from '@/features/user/features/auth/features/welcome/components/presenters/LandingSections';
-import { Text } from '@/shared/theme/components/Text';
-import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
+import type {
+	FloatingIconMotion,
+	ServerSettings,
+	WelcomeActions,
+} from '@/features/user/features/auth/features/welcome/welcomeTypes';
 
-interface WelcomeViewProps {
+type WelcomeViewProps = {
 	icons: FloatingIconMotion[];
 	buildLabel: string;
-	showServer: boolean;
-	onToggleServer: () => void;
-	onStart: () => void;
-	onLogin: () => void;
-	onOpenPrivacyPolicy: () => void;
-	onOpenLink: (url: string) => void;
-	backendUrlField: React.ReactNode;
-}
+	server: ServerSettings;
+	actions: WelcomeActions;
+};
 
-export function WelcomeView({
-	icons,
-	buildLabel,
-	showServer,
-	onToggleServer,
-	onStart,
-	onLogin,
-	onOpenPrivacyPolicy,
-	onOpenLink,
-	backendUrlField,
-}: WelcomeViewProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const { height } = useWindowDimensions();
-	const heroHeight = LANDING_SHOWN ? height - LANDING_PEEK : undefined;
+export function WelcomeView({ icons, buildLabel, server, actions }: WelcomeViewProps) {
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{icons.map((icon, index) => (
-				<FloatingIcon key={index} {...icon} />
+			{icons.map(icon => (
+				<FloatingIcon key={icon.spec.id} motion={icon} />
 			))}
-
 			<KeyboardAvoidingView
 				style={styles.flex}
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 			>
 				<ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-					<View style={[styles.hero, heroHeight !== undefined && { minHeight: heroHeight }]}>
-						<View style={styles.header}>
-							<PixelWordmark size={48} />
-							{LANDING_SHOWN && <Text style={styles.intro}>{LANDING_INTRO}</Text>}
-						</View>
-
-						<View style={styles.buttonContainer}>
-							<Button title="Commencer" onPress={onStart} variant="primary" fullWidth />
-							<Button title="Se connecter" onPress={onLogin} variant="outline" fullWidth />
-							<>
-								<Pressable
-									onPress={onToggleServer}
-									accessibilityLabel="Serveur"
-									accessibilityState={{ expanded: showServer }}
-									hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-									style={styles.serverToggle}
-								>
-									<PixelIcon
-										icon={CogSolid}
-										size={20}
-										color={showServer ? theme.colors.primary : theme.colors.textSecondary}
-									/>
-								</Pressable>
-								{showServer && <View style={styles.serverPanel}>{backendUrlField}</View>}
-							</>
-						</View>
-					</View>
-
+					<WelcomeHero actions={actions} server={server} />
 					{LANDING_SHOWN ? (
-						<LandingSections
-							buildLabel={buildLabel}
-							onOpenPrivacyPolicy={onOpenPrivacyPolicy}
-							onOpenLink={onOpenLink}
-						/>
+						<LandingSections buildLabel={buildLabel} actions={actions} />
 					) : (
-						<>
-							<Pressable
-								onPress={onOpenPrivacyPolicy}
-								accessibilityRole="link"
-								accessibilityLabel="Politique de confidentialité"
-								style={styles.privacyLink}
-							>
-								<Text style={styles.privacyLinkText}>Politique de confidentialité</Text>
-							</Pressable>
-							<Text style={styles.buildLabel}>{buildLabel}</Text>
-						</>
+						<WelcomeFooter buildLabel={buildLabel} actions={actions} />
 					)}
 				</ScrollView>
 			</KeyboardAvoidingView>
@@ -115,10 +46,8 @@ export function WelcomeView({
 	);
 }
 
-const LANDING_PEEK = 96;
-
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -131,53 +60,6 @@ function createStyles(theme: Theme) {
 			justifyContent: 'space-between',
 			padding: theme.spacing.lg,
 		},
-		hero: {
-			flex: 1,
-		},
-		header: {
-			flex: 1,
-			justifyContent: 'center',
-			alignItems: 'center',
-			gap: theme.spacing.xl,
-		},
-		intro: {
-			maxWidth: CONTENT_MAX_WIDTH.form,
-			marginBottom: theme.spacing.xl,
-			fontSize: theme.typography.sizes.lg,
-			lineHeight: 24,
-			color: theme.colors.text,
-			textAlign: 'center',
-		},
-		buttonContainer: {
-			width: '100%',
-			maxWidth: CONTENT_MAX_WIDTH.form - 2 * theme.spacing.lg,
-			alignSelf: 'center',
-			gap: theme.spacing.md,
-			marginBottom: theme.spacing.lg,
-		},
-		serverToggle: {
-			alignSelf: 'center',
-			padding: theme.spacing.xs,
-		},
-		privacyLink: {
-			alignSelf: 'center',
-			marginBottom: theme.spacing.sm,
-		},
-		privacyLinkText: {
-			fontSize: 12,
-			color: theme.colors.textSecondary,
-			textDecorationLine: 'underline',
-		},
-		buildLabel: {
-			fontSize: 12,
-			color: theme.colors.textSecondary,
-			textAlign: 'center',
-		},
-		serverPanel: {
-			padding: theme.spacing.md,
-			backgroundColor: theme.colors.surface,
-			borderWidth: theme.borders.thin,
-			borderColor: theme.colors.border,
-		},
 	});
+	return styles;
 }

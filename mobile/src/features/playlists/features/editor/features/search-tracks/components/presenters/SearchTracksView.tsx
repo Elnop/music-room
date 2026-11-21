@@ -1,13 +1,11 @@
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
-import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { StyleSheet, View } from 'react-native';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { SearchTracks } from '@/features/playlists/features/editor/features/search-tracks/useSearchTracks';
-import { AddableTrackRow } from '@/features/playlists/features/editor/features/search-tracks/components/presenters/AddableTrackRow';
-import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import type { SearchTracks } from '@/features/playlists/features/editor/features/search-tracks/searchTracksTypes';
+import { SearchTracksResults } from '@/features/playlists/features/editor/features/search-tracks/components/presenters/SearchTracksResults';
 
 type SearchTracksViewProps = {
 	screen: SearchTracks;
@@ -16,7 +14,6 @@ type SearchTracksViewProps = {
 
 export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProps) {
 	const { styles } = useThemedStyles(createStyles);
-	const typed = screen.search.text.trim() !== '';
 
 	return (
 		<View style={styles.container}>
@@ -29,37 +26,10 @@ export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProp
 					input={{ autoFocus: true }}
 				/>
 			</View>
-
 			{screen.isLoading && screen.results.length === 0 ? (
 				<SkeletonList count={8} row={TrackRowSkeleton} />
 			) : (
-				<FlatList
-					data={screen.results}
-					keyExtractor={item => item.id.toString()}
-					renderItem={({ item }) => (
-						<AddableTrackRow
-							track={item}
-							isAdded={screen.isAdded(item)}
-							onAdd={screen.add}
-							onAddToQueue={screen.addToQueue}
-							onShowActions={screen.showActions}
-						/>
-					)}
-					contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }]}
-					showsVerticalScrollIndicator={false}
-					ListEmptyComponent={
-						typed && screen.isLoading ? null : (
-							<EmptyState
-								icon={MusicSolid}
-								message={
-									typed
-										? 'Aucun titre trouvé'
-										: 'Recherchez des titres sur SoundCloud pour les ajouter à votre playlist'
-								}
-							/>
-						)
-					}
-				/>
+				<SearchTracksResults screen={screen} bottomPadding={bottomPadding} />
 			)}
 		</View>
 	);
@@ -74,10 +44,6 @@ function createStyles(theme: Theme) {
 		searchContainer: {
 			paddingHorizontal: theme.spacing.md,
 			paddingVertical: theme.spacing.sm,
-		},
-		list: {
-			flexGrow: 1,
-			paddingTop: theme.spacing.sm,
 		},
 	});
 	return styles;

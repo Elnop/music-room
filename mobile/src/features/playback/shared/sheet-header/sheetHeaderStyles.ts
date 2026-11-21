@@ -33,7 +33,7 @@ export function sheetHeaderStyles(theme: Theme, insets: { top: number }, separat
 			flex: 1,
 			marginRight: 40,
 			textAlign: 'center' as const,
-			fontSize: theme.typography.sizes.lgx,
+			fontSize: theme.typography.sizes.lgxl,
 			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.text,
 		},

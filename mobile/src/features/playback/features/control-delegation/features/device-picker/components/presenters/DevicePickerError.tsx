@@ -14,7 +14,7 @@ type DevicePickerErrorProps = {
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		errorText: {
-			fontSize: theme.typography.sizes.mdl,
+			fontSize: theme.typography.sizes.mlg,
 			color: theme.colors.textSecondary,
 			textAlign: 'center',
 		},

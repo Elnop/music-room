@@ -5,8 +5,8 @@ import { Artwork } from '@/shared/theme/components/Artwork';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { formatDuration } from '@/shared/formatting/formatters';
-import { QueuePlayingIcon } from '@/features/playback/features/queue-modal/components/presenters/QueuePlayingIcon';
-import { QueueTrackDetails } from '@/features/playback/features/queue-modal/components/presenters/QueueTrackDetails';
+import { TrackPlayingIndicator } from '@/shared/theme/components/TrackPlayingIndicator';
+import { TrackRowInfo } from '@/shared/theme/components/TrackRowInfo';
 import type { QueueItem } from '@/features/playback/shared/player/types/queueTypes';
 import type { QueueRowActions } from '@/features/playback/features/queue-modal/queueModalTypes';
 import type { Theme } from '@/shared/theme/types/themeTypes';
@@ -32,8 +32,8 @@ export function QueueRowMain({ item, isCurrent, actions }: QueueRowMainProps) {
 			testID={`queue-item-${item.id}`}
 		>
 			<Artwork uri={track.albumArt} size={42} />
-			<QueueTrackDetails title={track.title} artist={track.artist} isCurrent={isCurrent} />
-			{isCurrent ? <QueuePlayingIcon /> : null}
+			<TrackRowInfo track={track} state={{ isCurrent }} />
+			<TrackPlayingIndicator state={{ isCurrent }} />
 			<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
 		</Pressable>
 	);

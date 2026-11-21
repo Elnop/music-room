@@ -1,4 +1,4 @@
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 import type { TrackInPlaylist } from '@/shared/tracks/types/trackTypes';
 
 export function playlistTrack(id: string, rank: string, trackUri = id): TrackInPlaylist {

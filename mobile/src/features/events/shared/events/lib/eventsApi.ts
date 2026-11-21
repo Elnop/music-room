@@ -1,10 +1,5 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import type {
-	EventInput,
-	GeocodedPlace,
-	MusicEvent,
-	PlaylistChoice,
-} from '@/features/events/lib/types';
+import type { EventInput, MusicEvent } from '@/features/events/eventTypes';
 
 export async function fetchEvents(): Promise<MusicEvent[]> {
 	const data = await apiRequest<{ events: MusicEvent[] }>('/api/events');
@@ -34,25 +29,4 @@ export async function updateEvent(id: string, changes: Partial<EventInput>): Pro
 
 export async function deleteEvent(id: string): Promise<void> {
 	await apiRequest(`/api/events/${id}`, { method: 'DELETE' });
-}
-
-export async function geocode(address: string): Promise<GeocodedPlace | null> {
-	const data = await apiRequest<{ location: GeocodedPlace | null }>(
-		`/api/events/geocode?q=${encodeURIComponent(address)}`
-	);
-	return data.location;
-}
-
-type OwnPlaylist = {
-	id: string;
-	name: string;
-	ownerId: string;
-	visibility: 'public' | 'private';
-};
-
-export async function fetchPlaylistChoices(userId: string): Promise<PlaylistChoice[]> {
-	const data = await apiRequest<{ playlists: OwnPlaylist[] }>('/api/playlists');
-	return data.playlists
-		.filter(playlist => playlist.ownerId === userId && playlist.visibility === 'public')
-		.map(({ id, name }) => ({ id, name }));
 }

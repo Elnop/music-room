@@ -1,6 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { Text } from '@/shared/theme/components/Text';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import {
 	POLICY_INTRO,
@@ -8,63 +10,32 @@ import {
 	POLICY_UPDATED_AT,
 } from '@/features/legal/privacyPolicyContent';
 import { PolicyText } from '@/features/legal/components/presenters/PolicyText';
+import { PolicySectionItem } from '@/features/legal/components/presenters/PolicySectionItem';
 
 type PrivacyPolicyViewProps = {
-	theme: Theme;
 	bottomPadding: number;
 	onOpenLink: (url: string) => void;
 };
 
-export function PrivacyPolicyView({ theme, bottomPadding, onOpenLink }: PrivacyPolicyViewProps) {
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function PrivacyPolicyView({ bottomPadding, onOpenLink }: PrivacyPolicyViewProps) {
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<ScrollView
 			style={styles.container}
-			contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
+			contentContainerStyle={[styles.content, paddingBottomStyle(bottomPadding)]}
 		>
 			<Text style={styles.updatedAt}>{POLICY_UPDATED_AT}</Text>
-			<PolicyText
-				spans={POLICY_INTRO}
-				theme={theme}
-				style={styles.paragraph}
-				onOpenLink={onOpenLink}
-			/>
-
+			<PolicyText spans={POLICY_INTRO} onOpenLink={onOpenLink} />
 			{POLICY_SECTIONS.map(section => (
-				<View key={section.title} style={styles.section}>
-					<Text style={styles.title} accessibilityRole="header">
-						{section.title}
-					</Text>
-					{section.blocks.map((block, blockIndex) =>
-						'paragraph' in block ? (
-							<PolicyText
-								key={blockIndex}
-								spans={block.paragraph}
-								theme={theme}
-								style={styles.paragraph}
-								onOpenLink={onOpenLink}
-							/>
-						) : (
-							<View key={blockIndex} style={styles.list}>
-								{block.list.map((item, itemIndex) => (
-									<View key={itemIndex} style={styles.item}>
-										<Text style={styles.bullet}>•</Text>
-										<PolicyText
-											spans={item}
-											theme={theme}
-											style={[styles.paragraph, styles.itemText]}
-											onOpenLink={onOpenLink}
-										/>
-									</View>
-								))}
-							</View>
-						)
-					)}
-				</View>
+				<PolicySectionItem key={section.title} section={section} onOpenLink={onOpenLink} />
 			))}
 		</ScrollView>
 	);
+}
+
+function paddingBottomStyle(paddingBottom: number): ViewStyle {
+	return { paddingBottom };
 }
 
 function createStyles(theme: Theme) {
@@ -80,35 +51,6 @@ function createStyles(theme: Theme) {
 		updatedAt: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
-		},
-		section: {
-			gap: theme.spacing.sm,
-			marginTop: theme.spacing.sm,
-		},
-		title: {
-			fontSize: theme.typography.sizes.xl,
-			fontFamily: theme.typography.families.bold,
-			color: theme.colors.text,
-		},
-		paragraph: {
-			fontSize: theme.typography.sizes.md,
-			lineHeight: 21,
-			color: theme.colors.text,
-		},
-		list: {
-			gap: theme.spacing.sm,
-		},
-		item: {
-			flexDirection: 'row',
-			gap: theme.spacing.sm,
-		},
-		bullet: {
-			fontSize: theme.typography.sizes.md,
-			lineHeight: 21,
-			color: theme.colors.textSecondary,
-		},
-		itemText: {
-			flex: 1,
 		},
 	});
 	return styles;

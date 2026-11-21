@@ -37,7 +37,7 @@ function createStyles(theme: Theme) {
 		deviceKey: { flex: 1, justifyContent: 'flex-start' },
 		deviceText: {
 			flexShrink: 1,
-			fontSize: theme.typography.sizes.mdl,
+			fontSize: theme.typography.sizes.mlg,
 			fontFamily: theme.typography.families.medium,
 			color: theme.colors.info,
 		},
