@@ -1,75 +1,53 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { FriendProfile } from '@/features/user/features/friends/types';
-import { ControlSwitch } from '@/features/user/features/friends/features/friends-list/components/presenters/ControlSwitch';
-import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
-import { Text } from '@/shared/theme/components/Text';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { FriendProfile } from '@/features/user/features/friends/friendsTypes';
+import type { FriendControl } from '@/features/user/features/friends/features/friends-list/friendsListTypes';
+import { FriendCardFooter } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendCardFooter';
+import { UserNames } from '@/features/user/features/friends/features/friends-list/components/presenters/UserNames';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
-import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 type FriendCardProps = {
 	friend: FriendProfile;
-	canControl: boolean;
-	isToggling: boolean;
-	disabled: boolean;
+	control: FriendControl;
 	onPress: (userId: string) => void;
-	onToggleControl: (friendId: string, currentValue: boolean) => void;
 };
 
-export function FriendCard({
-	friend,
-	canControl,
-	isToggling,
-	disabled,
-	onPress,
-	onToggleControl,
-}: FriendCardProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
+export function FriendCard({ friend, control, onPress }: FriendCardProps) {
+	const { theme, styles } = useThemedStyles(createStyles);
 	const name = friend.displayName || friend.username;
-	const controlLabel = 'Peut contrôler ma musique sur tous mes appareils';
 
 	return (
-		<View style={isToggling && styles.userItemProcessing}>
+		<View style={control.togglingUserId === friend.id && styles.userItemProcessing}>
 			<Pressable
 				style={styles.cardHeader}
 				onPress={() => onPress(friend.id)}
 				accessibilityLabel={name}
 			>
 				<Avatar size="md" name={name} uri={friend.avatarUrl} />
-				<View style={styles.userInfo}>
-					<Text style={styles.username} numberOfLines={1}>
-						{friend.username}
-					</Text>
-					{friend.displayName && (
-						<Text style={styles.displayName} numberOfLines={1}>
-							{friend.displayName}
-						</Text>
-					)}
-				</View>
+				<UserNames user={friend} singleLine />
 				<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
 			</Pressable>
-			<View style={styles.cardFooter}>
-				<PixelIcon
-					icon={MusicSolid}
-					size={14}
-					color={canControl ? theme.colors.primary : theme.colors.textSecondary}
-				/>
-				<Text style={[styles.cardFooterText, canControl && styles.controlTextActive]}>
-					{controlLabel}
-				</Text>
-				<ControlSwitch
-					canControl={canControl}
-					isToggling={isToggling}
-					disabled={disabled}
-					onToggle={() => onToggleControl(friend.id, canControl)}
-					accessibilityLabel={`${name} ${controlLabel.toLowerCase()}`}
-				/>
-			</View>
+			<FriendCardFooter friendId={friend.id} name={name} control={control} />
 		</View>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		userItemProcessing: {
+			opacity: 0.7,
+		},
+		cardHeader: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			paddingTop: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.md,
+		},
+	});
+	return styles;
 }

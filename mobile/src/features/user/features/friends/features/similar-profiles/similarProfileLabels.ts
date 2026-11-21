@@ -1,5 +1,5 @@
 import { GENRE_INFO } from '@/shared/theme/configs/genresConfig';
-import type { MusicGenre, RecommendedProfile } from '@/features/user/features/friends/types';
+import type { MusicGenre, RecommendedProfile } from '@/features/user/features/friends/friendsTypes';
 
 function commonGenresLabel(genres: MusicGenre[]): string {
 	return genres.map(genre => GENRE_INFO[genre].label).join(' · ');

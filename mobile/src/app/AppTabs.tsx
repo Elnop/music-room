@@ -11,7 +11,7 @@ import { MiniPlayerContainer } from '@/features/playback/features/mini-player/co
 import { TabBarLayout } from '@/features/shell/components/orchestrators/TabBarLayout';
 import { useTabOptions } from '@/features/shell/hooks/useTabOptions';
 import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/playlistTypes';
-import type { ProfileStackParamList } from '@/features/user/features/profile/types';
+import type { ProfileStackParamList } from '@/features/user/features/profile/profileTypes';
 
 export type AppTabsParamList = {
 	HomeTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;

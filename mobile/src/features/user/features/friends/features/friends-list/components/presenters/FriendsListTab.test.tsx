@@ -27,15 +27,19 @@ const friends = [
 function renderTab(onToggleControl = jest.fn()) {
 	render(
 		<FriendsListTab
-			friends={friends}
-			isLoading={false}
-			loadFailed={false}
-			onRetry={jest.fn()}
-			isRefreshing={false}
-			onRefresh={jest.fn()}
-			canControl={id => id === 's'}
-			togglingUserId={null}
-			onToggleControl={onToggleControl}
+			friendsList={{
+				friends,
+				isLoading: false,
+				loadFailed: false,
+				onRetry: jest.fn(),
+				isRefreshing: false,
+				onRefresh: jest.fn(),
+			}}
+			control={{
+				canControl: id => id === 's',
+				togglingUserId: null,
+				onToggleControl,
+			}}
 			onSelectUser={jest.fn()}
 			onGoToSearch={jest.fn()}
 			bottomPadding={0}

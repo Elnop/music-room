@@ -1,55 +1,28 @@
 import React, { useLayoutEffect } from 'react';
-import { useProfileScreen } from '@/features/user/features/profile/features/profile-screen/useProfileScreen';
+import { useProfileScreen } from '@/features/user/features/profile/features/profile-screen/hooks/useProfileScreen';
 import { ProfileHeaderButtons } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileHeaderButtons';
 import { ProfileView } from '@/features/user/features/profile/features/profile-screen/components/presenters/ProfileView';
 
 export function ProfileContainer() {
-	const {
-		theme,
-		bottomPadding,
-		user,
-		navigation,
-		stats,
-		genres,
-		isRefreshing,
-		isLoading,
-		buildLabel,
-		handleRefresh,
-		handleEditProfile,
-		handleSettings,
-		handleMusicPreferences,
-		handlePrivacySettings,
-		handleLinkedAccounts,
-		handleMyDevices,
-		confirmLogout,
-	} = useProfileScreen();
+	const screen = useProfileScreen();
+	const { navigation } = screen;
+	const { onEditProfile, onSettings } = screen.actions;
 
 	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerRight: () => (
-				<ProfileHeaderButtons onEditProfile={handleEditProfile} onSettings={handleSettings} />
-			),
-		});
-	}, [navigation, handleEditProfile, handleSettings]);
+		navigation.setOptions({ headerRight: profileHeaderRight(onEditProfile, onSettings) });
+	}, [navigation, onEditProfile, onSettings]);
 
 	return (
 		<ProfileView
-			theme={theme}
-			bottomPadding={bottomPadding}
-			user={user}
-			stats={stats}
-			genres={genres}
-			isRefreshing={isRefreshing}
-			isLoading={isLoading}
-			buildLabel={buildLabel}
-			onRefresh={handleRefresh}
-			onEditProfile={handleEditProfile}
-			onSettings={handleSettings}
-			onMusicPreferences={handleMusicPreferences}
-			onPrivacySettings={handlePrivacySettings}
-			onLinkedAccounts={handleLinkedAccounts}
-			onMyDevices={handleMyDevices}
-			onConfirmLogout={confirmLogout}
+			bottomPadding={screen.bottomPadding}
+			user={screen.user}
+			content={screen.content}
+			refresh={screen.refresh}
+			actions={screen.actions}
 		/>
 	);
+}
+
+function profileHeaderRight(onEditProfile: () => void, onSettings: () => void) {
+	return () => <ProfileHeaderButtons onEditProfile={onEditProfile} onSettings={onSettings} />;
 }

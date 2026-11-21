@@ -1,91 +1,42 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
-import { VisibilityToggle } from '@/features/user/features/profile/features/privacy-settings/components/presenters/VisibilityToggle';
+import { PrivacyToggles } from '@/features/user/features/profile/features/privacy-settings/components/presenters/PrivacyToggles';
+import type {
+	PrivacyEditing,
+	PrivacySave,
+} from '@/features/user/features/profile/features/privacy-settings/privacySettingsTypes';
 import { Button } from '@/shared/theme/components/Button';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { ProfilePrivacy, VisibilityLevel } from '@/shared/users/userTypes';
 
-interface PrivacySettingsViewProps {
-	theme: Theme;
+type PrivacySettingsViewProps = {
 	bottomPadding: number;
 	isLoading: boolean;
-	isSaving: boolean;
-	privacy: ProfilePrivacy | null;
-	hasChanges: boolean;
-	onVisibilityChange: (field: keyof ProfilePrivacy, value: VisibilityLevel) => void;
-	onSave: () => void;
-}
+	editing: PrivacyEditing;
+	save: PrivacySave;
+};
 
-export function PrivacySettingsView({
-	bottomPadding,
-	isLoading,
-	isSaving,
-	privacy,
-	hasChanges,
-	onVisibilityChange,
-	onSave,
-}: PrivacySettingsViewProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function PrivacySettingsView(props: PrivacySettingsViewProps) {
+	const { editing, save } = props;
+	const { privacy } = editing;
 
 	return (
 		<ProfileScreenFrame
 			subtitle="Choisissez qui peut voir vos informations"
-			bottomPadding={bottomPadding}
-			isLoading={isLoading}
+			bottomPadding={props.bottomPadding}
+			isLoading={props.isLoading}
 			errorMessage={!privacy ? 'Impossible de charger les paramètres' : null}
 		>
 			{privacy && (
 				<>
-					<View style={styles.settings}>
-						<VisibilityToggle
-							label="Photo de profil"
-							description="Qui peut voir votre photo"
-							value={privacy.avatarVisibility}
-							onChange={value => onVisibilityChange('avatarVisibility', value)}
-						/>
-
-						<VisibilityToggle
-							label="Adresse email"
-							description="Qui peut voir votre email"
-							value={privacy.emailVisibility}
-							onChange={value => onVisibilityChange('emailVisibility', value)}
-						/>
-
-						<VisibilityToggle
-							label="Bio"
-							description="Qui peut voir votre bio"
-							value={privacy.bioVisibility}
-							onChange={value => onVisibilityChange('bioVisibility', value)}
-						/>
-
-						<VisibilityToggle
-							label="Préférences musicales"
-							description="Qui peut voir vos genres préférés"
-							value={privacy.musicPreferencesVisibility}
-							onChange={value => onVisibilityChange('musicPreferencesVisibility', value)}
-						/>
-					</View>
+					<PrivacyToggles privacy={privacy} onVisibilityChange={editing.onVisibilityChange} />
 					<Button
 						variant="primary"
-						onPress={onSave}
-						loading={isSaving}
-						disabled={!hasChanges || isSaving}
-					>
-						Enregistrer
-					</Button>
+						onPress={save.onSave}
+						loading={save.isSaving}
+						disabled={!save.hasChanges || save.isSaving}
+						title="Enregistrer"
+					/>
 				</>
 			)}
 		</ProfileScreenFrame>
 	);
-}
-
-function createStyles(theme: Theme) {
-	return StyleSheet.create({
-		settings: {
-			marginBottom: theme.spacing.xl,
-		},
-	});
 }

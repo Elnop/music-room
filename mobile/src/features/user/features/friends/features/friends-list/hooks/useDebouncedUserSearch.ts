@@ -1,79 +1,21 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import { showError } from '@/shared/theme/lib/toast';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { debounce } from '@/shared/debounce/debounce';
-import { logger } from '@/shared/logging/logger';
-import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
-import type { UserProfile } from '@/features/user/features/friends/types';
+import { useUserSearchRequest } from '@/features/user/features/friends/features/friends-list/hooks/useUserSearchRequest';
+import { useDebouncedQuery } from '@/features/user/features/friends/features/friends-list/hooks/useDebouncedQuery';
+import { useSearchRefresh } from '@/features/user/features/friends/features/friends-list/hooks/useSearchRefresh';
+import type { UserSearch } from '@/features/user/features/friends/features/friends-list/friendsListTypes';
 
-export function useDebouncedUserSearch() {
-	const [searchQuery, setSearchQuery] = useState('');
-	const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
-	const [isSearching, setIsSearching] = useState(false);
-	const [searchFailed, setSearchFailed] = useState(false);
-	const [isRefreshingSearch, setIsRefreshingSearch] = useState(false);
-
-	const performSearch = useCallback(async (query: string, isRefresh = false) => {
-		if (!query.trim()) {
-			setSearchResults([]);
-			return;
-		}
-		setIsSearching(true);
-		if (!isRefresh) setSearchFailed(false);
-		try {
-			const results = await friendsApi.searchUsers(query);
-			setSearchResults(results);
-		} catch (error) {
-			logger.error('[FriendsList] User search failed:', error);
-			showError(apiErrorMessage(error, 'La recherche a échoué'));
-			if (!isRefresh) {
-				setSearchResults([]);
-				setSearchFailed(true);
-			}
-		} finally {
-			setIsSearching(false);
-		}
-	}, []);
-
-	const debouncedSearch = useMemo(
-		() => debounce((q: string) => performSearch(q), 500),
-		[performSearch]
-	);
-
-	useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
-
-	const handleSearchChange = useCallback(
-		(text: string) => {
-			setSearchQuery(text);
-			setSearchFailed(false);
-			if (text.trim()) {
-				debouncedSearch(text);
-			} else {
-				debouncedSearch.cancel();
-				setSearchResults([]);
-			}
-		},
-		[debouncedSearch]
-	);
-
-	const handleRefreshSearch = useCallback(async () => {
-		if (!searchQuery.trim()) return;
-		setIsRefreshingSearch(true);
-		try {
-			await performSearch(searchQuery, true);
-		} finally {
-			setIsRefreshingSearch(false);
-		}
-	}, [performSearch, searchQuery]);
+export function useDebouncedUserSearch(): UserSearch {
+	const { request, setRequest, performSearch } = useUserSearchRequest();
+	const query = useDebouncedQuery(performSearch, setRequest);
+	const refresh = useSearchRefresh(query.searchQuery, performSearch);
 
 	return {
-		searchQuery,
-		searchResults,
-		isSearching,
-		searchFailed,
-		isRefreshingSearch,
-		onSearchChange: handleSearchChange,
-		onRefreshSearch: handleRefreshSearch,
-		onRetrySearch: () => performSearch(searchQuery),
+		searchQuery: query.searchQuery,
+		onSearchChange: query.onSearchChange,
+		searchResults: request.results,
+		isSearching: request.isSearching,
+		searchFailed: request.failed,
+		isRefreshing: refresh.isRefreshing,
+		onRefresh: refresh.onRefresh,
+		onRetry: () => performSearch(query.searchQuery),
 	};
 }

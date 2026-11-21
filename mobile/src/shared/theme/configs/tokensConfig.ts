@@ -42,9 +42,11 @@ export const PIXEL_TYPOGRAPHY = {
 		xs: 18,
 		sm: 20,
 		md: 21,
+		relaxed: 22,
 		lg: 24,
 	},
 	letterSpacings: {
+		caption: 0.5,
 		wide: 1,
 	},
 	displayScale: {
@@ -99,6 +101,7 @@ export const GENRE_COLORS = {
 
 export const SPACING = {
 	pullXs: -4,
+	hairline: 1,
 	xxs: 2,
 	xxsm: 3,
 	xs: 4,
@@ -132,6 +135,11 @@ export const CONTROL_SIZES = {
 	button: 52,
 	largeButton: 56,
 	toast: 56,
+	statusDot: 6,
+	switchHeight: 31,
+	switchWidth: 51,
+	statDivider: 30,
+	textArea: 100,
 	actionButton: 72,
 	codeBoxWidth: 50,
 	codeBoxHeight: 60,

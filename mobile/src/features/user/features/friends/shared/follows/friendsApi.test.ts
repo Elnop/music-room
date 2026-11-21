@@ -1,5 +1,5 @@
 import { apiRequest, authRequest } from '@/shared/backend/lib/api';
-import type { FollowStatus } from '@/features/user/features/friends/types';
+import type { FollowStatus } from '@/features/user/features/friends/friendsTypes';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({

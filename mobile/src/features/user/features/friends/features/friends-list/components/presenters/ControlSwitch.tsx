@@ -1,38 +1,43 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { FriendControl } from '@/features/user/features/friends/features/friends-list/friendsListTypes';
 
 type ControlSwitchProps = {
-	canControl: boolean;
-	isToggling: boolean;
-	disabled: boolean;
-	onToggle: () => void;
+	friendId: string;
+	control: FriendControl;
 	accessibilityLabel: string;
 };
 
-export function ControlSwitch({
-	canControl,
-	isToggling,
-	disabled,
-	onToggle,
-	accessibilityLabel,
-}: ControlSwitchProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
+export function ControlSwitch({ friendId, control, accessibilityLabel }: ControlSwitchProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const canControl = control.canControl(friendId);
 
-	return isToggling ? (
+	return control.togglingUserId === friendId ? (
 		<View style={styles.switchPlaceholder}>
 			<LoadingSpinner size="small" />
 		</View>
 	) : (
 		<ThemedSwitch
 			value={canControl}
-			onValueChange={onToggle}
-			disabled={disabled}
+			onValueChange={() => control.onToggleControl(friendId, canControl)}
+			disabled={Boolean(control.togglingUserId)}
 			accessibilityLabel={accessibilityLabel}
 		/>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		switchPlaceholder: {
+			width: theme.controls.switchWidth,
+			height: theme.controls.switchHeight,
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
+	});
+	return styles;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { ActionSheetTitle } from '@/features/playlists/features/editor/shared/action-sheet/components/ActionSheetTitle';
+import { TitleLines } from '@/shared/theme/components/TitleLines';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
 import type { Theme } from '@/shared/theme/types/themeTypes';
@@ -25,7 +25,7 @@ export function ActionSheetHeader({ heading }: ActionSheetHeaderProps) {
 					<PixelIcon icon={AngleLeftSolid} size={22} color={theme.colors.text} />
 				</Pressable>
 			)}
-			<ActionSheetTitle title={heading.title} subtitle={heading.subtitle} />
+			<TitleLines title={heading.title} subtitle={heading.subtitle} size="large" singleLine />
 		</View>
 	);
 }

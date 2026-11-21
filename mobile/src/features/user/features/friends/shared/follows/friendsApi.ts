@@ -7,7 +7,7 @@ import type {
 	ProfileRecommendations,
 	UserProfile,
 	FilteredProfile,
-} from '@/features/user/features/friends/types';
+} from '@/features/user/features/friends/friendsTypes';
 
 export const friendsApi = {
 	getFriends(accessToken?: string): Promise<FriendProfile[]> {

@@ -1,66 +1,52 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GenreSelector } from '@/features/user/features/profile/features/music-preferences/components/presenters/GenreSelector';
+import type {
+	GenreSelection,
+	PreferencesSave,
+} from '@/features/user/features/profile/features/music-preferences/musicPreferencesTypes';
 import { ProfileScreenFrame } from '@/features/user/shared/profile-layout/ProfileScreenFrame';
 import { Button } from '@/shared/theme/components/Button';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { MusicGenre } from '@/shared/users/userTypes';
 import { MAX_GENRES } from '@/shared/users/userConfig';
 
-interface MusicPreferencesViewProps {
-	theme: Theme;
+type MusicPreferencesViewProps = {
 	bottomPadding: number;
 	isLoading: boolean;
-	isSaving: boolean;
-	selectedGenres: MusicGenre[];
-	hasChanges: boolean;
-	onGenreToggle: (genre: MusicGenre) => void;
-	onSave: () => void;
-}
+	selection: GenreSelection;
+	save: PreferencesSave;
+};
 
-export function MusicPreferencesView({
-	bottomPadding,
-	isLoading,
-	isSaving,
-	selectedGenres,
-	hasChanges,
-	onGenreToggle,
-	onSave,
-}: MusicPreferencesViewProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function MusicPreferencesView(props: MusicPreferencesViewProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const { save } = props;
 
 	return (
 		<ProfileScreenFrame
 			subtitle={`Quels genres aimez-vous ? Choisissez-en jusqu'à ${MAX_GENRES}.`}
-			bottomPadding={bottomPadding}
-			isLoading={isLoading}
+			bottomPadding={props.bottomPadding}
+			isLoading={props.isLoading}
 		>
 			<View style={styles.selectorContainer}>
-				<GenreSelector
-					selectedGenres={selectedGenres}
-					onGenreToggle={onGenreToggle}
-					maxGenres={MAX_GENRES}
-				/>
+				<GenreSelector selection={props.selection} maxGenres={MAX_GENRES} />
 			</View>
 
 			<Button
 				variant="primary"
-				onPress={onSave}
-				loading={isSaving}
-				disabled={!hasChanges || isSaving}
+				onPress={save.onSave}
+				loading={save.isSaving}
+				disabled={!save.hasChanges || save.isSaving}
 				fullWidth={false}
 				style={styles.saveButton}
-			>
-				Enregistrer
-			</Button>
+				title="Enregistrer"
+			/>
 		</ProfileScreenFrame>
 	);
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		selectorContainer: {
 			backgroundColor: theme.colors.surface,
 			marginBottom: theme.spacing.lg,
@@ -69,4 +55,5 @@ function createStyles(theme: Theme) {
 			marginHorizontal: 0,
 		},
 	});
+	return styles;
 }

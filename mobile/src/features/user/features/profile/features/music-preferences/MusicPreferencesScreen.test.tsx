@@ -72,7 +72,7 @@ describe('MusicPreferencesScreen', () => {
 			expect(privacyApi.updateMusicPreferences).toHaveBeenCalledWith({
 				genres: ['rock', 'pop'],
 			});
-			expect(mockGoBack).toHaveBeenCalled();
+			expect(mockGoBack).toHaveBeenCalledWith();
 		});
 	});
 });

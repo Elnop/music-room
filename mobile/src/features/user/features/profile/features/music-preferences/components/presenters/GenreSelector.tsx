@@ -1,57 +1,26 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { GenreChip } from '@/shared/theme/components/GenreChip';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { GenreGrid } from '@/features/user/features/profile/features/music-preferences/components/presenters/GenreGrid';
+import { GenreSelectorIntro } from '@/features/user/features/profile/features/music-preferences/components/presenters/GenreSelectorIntro';
+import type { GenreSelection } from '@/features/user/features/profile/features/music-preferences/musicPreferencesTypes';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { MusicGenre } from '@/shared/users/userTypes';
-import { MAX_GENRES, MUSIC_GENRES } from '@/shared/users/userConfig';
+import { MAX_GENRES } from '@/shared/users/userConfig';
 import { Text } from '@/shared/theme/components/Text';
 
 type GenreSelectorProps = {
-	selectedGenres: MusicGenre[];
-	onGenreToggle: (genre: MusicGenre) => void;
+	selection: GenreSelection;
 	maxGenres?: number;
 };
 
-export function GenreSelector({
-	selectedGenres,
-	onGenreToggle,
-	maxGenres = MAX_GENRES,
-}: GenreSelectorProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-	const isMaxReached = selectedGenres.length >= maxGenres;
+export function GenreSelector({ selection, maxGenres = MAX_GENRES }: GenreSelectorProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const isMaxReached = selection.selectedGenres.length >= maxGenres;
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.header}>
-				<Text style={styles.counter}>
-					{selectedGenres.length}/{maxGenres} {selectedGenres.length > 1 ? 'choisis' : 'choisi'}
-				</Text>
-			</View>
-
-			<Text style={styles.description}>
-				Choisissez jusqu'à {maxGenres} genres qui définissent vos goûts musicaux
-			</Text>
-
-			<View style={styles.genresGrid}>
-				{MUSIC_GENRES.map(genre => {
-					const isSelected = selectedGenres.includes(genre);
-					const isDisabled = !isSelected && isMaxReached;
-
-					return (
-						<GenreChip
-							key={genre}
-							genre={genre}
-							selected={isSelected}
-							disabled={isDisabled}
-							onPress={() => onGenreToggle(genre)}
-						/>
-					);
-				})}
-			</View>
-
+			<GenreSelectorIntro selectedCount={selection.selectedGenres.length} maxGenres={maxGenres} />
+			<GenreGrid selection={selection} isMaxReached={isMaxReached} />
 			{isMaxReached && (
 				<Text style={styles.maxWarning}>
 					Nombre maximum de genres atteint. Retirez-en un pour en ajouter un autre.
@@ -66,29 +35,8 @@ function createStyles(theme: Theme) {
 		container: {
 			padding: theme.spacing.md,
 		},
-		header: {
-			flexDirection: 'row',
-			justifyContent: 'flex-end',
-			alignItems: 'center',
-			marginBottom: theme.spacing.xs,
-		},
-		counter: {
-			fontSize: 14,
-			color: theme.colors.primary,
-			fontFamily: theme.typography.families.medium,
-		},
-		description: {
-			fontSize: 14,
-			color: theme.colors.textSecondary,
-			marginBottom: theme.spacing.lg,
-		},
-		genresGrid: {
-			flexDirection: 'row',
-			flexWrap: 'wrap',
-			gap: theme.spacing.sm,
-		},
 		maxWarning: {
-			fontSize: 12,
+			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.warning,
 			marginTop: theme.spacing.md,
 			fontStyle: 'italic',

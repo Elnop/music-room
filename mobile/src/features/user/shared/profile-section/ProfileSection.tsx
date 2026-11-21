@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { pixelCaption } from '@/shared/theme/lib/pixelCaption';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/types/themeTypes';
@@ -23,16 +23,16 @@ export function ProfileSection({
 	rightAction,
 	prominent = false,
 }: ProfileSectionProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { styles } = useThemedStyles(createStyles);
+	const { styles: headerStyles } = useThemedStyles(createHeaderStyles);
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.header}>
-				<Text style={prominent ? styles.prominentTitle : styles.title}>{title}</Text>
+			<View style={headerStyles.header}>
+				<Text style={prominent ? headerStyles.prominentTitle : headerStyles.title}>{title}</Text>
 				{rightAction && (
 					<Pressable onPress={rightAction.onPress} accessibilityLabel={rightAction.label}>
-						<Text style={styles.action}>{rightAction.label}</Text>
+						<Text style={headerStyles.action}>{rightAction.label}</Text>
 					</Pressable>
 				)}
 			</View>
@@ -50,6 +50,16 @@ function createStyles(theme: Theme) {
 			marginBottom: theme.spacing.md,
 			overflow: 'hidden',
 		},
+		content: {
+			paddingHorizontal: theme.spacing.md,
+			paddingBottom: theme.spacing.md,
+		},
+	});
+	return styles;
+}
+
+function createHeaderStyles(theme: Theme) {
+	const headerStyles = StyleSheet.create({
 		header: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
@@ -58,23 +68,17 @@ function createStyles(theme: Theme) {
 			paddingTop: theme.spacing.md,
 			paddingBottom: theme.spacing.sm,
 		},
-		title: {
-			...pixelCaption(theme),
-		},
+		title: pixelCaption(theme),
 		prominentTitle: {
 			fontSize: theme.typography.sizes.lg,
 			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		action: {
-			fontSize: 14,
+			fontSize: theme.typography.sizes.md,
 			fontFamily: theme.typography.families.medium,
 			color: theme.colors.primary,
 		},
-		content: {
-			paddingHorizontal: theme.spacing.md,
-			paddingBottom: theme.spacing.md,
-		},
 	});
-	return styles;
+	return headerStyles;
 }

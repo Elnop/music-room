@@ -1,86 +1,37 @@
 import React from 'react';
-import { View } from 'react-native';
-import { Avatar } from '@/shared/theme/components/Avatar';
-import { GenreChip } from '@/shared/theme/components/GenreChip';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type {
-	FilteredProfile,
-	FollowStatus,
-	MusicGenre,
-} from '@/features/user/features/friends/types';
-import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
-import { HiddenFieldNote } from '@/features/user/features/friends/features/user-profile/components/presenters/HiddenFieldNote';
-import { UserProfileBadges } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileBadges';
-import { Text } from '@/shared/theme/components/Text';
+import { StyleSheet } from 'react-native';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { ViewedProfile } from '@/features/user/features/friends/features/user-profile/userProfileTypes';
+import { UserProfileBio } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileBio';
+import { UserProfileGenreChips } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileGenreChips';
+import { UserProfileNames } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileNames';
+import { UserProfileTopRow } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileTopRow';
 
 type UserProfileInfoProps = {
-	profile: FilteredProfile;
-	followStatus: FollowStatus | null;
-	canControlMusic: boolean;
-	hasDevicesOnline: boolean;
+	viewed: ViewedProfile;
 };
 
-export function UserProfileInfo({
-	profile,
-	followStatus,
-	canControlMusic,
-	hasDevicesOnline,
-}: UserProfileInfoProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createUserProfileHeaderStyles(theme), [theme]);
-	const isFriend = followStatus?.isFriend ?? false;
-	const isBioHidden = profile.bio === undefined;
-	const isMusicPrefsHidden = profile.musicPreferences === undefined;
+export function UserProfileInfo({ viewed }: UserProfileInfoProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const { profile } = viewed;
 	const genres = profile.musicPreferences || [];
 
 	return (
 		<>
-			<View style={styles.topRow}>
-				<Avatar size="lg" name={profile.displayName || profile.username} uri={profile.avatarUrl} />
-				{followStatus && (
-					<View style={styles.statsContainer}>
-						<View style={styles.statItem}>
-							<Text style={styles.statNumber}>{followStatus.followersCount}</Text>
-							<Text style={styles.statLabel}>Abonnés</Text>
-						</View>
-						<View style={styles.statItem}>
-							<Text style={styles.statNumber}>{followStatus.followingCount}</Text>
-							<Text style={styles.statLabel}>Abonnements</Text>
-						</View>
-					</View>
-				)}
-			</View>
-
-			<View style={styles.nameSection}>
-				<View style={styles.usernameRow}>
-					<Text style={styles.username}>{profile.username}</Text>
-					<UserProfileBadges
-						followStatus={followStatus}
-						canControlMusic={canControlMusic}
-						hasDevicesOnline={hasDevicesOnline}
-					/>
-				</View>
-				{profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
-				{followStatus?.isFollowedBy && !followStatus.isFollowing && (
-					<Text style={styles.followBackHint}>
-						Suivez cet utilisateur en retour pour devenir amis.
-					</Text>
-				)}
-			</View>
-
-			{isBioHidden ? (
-				<HiddenFieldNote label={isFriend ? 'Bio privée' : 'Visible uniquement par ses amis'} />
-			) : profile.bio ? (
-				<Text style={styles.bio}>{profile.bio}</Text>
-			) : null}
-
-			{!isMusicPrefsHidden && genres.length > 0 && (
-				<View style={styles.genresInline}>
-					{genres.map((genre: MusicGenre) => (
-						<GenreChip key={genre} genre={genre} selected size="sm" />
-					))}
-				</View>
-			)}
+			<UserProfileTopRow profile={profile} followStatus={viewed.follow.status} />
+			<UserProfileNames viewed={viewed} />
+			<UserProfileBio profile={profile} isFriend={viewed.follow.status?.isFriend ?? false} />
+			{genres.length > 0 && <UserProfileGenreChips genres={genres} style={styles.genresInline} />}
 		</>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		genresInline: {
+			marginTop: theme.spacing.md,
+		},
+	});
+	return styles;
 }

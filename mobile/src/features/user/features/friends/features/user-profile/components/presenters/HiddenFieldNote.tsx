@@ -1,14 +1,17 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 
-export function HiddenFieldNote({ label }: { label: string }) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createUserProfileHeaderStyles(theme), [theme]);
+type HiddenFieldNoteProps = {
+	label: string;
+};
+
+export function HiddenFieldNote({ label }: HiddenFieldNoteProps) {
+	const { theme, styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.hiddenField}>
@@ -21,4 +24,24 @@ export function HiddenFieldNote({ label }: { label: string }) {
 			<Text style={styles.hiddenText}>{label}</Text>
 		</View>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		hiddenField: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			marginTop: theme.spacing.sm,
+			gap: theme.spacing.xsm,
+		},
+		hiddenIcon: {
+			marginRight: theme.spacing.xs,
+		},
+		hiddenText: {
+			fontSize: theme.typography.sizes.md,
+			color: theme.colors.textSecondary,
+			fontStyle: 'italic',
+		},
+	});
+	return styles;
 }

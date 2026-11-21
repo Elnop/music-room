@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { Text } from '@/shared/theme/components/Text';
+import { NameLabel } from '@/shared/theme/components/NameLabel';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import BracketSquareOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/bracket-square.svg';
@@ -31,9 +31,7 @@ export function PlaylistOption({ name, selected, onSelect }: PlaylistOptionProps
 				size={18}
 				color={selected ? theme.colors.primary : theme.colors.textSecondary}
 			/>
-			<Text style={styles.name} numberOfLines={1}>
-				{name}
-			</Text>
+			<NameLabel name={name} variant="row" />
 		</Pressable>
 	);
 }
@@ -49,7 +47,6 @@ function createStyles(theme: Theme) {
 			backgroundColor: theme.colors.surface,
 		},
 		selected: { backgroundColor: theme.colors.surfaceAlt },
-		name: { flex: 1, fontSize: theme.typography.sizes.md, color: theme.colors.text },
 	});
 	return styles;
 }

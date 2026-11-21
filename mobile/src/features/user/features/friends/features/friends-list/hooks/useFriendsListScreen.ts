@@ -1,90 +1,20 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
-import { showError } from '@/shared/theme/lib/toast';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { logger } from '@/shared/logging/logger';
-import {
-	useFriendsList,
-	useControlPermissions,
-} from '@/features/user/features/friends/shared/follows/hooks/useFriendsQueries';
-import { useToggleControlMutation } from '@/features/user/features/friends/shared/follows/hooks/useFriendsMutations';
 import { useDebouncedUserSearch } from '@/features/user/features/friends/features/friends-list/hooks/useDebouncedUserSearch';
+import { useFriendControl } from '@/features/user/features/friends/features/friends-list/hooks/useFriendControl';
+import { useFriendsListState } from '@/features/user/features/friends/features/friends-list/hooks/useFriendsListState';
+import { useFriendsTabs } from '@/features/user/features/friends/features/friends-list/hooks/useFriendsTabs';
 
 export function useFriendsListScreen(onNavigateToProfile: (userId: string) => void) {
-	const bottomPadding = useBottomPadding();
-	const {
-		data: friends = [],
-		isPending: isLoadingFriends,
-		isSuccess: hasLoadedFriends,
-		isError: friendsFailed,
-		refetch: refetchFriends,
-	} = useFriendsList();
-	const { data: permissions = [], refetch: refetchPermissions } = useControlPermissions();
-	const toggleMutation = useToggleControlMutation();
-	const search = useDebouncedUserSearch();
-
-	const [activeTab, setActiveTab] = useState<'friends' | 'search'>('friends');
-	const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
-	const [isRefreshingFriends, setIsRefreshingFriends] = useState(false);
-
-	const hasCheckedEmptyRef = useRef(false);
-	useEffect(() => {
-		if (hasLoadedFriends && friends.length === 0 && !hasCheckedEmptyRef.current) {
-			hasCheckedEmptyRef.current = true;
-			setActiveTab('search');
-		}
-	}, [hasLoadedFriends, friends.length]);
-
-	const handleToggleControl = useCallback(
-		async (friendId: string, currentValue: boolean) => {
-			setTogglingUserId(friendId);
-			try {
-				await toggleMutation.mutateAsync({ userId: friendId, shouldGrant: !currentValue });
-			} catch (err) {
-				logger.error('[FriendsList] Failed to toggle control:', err);
-				showError(apiErrorMessage(err, 'Impossible de modifier les permissions'));
-			} finally {
-				setTogglingUserId(null);
-			}
-		},
-		[toggleMutation]
-	);
-
-	const handleRefreshFriends = useCallback(async () => {
-		setIsRefreshingFriends(true);
-		try {
-			await Promise.all([refetchFriends(), refetchPermissions()]);
-		} finally {
-			setIsRefreshingFriends(false);
-		}
-	}, [refetchFriends, refetchPermissions]);
-
-	useFocusEffect(
-		useCallback(() => {
-			refetchFriends();
-			refetchPermissions();
-		}, [refetchFriends, refetchPermissions])
-	);
-
-	const permissionSet = useMemo(() => new Set(permissions), [permissions]);
-	const canControl = useCallback((id: string) => permissionSet.has(id), [permissionSet]);
+	const { control, refetchPermissions } = useFriendControl();
+	const { friendsList, hasLoadedFriends } = useFriendsListState(refetchPermissions);
+	const tabs = useFriendsTabs(friendsList.friends.length, hasLoadedFriends);
 
 	return {
-		activeTab,
-		friends,
-		isLoadingFriends,
-		friendsFailed: friendsFailed && friends.length === 0,
-		onRetryFriends: refetchFriends,
-		isRefreshingFriends,
-		onRefreshFriends: handleRefreshFriends,
-		...search,
-		hasFriends: friends.length > 0,
-		canControl,
-		togglingUserId,
-		onToggleControl: handleToggleControl,
+		tabs,
+		friendsList,
+		search: useDebouncedUserSearch(),
+		control,
 		onSelectUser: onNavigateToProfile,
-		onTabChange: setActiveTab,
-		bottomPadding,
+		bottomPadding: useBottomPadding(),
 	};
 }

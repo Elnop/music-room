@@ -1,45 +1,22 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import type { Control, FieldErrors } from 'react-hook-form';
-import { EditProfileFormFields } from '@/features/user/features/profile/features/edit-profile/components/presenters/EditProfileFormFields';
-import { EditProfilePhoto } from '@/features/user/features/profile/features/edit-profile/components/presenters/EditProfilePhoto';
-import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
-import { FormError } from '@/shared/theme/components/FormError';
-import { Button } from '@/shared/theme/components/Button';
+import type { ViewStyle } from 'react-native';
+import { EditProfileBody } from '@/features/user/features/profile/features/edit-profile/components/presenters/EditProfileBody';
+import type {
+	EditProfileFormState,
+	EditProfilePhotoState,
+} from '@/features/user/features/profile/features/edit-profile/editProfileTypes';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { UserProfile } from '@/shared/users/userTypes';
-import { Text } from '@/shared/theme/components/Text';
 
-interface EditProfileViewProps {
-	theme: Theme;
+type EditProfileViewProps = {
 	bottomPadding: number;
-	user: UserProfile | null;
-	error: string | null;
-	isUploading: boolean;
-	isLoading: boolean;
-	isDirty: boolean;
-	control: Control<UpdateProfileInput>;
-	errors: FieldErrors<UpdateProfileInput>;
-	onOpenPhotoMenu: () => void;
-	onSubmit: () => void;
-	onCancel: () => void;
-}
+	photo: EditProfilePhotoState;
+	form: EditProfileFormState;
+};
 
-export function EditProfileView({
-	theme,
-	bottomPadding,
-	user,
-	error,
-	isUploading,
-	isLoading,
-	isDirty,
-	control,
-	errors,
-	onOpenPhotoMenu,
-	onSubmit,
-	onCancel,
-}: EditProfileViewProps) {
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function EditProfileView({ bottomPadding, photo, form }: EditProfileViewProps) {
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.root}>
@@ -50,54 +27,22 @@ export function EditProfileView({
 			>
 				<ScrollView
 					style={styles.scrollView}
-					contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
+					contentContainerStyle={[styles.contentContainer, bottomPaddingStyle(bottomPadding)]}
 					keyboardShouldPersistTaps="handled"
 				>
-					<Text style={styles.subtitle}>Mettez à jour vos informations</Text>
-
-					{error && <FormError message={error} />}
-
-					<EditProfilePhoto
-						user={user}
-						isUploading={isUploading}
-						isLoading={isLoading}
-						onOpenMenu={onOpenPhotoMenu}
-					/>
-
-					<EditProfileFormFields
-						control={control}
-						errors={errors}
-						onSubmit={isDirty && !isLoading ? onSubmit : undefined}
-					/>
-
-					<View style={styles.actions}>
-						<Button
-							variant="primary"
-							onPress={onSubmit}
-							loading={isLoading}
-							disabled={!isDirty || isLoading}
-							style={styles.actionButton}
-						>
-							Enregistrer
-						</Button>
-
-						<Button
-							variant="outline"
-							onPress={onCancel}
-							disabled={isLoading}
-							style={styles.actionButton}
-						>
-							Annuler
-						</Button>
-					</View>
+					<EditProfileBody photo={photo} form={form} />
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</View>
 	);
 }
 
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
+function bottomPaddingStyle(bottomPadding: number): ViewStyle {
+	return { paddingBottom: bottomPadding };
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
 		root: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -108,16 +53,6 @@ const createStyles = (theme: Theme) =>
 		contentContainer: {
 			padding: theme.spacing.lg,
 		},
-		subtitle: {
-			fontSize: 14,
-			color: theme.colors.textSecondary,
-			marginBottom: theme.spacing.xl,
-		},
-		actions: {
-			marginTop: theme.spacing.md,
-			gap: theme.spacing.md,
-		},
-		actionButton: {
-			marginBottom: theme.spacing.sm,
-		},
 	});
+	return styles;
+}

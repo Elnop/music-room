@@ -1,17 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSimilarProfiles } from '@/features/user/features/friends/shared/follows/hooks/useFriendsQueries';
-import type { RecommendedProfile } from '@/features/user/features/friends/types';
-
-export type SimilarProfilesStatus = 'loading' | 'error' | 'needsPreferences' | 'empty' | 'ready';
-
-export type SimilarProfilesSection = {
-	status: SimilarProfilesStatus;
-	profiles: RecommendedProfile[];
-	openProfile: (userId: string) => void;
-	openPreferences: () => void;
-	retry: () => void;
-};
+import type {
+	SimilarProfilesSection,
+	SimilarProfilesStatus,
+} from '@/features/user/features/friends/features/similar-profiles/similarProfilesTypes';
 
 function statusOf(query: ReturnType<typeof useSimilarProfiles>): SimilarProfilesStatus {
 	if (query.data) {

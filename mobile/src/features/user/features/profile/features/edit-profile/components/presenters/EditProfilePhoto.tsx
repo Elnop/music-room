@@ -1,32 +1,24 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import type { EditProfilePhotoState } from '@/features/user/features/profile/features/edit-profile/editProfileTypes';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { Button } from '@/shared/theme/components/Button';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { UserProfile } from '@/shared/users/userTypes';
 
 type EditProfilePhotoProps = {
-	user: UserProfile | null;
-	isUploading: boolean;
-	isLoading: boolean;
-	onOpenMenu: () => void;
+	photo: EditProfilePhotoState;
 };
 
-export function EditProfilePhoto({
-	user,
-	isUploading,
-	isLoading,
-	onOpenMenu,
-}: EditProfilePhotoProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function EditProfilePhoto({ photo }: EditProfilePhotoProps) {
+	const { styles, theme } = useThemedStyles(createStyles);
+	const { user } = photo;
 
 	return (
 		<View style={styles.photoBlock}>
 			<View>
 				<Avatar uri={user?.avatarUrl} name={user?.displayName || user?.username} size="lg" />
-				{isUploading && (
+				{photo.isUploading && (
 					<View style={styles.photoSpinner} testID="avatar-uploading">
 						<ActivityIndicator color={theme.colors.textInverse} />
 					</View>
@@ -34,12 +26,11 @@ export function EditProfilePhoto({
 			</View>
 			<Button
 				variant="outline"
-				onPress={onOpenMenu}
-				disabled={isUploading || isLoading}
+				onPress={photo.onOpenMenu}
+				disabled={photo.isUploading || photo.isLoading}
 				style={styles.photoButton}
-			>
-				Changer la photo
-			</Button>
+				title="Changer la photo"
+			/>
 		</View>
 	);
 }

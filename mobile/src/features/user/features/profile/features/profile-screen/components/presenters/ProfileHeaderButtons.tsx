@@ -2,7 +2,8 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
@@ -12,7 +13,7 @@ type ProfileHeaderButtonsProps = {
 };
 
 export function ProfileHeaderButtons({ onEditProfile, onSettings }: ProfileHeaderButtonsProps) {
-	const { theme } = useTheme();
+	const { styles, theme } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.container}>
@@ -36,14 +37,17 @@ export function ProfileHeaderButtons({ onEditProfile, onSettings }: ProfileHeade
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flexDirection: 'row',
-	},
-	button: {
-		width: 36,
-		height: 36,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-});
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		container: {
+			flexDirection: 'row',
+		},
+		button: {
+			width: theme.controls.headerButton,
+			height: theme.controls.headerButton,
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+	});
+	return styles;
+}

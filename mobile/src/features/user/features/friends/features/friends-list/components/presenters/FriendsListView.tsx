@@ -1,131 +1,58 @@
 import React from 'react';
-import { View } from 'react-native';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { SearchBar } from '@/shared/theme/components/SearchBar';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { FriendProfile, UserProfile } from '@/features/user/features/friends/types';
+import { StyleSheet, View } from 'react-native';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type {
+	FriendControl,
+	FriendsListState,
+	FriendsTabs,
+	UserSearch,
+} from '@/features/user/features/friends/features/friends-list/friendsListTypes';
+import { FriendsListHeader } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendsListHeader';
 import { FriendsListTab } from '@/features/user/features/friends/features/friends-list/components/presenters/FriendsListTab';
 import { SearchUsersTab } from '@/features/user/features/friends/features/friends-list/components/presenters/SearchUsersTab';
-import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
-import { Text } from '@/shared/theme/components/Text';
-import { useContentColumn } from '@/shared/content-column/useContentColumn';
 
-interface FriendsListViewProps {
-	activeTab: 'friends' | 'search';
-	friends: FriendProfile[];
-	isLoadingFriends: boolean;
-	friendsFailed: boolean;
-	onRetryFriends: () => void;
-	isRefreshingFriends: boolean;
-	onRefreshFriends: () => void;
-	searchQuery: string;
-	onSearchChange: (text: string) => void;
-	searchResults: UserProfile[];
-	isSearching: boolean;
-	searchFailed: boolean;
-	isRefreshingSearch: boolean;
-	onRefreshSearch: () => void;
-	onRetrySearch: () => void;
-	hasFriends: boolean;
-	canControl: (friendId: string) => boolean;
-	togglingUserId: string | null;
-	onToggleControl: (friendId: string, current: boolean) => void;
+type FriendsListViewProps = {
+	tabs: FriendsTabs;
+	friendsList: FriendsListState;
+	search: UserSearch;
+	control: FriendControl;
 	onSelectUser: (userId: string) => void;
-	onTabChange: (tab: 'friends' | 'search') => void;
 	bottomPadding: number;
-}
+};
 
-export function FriendsListView({
-	activeTab,
-	friends,
-	isLoadingFriends,
-	friendsFailed,
-	onRetryFriends,
-	isRefreshingFriends,
-	onRefreshFriends,
-	searchQuery,
-	onSearchChange,
-	searchResults,
-	isSearching,
-	searchFailed,
-	isRefreshingSearch,
-	onRefreshSearch,
-	onRetrySearch,
-	hasFriends,
-	canControl,
-	togglingUserId,
-	onToggleControl,
-	onSelectUser,
-	onTabChange,
-	bottomPadding,
-}: FriendsListViewProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
-	const column = useContentColumn();
+export function FriendsListView(props: FriendsListViewProps) {
+	const { tabs, friendsList, search } = props;
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.container}>
-			<View style={[styles.header, column]}>
-				{hasFriends && (
-					<View style={styles.tabsContainer}>
-						<Pressable
-							style={[styles.tab, activeTab === 'friends' && styles.tabActive]}
-							onPress={() => onTabChange('friends')}
-							accessibilityLabel={`Mes amis (${friends.length})`}
-						>
-							<Text style={[styles.tabText, activeTab === 'friends' && styles.tabTextActive]}>
-								Mes amis ({friends.length})
-							</Text>
-						</Pressable>
-						<Pressable
-							style={[styles.tab, activeTab === 'search' && styles.tabActive]}
-							onPress={() => onTabChange('search')}
-							accessibilityLabel="Rechercher"
-						>
-							<Text style={[styles.tabText, activeTab === 'search' && styles.tabTextActive]}>
-								Rechercher
-							</Text>
-						</Pressable>
-					</View>
-				)}
-				{activeTab === 'search' && (
-					<SearchBar
-						value={searchQuery}
-						onChangeText={onSearchChange}
-						placeholder="Rechercher un utilisateur..."
-						style={styles.searchBar}
-					/>
-				)}
-			</View>
-
-			{activeTab === 'friends' ? (
+			<FriendsListHeader tabs={tabs} friendsCount={friendsList.friends.length} search={search} />
+			{tabs.activeTab === 'friends' ? (
 				<FriendsListTab
-					friends={friends}
-					isLoading={isLoadingFriends}
-					loadFailed={friendsFailed}
-					onRetry={onRetryFriends}
-					isRefreshing={isRefreshingFriends}
-					onRefresh={onRefreshFriends}
-					canControl={canControl}
-					togglingUserId={togglingUserId}
-					onToggleControl={onToggleControl}
-					onSelectUser={onSelectUser}
-					onGoToSearch={() => onTabChange('search')}
-					bottomPadding={bottomPadding}
+					friendsList={friendsList}
+					control={props.control}
+					onSelectUser={props.onSelectUser}
+					onGoToSearch={() => tabs.onTabChange('search')}
+					bottomPadding={props.bottomPadding}
 				/>
 			) : (
 				<SearchUsersTab
-					searchResults={searchResults}
-					searchQuery={searchQuery}
-					isSearching={isSearching}
-					searchFailed={searchFailed}
-					isRefreshing={isRefreshingSearch}
-					onRefresh={onRefreshSearch}
-					onRetry={onRetrySearch}
-					onSelectUser={onSelectUser}
-					bottomPadding={bottomPadding}
+					search={search}
+					onSelectUser={props.onSelectUser}
+					bottomPadding={props.bottomPadding}
 				/>
 			)}
 		</View>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: theme.colors.background,
+		},
+	});
+	return styles;
 }

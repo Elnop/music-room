@@ -1,11 +1,13 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import type { Control, FieldErrors } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
-import { PROFILE_LIMITS } from '@/features/user/features/profile/features/edit-profile/profileSchema';
-import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/profileSchema';
-import { Input } from '@/shared/theme/components/Input';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { EditProfileCappedField } from '@/features/user/features/profile/features/edit-profile/components/presenters/EditProfileCappedField';
+import {
+	BIO_FIELD,
+	DISPLAY_NAME_FIELD,
+} from '@/features/user/features/profile/features/edit-profile/editProfileConfig';
+import type { UpdateProfileInput } from '@/features/user/features/profile/features/edit-profile/editProfileTypes';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Text } from '@/shared/theme/components/Text';
 
@@ -16,58 +18,22 @@ type EditProfileFormFieldsProps = {
 };
 
 export function EditProfileFormFields({ control, errors, onSubmit }: EditProfileFormFieldsProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<>
-			<Controller
+			<EditProfileCappedField
 				control={control}
 				name="displayName"
-				render={({ field: { onChange, onBlur, value } }) => (
-					<View>
-						<Input
-							label="Nom affiché"
-							placeholder="Saisissez votre nom"
-							value={value}
-							onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.DISPLAY_NAME_MAX))}
-							onBlur={onBlur}
-							error={errors.displayName?.message}
-							autoCapitalize="words"
-							returnKeyType="next"
-							onEnter={onSubmit}
-							maxLength={PROFILE_LIMITS.DISPLAY_NAME_MAX}
-						/>
-						<Text style={styles.charCount}>
-							{value?.length || 0}/{PROFILE_LIMITS.DISPLAY_NAME_MAX}
-						</Text>
-					</View>
-				)}
+				error={errors.displayName?.message}
+				config={{ ...DISPLAY_NAME_FIELD, onEnter: onSubmit }}
 			/>
 
-			<Controller
+			<EditProfileCappedField
 				control={control}
 				name="bio"
-				render={({ field: { onChange, onBlur, value } }) => (
-					<View>
-						<Input
-							label="Bio"
-							placeholder="Parlez-nous de vous…"
-							value={value}
-							onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.BIO_MAX))}
-							onBlur={onBlur}
-							error={errors.bio?.message}
-							multiline
-							numberOfLines={4}
-							style={styles.bioInput}
-							returnKeyType="done"
-							maxLength={PROFILE_LIMITS.BIO_MAX}
-						/>
-						<Text style={styles.charCount}>
-							{value?.length || 0}/{PROFILE_LIMITS.BIO_MAX}
-						</Text>
-					</View>
-				)}
+				error={errors.bio?.message}
+				config={BIO_FIELD}
 			/>
 
 			<Text style={styles.infoText}>
@@ -79,19 +45,8 @@ export function EditProfileFormFields({ control, errors, onSubmit }: EditProfile
 
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
-		bioInput: {
-			minHeight: 100,
-			textAlignVertical: 'top',
-		},
-		charCount: {
-			fontSize: 12,
-			color: theme.colors.textSecondary,
-			textAlign: 'right',
-			marginTop: -theme.spacing.sm,
-			marginBottom: theme.spacing.sm,
-		},
 		infoText: {
-			fontSize: 12,
+			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
 			fontStyle: 'italic',
 			marginTop: theme.spacing.md,

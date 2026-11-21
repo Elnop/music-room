@@ -1,86 +1,42 @@
 import React from 'react';
-import { View } from 'react-native';
-import { Button } from '@/shared/theme/components/Button';
+import { StyleSheet } from 'react-native';
 import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
 import { userLink } from '@/shared/share-links/shareLinks';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import type { UserProfileHeaderProps } from '@/features/user/features/friends/types';
-import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
-import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { ViewedProfile } from '@/features/user/features/friends/features/user-profile/userProfileTypes';
+import { FollowButtons } from '@/features/user/features/friends/features/user-profile/components/presenters/FollowButtons';
 import { UserProfileListening } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileListening';
-import { Text } from '@/shared/theme/components/Text';
 
-type UserProfileActionsProps = UserProfileHeaderProps;
+type UserProfileActionsProps = {
+	viewed: ViewedProfile;
+};
 
-export function UserProfileActions({
-	userId,
-	profile,
-	followStatus,
-	isFollowLoading,
-	onFollowToggle,
-	canControlMusic,
-	devices,
-	isListeningLoading,
-	onRemotePlay,
-	onRemotePause,
-}: UserProfileActionsProps) {
-	const { theme } = useTheme();
-	const headerStyles = React.useMemo(() => createUserProfileHeaderStyles(theme), [theme]);
-	const styles = React.useMemo(() => createUserProfileStyles(theme), [theme]);
+export function UserProfileActions({ viewed }: UserProfileActionsProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const { profile, follow, listening } = viewed;
 
 	return (
 		<>
-			{followStatus && (
-				<View style={headerStyles.actionButtons}>
-					{followStatus.isFriend ? (
-						<>
-							<View style={headerStyles.friendBadge}>
-								<Text style={headerStyles.friendBadgeText}>Amis</Text>
-							</View>
-							<Button
-								variant="outline"
-								onPress={onFollowToggle}
-								loading={isFollowLoading}
-								style={headerStyles.actionButton}
-							>
-								Abonné
-							</Button>
-						</>
-					) : followStatus.isFollowing ? (
-						<Button
-							variant="outline"
-							onPress={onFollowToggle}
-							loading={isFollowLoading}
-							style={headerStyles.fullWidthButton}
-						>
-							Abonné
-						</Button>
-					) : (
-						<Button
-							variant="primary"
-							onPress={onFollowToggle}
-							loading={isFollowLoading}
-							style={headerStyles.fullWidthButton}
-						>
-							Suivre
-						</Button>
-					)}
-				</View>
-			)}
-
+			{follow.status && <FollowButtons status={follow.status} follow={follow} />}
 			<ShareLinkButton
-				url={userLink(userId)}
+				url={userLink(viewed.userId)}
 				title={profile.displayName || profile.username}
 				style={styles.shareButton}
 			/>
-
-			{canControlMusic && followStatus?.isFriend && !isListeningLoading && (
-				<UserProfileListening
-					devices={devices}
-					onRemotePlay={onRemotePlay}
-					onRemotePause={onRemotePause}
-				/>
+			{listening.canControlMusic && follow.status?.isFriend && !listening.isLoading && (
+				<UserProfileListening listening={listening} />
 			)}
 		</>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		shareButton: {
+			alignSelf: 'flex-start',
+			marginTop: theme.spacing.md,
+		},
+	});
+	return styles;
 }

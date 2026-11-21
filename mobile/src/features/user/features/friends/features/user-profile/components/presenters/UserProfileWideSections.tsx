@@ -1,28 +1,16 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { ProfileSection } from '@/features/user/shared/profile-section/ProfileSection';
-import {
-	ProfileInfoRows,
-	memberSinceLabel,
-} from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
-import type { ProfileInfoRow } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
-import { GenreChip } from '@/shared/theme/components/GenreChip';
-import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import type { Theme } from '@/shared/theme/types/themeTypes';
-import type {
-	FilteredProfile,
-	FriendPlaylistSummary,
-} from '@/features/user/features/friends/types';
-import { FriendPlaylistCard } from '@/features/user/features/friends/features/user-profile/components/presenters/FriendPlaylistCard';
-import { HiddenFieldNote } from '@/features/user/features/friends/features/user-profile/components/presenters/HiddenFieldNote';
-import { Text } from '@/shared/theme/components/Text';
+import { ProfileInfoRows } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
+import type { ProfileInfoRow } from '@/features/user/shared/profile-info-rows/profileInfoRowsTypes';
+import { memberSinceLabel } from '@/features/user/shared/member-since/memberSinceLabel';
+import type { FilteredProfile } from '@/features/user/features/friends/friendsTypes';
+import type { ViewedProfile } from '@/features/user/features/friends/features/user-profile/userProfileTypes';
+import { UserProfileGenres } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileGenres';
+import { UserProfileListening } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileListening';
+import { UserProfileWidePlaylists } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileWidePlaylists';
+import { UserProfileWideSection } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileWideSection';
 
 type UserProfileWideSectionsProps = {
-	profile: FilteredProfile;
-	isFriend: boolean;
-	playlists: FriendPlaylistSummary[];
-	onSelectPlaylist: (playlistId: string) => void;
-	listening?: React.ReactNode;
+	viewed: ViewedProfile;
 };
 
 function infoRows(profile: FilteredProfile): ProfileInfoRow[] {
@@ -35,70 +23,36 @@ function infoRows(profile: FilteredProfile): ProfileInfoRow[] {
 	return rows;
 }
 
-export function UserProfileWideSections({
-	profile,
-	isFriend,
-	playlists,
-	onSelectPlaylist,
-	listening,
-}: UserProfileWideSectionsProps) {
-	const { styles } = useThemedStyles(createStyles);
-	const genres = profile.musicPreferences;
-
+function showsListening({ follow, listening }: ViewedProfile): boolean {
+	const isFriend = follow.status?.isFriend ?? false;
 	return (
-		<>
-			{listening && (
-				<View style={styles.section}>
-					<ProfileSection title="En écoute" prominent>
-						{listening}
-					</ProfileSection>
-				</View>
-			)}
-			<View style={styles.section}>
-				<ProfileSection title="Préférences musicales" prominent>
-					{genres === undefined ? (
-						<HiddenFieldNote label={isFriend ? 'Privées' : 'Visibles uniquement par ses amis'} />
-					) : genres.length > 0 ? (
-						<View style={styles.genres}>
-							{genres.map(genre => (
-								<GenreChip key={genre} genre={genre} selected size="sm" />
-							))}
-						</View>
-					) : (
-						<Text style={styles.empty}>Aucun genre choisi</Text>
-					)}
-				</ProfileSection>
-			</View>
-			<View style={styles.section}>
-				<ProfileSection title="Information" prominent>
-					<ProfileInfoRows rows={infoRows(profile)} />
-				</ProfileSection>
-			</View>
-			{playlists.length > 0 && (
-				<View style={styles.section}>
-					<ProfileSection title="Playlists" prominent>
-						{playlists.map(playlist => (
-							<FriendPlaylistCard
-								key={playlist.id}
-								playlist={playlist}
-								ownerName={profile.username}
-								onPress={() => onSelectPlaylist(playlist.id)}
-								style={styles.playlist}
-							/>
-						))}
-					</ProfileSection>
-				</View>
-			)}
-		</>
+		listening.canControlMusic &&
+		isFriend &&
+		!listening.isLoading &&
+		listening.devices.some(d => Boolean(d.track))
 	);
 }
 
-function createStyles(theme: Theme) {
-	const styles = StyleSheet.create({
-		section: { marginTop: theme.spacing.md },
-		genres: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.xs },
-		empty: { fontSize: theme.typography.sizes.md, color: theme.colors.textSecondary },
-		playlist: { paddingHorizontal: 0 },
-	});
-	return styles;
+export function UserProfileWideSections({ viewed }: UserProfileWideSectionsProps) {
+	const { profile } = viewed;
+
+	return (
+		<>
+			{showsListening(viewed) && (
+				<UserProfileWideSection title="En écoute">
+					<UserProfileListening listening={viewed.listening} />
+				</UserProfileWideSection>
+			)}
+			<UserProfileWideSection title="Préférences musicales">
+				<UserProfileGenres
+					genres={profile.musicPreferences}
+					isFriend={viewed.follow.status?.isFriend ?? false}
+				/>
+			</UserProfileWideSection>
+			<UserProfileWideSection title="Information">
+				<ProfileInfoRows rows={infoRows(profile)} />
+			</UserProfileWideSection>
+			<UserProfileWidePlaylists playlists={viewed.playlists} ownerName={profile.username} />
+		</>
+	);
 }
