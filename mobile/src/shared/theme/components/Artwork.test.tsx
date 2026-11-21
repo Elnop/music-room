@@ -11,7 +11,7 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 describe('Artwork', () => {
 	it('shows the image when there is a uri', () => {
 		render(<Artwork uri="https://i1.sndcdn.com/a-large.jpg" size={48} />);
-		expect(screen.getByTestId('artwork-image').props.source).toEqual({
+		expect(screen.getByTestId('artwork-image').props.source).toStrictEqual({
 			uri: 'https://i1.sndcdn.com/a-large.jpg',
 		});
 		expect(screen.queryByTestId('artwork-placeholder')).toBeNull();

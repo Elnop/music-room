@@ -11,11 +11,11 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { LANDING_FEATURES } from '@/features/user/features/auth/features/welcome/landingContent';
 import { FeatureCard } from '@/features/user/features/auth/features/welcome/components/presenters/FeatureCard';
 
-interface LandingSectionsProps {
+type LandingSectionsProps = {
 	buildLabel: string;
 	onOpenPrivacyPolicy: () => void;
 	onOpenLink: (url: string) => void;
-}
+};
 
 export function LandingSections({
 	buildLabel,
@@ -85,7 +85,7 @@ export function LandingSections({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		sections: {
 			width: '100%',
 			maxWidth: CONTENT_MAX_WIDTH.content,
@@ -138,4 +138,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

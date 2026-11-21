@@ -7,10 +7,10 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistForm } from '@/features/playlists/features/editor/features/playlist-form/usePlaylistForm';
 import { ToggleCard } from '@/features/playlists/features/editor/features/playlist-form/components/presenters/ToggleCard';
 
-interface PlaylistFormViewProps {
+type PlaylistFormViewProps = {
 	form: PlaylistForm;
 	bottomPadding: number;
-}
+};
 
 export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -80,11 +80,12 @@ export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps)
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		screen: { flex: 1, backgroundColor: theme.colors.background },
 		keyboard: { flex: 1 },
 		scroll: { flexGrow: 1, paddingTop: theme.spacing.md },
 		body: { flex: 1, padding: theme.spacing.lg },
 		form: { gap: theme.spacing.md },
 	});
+	return styles;
 }

@@ -10,7 +10,7 @@ import type { SharingSettings } from '@/features/playlists/features/editor/featu
 import { useUserSearch } from '@/features/playlists/features/editor/features/sharing/hooks/useUserSearch';
 import type { UserSearch } from '@/features/playlists/features/editor/features/sharing/hooks/useUserSearch';
 
-export interface PlaylistSharing {
+export type PlaylistSharing = {
 	mode: SharingMode;
 	isInfoOnly: boolean;
 	members: SharingMembers;
@@ -19,7 +19,7 @@ export interface PlaylistSharing {
 	addUser: (user: UserSummary) => void;
 	removeUser: (userId: string) => Promise<void>;
 	bottomPadding: number;
-}
+};
 
 export function usePlaylistSharing(id: string): PlaylistSharing {
 	const playlist = useCachedPlaylist(id);

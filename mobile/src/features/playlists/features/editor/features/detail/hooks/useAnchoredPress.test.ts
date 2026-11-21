@@ -29,7 +29,12 @@ describe('useAnchoredPress', () => {
 	it('records where the button is before opening the menu on desktop', () => {
 		mockWidth(1440);
 		const onPress = jest.fn(() =>
-			expect(useMenuAnchorStore.getState().anchor).toEqual({ x: 5, y: 6, width: 32, height: 32 })
+			expect(useMenuAnchorStore.getState().anchor).toStrictEqual({
+				x: 5,
+				y: 6,
+				width: 32,
+				height: 32,
+			})
 		);
 		const { result } = renderHook(() => useAnchoredPress(buttonAt(5, 6), onPress));
 		result.current();

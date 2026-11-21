@@ -1,12 +1,15 @@
 import React from 'react';
 import { ProfileSection } from '@/features/user/shared/profile-section/ProfileSection';
-import { ProfileInfoRows, memberSinceLabel } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
+import {
+	ProfileInfoRows,
+	memberSinceLabel,
+} from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
 import type { UserProfile } from '@/shared/users/user.types';
 
-interface ProfileInfoSectionProps {
+type ProfileInfoSectionProps = {
 	user: UserProfile;
 	prominent?: boolean;
-}
+};
 
 export function ProfileInfoSection({ user, prominent }: ProfileInfoSectionProps) {
 	return (

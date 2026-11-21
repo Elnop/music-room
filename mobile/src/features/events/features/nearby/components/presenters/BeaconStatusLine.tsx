@@ -9,10 +9,10 @@ import { Text } from '@/shared/theme/components/Text';
 import WifiOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/wifi.svg';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
-interface BeaconStatusLineProps {
+type BeaconStatusLineProps = {
 	status: BeaconScanStatus;
 	onRequestPermission: () => void;
-}
+};
 
 const TEXTS: Partial<Record<BeaconScanStatus, string>> = {
 	scanning: 'Détection des balises Bluetooth active',
@@ -50,7 +50,7 @@ export function BeaconStatusLine({ status, onRequestPermission }: BeaconStatusLi
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -65,4 +65,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.primary,
 		},
 	});
+	return styles;
 }

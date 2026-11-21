@@ -10,7 +10,7 @@ export const playlistFormSchema = z.object({
 
 export type PlaylistFormInput = z.infer<typeof playlistFormSchema>;
 
-export interface PlaylistInput extends PlaylistFormInput {
+export type PlaylistInput = PlaylistFormInput & {
 	visibility?: 'public' | 'private';
 	editMode?: 'open' | 'restricted';
-}
+};

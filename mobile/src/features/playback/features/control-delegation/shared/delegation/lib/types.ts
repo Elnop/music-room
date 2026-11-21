@@ -22,25 +22,25 @@ export type {
 	UserDeviceWithLicenses,
 };
 
-export interface MusicControlPermissionsResponse {
+export type MusicControlPermissionsResponse = {
 	allowedUserIds: string[];
-}
+};
 
-export interface CanControlResponse {
+export type CanControlResponse = {
 	canControl: boolean;
 	targetUserId: string;
-}
+};
 
-export interface ControlActionResponse {
+export type ControlActionResponse = {
 	success: boolean;
 	allowedUserId: string;
-}
+};
 
-export interface FriendDeviceStatus extends ListeningStatus {
+export type FriendDeviceStatus = ListeningStatus & {
 	controllable: boolean;
-}
+};
 
-export interface FriendListeningResult {
+export type FriendListeningResult = {
 	devices: FriendDeviceStatus[];
 	canControl: boolean;
 	isLoading: boolean;
@@ -48,11 +48,11 @@ export interface FriendListeningResult {
 	controlError: ControlError | null;
 	remotePlay: (targetDeviceId: string) => void;
 	remotePause: (targetDeviceId: string) => void;
-}
+};
 
-export interface FriendUserSummary {
+export type FriendUserSummary = {
 	id: string;
 	username: string;
 	displayName?: string | null;
 	avatarUrl?: string | null;
-}
+};

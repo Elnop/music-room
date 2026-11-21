@@ -5,12 +5,12 @@ import type { Plan } from '@/features/subscription/lib/subscription';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface SubscriptionSectionProps {
+type SubscriptionSectionProps = {
 	theme: Theme;
 	plan: Plan | undefined;
 	disabled: boolean;
 	onTogglePremium: (premium: boolean) => void;
-}
+};
 
 export function SubscriptionSection({
 	theme,
@@ -43,7 +43,7 @@ export function SubscriptionSection({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -69,4 +69,5 @@ function createStyles(theme: Theme) {
 			marginTop: theme.spacing.sm,
 		},
 	});
+	return styles;
 }

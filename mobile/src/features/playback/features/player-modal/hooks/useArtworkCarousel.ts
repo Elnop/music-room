@@ -24,15 +24,15 @@ const SWIPE_MS = 200;
 const TRACK_CHANGE_MS = 260;
 const WINDOW = 2;
 
-export interface CarouselSlot {
+export type CarouselSlot = {
 	key: string;
 	index: number;
 	uri: string | null;
 	title: string;
 	artist: string;
-}
+};
 
-export interface ArtworkCarousel {
+export type ArtworkCarousel = {
 	slots: CarouselSlot[];
 	center: SharedValue<number>;
 	drag: SharedValue<number>;
@@ -41,7 +41,7 @@ export interface ArtworkCarousel {
 	panGesture: ReturnType<typeof Gesture.Pan>;
 	artworkSize: number;
 	artworkStep: number;
-}
+};
 
 function queueSlots(items: QueueItem[], shown: number): CarouselSlot[] {
 	const first = Math.max(0, shown - WINDOW);

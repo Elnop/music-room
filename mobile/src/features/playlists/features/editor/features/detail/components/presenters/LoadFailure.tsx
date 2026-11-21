@@ -7,10 +7,10 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 
-interface LoadFailureProps {
+type LoadFailureProps = {
 	notFound: boolean;
 	onRetry: () => void;
-}
+};
 
 export function LoadFailure({ notFound, onRetry }: LoadFailureProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -34,7 +34,7 @@ export function LoadFailure({ notFound, onRetry }: LoadFailureProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		failure: {
 			flex: 1,
 			alignItems: 'center',
@@ -45,4 +45,5 @@ function createStyles(theme: Theme) {
 			marginBottom: theme.spacing.lg,
 		},
 	});
+	return styles;
 }

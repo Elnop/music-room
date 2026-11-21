@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 const CAUGHT_UP_S = 1;
 const HOLD_MS = 3000;
 
-export interface SeekPosition {
+export type SeekPosition = {
 	position: number;
 	onSlidingStart: (value: number) => void;
 	onValueChange: (value: number) => void;
 	onSlidingComplete: (value: number) => void;
-}
+};
 
 export function useSeekPosition(
 	currentTime: number,

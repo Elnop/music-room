@@ -13,7 +13,7 @@ describe('fetchStreamUrl', () => {
 		async protocol => {
 			mockApiRequest.mockResolvedValueOnce({ streamUrl: 'u', protocol, expiresAt: EXPIRES_AT });
 
-			expect(await fetchStreamUrl('https://soundcloud.com/a/b', signal)).toEqual({
+			expect(await fetchStreamUrl('https://soundcloud.com/a/b', signal)).toStrictEqual({
 				streamUrl: 'u',
 				protocol,
 				expiresAt: Date.parse(EXPIRES_AT),

@@ -126,7 +126,7 @@ function expectAuthenticated(): void {
 }
 
 async function expectPersisted(): Promise<void> {
-	expect(JSON.parse((await AsyncStorage.getItem(KEYS.user)) as string)).toEqual(user);
+	expect(JSON.parse((await AsyncStorage.getItem(KEYS.user)) as string)).toStrictEqual(user);
 	expect(await AsyncStorage.getItem(KEYS.access)).toBe('new-access');
 	expect(await AsyncStorage.getItem(KEYS.refresh)).toBe('new-refresh');
 	expect(await AsyncStorage.getItem(KEYS.isAuth)).toBe('true');
@@ -142,7 +142,7 @@ async function expectSignedOutAndNothingStored(): Promise<void> {
 		isAuthenticated: false,
 		isLoading: false,
 	});
-	expect(await AsyncStorage.multiGet(Object.values(KEYS))).toEqual(
+	expect(await AsyncStorage.multiGet(Object.values(KEYS))).toStrictEqual(
 		Object.values(KEYS).map(key => [key, null])
 	);
 }
@@ -159,7 +159,7 @@ describe('login', () => {
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		expect(url).toMatch(/\/api\/auth\/login$/u);
 		expect(init.method).toBe('POST');
-		expect(body).toEqual({ email: 'a@example.com', password: 'Secret1!' });
+		expect(body).toStrictEqual({ email: 'a@example.com', password: 'Secret1!' });
 		expectAuthenticated();
 		await expectPersisted();
 	});
@@ -200,7 +200,7 @@ describe('register', () => {
 			})
 		);
 
-		await expect(register(input)).resolves.toEqual({
+		await expect(register(input)).resolves.toStrictEqual({
 			requiresVerification: true,
 			userId: 'user-new',
 			email: 'new@example.com',
@@ -209,7 +209,7 @@ describe('register', () => {
 		const { url, init, body } = requestAt();
 		expect(url).toMatch(/\/api\/auth\/register$/u);
 		expect(init.method).toBe('POST');
-		expect(body).toEqual(input);
+		expect(body).toStrictEqual(input);
 		await expectSignedOutAndNothingStored();
 	});
 
@@ -218,7 +218,7 @@ describe('register', () => {
 			jsonResponse(201, { success: true, data: { user, session, requiresVerification: false } })
 		);
 
-		await expect(register(input)).resolves.toEqual({
+		await expect(register(input)).resolves.toStrictEqual({
 			requiresVerification: false,
 		});
 
@@ -252,7 +252,7 @@ describe('loginWithGoogle', () => {
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		expect(url).toMatch(/\/api\/auth\/google$/u);
 		expect(init.method).toBe('POST');
-		expect(body).toEqual({ idToken: 'google-id-token' });
+		expect(body).toStrictEqual({ idToken: 'google-id-token' });
 		expectAuthenticated();
 		await expectPersisted();
 	});
@@ -297,7 +297,7 @@ describe('loginWithFacebook', () => {
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		expect(url).toMatch(/\/api\/auth\/facebook$/u);
 		expect(init.method).toBe('POST');
-		expect(body).toEqual({ accessToken: 'facebook-access-token' });
+		expect(body).toStrictEqual({ accessToken: 'facebook-access-token' });
 		expectAuthenticated();
 		await expectPersisted();
 	});
@@ -341,7 +341,7 @@ describe('verifyEmail', () => {
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		expect(url).toMatch(/\/api\/auth\/verify-email$/u);
 		expect(init.method).toBe('POST');
-		expect(body).toEqual({ userId: 'user-a', code: '123456' });
+		expect(body).toStrictEqual({ userId: 'user-a', code: '123456' });
 		expectAuthenticated();
 		await expectPersisted();
 	});

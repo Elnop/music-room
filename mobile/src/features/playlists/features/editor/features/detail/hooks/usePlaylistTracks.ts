@@ -24,7 +24,7 @@ import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
 import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
-export interface PlaylistTracks {
+export type PlaylistTracks = {
 	canEdit: boolean;
 	isMoving: boolean;
 	currentUri: string | null;
@@ -35,7 +35,7 @@ export interface PlaylistTracks {
 	explainUnavailable: () => void;
 	deleteTrack: (trackId: string) => Promise<void>;
 	reorder: (from: number, to: number) => Promise<void>;
-}
+};
 
 export function usePlaylistTracks(
 	id: string,

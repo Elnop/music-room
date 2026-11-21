@@ -18,10 +18,10 @@ import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player
 
 type Sheet = 'queue' | 'devices';
 
-interface OpenActions {
+type OpenActions = {
 	track: AddQueueItemBody;
 	start: TrackActionsStart;
-}
+};
 
 export function useNowPlayingPanel() {
 	const { theme } = useTheme();

@@ -16,11 +16,11 @@ import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-sol
 
 const TITLES = { playlists: 'Ajouter à une playlist', newPlaylist: 'Nouvelle playlist' } as const;
 
-interface TrackActionsViewProps {
+type TrackActionsViewProps = {
 	actions: TrackActions;
 	anchor: MenuAnchor | null;
 	onClose: () => void;
-}
+};
 
 export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -94,7 +94,7 @@ export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewP
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		list: {
 			maxHeight: 360,
 		},
@@ -109,4 +109,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

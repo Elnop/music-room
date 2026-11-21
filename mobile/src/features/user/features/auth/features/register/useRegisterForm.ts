@@ -11,14 +11,14 @@ import { useRegisterMutation } from '@/features/user/features/auth/shared/sign-i
 import { useFieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
 import type { FieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
 
-interface RegisterForm {
+type RegisterForm = {
 	email: FieldBinding;
 	username: FieldBinding;
 	password: FieldBinding;
 	submit: () => void;
 	isSubmitting: boolean;
 	goToLogin: () => void;
-}
+};
 
 export function useRegisterForm(
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'Register'>

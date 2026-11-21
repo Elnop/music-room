@@ -9,7 +9,7 @@ import type { createStyles } from '@/features/playback/features/player-modal/com
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
-interface PlayerHeaderProps {
+type PlayerHeaderProps = {
 	styles: ReturnType<typeof createStyles>;
 	colors: {
 		textSecondary: string;
@@ -17,7 +17,7 @@ interface PlayerHeaderProps {
 	dialog?: boolean;
 	isLoading?: boolean;
 	onClose: () => void;
-}
+};
 
 export function PlayerHeader({
 	styles,

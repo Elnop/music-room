@@ -76,7 +76,7 @@ describe('useSoundCloudSearch', () => {
 		const { result } = renderHook(() => useSoundCloudSearch('daft'), { wrapper });
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual(sampleTracks);
+		expect(result.current.data).toStrictEqual(sampleTracks);
 		expect(mockSearchTracks).toHaveBeenCalledWith('daft');
 	});
 

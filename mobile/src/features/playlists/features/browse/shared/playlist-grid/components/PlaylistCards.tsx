@@ -9,11 +9,11 @@ import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import { playlistCardLabel } from '@/features/playlists/features/browse/shared/playlist-grid/lib/playlistLabels';
 import { PlaylistCassette } from '@/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCassette';
 
-interface PlaylistGridCardProps {
+type PlaylistGridCardProps = {
 	playlist: Playlist;
 	onPress: () => void;
 	onShowActions?: () => void;
-}
+};
 
 export function PlaylistGridCard({ playlist, onPress, onShowActions }: PlaylistGridCardProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -34,7 +34,8 @@ export function PlaylistGridCard({ playlist, onPress, onShowActions }: PlaylistG
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		tile: { marginBottom: theme.spacing.lg },
 	});
+	return styles;
 }

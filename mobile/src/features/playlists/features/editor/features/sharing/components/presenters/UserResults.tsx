@@ -13,12 +13,12 @@ import { Text } from '@/shared/theme/components/Text';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
 
-interface UserResultsProps {
+type UserResultsProps = {
 	results: UserSummary[];
 	isSearching: boolean;
 	busy: boolean;
 	onAdd: (user: UserSummary) => void;
-}
+};
 
 export function UserResults({ results, isSearching, busy, onAdd }: UserResultsProps) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
@@ -61,7 +61,7 @@ export function UserResults({ results, isSearching, busy, onAdd }: UserResultsPr
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			marginBottom: theme.spacing.lg,
 		},
@@ -94,4 +94,5 @@ function createStyles(theme: Theme) {
 			justifyContent: 'center',
 		},
 	});
+	return styles;
 }

@@ -2,11 +2,11 @@ import React from 'react';
 import { NowPlayingInline } from '@/features/user/features/friends/features/user-profile/components/presenters/NowPlayingInline';
 import type { FriendListeningDevice } from '@/features/user/features/friends/types';
 
-interface UserProfileListeningProps {
+type UserProfileListeningProps = {
 	devices: FriendListeningDevice[];
 	onRemotePlay: (deviceId: string) => void;
 	onRemotePause: (deviceId: string) => void;
-}
+};
 
 export function UserProfileListening({
 	devices,

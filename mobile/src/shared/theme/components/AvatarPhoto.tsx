@@ -1,12 +1,12 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 
-export interface AvatarPhotoProps {
+export type AvatarPhotoProps = {
 	uri: string;
 	size: number;
 	onLoad: () => void;
 	onError: () => void;
-}
+};
 
 export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 	return (

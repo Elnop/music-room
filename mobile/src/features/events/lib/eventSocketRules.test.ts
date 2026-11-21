@@ -31,18 +31,18 @@ afterAll(() => client.clear());
 describe('EVENT_SOCKET_RULES', () => {
 	it('adds an event created on another phone, without a refetch', () => {
 		emit('event:created', musicEvent({ id: 'e2', name: 'Bar' }));
-		expect(shown()).toEqual(['Rooftop', 'Bar']);
+		expect(shown()).toStrictEqual(['Rooftop', 'Bar']);
 	});
 
 	it('updates the list and the detail', () => {
 		client.setQueryData(queryKeys.events.detail('e1'), musicEvent());
 		emit('event:updated', musicEvent({ name: 'Renamed' }));
-		expect(shown()).toEqual(['Renamed']);
+		expect(shown()).toStrictEqual(['Renamed']);
 		expect(client.getQueryData<MusicEvent>(queryKeys.events.detail('e1'))?.name).toBe('Renamed');
 	});
 
 	it('removes a deleted event', () => {
 		emit('event:deleted', { eventId: 'e1' });
-		expect(shown()).toEqual([]);
+		expect(shown()).toStrictEqual([]);
 	});
 });

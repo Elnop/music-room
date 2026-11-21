@@ -11,12 +11,12 @@ import { PlaylistByline } from '@/features/playlists/features/editor/features/de
 import { PlaylistCover } from '@/features/playlists/features/editor/features/detail/components/presenters/PlaylistCover';
 import { Text } from '@/shared/theme/components/Text';
 
-interface PlaylistWideHeaderProps {
+type PlaylistWideHeaderProps = {
 	playlist: PlaylistWithTracks;
 	playButton: React.ReactNode;
 	canEdit: boolean;
 	onAddTrack: () => void;
-}
+};
 
 export function PlaylistWideHeader({
 	playlist,
@@ -55,7 +55,7 @@ export function PlaylistWideHeader({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.sm },
 		hero: {
 			flexDirection: 'row',
@@ -86,4 +86,5 @@ function createStyles(theme: Theme) {
 			marginTop: theme.spacing.lg,
 		},
 	});
+	return styles;
 }

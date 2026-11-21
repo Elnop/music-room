@@ -9,11 +9,11 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface EditProfileFormFieldsProps {
+type EditProfileFormFieldsProps = {
 	control: Control<UpdateProfileInput>;
 	errors: FieldErrors<UpdateProfileInput>;
 	onSubmit?: () => void;
-}
+};
 
 export function EditProfileFormFields({ control, errors, onSubmit }: EditProfileFormFieldsProps) {
 	const { theme } = useTheme();
@@ -78,7 +78,7 @@ export function EditProfileFormFields({ control, errors, onSubmit }: EditProfile
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		bioInput: {
 			minHeight: 100,
 			textAlignVertical: 'top',
@@ -98,4 +98,5 @@ function createStyles(theme: Theme) {
 			marginBottom: theme.spacing.lg,
 		},
 	});
+	return styles;
 }

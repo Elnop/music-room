@@ -4,17 +4,17 @@ import { musicControlApi } from '@/features/playback/features/control-delegation
 import type { ControlError } from '@/shared/control-error/controlError';
 import { logger } from '@/shared/logging/logger';
 
-interface PermissionChangedEvent {
+type PermissionChangedEvent = {
 	ownerId: string;
 	targetUserId: string;
 	canControl: boolean;
-}
+};
 
-interface ControllableIds {
+type ControllableIds = {
 	userId: string;
 	allDevices: boolean;
 	ids: string[];
-}
+};
 
 const NO_IDS: string[] = [];
 

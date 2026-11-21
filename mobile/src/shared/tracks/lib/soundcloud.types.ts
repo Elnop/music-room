@@ -1,4 +1,4 @@
-export interface SoundCloudTrack {
+export type SoundCloudTrack = {
 	id: number;
 	title: string;
 	description: string | null;
@@ -21,18 +21,18 @@ export interface SoundCloudTrack {
 			snipped?: boolean;
 		}>;
 	};
-}
+};
 
-export interface SoundCloudSearchResult {
+export type SoundCloudSearchResult = {
 	collection: SoundCloudTrack[];
 	total_results?: number;
 	next_href?: string | null;
-}
+};
 
 export type StreamProtocol = 'hls' | 'progressive';
 
-export interface StreamUrlResponse {
+export type StreamUrlResponse = {
 	streamUrl: string;
 	protocol: StreamProtocol;
 	expiresAt: string;
-}
+};

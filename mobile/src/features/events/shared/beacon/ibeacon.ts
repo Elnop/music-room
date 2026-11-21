@@ -9,12 +9,12 @@ export const MEASURED_POWER = -59;
 const IBEACON_TYPE = 0x02;
 const IBEACON_LENGTH = 0x15;
 
-interface IBeaconFrame {
+type IBeaconFrame = {
 	uuid: string;
 	major: number;
 	minor: number;
 	measuredPower: number;
-}
+};
 
 function uuidBytes(uuid: string): number[] {
 	const hex = uuid.replaceAll('-', '');

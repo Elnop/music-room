@@ -7,11 +7,11 @@ import type { MusicGenre } from '@/shared/users/user.types';
 import { MAX_GENRES, MUSIC_GENRES } from '@/shared/users/user.types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface GenreSelectorProps {
+type GenreSelectorProps = {
 	selectedGenres: MusicGenre[];
 	onGenreToggle: (genre: MusicGenre) => void;
 	maxGenres?: number;
-}
+};
 
 export function GenreSelector({
 	selectedGenres,
@@ -62,7 +62,7 @@ export function GenreSelector({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			padding: theme.spacing.md,
 		},
@@ -94,4 +94,5 @@ function createStyles(theme: Theme) {
 			fontStyle: 'italic',
 		},
 	});
+	return styles;
 }

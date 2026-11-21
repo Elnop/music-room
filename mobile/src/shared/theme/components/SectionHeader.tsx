@@ -9,14 +9,14 @@ import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 
-interface SectionHeaderProps {
+type SectionHeaderProps = {
 	icon: PixelIconSource;
 	title: string;
 	count: number;
 	open?: boolean;
 	onToggle?: () => void;
 	action?: React.ReactNode;
-}
+};
 
 export function SectionHeader({ icon, title, count, open, onToggle, action }: SectionHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -50,7 +50,7 @@ export function SectionHeader({ icon, title, count, open, onToggle, action }: Se
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		header: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -65,4 +65,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

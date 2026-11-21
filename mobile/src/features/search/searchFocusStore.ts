@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 
-interface SearchFocusState {
+type SearchFocusState = {
 	pending: boolean;
 	request: () => void;
 	consume: () => void;
-}
+};
 
 export const useSearchFocusStore = create<SearchFocusState>(set => ({
 	pending: false,

@@ -5,16 +5,16 @@ import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
 
 export type SheetComponent = React.ComponentType<{ visible: boolean; onClose: () => void }>;
 
-export interface PlayerSheets {
+export type PlayerSheets = {
 	QueueModal: SheetComponent;
 	DevicePicker: SheetComponent;
-}
+};
 
-interface FullScreenSheetProps {
+type FullScreenSheetProps = {
 	visible: boolean;
 	onClose: () => void;
 	children: React.ReactNode;
-}
+};
 
 export function FullScreenSheet({ visible, onClose, children }: FullScreenSheetProps) {
 	const { isWide } = useBreakpoint();

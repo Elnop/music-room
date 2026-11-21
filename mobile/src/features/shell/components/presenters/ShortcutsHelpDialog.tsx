@@ -8,11 +8,11 @@ import type { Theme } from '@/shared/theme/lib/types';
 import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
 import { Text } from '@/shared/theme/components/Text';
 
-interface ShortcutsHelpDialogProps {
+type ShortcutsHelpDialogProps = {
 	visible: boolean;
 	shortcuts: readonly Pick<KeyboardShortcut, 'keys' | 'description'>[];
 	onClose: () => void;
-}
+};
 
 export function ShortcutsHelpDialog({ visible, shortcuts, onClose }: ShortcutsHelpDialogProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -43,7 +43,7 @@ export function ShortcutsHelpDialog({ visible, shortcuts, onClose }: ShortcutsHe
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		...dialogStyles(theme),
 		list: { marginTop: theme.spacing.md, gap: theme.spacing.sm },
 		row: {
@@ -80,4 +80,5 @@ function createStyles(theme: Theme) {
 			marginTop: theme.spacing.lg,
 		},
 	});
+	return styles;
 }

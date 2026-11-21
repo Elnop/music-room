@@ -106,7 +106,7 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		blip: {
 			position: 'absolute',
 			flexDirection: 'row',
@@ -175,4 +175,5 @@ function createStyles(theme: Theme) {
 		},
 		mineList: { flex: 1, gap: theme.spacing.md },
 	});
+	return styles;
 }

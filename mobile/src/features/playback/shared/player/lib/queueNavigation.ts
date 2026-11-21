@@ -6,10 +6,10 @@ export function previousAction(currentTime: number, hasPrevious: boolean): 'rest
 	return currentTime > RESTART_THRESHOLD_S || !hasPrevious ? 'restart' : 'previous';
 }
 
-interface QueueItemsView {
+type QueueItemsView = {
 	currentItemId: string | null;
 	items: QueueItem[];
-}
+};
 
 function currentIndex(state: QueueItemsView): number {
 	return state.currentItemId === null

@@ -12,10 +12,10 @@ import { ThemeProvider } from '@/shared/theme/components/ThemeContext';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { onSessionEnd } from '@/shared/backend/lib/authSession';
 
-interface AppProvidersProps {
+type AppProvidersProps = {
 	children: React.ReactNode;
 	queryClient?: QueryClient;
-}
+};
 
 export function AppProvidersContainer({ children, queryClient }: AppProvidersProps) {
 	const [client] = useState(() => queryClient ?? createQueryClient());

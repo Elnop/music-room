@@ -11,7 +11,7 @@ import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 import UserMinusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-minus-solid.svg';
 
-interface SwipeableUserItemProps {
+type SwipeableUserItemProps = {
 	user: {
 		id: string;
 		username: string;
@@ -20,7 +20,7 @@ interface SwipeableUserItemProps {
 	};
 	role: 'collaborator' | 'viewer';
 	onRemove: (userId: string) => Promise<void>;
-}
+};
 
 export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemProps) {
 	const { theme } = useTheme();
@@ -59,7 +59,12 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 					</Text>
 				</View>
 
-				<View style={[styles.roleBadge, styles[`roleBadge_${role}`]]}>
+				<View
+					style={[
+						styles.roleBadge,
+						role === 'collaborator' ? styles.roleBadge_collaborator : styles.roleBadge_viewer,
+					]}
+				>
 					<Text style={styles.roleText}>
 						{role === 'collaborator' ? 'Collaborateur' : 'Lecteur'}
 					</Text>
@@ -70,7 +75,7 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 }
 
 function createStyles(theme: Theme, separator: string) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		userContainer: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -125,4 +130,5 @@ function createStyles(theme: Theme, separator: string) {
 			marginTop: 4,
 		},
 	});
+	return styles;
 }

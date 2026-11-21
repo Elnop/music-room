@@ -4,10 +4,10 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Text } from '@/shared/theme/components/Text';
 
-export interface ProfileInfoRow {
+export type ProfileInfoRow = {
 	label: string;
 	value: string;
-}
+};
 
 export function ProfileInfoRows({ rows }: { rows: ProfileInfoRow[] }) {
 	const { styles } = useThemedStyles(createStyles);
@@ -34,7 +34,7 @@ export function memberSinceLabel(createdAt: string): string {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		infoItem: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
@@ -55,4 +55,5 @@ function createStyles(theme: Theme) {
 			backgroundColor: theme.colors.border,
 		},
 	});
+	return styles;
 }

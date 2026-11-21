@@ -6,10 +6,10 @@ import type { BeaconSighting } from '@/features/events/features/nearby/lib/beaco
 import type { Coordinates } from '@/features/events/shared/events/lib/eventLocation';
 import type { MusicEvent } from '@/features/events/lib/types';
 
-interface NearbyEvent {
+type NearbyEvent = {
 	event: MusicEvent;
 	distance: number;
-}
+};
 
 export function nearbyByGps(
 	events: MusicEvent[],
@@ -24,10 +24,10 @@ export function nearbyByGps(
 		.sort((a, b) => a.distance - b.distance);
 }
 
-export interface NearbyItem {
+export type NearbyItem = {
 	event: MusicEvent;
 	proximity: string;
-}
+};
 
 export function mergeNearby(
 	events: MusicEvent[],

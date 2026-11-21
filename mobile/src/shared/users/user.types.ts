@@ -27,7 +27,7 @@ export const MUSIC_GENRES: MusicGenre[] = [
 
 export const MAX_GENRES = 5;
 
-export interface ProfilePrivacy {
+export type ProfilePrivacy = {
 	userId: string;
 	emailVisibility: VisibilityLevel;
 	bioVisibility: VisibilityLevel;
@@ -35,52 +35,52 @@ export interface ProfilePrivacy {
 	musicPreferencesVisibility: VisibilityLevel;
 	createdAt: string;
 	updatedAt: string;
-}
+};
 
-export interface UpdatePrivacyData {
+export type UpdatePrivacyData = {
 	emailVisibility?: VisibilityLevel;
 	bioVisibility?: VisibilityLevel;
 	avatarVisibility?: VisibilityLevel;
 	musicPreferencesVisibility?: VisibilityLevel;
-}
+};
 
-export interface MusicPreferences {
+export type MusicPreferences = {
 	userId: string;
 	genres: MusicGenre[];
 	updatedAt: string;
-}
+};
 
-export interface UpdateMusicPreferencesData {
+export type UpdateMusicPreferencesData = {
 	genres: MusicGenre[];
-}
+};
 
-interface User {
+type User = {
 	id: string;
 	email: string;
 	username: string;
 	avatarUrl?: string;
 	createdAt: string;
-}
+};
 
-export interface UserProfile extends User {
+export type UserProfile = User & {
 	displayName?: string;
 	bio?: string;
 	favoriteArtist?: string;
 	updatedAt: string;
-}
+};
 
-export interface UpdateProfileData {
+export type UpdateProfileData = {
 	displayName?: string;
 	bio?: string;
 	avatarUrl?: string;
 	favoriteArtist?: string;
-}
+};
 
-export interface AvatarResponse {
+export type AvatarResponse = {
 	avatarUrl: string | null;
-}
+};
 
-export interface FilteredProfile {
+export type FilteredProfile = {
 	id: string;
 	username: string;
 	displayName?: string;
@@ -92,7 +92,7 @@ export interface FilteredProfile {
 	createdAt: string;
 	isOwnProfile: boolean;
 	isFriend: boolean;
-}
+};
 
 export const VISIBILITY_LABELS: Record<VisibilityLevel, string> = {
 	public: 'Public',

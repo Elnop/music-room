@@ -20,7 +20,7 @@ export function PixelWordmark({ size = 24 }: { size?: number }) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		word: {
 			fontFamily: theme.typography.families.mono,
 			color: theme.colors.primary,
@@ -28,4 +28,5 @@ function createStyles(theme: Theme) {
 			textShadowRadius: 0,
 		},
 	});
+	return styles;
 }

@@ -77,7 +77,7 @@ describe('ReorderableList', () => {
 	it('shows the dropped order while the move is in flight', () => {
 		renderList(() => new Promise(() => {}));
 		act(() => libProps.onReorder({ from: 0, to: 2 }));
-		expect(rows()).toEqual(['b', 'c', 'a']);
+		expect(rows()).toStrictEqual(['b', 'c', 'a']);
 	});
 
 	it('does not call onReorder when the row is dropped in place', () => {
@@ -90,13 +90,13 @@ describe('ReorderableList', () => {
 	it('shows data again when the move resolves without new data', async () => {
 		renderList(() => Promise.resolve());
 		await act(async () => libProps.onReorder({ from: 0, to: 2 }));
-		expect(rows()).toEqual(['a', 'b', 'c']);
+		expect(rows()).toStrictEqual(['a', 'b', 'c']);
 	});
 
 	it('shows data again when the move fails', async () => {
 		renderList(() => Promise.reject(new Error('network')));
 		await act(async () => libProps.onReorder({ from: 0, to: 2 }));
-		expect(rows()).toEqual(['a', 'b', 'c']);
+		expect(rows()).toStrictEqual(['a', 'b', 'c']);
 	});
 
 	it('shows new data from the store over the dropped order', () => {
@@ -114,6 +114,6 @@ describe('ReorderableList', () => {
 				)}
 			/>
 		);
-		expect(rows()).toEqual(['c', 'a', 'b']);
+		expect(rows()).toStrictEqual(['c', 'a', 'b']);
 	});
 });

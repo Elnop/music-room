@@ -1,4 +1,4 @@
-export interface Track {
+export type Track = {
 	id: string;
 	title: string;
 	artist: string;
@@ -7,13 +7,13 @@ export interface Track {
 	durationMs: number;
 	trackUri: string;
 	previewUrl?: string;
-}
+};
 
-export interface TrackInPlaylist extends Track {
+export type TrackInPlaylist = Track & {
 	createdAt: string;
 	updatedAt: string;
 	rank: string;
 	addedBy: string | null;
 	addedAt: string;
 	unavailable: boolean;
-}
+};

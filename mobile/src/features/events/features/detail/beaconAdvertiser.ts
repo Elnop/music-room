@@ -8,11 +8,11 @@ import {
 
 type BluetoothState = 'on' | 'off' | 'unsupported';
 
-interface BeaconAdvertiserModule {
+type BeaconAdvertiserModule = {
 	getState(): BluetoothState;
 	start(manufacturerId: number, data: number[]): Promise<void>;
 	stop(): void;
-}
+};
 
 function nativeModule() {
 	return Platform.OS === 'android'

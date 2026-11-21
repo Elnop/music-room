@@ -1,7 +1,7 @@
-export interface SharingMode {
+export type SharingMode = {
 	isPrivate: boolean;
 	isEditRestricted: boolean;
-}
+};
 
 export function sharingHeader({ isPrivate, isEditRestricted }: SharingMode) {
 	if (isPrivate && isEditRestricted) {

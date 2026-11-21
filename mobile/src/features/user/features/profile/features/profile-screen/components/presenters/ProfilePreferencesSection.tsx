@@ -10,11 +10,11 @@ import type { MusicGenre } from '@/shared/users/user.types';
 import { Text } from '@/shared/theme/components/Text';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-interface ProfilePreferencesSectionProps {
+type ProfilePreferencesSectionProps = {
 	genres: MusicGenre[];
 	onModify: () => void;
 	prominent?: boolean;
-}
+};
 
 export function ProfilePreferencesSection({
 	genres,
@@ -60,7 +60,7 @@ export function ProfilePreferencesSection({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		genresContainer: {
 			flexDirection: 'row',
 			flexWrap: 'wrap',
@@ -85,4 +85,5 @@ function createStyles(theme: Theme) {
 			marginTop: 4,
 		},
 	});
+	return styles;
 }

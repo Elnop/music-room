@@ -1,6 +1,6 @@
 import type { DeviceInfo } from '@/shared/backend/deviceService';
 
-export interface ListeningStatus {
+export type ListeningStatus = {
 	ownerId: string;
 	device: DeviceInfo;
 	track: {
@@ -12,9 +12,9 @@ export interface ListeningStatus {
 	isPlaying: boolean;
 	positionMs: number | null;
 	updatedAt: string;
-}
+};
 
-export interface UserListeningStatus {
+export type UserListeningStatus = {
 	ownerId: string;
 	devices: ListeningStatus[];
-}
+};

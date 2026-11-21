@@ -12,14 +12,14 @@ export function hashStringToNumber(str: string): number {
 	return Math.abs(hash);
 }
 
-interface PlayableFields {
+type PlayableFields = {
 	id: number;
 	title: string;
 	artist: string;
 	durationMs: number;
 	trackUri: string;
 	albumArt: string | null;
-}
+};
 
 function build({ id, title, artist, durationMs, trackUri, albumArt }: PlayableFields) {
 	return {

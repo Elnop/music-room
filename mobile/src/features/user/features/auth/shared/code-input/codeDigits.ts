@@ -2,10 +2,10 @@ const CODE_LENGTH = 6;
 
 export const CODE_INPUT_MAX_LENGTH = 32;
 
-interface CodeFillResult {
+type CodeFillResult = {
 	code: string[];
 	focusIndex: number | null;
-}
+};
 
 export function fillCodeDigits(
 	code: readonly string[],

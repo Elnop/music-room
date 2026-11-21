@@ -8,12 +8,12 @@ import type { NowPlayingPanelStyles } from '@/features/playback/features/now-pla
 import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
-interface PanelDeviceCardProps {
+type PanelDeviceCardProps = {
 	deviceLabel: string;
 	isRemote: boolean;
 	styles: NowPlayingPanelStyles;
 	onOpenDevices: () => void;
-}
+};
 
 export function PanelDeviceCard({
 	deviceLabel,

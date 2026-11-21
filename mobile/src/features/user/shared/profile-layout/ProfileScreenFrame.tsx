@@ -5,13 +5,13 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface ProfileScreenLayoutProps {
+type ProfileScreenLayoutProps = {
 	subtitle?: string;
 	bottomPadding: number;
 	isLoading?: boolean;
 	errorMessage?: string | null;
 	children?: React.ReactNode;
-}
+};
 
 export function ProfileScreenFrame({
 	subtitle,
@@ -55,7 +55,7 @@ export function ProfileScreenFrame({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -85,4 +85,5 @@ function createStyles(theme: Theme) {
 			textAlign: 'center',
 		},
 	});
+	return styles;
 }

@@ -11,14 +11,14 @@ import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import { PLAYLIST_NAME_MAX } from '@/features/playlists/features/editor/features/track-actions/playlistName';
 
-export interface NewPlaylistDraft {
+export type NewPlaylistDraft = {
 	name: string;
 	setName: (name: string) => void;
 	error?: string;
 	creating: boolean;
 	start: () => void;
 	submit: () => void;
-}
+};
 
 export function useNewPlaylistFromTrack(
 	track: AddQueueItemBody | null,

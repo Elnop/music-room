@@ -82,7 +82,7 @@ describe('ResetPasswordContainer', () => {
 		await waitFor(() =>
 			expect(showSuccess).toHaveBeenCalledWith('Mot de passe réinitialisé avec succès')
 		);
-		expect(request().body).toEqual({
+		expect(request().body).toStrictEqual({
 			email: 'a@example.com',
 			code: '123456',
 			newPassword: 'NewSecret1',

@@ -8,13 +8,13 @@ import type {
 	SetAuthState,
 } from '@/features/user/features/auth/shared/sign-in/lib/authState';
 
-interface TokenRefreshDeps {
+type TokenRefreshDeps = {
 	set: SetAuthState;
 	get: GetAuthState;
 	applySession: (user: UserProfile, session: AuthSessionTokens) => void;
 	persist: () => Promise<void>;
 	endSessionLocally: () => Promise<void>;
-}
+};
 
 export function createTokenRefresh({
 	set,

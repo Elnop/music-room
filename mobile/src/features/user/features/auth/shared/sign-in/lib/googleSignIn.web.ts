@@ -5,11 +5,11 @@ import type { GoogleButtonVariant } from '@/features/user/features/auth/types';
 
 const GIS_SCRIPT = 'https://accounts.google.com/gsi/client';
 
-export interface GoogleButtonTarget {
+export type GoogleButtonTarget = {
 	offsetWidth: number;
-}
+};
 
-interface ButtonConfiguration {
+type ButtonConfiguration = {
 	type: 'standard';
 	theme: 'outline' | 'filled_black';
 	size: 'large' | 'medium';
@@ -19,9 +19,9 @@ interface ButtonConfiguration {
 	locale: string;
 	width?: number;
 	click_listener: () => void;
-}
+};
 
-interface GoogleIdentity {
+type GoogleIdentity = {
 	initialize: (config: {
 		client_id: string;
 		callback: (response: { credential?: string }) => void;
@@ -29,7 +29,7 @@ interface GoogleIdentity {
 		auto_select: boolean;
 	}) => void;
 	renderButton: (target: GoogleButtonTarget, config: ButtonConfiguration) => void;
-}
+};
 
 type Listener = () => void;
 

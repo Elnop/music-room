@@ -16,7 +16,7 @@ import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsSheet'
 
 type Step = 'actions' | 'playlists' | 'newPlaylist';
 
-export interface TrackActions {
+export type TrackActions = {
 	visible: boolean;
 	shown: AddQueueItemBody | null;
 	step: Step;
@@ -31,7 +31,7 @@ export interface TrackActions {
 	newPlaylist: NewPlaylistDraft;
 	addToPlaylist: (playlist: Playlist) => void;
 	share: () => void;
-}
+};
 
 export function useTrackActions(
 	track: AddQueueItemBody | null,

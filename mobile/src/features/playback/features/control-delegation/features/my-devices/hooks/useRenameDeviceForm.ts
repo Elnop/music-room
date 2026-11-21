@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 const DEVICE_NAME_MAX_LENGTH = 40;
 
-interface UseRenameDeviceFormOptions {
+type UseRenameDeviceFormOptions = {
 	deviceName: string | null;
 	onSubmit: (name: string | null) => void;
-}
+};
 
 export function useRenameDeviceForm({ deviceName, onSubmit }: UseRenameDeviceFormOptions) {
 	const [name, setName] = useState(deviceName ?? '');

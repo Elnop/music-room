@@ -1,17 +1,17 @@
-export interface MenuAnchor {
+export type MenuAnchor = {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
 	align?: 'start';
-}
+};
 
-interface MenuPlacement {
+type MenuPlacement = {
 	left: number;
 	top?: number;
 	bottom?: number;
 	maxHeight: number;
-}
+};
 
 const GAP = 4;
 const MARGIN = 8;

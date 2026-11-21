@@ -6,7 +6,7 @@ import { useForgotPasswordMutation } from '@/features/user/features/auth/shared/
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 
-export interface ForgotPassword {
+export type ForgotPassword = {
 	email: string;
 	changeEmail: (email: string) => void;
 	emailError: string | null;
@@ -14,7 +14,7 @@ export interface ForgotPassword {
 	isSending: boolean;
 	error: string | null;
 	goToLogin: () => void;
-}
+};
 
 export function useForgotPassword(
 	initialEmail: string,

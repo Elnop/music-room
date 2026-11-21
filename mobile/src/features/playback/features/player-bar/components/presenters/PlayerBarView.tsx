@@ -20,9 +20,9 @@ import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playli
 import SoundMuteSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-mute-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 
-interface PlayerBarViewProps extends PlayerSheets {
+type PlayerBarViewProps = PlayerSheets & {
 	data: PlayerBarData;
-}
+};
 
 export function PlayerBarView({ data, QueueModal, DevicePicker }: PlayerBarViewProps) {
 	const { theme } = useTheme();

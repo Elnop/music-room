@@ -71,7 +71,7 @@ describe('useChangePlan', () => {
 
 		await act(async () => request.resolve(PREMIUM));
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(client.getQueryData(queryKeys.subscription.plan())).toEqual(PREMIUM);
+		expect(client.getQueryData(queryKeys.subscription.plan())).toStrictEqual(PREMIUM);
 	});
 
 	it('puts the previous plan back when the request fails', async () => {
@@ -82,6 +82,6 @@ describe('useChangePlan', () => {
 		act(() => result.current.mutate('premium'));
 
 		await waitFor(() => expect(result.current.isError).toBe(true));
-		expect(client.getQueryData(queryKeys.subscription.plan())).toEqual(FREE);
+		expect(client.getQueryData(queryKeys.subscription.plan())).toStrictEqual(FREE);
 	});
 });

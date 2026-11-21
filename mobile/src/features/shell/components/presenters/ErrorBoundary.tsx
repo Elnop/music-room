@@ -6,14 +6,14 @@ import { originalTheme } from '@/shared/theme/lib/original.theme';
 import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
-interface Props {
+type Props = {
 	children: React.ReactNode;
-}
+};
 
-interface State {
+type State = {
 	error: Error | null;
 	componentStack: string | null;
-}
+};
 
 const NO_ERROR: State = { error: null, componentStack: null };
 

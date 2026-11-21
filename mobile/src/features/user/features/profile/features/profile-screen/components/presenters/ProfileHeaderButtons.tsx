@@ -6,10 +6,10 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
-interface ProfileHeaderButtonsProps {
+type ProfileHeaderButtonsProps = {
 	onEditProfile: () => void;
 	onSettings: () => void;
-}
+};
 
 export function ProfileHeaderButtons({ onEditProfile, onSettings }: ProfileHeaderButtonsProps) {
 	const { theme } = useTheme();

@@ -5,13 +5,13 @@ import type { RecommendedProfile } from '@/features/user/features/friends/types'
 
 export type SimilarProfilesStatus = 'loading' | 'error' | 'needsPreferences' | 'empty' | 'ready';
 
-export interface SimilarProfilesSection {
+export type SimilarProfilesSection = {
 	status: SimilarProfilesStatus;
 	profiles: RecommendedProfile[];
 	openProfile: (userId: string) => void;
 	openPreferences: () => void;
 	retry: () => void;
-}
+};
 
 function statusOf(query: ReturnType<typeof useSimilarProfiles>): SimilarProfilesStatus {
 	if (query.data) {

@@ -97,7 +97,7 @@ describe('PlaylistFormContainer create mode', () => {
 		await waitFor(() =>
 			expect(mockNavigation.replace).toHaveBeenCalledWith('PlaylistDetail', { id: 'new-id' })
 		);
-		expect(sentBody).toEqual({
+		expect(sentBody).toStrictEqual({
 			name: 'Les tubes du Crabe Croustillant',
 			description: '',
 			visibility: 'public',
@@ -137,9 +137,9 @@ describe('PlaylistFormContainer edit mode (#342)', () => {
 		fireEvent.press(screen.getByText('Enregistrer'));
 
 		await waitFor(() => expect(mockNavigation.goBack).toHaveBeenCalledTimes(1));
-		expect(sentBody).toEqual({ name: 'Renamed', description: '' });
+		expect(sentBody).toStrictEqual({ name: 'Renamed', description: '' });
 		expect(showSuccess).toHaveBeenCalledWith('Playlist modifiée');
-		expect(routes.calls()).toEqual(['PATCH /api/playlists/p1']);
+		expect(routes.calls()).toStrictEqual(['PATCH /api/playlists/p1']);
 	});
 
 	it('keeps the form with a toast when the update fails', async () => {
@@ -161,7 +161,7 @@ describe('PlaylistFormContainer edit mode (#342)', () => {
 		fireEvent.press(screen.getByText('Enregistrer'));
 
 		expect(await screen.findByText('Le nom de la playlist est requis')).toBeTruthy();
-		expect(routes.calls()).toEqual([]);
+		expect(routes.calls()).toStrictEqual([]);
 	});
 });
 
@@ -177,7 +177,7 @@ describe('PlaylistFormContainer caches', () => {
 		await waitFor(() => expect(mockNavigation.replace).toHaveBeenCalled());
 		expect(sentBody).toMatchObject({ visibility: 'private', editMode: 'restricted' });
 		const list = view.client.getQueryData<Playlist[]>(queryKeys.playlists.list());
-		expect(list?.map(p => p.id)).toEqual(['new-id', 'old']);
+		expect(list?.map(p => p.id)).toStrictEqual(['new-id', 'old']);
 	});
 
 	it('toasts a failed creation and stays on the form', async () => {

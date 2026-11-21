@@ -23,7 +23,7 @@ export function RowGrid({ children }: { children: React.ReactNode }) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		grid: {
 			flexDirection: 'row',
 			flexWrap: 'wrap',
@@ -36,4 +36,5 @@ function createStyles(theme: Theme) {
 			backgroundColor: theme.colors.surface,
 		},
 	});
+	return styles;
 }

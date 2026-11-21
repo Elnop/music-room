@@ -38,7 +38,7 @@ describe('backendUrl first launch', () => {
 
 describe('backendUrl save', () => {
 	it('trims the trailing slash, persists and applies the address', async () => {
-		await expect(setBackendUrl('  http://192.168.1.20:3000/ ')).resolves.toEqual({
+		await expect(setBackendUrl('  http://192.168.1.20:3000/ ')).resolves.toStrictEqual({
 			url: 'http://192.168.1.20:3000',
 		});
 
@@ -62,7 +62,7 @@ describe('backendUrl save', () => {
 	it('still applies the address when storage fails', async () => {
 		storage.setItem.mockRejectedValueOnce(new Error('disk full'));
 
-		await expect(setBackendUrl('http://10.0.0.2:3000')).resolves.toEqual({
+		await expect(setBackendUrl('http://10.0.0.2:3000')).resolves.toStrictEqual({
 			url: 'http://10.0.0.2:3000',
 		});
 		expect(getBackendUrl()).toBe('http://10.0.0.2:3000');
@@ -113,7 +113,7 @@ describe('backendUrl invalid input', () => {
 		await setBackendUrl('http://192.168.1.20:3000');
 		storage.setItem.mockClear();
 
-		await expect(setBackendUrl(input)).resolves.toEqual({
+		await expect(setBackendUrl(input)).resolves.toStrictEqual({
 			error: INVALID_BACKEND_URL_MESSAGE,
 		});
 		expect(getBackendUrl()).toBe('http://192.168.1.20:3000');

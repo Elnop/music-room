@@ -9,12 +9,12 @@ export function breakpointOf(width: number): Breakpoint {
 	return 'phone';
 }
 
-interface BreakpointInfo {
+type BreakpointInfo = {
 	breakpoint: Breakpoint;
 	isWide: boolean;
 	isDesktop: boolean;
 	width: number;
-}
+};
 
 export function useBreakpoint(): BreakpointInfo {
 	const { width } = useWindowDimensions();

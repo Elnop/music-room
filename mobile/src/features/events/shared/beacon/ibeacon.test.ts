@@ -15,7 +15,7 @@ describe('buildIBeaconPayload', () => {
 			minor: 0xa0b1,
 			measuredPower: -59,
 		});
-		expect(payload).toEqual([
+		expect(payload).toStrictEqual([
 			0x02, 0x15, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89,
 			0xab, 0xcd, 0xef, 0x01, 0x02, 0xa0, 0xb1, 0xc5,
 		]);
@@ -30,7 +30,7 @@ describe('buildIBeaconPayload', () => {
 				.map(b => b.toString(16).padStart(2, '0'))
 				.join('')
 		).toBe(ZUMIK_BEACON_UUID.replaceAll('-', ''));
-		expect(payload.slice(20, 22)).toEqual([0, 42]);
+		expect(payload.slice(20, 22)).toStrictEqual([0, 42]);
 		expect(payload[22]).toBe(MEASURED_POWER & 0xff);
 	});
 
@@ -49,7 +49,7 @@ describe('parseIBeacon', () => {
 
 	it('reads back a frame built by buildIBeaconPayload', () => {
 		const frame = eventBeaconFrame(513);
-		expect(parseIBeacon(withCompanyId(buildIBeaconPayload(frame)))).toEqual(frame);
+		expect(parseIBeacon(withCompanyId(buildIBeaconPayload(frame)))).toStrictEqual(frame);
 		expect(zumikBeaconMinor(parseIBeacon(withCompanyId(buildIBeaconPayload(frame))))).toBe(513);
 	});
 

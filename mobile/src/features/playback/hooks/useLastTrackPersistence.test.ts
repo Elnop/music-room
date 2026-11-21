@@ -183,7 +183,7 @@ describe('useLastTrackPersistence save', () => {
 		act(() => usePlayerStore.getState().playTrack(other, 'q2'));
 		await flush();
 
-		expect(await stored()).toEqual({
+		expect(await stored()).toStrictEqual({
 			track: {
 				trackUri: other.permalink_url,
 				title: 'Other',

@@ -11,14 +11,14 @@ import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-interface FriendCardProps {
+type FriendCardProps = {
 	friend: FriendProfile;
 	canControl: boolean;
 	isToggling: boolean;
 	disabled: boolean;
 	onPress: (userId: string) => void;
 	onToggleControl: (friendId: string, currentValue: boolean) => void;
-}
+};
 
 export function FriendCard({
 	friend,

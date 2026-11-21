@@ -3,25 +3,25 @@ import type { ContextMenuProps } from '@/shared/theme/hooks/useContextMenu';
 
 export type { ContextMenuProps } from '@/shared/theme/hooks/useContextMenu';
 
-interface BrowserElement {
+type BrowserElement = {
 	getBoundingClientRect(): { left: number; top: number; width: number; height: number };
-}
+};
 
-interface BrowserEvent {
+type BrowserEvent = {
 	currentTarget: BrowserElement;
 	preventDefault(): void;
 	stopPropagation(): void;
-}
+};
 
-interface BrowserMouseEvent extends BrowserEvent {
+type BrowserMouseEvent = BrowserEvent & {
 	clientX: number;
 	clientY: number;
-}
+};
 
-interface BrowserKeyEvent extends BrowserEvent {
+type BrowserKeyEvent = BrowserEvent & {
 	key: string;
 	shiftKey: boolean;
-}
+};
 
 function isMenuKey(event: BrowserKeyEvent) {
 	return event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey);

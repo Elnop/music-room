@@ -4,12 +4,12 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
-interface PasswordScreenLayoutProps {
+type PasswordScreenLayoutProps = {
 	title: string;
 	subtitle: React.ReactNode;
 	headerSpacing: number;
 	children: React.ReactNode;
-}
+};
 
 export function PasswordScreenFrame({
 	title,

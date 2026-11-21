@@ -15,12 +15,12 @@ describe('musicControlApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce({ allowedUserIds: ['u1'] });
 		const result = await musicControlApi.getMyPermissions();
 		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/permissions', {});
-		expect(result).toEqual(['u1']);
+		expect(result).toStrictEqual(['u1']);
 
 		jest.mocked(authRequest).mockResolvedValueOnce({ allowedUserIds: ['u2'] });
 		const resultToken = await musicControlApi.getMyPermissions('tok');
 		expect(authRequest).toHaveBeenCalledWith('/api/music-control/permissions', 'tok', {});
-		expect(resultToken).toEqual(['u2']);
+		expect(resultToken).toStrictEqual(['u2']);
 	});
 
 	it('grantControl sends POST', async () => {
@@ -54,7 +54,7 @@ describe('musicControlApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce({ devices });
 		const res = await musicControlApi.getMyDevices();
 		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/devices', {});
-		expect(res).toEqual(devices);
+		expect(res).toStrictEqual(devices);
 	});
 
 	it('renameDevice sends PATCH with name or null', async () => {
@@ -65,7 +65,7 @@ describe('musicControlApi', () => {
 			method: 'PATCH',
 			body: JSON.stringify({ name: 'Salon' }),
 		});
-		expect(res).toEqual(device);
+		expect(res).toStrictEqual(device);
 	});
 
 	it('getControllableDevices calls user devices endpoint', async () => {
@@ -73,7 +73,7 @@ describe('musicControlApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce(payload);
 		const res = await musicControlApi.getControllableDevices('u1');
 		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/users/u1/devices', {});
-		expect(res).toEqual(payload);
+		expect(res).toStrictEqual(payload);
 	});
 
 	it('getDevicePicker calls controllable-devices endpoint', async () => {
@@ -81,7 +81,7 @@ describe('musicControlApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce(payload);
 		const res = await musicControlApi.getDevicePicker();
 		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/controllable-devices', {});
-		expect(res).toEqual(payload);
+		expect(res).toStrictEqual(payload);
 	});
 
 	it('grantDeviceLicense and revokeDeviceLicense send POST and DELETE', async () => {

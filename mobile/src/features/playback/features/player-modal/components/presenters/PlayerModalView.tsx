@@ -17,12 +17,12 @@ import type { usePlayerModalGestures } from '@/features/playback/features/player
 import type { SeekPosition } from '@/features/playback/shared/seek-bar/useSeekPosition';
 import type { ArtworkCarousel } from '@/features/playback/features/player-modal/hooks/useArtworkCarousel';
 
-interface PlayerModalViewProps extends PlayerSheets {
+type PlayerModalViewProps = PlayerSheets & {
 	modal: ReturnType<typeof usePlayerModal>;
 	gestures: ReturnType<typeof usePlayerModalGestures>;
 	seek: SeekPosition;
 	carousel: ArtworkCarousel;
-}
+};
 
 export function PlayerModalView({
 	modal,

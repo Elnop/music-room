@@ -25,7 +25,7 @@ export function PlaylistCover({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		cover: {
 			backgroundColor: theme.colors.surfaceAlt,
 			borderWidth: theme.borders.thick,
@@ -33,4 +33,5 @@ function createStyles(theme: Theme) {
 			...theme.shadows.large,
 		},
 	});
+	return styles;
 }

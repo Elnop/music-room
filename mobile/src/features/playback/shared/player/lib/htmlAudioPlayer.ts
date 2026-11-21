@@ -7,10 +7,10 @@ import {
 import type { MediaElement } from '@/features/playback/shared/player/lib/mediaElement';
 import { attachStream } from '@/features/playback/shared/player/lib/streamSource';
 
-export interface PlaybackEvents {
+export type PlaybackEvents = {
 	onPlayBlocked: () => void;
 	onPlaying: () => void;
-}
+};
 
 const HAVE_METADATA = 1;
 const HAVE_FUTURE_DATA = 3;

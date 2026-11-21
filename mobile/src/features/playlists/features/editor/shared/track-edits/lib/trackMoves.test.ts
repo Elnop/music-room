@@ -99,7 +99,7 @@ describe('loadPlaylist', () => {
 			tracks: [playlistTrack('C', 'p'), playlistTrack('A', 'a')],
 		});
 		const playlist = await loadPlaylist(client, 'p');
-		expect(playlist.tracks.map(t => t.id)).toEqual(['A', 'C']);
+		expect(playlist.tracks.map(t => t.id)).toStrictEqual(['A', 'C']);
 	});
 
 	it('keeps a newer track list applied while the request was in flight', async () => {
@@ -117,7 +117,7 @@ describe('add and remove', () => {
 			rebalanced: false,
 		});
 		await addTrack(client, 'p', { trackUri: 'D', title: 'D', artist: 'A', durationMs: 1 });
-		expect(order()).toEqual(['A', 'B', 'C', 'D']);
+		expect(order()).toStrictEqual(['A', 'B', 'C', 'D']);
 		expect(shown().tracksVersion).toBe(11);
 		expect(fetchPlaylist).not.toHaveBeenCalled();
 	});
@@ -137,10 +137,10 @@ describe('add and remove', () => {
 		const answer = deferred<{ tracksVersion: number }>();
 		api.removeTrack.mockReturnValue(answer.promise);
 		const removing = removeTrack(client, 'p', 'B');
-		expect(order()).toEqual(['A', 'C']);
+		expect(order()).toStrictEqual(['A', 'C']);
 		answer.resolve({ tracksVersion: 11 });
 		await removing;
-		expect(order()).toEqual(['A', 'C']);
+		expect(order()).toStrictEqual(['A', 'C']);
 		expect(shown().tracksVersion).toBe(11);
 		expect(fetchPlaylist).not.toHaveBeenCalled();
 	});
@@ -152,7 +152,7 @@ describe('add and remove', () => {
 			tracks: [playlistTrack('C', 'p'), playlistTrack('B', 'h'), playlistTrack('A', 'a')],
 		});
 		await expect(removeTrack(client, 'p', 'B')).rejects.toThrow('nope');
-		expect(order()).toEqual(['A', 'B', 'C']);
+		expect(order()).toStrictEqual(['A', 'B', 'C']);
 	});
 
 	it('does not reload a playlist left before a remove fails', async () => {
@@ -169,7 +169,7 @@ describe('moveTrack', () => {
 		api.moveTrack.mockResolvedValue(moved('C', 'c', 11));
 		await expect(moveTrack(client, 'p', 'C', 'a')).resolves.toBe('moved');
 		expect(api.moveTrack).toHaveBeenCalledWith('p', 'C', 'a', 10);
-		expect(order()).toEqual(['A', 'C', 'B']);
+		expect(order()).toStrictEqual(['A', 'C', 'B']);
 		expect(pending()).toBe(0);
 	});
 
@@ -187,7 +187,7 @@ describe('moveTrack', () => {
 		first.resolve(moved('C', 'c', 11));
 		await moves;
 		expect(api.moveTrack).toHaveBeenNthCalledWith(2, 'p', 'B', null, 11);
-		expect(order()).toEqual(['B', 'A', 'C']);
+		expect(order()).toStrictEqual(['B', 'A', 'C']);
 		expect(pending()).toBe(0);
 	});
 
@@ -213,7 +213,7 @@ describe('moveTrack', () => {
 		api.moveTrack.mockRejectedValue(new ApiError('Network', 'NETWORK_ERROR'));
 		await expect(moveTrack(client, 'p', 'C', 'a')).rejects.toThrow('Network');
 		expect(fetchPlaylist).not.toHaveBeenCalled();
-		expect(order()).toEqual(['A', 'B', 'C']);
+		expect(order()).toStrictEqual(['A', 'B', 'C']);
 	});
 
 	it('sends the next move after a refused one, with the reloaded version', async () => {
@@ -225,7 +225,7 @@ describe('moveTrack', () => {
 			moveTrack(client, 'p', 'C', 'a'),
 			moveTrack(client, 'p', 'B', null),
 		]);
-		expect(results.map(r => r.status)).toEqual(['rejected', 'fulfilled']);
+		expect(results.map(r => r.status)).toStrictEqual(['rejected', 'fulfilled']);
 		expect(api.moveTrack).toHaveBeenNthCalledWith(2, 'p', 'B', null, 13);
 		expect(shown().tracksVersion).toBe(14);
 	});
@@ -240,7 +240,7 @@ describe('moveTrack', () => {
 		await Promise.resolve();
 		unsubscribe();
 		first.resolve(moved('C', 'c', 11));
-		await expect(moves).resolves.toEqual(['moved', 'skipped']);
+		await expect(moves).resolves.toStrictEqual(['moved', 'skipped']);
 		expect(api.moveTrack).toHaveBeenCalledTimes(1);
 		expect(pending()).toBe(0);
 		open();

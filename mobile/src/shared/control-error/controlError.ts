@@ -1,7 +1,7 @@
-export interface ControlError {
+export type ControlError = {
 	code: string;
 	message: string;
-}
+};
 
 export function controlErrorMessage(err: ControlError): string {
 	switch (err.code) {

@@ -10,13 +10,13 @@ import { useSocketStore } from '@/shared/backend/socketStore';
 import type { Theme } from '@/shared/theme/lib/types';
 import { ConnectionBanner } from '@/features/shell/components/presenters/ConnectionBanner';
 
-interface AppFrameLayoutProps {
+type AppFrameLayoutProps = {
 	children: ReactNode;
 	panel: ReactNode;
 	playerBar: ReactNode;
 	miniPlayer: ReactNode;
 	overlays: ReactNode;
-}
+};
 
 export function AppFrameLayout({
 	children,
@@ -57,7 +57,7 @@ export function AppFrameLayout({
 }
 
 function createStyles(theme: Theme, bottomInset: number) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: { flex: 1 },
 		body: { flex: 1, flexDirection: 'row' },
 		playerBar: {
@@ -66,4 +66,5 @@ function createStyles(theme: Theme, bottomInset: number) {
 			backgroundColor: theme.colors.background,
 		},
 	});
+	return styles;
 }

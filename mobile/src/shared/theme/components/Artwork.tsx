@@ -5,12 +5,12 @@ import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-interface ArtworkProps {
+type ArtworkProps = {
 	uri?: string | null;
 	size: number;
 	style?: StyleProp<ViewStyle>;
 	iconSize?: number;
-}
+};
 
 export function Artwork({ uri, size, style, iconSize }: ArtworkProps) {
 	const { theme } = useTheme();

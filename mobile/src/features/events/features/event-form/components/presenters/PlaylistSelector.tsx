@@ -10,11 +10,11 @@ import { Text } from '@/shared/theme/components/Text';
 import BracketSquareOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/bracket-square.svg';
 import CheckBoxSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-box-solid.svg';
 
-interface PlaylistSelectorProps {
+type PlaylistSelectorProps = {
 	playlists: PlaylistChoice[];
 	selectedId: string | null;
 	onSelect: (id: string | null) => void;
-}
+};
 
 export function PlaylistSelector({ playlists, selectedId, onSelect }: PlaylistSelectorProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -56,7 +56,7 @@ export function PlaylistSelector({ playlists, selectedId, onSelect }: PlaylistSe
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		hint: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
@@ -74,4 +74,5 @@ function createStyles(theme: Theme) {
 		selected: { backgroundColor: theme.colors.surfaceAlt },
 		name: { flex: 1, fontSize: theme.typography.sizes.md, color: theme.colors.text },
 	});
+	return styles;
 }

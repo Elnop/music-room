@@ -1,7 +1,7 @@
-export interface UserStats {
+export type UserStats = {
 	followersCount: number;
 	followingCount: number;
-}
+};
 
 export type ProfileStackParamList = {
 	Profile: undefined;

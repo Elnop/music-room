@@ -102,5 +102,6 @@ export function UserProfileWideHeader({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({ action: wideProfileActionStyle(theme) });
+	const styles = StyleSheet.create({ action: wideProfileActionStyle(theme) });
+	return styles;
 }

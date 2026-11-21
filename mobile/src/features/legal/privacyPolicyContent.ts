@@ -5,10 +5,10 @@ export type PolicySpan =
 
 type PolicyBlock = { paragraph: PolicySpan[] } | { list: PolicySpan[][] };
 
-interface PolicySection {
+type PolicySection = {
 	title: string;
 	blocks: PolicyBlock[];
-}
+};
 
 export const POLICY_UPDATED_AT = 'Dernière mise à jour : 25 octobre 2026';
 

@@ -5,14 +5,14 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
 import { Text } from '@/shared/theme/components/Text';
 
-interface AuthFormLayoutProps {
+type AuthFormLayoutProps = {
 	logoSize: number;
 	bottomInset?: number;
 	footerText: string;
 	footerLink: string;
 	onFooterLink: () => void;
 	children: React.ReactNode;
-}
+};
 
 export function AuthFormFrame({
 	logoSize,
@@ -61,7 +61,7 @@ export function AuthFormFrame({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -99,4 +99,5 @@ function createStyles(theme: Theme) {
 			fontFamily: theme.typography.families.semibold,
 		},
 	});
+	return styles;
 }

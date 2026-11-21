@@ -3,10 +3,10 @@ import { requireOptionalNativeModule } from 'expo';
 
 const TASK_KEY = 'JsKeepAlive';
 
-interface JsKeepAliveModule {
+type JsKeepAliveModule = {
 	start(): void;
 	stop(): void;
-}
+};
 
 const native =
 	Platform.OS === 'android' ? requireOptionalNativeModule<JsKeepAliveModule>('JsKeepAlive') : null;

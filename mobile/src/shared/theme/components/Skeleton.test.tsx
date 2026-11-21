@@ -33,7 +33,7 @@ describe('SkeletonList', () => {
 		const announcements = screen.getAllByLabelText('Chargement');
 		expect(announcements).toHaveLength(1);
 		expect(announcements[0].props.accessibilityRole).toBe('progressbar');
-		expect(announcements[0].props.accessibilityState).toEqual({ busy: true });
+		expect(announcements[0].props.accessibilityState).toStrictEqual({ busy: true });
 	});
 
 	it('hides every block from screen readers', async () => {

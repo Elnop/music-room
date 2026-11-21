@@ -11,7 +11,7 @@ import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid
 import SoundMuteSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-mute-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 
-interface NowPlayingInlineProps {
+type NowPlayingInlineProps = {
 	track: {
 		title: string;
 		artist: string;
@@ -21,7 +21,7 @@ interface NowPlayingInlineProps {
 	onPlay: () => void;
 	onPause: () => void;
 	controllable?: boolean;
-}
+};
 
 export function NowPlayingInline({
 	track,
@@ -81,7 +81,7 @@ export function NowPlayingInline({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		trackCard: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -129,4 +129,5 @@ function createStyles(theme: Theme) {
 			alignItems: 'center',
 		},
 	});
+	return styles;
 }

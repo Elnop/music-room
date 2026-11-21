@@ -7,11 +7,11 @@ import type { QueueItem } from '@/shared/playback/lib/playback';
 import { UP_NEXT_ARTWORK_SIZE } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 
-interface UpNextRowProps {
+type UpNextRowProps = {
 	item: QueueItem;
 	styles: NowPlayingPanelStyles;
 	onPlay: (itemId: string) => void;
-}
+};
 
 export function UpNextRow({ item, styles, onPlay }: UpNextRowProps) {
 	const { track } = item;

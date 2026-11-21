@@ -5,9 +5,9 @@ import { useMenuAnchor } from '@/features/playlists/features/editor/shared/actio
 import type { TrackActionsSheetProps } from '@/shared/playback/lib/trackActionsSheet';
 import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
 
-interface TrackActionsSheetContainerProps extends TrackActionsSheetProps {
+type TrackActionsSheetContainerProps = TrackActionsSheetProps & {
 	playback: PlaybackActions;
-}
+};
 
 export function TrackActionsSheetContainer({
 	track,

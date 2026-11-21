@@ -93,11 +93,11 @@ describe('profileApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce(stats);
 		const res1 = await profileApi.getMyStats();
 		expect(apiRequest).toHaveBeenCalledWith('/api/friends/stats/me');
-		expect(res1).toEqual(stats);
+		expect(res1).toStrictEqual(stats);
 
 		jest.mocked(authRequest).mockResolvedValueOnce(stats);
 		const res2 = await profileApi.getMyStats('tok');
 		expect(authRequest).toHaveBeenCalledWith('/api/friends/stats/me', 'tok');
-		expect(res2).toEqual(stats);
+		expect(res2).toStrictEqual(stats);
 	});
 });

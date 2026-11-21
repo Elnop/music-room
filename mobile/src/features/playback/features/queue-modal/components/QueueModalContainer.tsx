@@ -3,11 +3,11 @@ import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActi
 import { useQueueModal } from '@/features/playback/features/queue-modal/useQueueModal';
 import { QueueModalView } from '@/features/playback/features/queue-modal/components/presenters/QueueModalView';
 
-interface QueueModalProps {
+type QueueModalProps = {
 	visible: boolean;
 	onClose: () => void;
 	TrackActionsSheet: TrackActionsSheetComponent;
-}
+};
 
 export function QueueModalContainer({ visible, onClose, TrackActionsSheet }: QueueModalProps) {
 	const {

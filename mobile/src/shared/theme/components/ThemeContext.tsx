@@ -6,9 +6,9 @@ const VALUE: ThemeContextValue = { theme: originalTheme };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-interface ThemeProviderProps {
+type ThemeProviderProps = {
 	children: React.ReactNode;
-}
+};
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
 	return <ThemeContext.Provider value={VALUE}>{children}</ThemeContext.Provider>;

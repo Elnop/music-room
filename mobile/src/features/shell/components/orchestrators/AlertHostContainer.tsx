@@ -51,7 +51,7 @@ export function AlertHostContainer() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		...dialogStyles(theme),
 		message: {
 			marginTop: theme.spacing.sm,
@@ -67,4 +67,5 @@ function createStyles(theme: Theme) {
 		},
 		destructive: { backgroundColor: theme.colors.error },
 	});
+	return styles;
 }

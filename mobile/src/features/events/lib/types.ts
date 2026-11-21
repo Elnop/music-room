@@ -1,19 +1,19 @@
 import type { MusicGenre } from '@/shared/users/user.types';
 
-export interface EventOrganizer {
+export type EventOrganizer = {
 	id: string;
 	username: string;
 	displayName?: string;
 	avatarUrl?: string;
-}
+};
 
-export interface EventPlaylist {
+export type EventPlaylist = {
 	id: string;
 	name: string;
 	coverUrl?: string;
-}
+};
 
-export interface MusicEvent {
+export type MusicEvent = {
 	id: string;
 	name: string;
 	description?: string;
@@ -29,15 +29,15 @@ export interface MusicEvent {
 	playlist: EventPlaylist | null;
 	createdAt: string;
 	updatedAt: string;
-}
+};
 
-export interface GeocodedPlace {
+export type GeocodedPlace = {
 	latitude: number;
 	longitude: number;
 	displayName: string;
-}
+};
 
-export interface EventInput {
+export type EventInput = {
 	name: string;
 	description: string | null;
 	address: string;
@@ -48,16 +48,16 @@ export interface EventInput {
 	startsAt: string;
 	endsAt: string;
 	playlistId: string | null;
-}
+};
 
-export interface PlaylistChoice {
+export type PlaylistChoice = {
 	id: string;
 	name: string;
-}
+};
 
-export interface EventDeletedPayload {
+export type EventDeletedPayload = {
 	eventId: string;
-}
+};
 
 export type EventStackParamList = {
 	EventDetail: { id: string };

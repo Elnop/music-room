@@ -30,11 +30,11 @@ const HAPTICS = {
 	success: hapticSuccess,
 } as const;
 
-interface PressableProps extends Omit<NativePressableProps, 'style' | 'accessibilityLabel'> {
+type PressableProps = Omit<NativePressableProps, 'style' | 'accessibilityLabel'> & {
 	accessibilityLabel: string;
 	style?: StyleProp<ViewStyle>;
 	haptic?: keyof typeof HAPTICS;
-}
+};
 
 export function Pressable({
 	style,

@@ -2,11 +2,11 @@ import * as ImagePicker from 'expo-image-picker';
 
 export type ImageSource = 'library' | 'camera';
 
-interface PickedImage {
+type PickedImage = {
 	uri: string;
 	width: number;
 	height: number;
-}
+};
 
 const PICKER_OPTIONS: ImagePicker.ImagePickerOptions = {
 	mediaTypes: ['images'],

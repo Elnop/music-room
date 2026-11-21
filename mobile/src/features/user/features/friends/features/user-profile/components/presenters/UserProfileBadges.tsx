@@ -5,11 +5,11 @@ import type { FollowStatus } from '@/features/user/features/friends/types';
 import { createUserProfileHeaderStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileHeaderStyles';
 import { Text } from '@/shared/theme/components/Text';
 
-interface UserProfileBadgesProps {
+type UserProfileBadgesProps = {
 	followStatus: FollowStatus | null;
 	canControlMusic: boolean;
 	hasDevicesOnline: boolean;
-}
+};
 
 export function UserProfileBadges({
 	followStatus,

@@ -4,10 +4,10 @@ import { useConnectStore } from '@/features/playback/shared/player/stores/connec
 import { showError } from '@/shared/theme/lib/toast';
 import type { ActionScope } from '@/features/playback/shared/player/lib/queue.types';
 
-export interface StepOptions {
+export type StepOptions = {
 	errorMessage?: string | ((error: unknown) => string);
 	stopWhenEmpty?: boolean;
-}
+};
 
 export function actionScope(): ActionScope {
 	const { target } = useConnectStore.getState();

@@ -5,19 +5,19 @@ const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
 type AppTab = keyof AppTabsParamList;
 
-interface StackRoute {
+type StackRoute = {
 	name: string;
 	params?: object;
-}
+};
 
-interface ScreenPath {
+type ScreenPath = {
 	screen: string;
 	path: string;
 	param?: string;
 	tab?: AppTab;
 	routes: (id: string) => StackRoute[];
 	isShareLink?: true;
-}
+};
 
 function PLAYLIST(id: string): StackRoute[] {
 	return [{ name: 'Playlists' }, { name: 'PlaylistDetail', params: { id } }];
@@ -148,10 +148,10 @@ const MATCHERS = SCREEN_PATHS.map(entry => ({
 	regex: new RegExp(`^${entry.path.replace(':id', `(${UUID})`)}$`, 'iu'),
 }));
 
-export interface ScreenPathMatch {
+export type ScreenPathMatch = {
 	entry: ScreenPath;
 	id: string;
-}
+};
 
 export function matchScreenPath(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
 	const bare = path.split(/[?#]/u)[0].replaceAll(/^\/+|\/+$/gu, '');
@@ -172,21 +172,21 @@ export function stateFromMatch({ entry, id }: ScreenPathMatch): InitialState {
 	return entry.tab ? { routes: [{ name: entry.tab, state: stack }] } : stack;
 }
 
-interface RouteNode {
+type RouteNode = {
 	name: string;
 	params?: object;
 	state?: StateNode;
-}
+};
 
-interface StateNode {
+type StateNode = {
 	index?: number;
 	routes: readonly RouteNode[];
-}
+};
 
-interface NestedParams {
+type NestedParams = {
 	screen?: string;
 	params?: object;
-}
+};
 
 function focusedRoute(state: StateNode): RouteNode | undefined {
 	let route = state.routes[state.index ?? state.routes.length - 1];

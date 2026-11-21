@@ -39,7 +39,7 @@ export function HomeSkeleton() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		header: {
 			width: '100%',
 		},
@@ -51,4 +51,5 @@ function createStyles(theme: Theme) {
 			marginBottom: theme.spacing.md * 2 + theme.spacing.sm,
 		},
 	});
+	return styles;
 }

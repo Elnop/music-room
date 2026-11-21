@@ -7,9 +7,9 @@ import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 
-interface TrackActionsButtonProps {
+type TrackActionsButtonProps = {
 	onPress: (anchor?: MenuAnchor) => void;
-}
+};
 
 export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
 	const { theme } = useTheme();

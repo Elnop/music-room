@@ -1,7 +1,7 @@
-interface ListeningSocket {
+type ListeningSocket = {
 	connected: boolean;
 	emit: (event: string, ...args: unknown[]) => unknown;
-}
+};
 
 const holders = new WeakMap<ListeningSocket, Map<string, number>>();
 

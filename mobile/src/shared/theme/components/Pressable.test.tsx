@@ -47,7 +47,7 @@ describe('Pressable', () => {
 
 		fireEvent.press(screen.getByRole('button', { name: 'Pick' }));
 
-		expect(calls).toEqual(['haptic', 'press']);
+		expect(calls).toStrictEqual(['haptic', 'press']);
 	});
 
 	it('does not call onPress while disabled', () => {

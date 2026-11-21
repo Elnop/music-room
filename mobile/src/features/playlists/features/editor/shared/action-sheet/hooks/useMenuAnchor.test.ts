@@ -17,10 +17,10 @@ describe('useMenuAnchor', () => {
 		act(() => useMenuAnchorStore.getState().setAnchor(anchor));
 		rerender({ visible: true });
 
-		expect(result.current).toEqual(anchor);
+		expect(result.current).toStrictEqual(anchor);
 		expect(useMenuAnchorStore.getState().anchor).toBeNull();
 		rerender({ visible: false });
-		expect(result.current).toEqual(anchor);
+		expect(result.current).toStrictEqual(anchor);
 	});
 
 	it('has no anchor for a menu opened without its button (a long press)', () => {
@@ -37,7 +37,7 @@ describe('useMenuAnchor', () => {
 	it('takes the anchor of a menu mounted already open', () => {
 		useMenuAnchorStore.getState().setAnchor(anchor);
 		const { result } = renderHook(() => useMenuAnchor(true));
-		expect(result.current).toEqual(anchor);
+		expect(result.current).toStrictEqual(anchor);
 		expect(useMenuAnchorStore.getState().anchor).toBeNull();
 	});
 });

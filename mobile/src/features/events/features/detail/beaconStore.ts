@@ -9,7 +9,7 @@ import type { AdvertiseFailure } from '@/features/events/features/detail/beaconA
 
 type BeaconStatus = 'idle' | 'starting' | 'broadcasting';
 
-interface BeaconState {
+type BeaconState = {
 	eventId: string | null;
 	status: BeaconStatus;
 	start: (event: {
@@ -18,7 +18,7 @@ interface BeaconState {
 		endsAt: string;
 	}) => Promise<AdvertiseFailure | null>;
 	stop: () => void;
-}
+};
 
 const MAX_TIMER_MS = 2_147_483_647;
 let endTimer: ReturnType<typeof setTimeout> | null = null;

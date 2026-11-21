@@ -14,11 +14,11 @@ import type { BeaconSighting } from '@/features/events/features/nearby/lib/beaco
 
 export type BeaconScanStatus = 'checking' | 'needs-permission' | 'off' | 'unsupported' | 'scanning';
 
-interface BeaconScan {
+type BeaconScan = {
 	status: BeaconScanStatus;
 	sightings: ReadonlyMap<number, BeaconSighting>;
 	requestPermission: () => void;
-}
+};
 
 const NONE: ReadonlyMap<number, BeaconSighting> = new Map();
 

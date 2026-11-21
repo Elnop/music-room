@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/lib/types';
 
 export function createListStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -30,4 +30,5 @@ export function createListStyles(theme: Theme) {
 			gap: 12,
 		},
 	});
+	return styles;
 }

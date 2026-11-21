@@ -143,7 +143,7 @@ describe('useRemoteTarget', () => {
 				devices: [deviceStatus('phone')],
 			})
 		);
-		expect(connect().target).toEqual({ kind: 'local' });
+		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(showInfo).toHaveBeenCalledWith('Appareil hors ligne');
 	});
 
@@ -156,7 +156,7 @@ describe('useRemoteTarget', () => {
 		expect(connect().target.kind).toBe('remote');
 
 		act(() => onRevoked({ ownerId: 'friend' }));
-		expect(connect().target).toEqual({ kind: 'local' });
+		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(showInfo).toHaveBeenCalledWith('Accès retiré');
 	});
 
@@ -197,7 +197,7 @@ describe('useRemoteTarget', () => {
 				message: 'no',
 			})
 		);
-		expect(connect().target).toEqual({ kind: 'local' });
+		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(showInfo).toHaveBeenCalledWith('Accès refusé à cet appareil');
 	});
 

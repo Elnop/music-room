@@ -13,9 +13,9 @@ import {
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-interface SimilarProfilesSectionProps {
+type SimilarProfilesSectionProps = {
 	section: Section;
-}
+};
 
 export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps) {
 	const { styles } = useThemedStyles(createSimilarProfilesStyles);

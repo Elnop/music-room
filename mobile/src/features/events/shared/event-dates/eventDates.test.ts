@@ -9,7 +9,7 @@ const HOUR = 3_600_000;
 describe('defaultSchedule', () => {
 	it('starts at the next full hour, for three hours', () => {
 		const { startsAt, endsAt } = defaultSchedule(new Date(2026, 10, 6, 19, 25));
-		expect(startsAt).toEqual(new Date(2026, 10, 6, 20, 0));
+		expect(startsAt).toStrictEqual(new Date(2026, 10, 6, 20, 0));
 		expect(endsAt.getTime() - startsAt.getTime()).toBe(3 * HOUR);
 	});
 });

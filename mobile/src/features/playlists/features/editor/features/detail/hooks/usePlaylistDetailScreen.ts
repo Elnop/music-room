@@ -16,7 +16,7 @@ import type {
 
 export type DetailNavigation = NativeStackNavigationProp<PlaylistStackParamList, 'PlaylistDetail'>;
 
-export interface PlaylistDetailScreen {
+export type PlaylistDetailScreen = {
 	id: string;
 	playlist: PlaylistWithTracks | undefined;
 	failure: 'notFound' | 'error' | null;
@@ -26,7 +26,7 @@ export interface PlaylistDetailScreen {
 	markDeleting: (deleting: boolean) => void;
 	leaveDeleted: () => void;
 	bottomPadding: number;
-}
+};
 
 export function usePlaylistDetailScreen(
 	navigation: DetailNavigation,

@@ -32,7 +32,7 @@ export function DeviceCardSkeleton() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		skeletonCard: {
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.lg,
@@ -67,4 +67,5 @@ function createStyles(theme: Theme) {
 			gap: theme.spacing.md,
 		},
 	});
+	return styles;
 }

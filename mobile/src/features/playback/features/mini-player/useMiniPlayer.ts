@@ -13,7 +13,7 @@ import { openPlayerLabel } from '@/features/playback/shared/player/lib/openPlaye
 
 const SWIPE_OPEN_THRESHOLD = 40;
 
-export interface MiniPlayerData {
+export type MiniPlayerData = {
 	track: NowPlayingTrack | null;
 	deviceLabel: string | null;
 	isPlaying: boolean;
@@ -27,7 +27,7 @@ export interface MiniPlayerData {
 	onNext: () => void;
 	infoStyle: ReturnType<typeof useAnimatedStyle>;
 	panGesture: ReturnType<typeof Gesture.Pan>;
-}
+};
 
 export function useMiniPlayer(): MiniPlayerData {
 	const toggleModal = usePlayerStore(state => state.toggleModal);

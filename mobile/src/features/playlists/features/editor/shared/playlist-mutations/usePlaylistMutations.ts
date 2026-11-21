@@ -15,10 +15,10 @@ export function useCreatePlaylist() {
 	});
 }
 
-interface UpdateVariables {
+type UpdateVariables = {
 	id: string;
 	changes: Partial<PlaylistInput>;
-}
+};
 
 export function useUpdatePlaylist() {
 	const client = useQueryClient();

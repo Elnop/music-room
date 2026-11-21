@@ -68,8 +68,8 @@ export function useTabOptions() {
 	return { screenOptions, hiddenOnDesktop };
 }
 
-const createStyles = (theme: Theme, bottomInset: number) =>
-	StyleSheet.create({
+const createStyles = (theme: Theme, bottomInset: number) => {
+	const styles = StyleSheet.create({
 		tabBar: {
 			height: TAB_BAR_HEIGHT + bottomInset,
 			paddingTop: 10,
@@ -80,3 +80,5 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			elevation: 0,
 		},
 	});
+	return styles;
+};

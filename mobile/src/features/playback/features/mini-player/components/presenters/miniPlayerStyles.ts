@@ -3,7 +3,7 @@ import { keycap, pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 
 export function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			...keycap(theme),
 			backgroundColor: theme.colors.surfaceAlt,
@@ -80,4 +80,5 @@ export function createStyles(theme: Theme) {
 			backgroundColor: theme.colors.primary,
 		},
 	});
+	return styles;
 }

@@ -8,11 +8,11 @@ import { createUserProfileStyles } from '@/features/user/features/friends/featur
 import { Text } from '@/shared/theme/components/Text';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-interface UserProfilePlaylistsProps {
+type UserProfilePlaylistsProps = {
 	playlists: FriendPlaylistSummary[];
 	ownerName: string;
 	onSelectPlaylist: (playlistId: string) => void;
-}
+};
 
 export function UserProfilePlaylists({
 	playlists,

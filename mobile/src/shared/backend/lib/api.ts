@@ -4,7 +4,7 @@ import { getDeviceName, getModelName } from '@/shared/backend/lib/deviceIdentity
 import { getBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { getAuthSession, getSession } from '@/shared/backend/lib/authSession';
 
-interface ApiResponse<T> {
+type ApiResponse<T> = {
 	success: boolean;
 	data?: T;
 	error?: {
@@ -17,12 +17,12 @@ interface ApiResponse<T> {
 	meta: {
 		timestamp: string;
 	};
-}
+};
 
-interface ApiErrorDebug {
+type ApiErrorDebug = {
 	why?: string;
 	fix?: string;
-}
+};
 
 export class ApiError extends Error {
 	code: string;

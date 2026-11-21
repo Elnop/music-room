@@ -8,11 +8,11 @@ function stateOf(path: string, signedIn?: boolean) {
 	return stateFromMatch(match);
 }
 
-interface Node {
+type Node = {
 	name: string;
 	params?: object;
 	state?: { routes: readonly Node[] };
-}
+};
 
 function outline(state: { routes: readonly Node[] }): unknown[] {
 	return state.routes.map(route =>
@@ -186,7 +186,7 @@ describe('screen paths', () => {
 		'%s opens its screen above its parents, and back',
 		(path, expected) => {
 			const state = stateOf(path, expected[0][0].endsWith('Tab'));
-			expect(outline(state as { routes: Node[] })).toEqual(expected);
+			expect(outline(state as { routes: Node[] })).toStrictEqual(expected);
 			expect(pathFromState(state as { routes: Node[] })).toBe(path);
 		}
 	);
@@ -196,7 +196,7 @@ describe('screen paths', () => {
 		['/reset-password', ['Welcome', 'Login', 'ForgotPassword']],
 	])('reloads %s on the screen before it, its email being out of the address', (path, names) => {
 		const state = stateOf(path);
-		expect(state.routes.map(route => route.name)).toEqual(names);
+		expect(state.routes.map(route => route.name)).toStrictEqual(names);
 		expect(
 			pathFromState({
 				routes: [
@@ -211,7 +211,7 @@ describe('screen paths', () => {
 
 	it('opens the /welcome alias on the welcome screen, written /', () => {
 		const state = stateOf('/welcome', false);
-		expect(state.routes.map(route => route.name)).toEqual(['Welcome']);
+		expect(state.routes.map(route => route.name)).toStrictEqual(['Welcome']);
 		expect(pathFromState(state)).toBe('/');
 	});
 
@@ -221,7 +221,7 @@ describe('screen paths', () => {
 	])('matches %s per session', (path, signedOut, signedIn) => {
 		const outEntry = matchScreenPath(path, false)?.entry;
 		const inEntry = matchScreenPath(path, true)?.entry;
-		expect([outEntry?.screen, outEntry?.tab]).toEqual([signedOut, undefined]);
+		expect([outEntry?.screen, outEntry?.tab]).toStrictEqual([signedOut, undefined]);
 		expect(inEntry?.screen).toBe(signedIn);
 		expect(inEntry?.tab).toBeDefined();
 	});

@@ -11,7 +11,7 @@ describe('upsertEvent', () => {
 		const late = musicEvent({ id: 'late', startsAt: at(5 * HOUR), endsAt: at(6 * HOUR) });
 		const early = musicEvent({ id: 'early' });
 		const list = upsertEvent([late], early);
-		expect(list.map(event => event.id)).toEqual(['early', 'late']);
+		expect(list.map(event => event.id)).toStrictEqual(['early', 'late']);
 
 		const renamed = upsertEvent(list, { ...early, name: 'Renamed' });
 		expect(renamed).toHaveLength(2);
@@ -20,12 +20,12 @@ describe('upsertEvent', () => {
 
 	it('drops an event that is over', () => {
 		const ended = musicEvent({ startsAt: at(-3 * HOUR), endsAt: at(-HOUR) });
-		expect(upsertEvent([musicEvent()], ended)).toEqual([]);
+		expect(upsertEvent([musicEvent()], ended)).toStrictEqual([]);
 	});
 });
 
 describe('removeEvent', () => {
 	it('removes the event by id', () => {
-		expect(removeEvent([musicEvent()], 'e1')).toEqual([]);
+		expect(removeEvent([musicEvent()], 'e1')).toStrictEqual([]);
 	});
 });

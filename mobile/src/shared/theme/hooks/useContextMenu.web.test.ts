@@ -27,7 +27,7 @@ afterEach(() => useMenuAnchorStore.setState({ anchor: null }));
 describe('useContextMenu (web)', () => {
 	it('opens the menu at the pointer instead of the browser menu', () => {
 		const onOpen = jest.fn(() =>
-			expect(useMenuAnchorStore.getState().anchor).toEqual({
+			expect(useMenuAnchorStore.getState().anchor).toStrictEqual({
 				x: 320,
 				y: 410,
 				width: 0,
@@ -51,7 +51,7 @@ describe('useContextMenu (web)', () => {
 		handlers(onOpen).onKeyDown?.(event);
 		expect(onOpen).toHaveBeenCalledTimes(1);
 		expect(event.preventDefault).toHaveBeenCalled();
-		expect(useMenuAnchorStore.getState().anchor).toEqual({
+		expect(useMenuAnchorStore.getState().anchor).toStrictEqual({
 			x: 40,
 			y: 200,
 			width: 900,
@@ -69,7 +69,7 @@ describe('useContextMenu (web)', () => {
 	});
 
 	it('keeps the browser menu on an item without a menu', () => {
-		expect(handlers(undefined)).toEqual({});
+		expect(handlers(undefined)).toStrictEqual({});
 	});
 });
 

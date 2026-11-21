@@ -43,7 +43,7 @@ describe('useEventPlace (web)', () => {
 		lookup.mockResolvedValue({ latitude: 45.7, longitude: 4.8, displayName: 'Lyon' });
 		const place = renderPlace();
 
-		await expect(place.current.resolve('1 place Bellecour, Lyon')).resolves.toEqual({
+		await expect(place.current.resolve('1 place Bellecour, Lyon')).resolves.toStrictEqual({
 			latitude: 45.7,
 			longitude: 4.8,
 		});
@@ -75,7 +75,7 @@ describe('useEventPlace (web)', () => {
 		expect(setAddress).toHaveBeenCalledWith('48.89664, 2.31836');
 		expect(location.reverseGeocodeAsync).not.toHaveBeenCalled();
 		expect(lookup).not.toHaveBeenCalled();
-		await expect(place.current.resolve('48.89664, 2.31836')).resolves.toEqual({
+		await expect(place.current.resolve('48.89664, 2.31836')).resolves.toStrictEqual({
 			latitude: 48.89664,
 			longitude: 2.31836,
 		});

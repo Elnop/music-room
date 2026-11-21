@@ -11,10 +11,10 @@ import type { DevicePickerOwner } from '@/features/playback/features/control-del
 import type { PickerDevice } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/DeviceRow';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
 
-export interface LoadedDevices {
+export type LoadedDevices = {
 	owners: DevicePickerOwner[];
 	phoneId: string;
-}
+};
 
 export function useDevicePicker(visible: boolean, onClose: () => void) {
 	const { theme } = useTheme();

@@ -9,12 +9,12 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
-interface ProfileNavigationItemProps {
+type ProfileNavigationItemProps = {
 	title: string;
 	subtitle: string;
 	icon: PixelIconSource;
 	onPress: () => void;
-}
+};
 
 export function ProfileNavigationItem({
 	title,
@@ -42,7 +42,7 @@ export function ProfileNavigationItem({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		buttonContainer: {
 			paddingHorizontal: theme.spacing.lg,
 			marginTop: theme.spacing.md,
@@ -77,4 +77,5 @@ function createStyles(theme: Theme) {
 			marginTop: 2,
 		},
 	});
+	return styles;
 }

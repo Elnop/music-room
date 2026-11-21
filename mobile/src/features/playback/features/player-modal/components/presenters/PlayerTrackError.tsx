@@ -5,7 +5,7 @@ import type { createStyles } from '@/features/playback/features/player-modal/com
 import { Text } from '@/shared/theme/components/Text';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 
-interface PlayerTrackErrorProps {
+type PlayerTrackErrorProps = {
 	styles: ReturnType<typeof createStyles>;
 	error: string | null;
 	isRemote: boolean;
@@ -13,7 +13,7 @@ interface PlayerTrackErrorProps {
 		error: string;
 		errorBg: string;
 	};
-}
+};
 
 export function PlayerTrackError({ styles, error, isRemote, colors }: PlayerTrackErrorProps) {
 	if (!error || isRemote) return null;

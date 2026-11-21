@@ -17,13 +17,13 @@ function steppedRange(levels: number[]) {
 	return { inputRange: [...inputRange, 1], outputRange: [...outputRange, levels[0]] };
 }
 
-interface EqualizerBarsProps {
+type EqualizerBarsProps = {
 	color: string;
 	bars?: number;
 	height?: number;
 	barWidth?: number;
 	playing?: boolean;
-}
+};
 
 export function EqualizerBars({
 	color,

@@ -11,10 +11,10 @@ import { formatEventDate, isOngoing } from '@/features/events/shared/event-dates
 import type { MusicEvent } from '@/features/events/lib/types';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
-interface EventRowProps {
+type EventRowProps = {
 	event: MusicEvent;
 	onPress: () => void;
-}
+};
 
 export function EventRow({ event, onPress }: EventRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -39,7 +39,7 @@ export function EventRow({ event, onPress }: EventRowProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: {
 			...keycap(theme),
 			height: 45,
@@ -61,4 +61,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

@@ -21,22 +21,22 @@ export type {
 	QueueStepOutcome,
 };
 
-export interface RemoteTarget {
+export type RemoteTarget = {
 	kind: 'remote';
 	ownerId: string;
 	deviceId: string;
 	ownerUsername?: string;
-}
+};
 
 export type ConnectTarget = { kind: 'local' } | RemoteTarget;
 
-export interface QueueCallTarget {
+export type QueueCallTarget = {
 	ownerId?: string;
 	deviceId?: string;
-}
+};
 
-export interface ActionScope {
+export type ActionScope = {
 	ownerId: string | null;
 	remote: boolean;
 	call: QueueCallTarget;
-}
+};

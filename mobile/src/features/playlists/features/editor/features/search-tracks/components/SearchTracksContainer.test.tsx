@@ -101,9 +101,9 @@ describe('SearchTracksContainer (#307)', () => {
 		expect(screen.getByTestId('skeleton-list')).toBeTruthy();
 		expect(screen.getByTestId('search-bar-loading')).toBeTruthy();
 		expect(screen.queryByText('Aucun titre trouvé')).toBeNull();
-		expect(routes.calls()).toEqual([]);
+		expect(routes.calls()).toStrictEqual([]);
 		expect(await screen.findByText('Song', {}, { timeout: 2000 })).toBeTruthy();
-		expect(routes.calls()).toEqual([SEARCH]);
+		expect(routes.calls()).toStrictEqual([SEARCH]);
 	});
 
 	it('says nothing was found, and drops the results at once when cleared', async () => {

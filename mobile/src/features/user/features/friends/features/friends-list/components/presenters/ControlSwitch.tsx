@@ -5,13 +5,13 @@ import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { createFriendsListStyles } from '@/features/user/features/friends/features/friends-list/components/presenters/friendsListStyles';
 
-interface ControlSwitchProps {
+type ControlSwitchProps = {
 	canControl: boolean;
 	isToggling: boolean;
 	disabled: boolean;
 	onToggle: () => void;
 	accessibilityLabel: string;
-}
+};
 
 export function ControlSwitch({
 	canControl,

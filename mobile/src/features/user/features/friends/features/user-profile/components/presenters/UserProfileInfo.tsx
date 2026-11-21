@@ -13,12 +13,12 @@ import { HiddenFieldNote } from '@/features/user/features/friends/features/user-
 import { UserProfileBadges } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileBadges';
 import { Text } from '@/shared/theme/components/Text';
 
-interface UserProfileInfoProps {
+type UserProfileInfoProps = {
 	profile: FilteredProfile;
 	followStatus: FollowStatus | null;
 	canControlMusic: boolean;
 	hasDevicesOnline: boolean;
-}
+};
 
 export function UserProfileInfo({
 	profile,

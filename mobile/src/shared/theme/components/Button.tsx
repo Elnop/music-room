@@ -43,9 +43,20 @@ export function Button({
 	const isDisabled = disabled || loading;
 	const buttonText = title ?? children;
 
+	const variantStyle = {
+		primary: styles.primary,
+		secondary: styles.secondary,
+		outline: styles.outline,
+	}[variant];
+	const variantTextStyle = {
+		primary: styles.primaryText,
+		secondary: styles.secondaryText,
+		outline: styles.outlineText,
+	}[variant];
+
 	const containerStyle = [
 		styles.container,
-		styles[variant],
+		variantStyle,
 		size === 'compact' && styles.compact,
 		fullWidth && styles.fullWidth,
 		isDisabled && styles.disabled,
@@ -54,7 +65,7 @@ export function Button({
 
 	const textStyle = [
 		styles.text,
-		styles[`${variant}Text` as keyof typeof styles],
+		variantTextStyle,
 		size === 'compact' && styles.compactText,
 		isDisabled && styles.disabledText,
 	];
@@ -81,7 +92,7 @@ export function Button({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			...keycap(theme),
 			height: 52,
@@ -135,4 +146,5 @@ function createStyles(theme: Theme) {
 			opacity: 0.7,
 		},
 	});
+	return styles;
 }

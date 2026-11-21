@@ -1,7 +1,7 @@
 import type { SoundCloudTrack, StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 import type { PlaybackState } from '@/shared/playback/lib/playback';
 
-export interface PlayerState {
+export type PlayerState = {
 	currentTrack: SoundCloudTrack | null;
 	streamUrl: string | null;
 	streamProtocol: StreamProtocol;
@@ -45,7 +45,7 @@ export interface PlayerState {
 	toggleModal: () => void;
 	setModalOpen: (isOpen: boolean) => void;
 	markSeek: () => void;
-}
+};
 
 export const initialPlayerState = {
 	currentTrack: null,

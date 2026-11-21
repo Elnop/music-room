@@ -11,13 +11,13 @@ import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton
 import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
-interface PanelTrackActionsProps {
+type PanelTrackActionsProps = {
 	title: string;
 	shareUrl: string;
 	styles: NowPlayingPanelStyles;
 	onAddToPlaylist: (anchor?: MenuAnchor) => void;
 	onMoreActions: (anchor?: MenuAnchor) => void;
-}
+};
 
 export function PanelTrackActions({
 	title,

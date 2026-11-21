@@ -294,7 +294,7 @@ describe('PlayerModalContainer slider for a screen reader', () => {
 			screen.getByTestId('seek-slider', { includeHiddenElements: true }).props
 				.importantForAccessibility
 		).toBe('no-hide-descendants');
-		expect(seekControl().props.accessibilityValue).toEqual({
+		expect(seekControl().props.accessibilityValue).toStrictEqual({
 			text: '0:30 sur 3:20',
 		});
 	});
@@ -609,7 +609,7 @@ describe('PlayerModalContainer artwork swipe', () => {
 
 	it('shows the current artwork between the previous and next ones', () => {
 		render(<PlayerModalContainer {...sheets} />);
-		expect(artworks()).toEqual([
+		expect(artworks()).toStrictEqual([
 			'https://i1.sndcdn.com/a-t500x500.jpg',
 			'https://i1.sndcdn.com/b-t500x500.jpg',
 			'https://i1.sndcdn.com/c-t500x500.jpg',
@@ -649,7 +649,7 @@ describe('PlayerModalContainer artwork swipe', () => {
 		render(<PlayerModalContainer {...sheets} />);
 		swipe(-120);
 		expect(mockNext).not.toHaveBeenCalled();
-		expect(artworks()).toEqual([
+		expect(artworks()).toStrictEqual([
 			'https://i1.sndcdn.com/b-t500x500.jpg',
 			'https://i1.sndcdn.com/c-t500x500.jpg',
 		]);

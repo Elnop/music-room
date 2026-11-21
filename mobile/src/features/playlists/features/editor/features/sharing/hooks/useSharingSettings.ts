@@ -8,11 +8,11 @@ import { refreshPlaylist } from '@/features/playlists/shared/playlist/lib/playli
 import type { PlaylistInput } from '@/features/playlists/shared/playlist/lib/validators';
 import type { SharingMode } from '@/features/playlists/features/editor/features/sharing/lib/sharingTexts';
 
-export interface SharingSettings {
+export type SharingSettings = {
 	isUpdating: boolean;
 	toggleVisibility: () => void;
 	toggleEditMode: () => void;
-}
+};
 
 export function useSharingSettings(
 	id: string,

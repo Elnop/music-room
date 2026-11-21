@@ -1,17 +1,17 @@
 import { create } from 'zustand';
 import type { AlertButton } from 'react-native';
 
-interface AlertRequest {
+type AlertRequest = {
 	title: string;
 	message: string;
 	buttons: AlertButton[];
-}
+};
 
-interface AlertState {
+type AlertState = {
 	queue: AlertRequest[];
 	push: (alert: AlertRequest) => void;
 	dismiss: () => void;
-}
+};
 
 export const useAlertStore = create<AlertState>(set => ({
 	queue: [],

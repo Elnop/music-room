@@ -9,11 +9,11 @@ import type { MusicGenre } from '@/shared/users/user.types';
 import { EVENT_LIMITS } from '@/features/events/features/event-form/lib/validators';
 import { FieldLabel } from '@/features/events/features/event-form/components/presenters/FieldLabel';
 
-interface GenreSelectorProps {
+type GenreSelectorProps = {
 	selected: MusicGenre[];
 	onToggle: (genre: MusicGenre) => void;
 	error?: string;
-}
+};
 
 export function GenreSelector({ selected, onToggle, error }: GenreSelectorProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -43,7 +43,8 @@ export function GenreSelector({ selected, onToggle, error }: GenreSelectorProps)
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		chips: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
 	});
+	return styles;
 }

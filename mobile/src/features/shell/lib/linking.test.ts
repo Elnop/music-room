@@ -70,7 +70,7 @@ describe('stateFromLinkPath outside a browser', () => {
 
 describe('createLinking', () => {
 	it('declares the zumik:// prefix', () => {
-		expect(createLinking(() => true).prefixes).toEqual(['zumik://']);
+		expect(createLinking(() => true).prefixes).toStrictEqual(['zumik://']);
 	});
 
 	it('applies a link when signed in', () => {
@@ -111,7 +111,7 @@ describe('createLinking in a browser', () => {
 	});
 
 	it('adds the page origin to the zumik:// prefix', () => {
-		expect(createLinking(() => true).prefixes).toEqual(['zumik://', 'http://localhost:8081']);
+		expect(createLinking(() => true).prefixes).toStrictEqual(['zumik://', 'http://localhost:8081']);
 	});
 
 	it('opens a reloaded /playlist/<id> address', () => {
@@ -142,7 +142,7 @@ describe('createLinking in a browser', () => {
 		const signedOut = createLinking(() => false);
 		expect(
 			signedOut.getStateFromPath!('/privacy', signedOut.config as Options)?.routes.map(r => r.name)
-		).toEqual(['Welcome', 'PrivacyPolicy']);
+		).toStrictEqual(['Welcome', 'PrivacyPolicy']);
 		const signedIn = createLinking(() => true);
 		expect(signedIn.getStateFromPath!('/privacy', signedIn.config as Options)?.routes[0].name).toBe(
 			'ProfileTab'
@@ -153,14 +153,14 @@ describe('createLinking in a browser', () => {
 	it('opens the welcome screen at the root when signed out', () => {
 		const linking = createLinking(() => false);
 		const state = linking.getStateFromPath!('/', linking.config as Options);
-		expect(state?.routes.map(route => route.name)).toEqual(['Welcome']);
+		expect(state?.routes.map(route => route.name)).toStrictEqual(['Welcome']);
 		expect(linking.getPathFromState!({ routes: [{ name: 'Welcome' }] }, linking.config)).toBe('/');
 	});
 
 	it('opens a signed-out screen when signed out', () => {
 		const linking = createLinking(() => false);
 		const state = linking.getStateFromPath!('/register', linking.config as Options);
-		expect(state?.routes.map(route => route.name)).toEqual(['Welcome', 'Register']);
+		expect(state?.routes.map(route => route.name)).toStrictEqual(['Welcome', 'Register']);
 	});
 
 	it('keeps an app screen opened signed out, but not the home', () => {
@@ -190,7 +190,7 @@ describe('createLinking in a browser', () => {
 		});
 
 		it('adds the base path to the origin prefix', () => {
-			expect(createLinking(() => true).prefixes).toEqual([
+			expect(createLinking(() => true).prefixes).toStrictEqual([
 				'zumik://',
 				'http://localhost:8081/music-room',
 			]);

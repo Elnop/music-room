@@ -19,12 +19,12 @@ import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-s
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
-interface PlaylistHeaderProps {
+type PlaylistHeaderProps = {
 	playlist: PlaylistWithTracks;
 	playButton: React.ReactNode;
 	canEdit: boolean;
 	onAddTrack: () => void;
-}
+};
 
 export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: PlaylistHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -88,7 +88,7 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: { padding: theme.spacing.md, gap: theme.spacing.md },
 		top: { flexDirection: 'row', alignItems: 'flex-end', gap: theme.spacing.md },
 		side: { flex: 1, gap: theme.spacing.sm },
@@ -125,4 +125,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

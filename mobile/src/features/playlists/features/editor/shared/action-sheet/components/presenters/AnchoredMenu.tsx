@@ -10,11 +10,11 @@ import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 const MENU_WIDTH = 320;
 
-interface AnchoredMenuProps {
+type AnchoredMenuProps = {
 	anchor: MenuAnchor;
 	onClose: () => void;
 	children: React.ReactNode;
-}
+};
 
 export function AnchoredMenu({ anchor, onClose, children }: AnchoredMenuProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -37,7 +37,7 @@ export function AnchoredMenu({ anchor, onClose, children }: AnchoredMenuProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		menu: {
 			position: 'absolute',
 			width: MENU_WIDTH,
@@ -47,4 +47,5 @@ function createStyles(theme: Theme) {
 			...theme.shadows.large,
 		},
 	});
+	return styles;
 }

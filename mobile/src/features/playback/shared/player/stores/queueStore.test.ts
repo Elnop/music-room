@@ -104,7 +104,7 @@ const listTrack: SoundCloudTrack = {
 	playable: true,
 };
 
-interface MockPlayerState {
+type MockPlayerState = {
 	currentTrack: SoundCloudTrack | null;
 	queueItemId: string | null;
 	loadCounter: number;
@@ -113,7 +113,7 @@ interface MockPlayerState {
 	error: string | null;
 	playTrack: (track: SoundCloudTrack, queueItemId?: string, startPositionMs?: number) => void;
 	stop: () => void;
-}
+};
 
 let mockPlayer: MockPlayerState;
 
@@ -189,7 +189,7 @@ describe('queueStore load and events', () => {
 		api.getQueue.mockResolvedValue(queue('a'));
 		await store().load();
 		expect(mine().currentItemId).toBe('a');
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b', 'c']);
 		expect(store().loaded).toBe(true);
 	});
 
@@ -206,7 +206,7 @@ describe('queueStore load and events', () => {
 		const before = player().loadCounter;
 		store().applyState(queue('c', ['a', 'c']));
 		expect(mine().currentItemId).toBe('c');
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'c']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'c']);
 		expect(player().loadCounter).toBe(before);
 		expect(player().currentTrack).toBe(listTrack);
 	});
@@ -214,7 +214,7 @@ describe('queueStore load and events', () => {
 	it('reset empties the store', () => {
 		store().applyState(queue('a'));
 		store().reset();
-		expect(mine().items).toEqual([]);
+		expect(mine().items).toStrictEqual([]);
 		expect(store().loaded).toBe(false);
 	});
 });
@@ -387,7 +387,7 @@ describe('queueStore addItem', () => {
 		await expect(store().addItem(body)).resolves.toBe(true);
 
 		expect(api.addItem).toHaveBeenCalledWith(body, {});
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'n']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'n']);
 		expect(mine().currentItemId).toBe('a');
 		expect(showSuccess).toHaveBeenCalledWith("Ajouté à la file d'attente");
 		expect(hapticSuccess).toHaveBeenCalledTimes(1);
@@ -402,7 +402,7 @@ describe('queueStore addItem', () => {
 
 		await expect(store().addItem(body)).resolves.toBe(false);
 
-		expect(mine().items.map(i => i.id)).toEqual(['a']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a']);
 		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter à la file d'attente");
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(hapticSuccess).not.toHaveBeenCalled();
@@ -424,7 +424,7 @@ describe('queueStore playNext', () => {
 		await expect(store().playNext(body)).resolves.toBe(true);
 
 		expect(api.addItem).toHaveBeenCalledWith({ ...body, next: true }, {});
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'n', 'b']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'n', 'b']);
 		expect(mine().currentItemId).toBe('a');
 		expect(showSuccess).toHaveBeenCalledWith('Lira ensuite');
 		expect(hapticSuccess).toHaveBeenCalledTimes(1);
@@ -436,7 +436,7 @@ describe('queueStore playNext', () => {
 
 		await expect(store().playNext(body)).resolves.toBe(false);
 
-		expect(mine().items.map(i => i.id)).toEqual(['a']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a']);
 		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter ce titre");
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(hapticSuccess).not.toHaveBeenCalled();
@@ -490,7 +490,7 @@ describe('queueStore removeItem', () => {
 		await expect(store().removeItem('b')).resolves.toBe(true);
 
 		expect(api.removeItem).toHaveBeenCalledWith('b', {});
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'c']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'c']);
 		expect(player().loadCounter).toBe(before);
 	});
 
@@ -515,7 +515,7 @@ describe('queueStore removeItem', () => {
 
 		await expect(store().removeItem('c')).resolves.toBe(true);
 
-		expect(mine().items).toEqual([]);
+		expect(mine().items).toStrictEqual([]);
 		expect(player().currentTrack).toBeNull();
 		expect(player().playbackState).toBe('idle');
 	});
@@ -528,7 +528,7 @@ describe('queueStore removeItem', () => {
 
 		await expect(store().removeItem('a')).resolves.toBe(true);
 
-		expect(mine().items).toEqual([]);
+		expect(mine().items).toStrictEqual([]);
 		expect(player().currentTrack).toBe(listTrack);
 		expect(player().loadCounter).toBe(before);
 	});
@@ -556,7 +556,7 @@ describe('queueStore removeItem', () => {
 		await expect(store().removeItem('a')).resolves.toBe(false);
 
 		expect(showError).toHaveBeenCalledTimes(2);
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b', 'c']);
 	});
 });
 
@@ -568,7 +568,7 @@ describe('queueStore moveItem', () => {
 		await expect(store().moveItem('c', null)).resolves.toBe(true);
 
 		expect(api.moveItem).toHaveBeenCalledWith('c', null, {});
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'c', 'b']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'c', 'b']);
 	});
 
 	it('shows an error and keeps the store order on a conflict', async () => {
@@ -578,7 +578,7 @@ describe('queueStore moveItem', () => {
 		await expect(store().moveItem('c', null)).resolves.toBe(false);
 
 		expect(showError).toHaveBeenCalled();
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b', 'c']);
 	});
 });
 
@@ -710,7 +710,7 @@ describe('queueStore versions (#285)', () => {
 		await addB;
 		first.resolve(withA);
 		await addA;
-		expect(mine().items.map(i => i.id)).toEqual(['a', 'b']);
+		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b']);
 	});
 
 	it('plays the item of a stale step answer but keeps the newer state', async () => {
@@ -835,14 +835,14 @@ describe('queueStore owners (#297)', () => {
 		await expect(store().next()).resolves.toBe('error');
 
 		expect(showError).toHaveBeenCalledWith(message);
-		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+		expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
 	});
 
 	it('goes back to local when a remote add is refused', async () => {
 		goRemote('friend');
 		api.addItem.mockRejectedValue(new ApiError('refused', 'QUEUE_ACCESS_DENIED', undefined, 403));
 		await expect(store().addItem(body('n'))).resolves.toBe(false);
-		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+		expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
 	});
 
 	it('marks a play-item current only when it is newer than the state held', () => {
@@ -895,7 +895,7 @@ describe('queueStore owners (#297)', () => {
 			transfer.mockRejectedValue(new ApiError('offline', 'DEVICE_OFFLINE', undefined, 409));
 			await store().playListTrack(listTrack);
 			expect(showError).toHaveBeenCalledWith("Cet appareil n'est plus en ligne");
-			expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+			expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
 		});
 
 		it('toasts another failure and stays remote', async () => {

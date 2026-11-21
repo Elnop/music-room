@@ -15,13 +15,13 @@ const SIZES = {
 	lg: { padding: 10, fontSize: 16, icon: 24 },
 } as const;
 
-interface GenreChipProps {
+type GenreChipProps = {
 	genre: MusicGenre;
 	selected?: boolean;
 	disabled?: boolean;
 	onPress?: () => void;
 	size?: keyof typeof SIZES;
-}
+};
 
 export function GenreChip({
 	genre,
@@ -61,7 +61,7 @@ export function GenreChip({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		chip: {
 			...pixelFrame(theme),
 			flexDirection: 'row',
@@ -73,4 +73,5 @@ function createStyles(theme: Theme) {
 		label: { color: theme.colors.text, fontFamily: theme.typography.families.medium },
 		labelSelected: { color: theme.colors.onColor, fontFamily: theme.typography.families.semibold },
 	});
+	return styles;
 }

@@ -15,7 +15,7 @@ import { useFocusedErrorToast } from '@/features/user/features/auth/features/log
 
 const REDIRECT_DELAY_MS = 1500;
 
-interface LoginForm {
+type LoginForm = {
 	email: FieldBinding;
 	password: FieldBinding;
 	submit: () => void;
@@ -23,7 +23,7 @@ interface LoginForm {
 	reportError: (message: string) => void;
 	goToForgotPassword: () => void;
 	goToRegister: () => void;
-}
+};
 
 export function useLoginForm(
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>

@@ -37,11 +37,11 @@ function systemState(nowPlaying: NowPlaying): PlaybackState {
 	return nowPlaying.isPlaying ? PlaybackState.PLAYING : PlaybackState.PAUSED;
 }
 
-interface SentState {
+type SentState = {
 	state: PlaybackState;
 	positionMs: number;
 	at: number;
-}
+};
 
 export function useMediaSession(): void {
 	const nowPlaying = useNowPlaying();

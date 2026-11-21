@@ -5,12 +5,12 @@ import { isOngoing } from '@/features/events/shared/event-dates/eventDates';
 import type { AdvertiseFailure } from '@/features/events/features/detail/beaconAdvertiser';
 import type { MusicEvent } from '@/features/events/lib/types';
 
-export interface BeaconBroadcast {
+export type BeaconBroadcast = {
 	available: boolean;
 	active: boolean;
 	starting: boolean;
 	toggle: (on: boolean) => void;
-}
+};
 
 const FAILURES: Record<AdvertiseFailure, string> = {
 	'permission-denied':

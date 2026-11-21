@@ -8,11 +8,11 @@ import type { DebouncedText } from '@/features/playlists/features/editor/shared/
 import { searchUsers } from '@/features/playlists/shared/playlist/lib/usersApi';
 import type { UserSummary } from '@/features/playlists/shared/playlist/lib/types';
 
-export interface UserSearch {
+export type UserSearch = {
 	search: DebouncedText;
 	results: UserSummary[];
 	isSearching: boolean;
-}
+};
 
 export function useUserSearch(excludedIds: string[]): UserSearch {
 	const search = useDebouncedText();

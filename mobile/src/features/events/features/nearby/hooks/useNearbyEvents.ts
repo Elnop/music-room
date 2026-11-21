@@ -15,7 +15,7 @@ import { mergeNearby } from '@/features/events/features/nearby/lib/nearbyEvents'
 import type { NearbyItem } from '@/features/events/features/nearby/lib/nearbyEvents';
 import type { EventStackParamList, MusicEvent } from '@/features/events/lib/types';
 
-export interface NearbyEvents {
+export type NearbyEvents = {
 	items: NearbyItem[];
 	notice: NearbyNotice;
 	mine: MusicEvent[];
@@ -25,7 +25,7 @@ export interface NearbyEvents {
 	openSettings: () => void;
 	beaconStatus: BeaconScanStatus;
 	requestBeaconPermission: () => void;
-}
+};
 
 export function useNearbyEvents(): NearbyEvents {
 	const navigation = useNavigation<NativeStackNavigationProp<EventStackParamList>>();

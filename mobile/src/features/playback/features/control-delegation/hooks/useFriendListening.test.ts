@@ -315,7 +315,7 @@ describe('useFriendListening', () => {
 		await receive('listening:status', { ownerId: FRIEND, devices: [status('A'), status('B')] });
 
 		expect(result.current.canControl).toBe(true);
-		expect(result.current.devices.map(d => [d.device.deviceId, d.controllable])).toEqual([
+		expect(result.current.devices.map(d => [d.device.deviceId, d.controllable])).toStrictEqual([
 			['A', true],
 			['B', false],
 		]);
@@ -375,7 +375,7 @@ describe('useFriendListening', () => {
 		const { result, unmount } = await renderFriend();
 
 		expect(emitted('listening:subscribe')).toHaveLength(0);
-		expect(result.current.devices).toEqual([]);
+		expect(result.current.devices).toStrictEqual([]);
 		expect(result.current.canControl).toBe(false);
 		unmount();
 	});
@@ -397,7 +397,7 @@ describe('useFriendListening', () => {
 		act(() => result.current.remotePlay('A'));
 		await receive('control:error', { code: 'NOT_AUTHORIZED', message: 'Not authorized' });
 
-		expect(result.current.controlError).toEqual({
+		expect(result.current.controlError).toStrictEqual({
 			code: 'NOT_AUTHORIZED',
 			message: 'Not authorized',
 		});

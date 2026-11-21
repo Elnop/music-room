@@ -10,11 +10,11 @@ export function smoothRssi(previous: number | undefined, rssi: number): number {
 	return previous === undefined ? rssi : previous + SMOOTHING * (rssi - previous);
 }
 
-export interface BeaconSighting {
+export type BeaconSighting = {
 	rssi: number;
 	measuredPower: number;
 	lastSeen: number;
-}
+};
 
 export function recordSighting(
 	sightings: ReadonlyMap<number, BeaconSighting>,

@@ -19,7 +19,7 @@ import type { QueueItem } from '@/shared/playback/lib/queue.types';
 import type { UserProfile } from '@/shared/users/user.types';
 import { noop } from '@test-utils/noop';
 
-interface MockPlayer {
+type MockPlayer = {
 	id: number;
 	url: string;
 	isLoaded: boolean;
@@ -29,9 +29,9 @@ interface MockPlayer {
 	play: jest.Mock;
 	pause: jest.Mock;
 	seekTo: jest.Mock;
-}
+};
 
-interface MockStatus {
+type MockStatus = {
 	id: number;
 	playbackState: string;
 	isLoaded: boolean;
@@ -40,7 +40,7 @@ interface MockStatus {
 	duration?: number;
 	playing?: boolean;
 	isBuffering?: boolean;
-}
+};
 
 const mockPlayers = new Map<string, MockPlayer>();
 const mockStatuses = new Map<number, MockStatus>();
@@ -288,7 +288,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		expect(u2.play).toHaveBeenCalled();
 		const state = usePlayerStore.getState();
 		expect(state.playbackState).toBe('playing');
-		expect(state.currentTrack).toEqual(track);
+		expect(state.currentTrack).toStrictEqual(track);
 		expect(state.queueItemId).toBe('q1');
 		expect(state.error).toBeNull();
 	});

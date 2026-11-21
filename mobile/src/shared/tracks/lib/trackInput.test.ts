@@ -16,7 +16,7 @@ const soundCloudTrack: SoundCloudTrack = {
 
 describe('toTrackInput', () => {
 	it('converts a SoundCloud search result', () => {
-		expect(toTrackInput(soundCloudTrack)).toEqual({
+		expect(toTrackInput(soundCloudTrack)).toStrictEqual({
 			trackUri: 'https://soundcloud.com/artist/song',
 			title: 'Song',
 			artist: 'Artist',
@@ -51,7 +51,7 @@ describe('toTrackInput', () => {
 			previewUrl: 'https://stream/expiring',
 		};
 		const body = toTrackInput(track);
-		expect(body).toEqual({
+		expect(body).toStrictEqual({
 			trackUri: 'https://soundcloud.com/artist/song',
 			title: 'Song',
 			artist: 'Artist',

@@ -16,7 +16,7 @@ import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
-export interface SearchTracks {
+export type SearchTracks = {
 	search: DebouncedText;
 	results: SoundCloudTrack[];
 	isLoading: boolean;
@@ -26,7 +26,7 @@ export interface SearchTracks {
 	actionTrack: AddQueueItemBody | null;
 	showActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
 	closeActions: () => void;
-}
+};
 
 export function useSearchTracks(playlistId: string, playback: PlaybackActions): SearchTracks {
 	const search = useDebouncedText();

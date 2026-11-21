@@ -9,7 +9,7 @@ export function createPickerStyles(
 	insets: { top: number; bottom: number },
 	separator: string
 ) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		...sheetHeaderStyles(theme, insets, separator),
 		listContent: {
 			paddingBottom: insets.bottom + 16,
@@ -87,4 +87,5 @@ export function createPickerStyles(
 			color: theme.colors.primary,
 		},
 	});
+	return styles;
 }

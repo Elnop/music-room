@@ -3,11 +3,11 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 export const SQUARE_IMAGE_SIZE = 512;
 const JPEG_QUALITY = 0.8;
 
-interface PickedImage {
+type PickedImage = {
 	uri: string;
 	width: number;
 	height: number;
-}
+};
 
 export async function prepareSquareImage({ uri, width, height }: PickedImage): Promise<string> {
 	const context = ImageManipulator.manipulate(uri);

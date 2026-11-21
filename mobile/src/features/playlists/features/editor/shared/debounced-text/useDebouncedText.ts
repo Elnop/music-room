@@ -3,13 +3,13 @@ import { debounce } from '@/shared/debounce/debounce';
 
 const SEARCH_DELAY_MS = 500;
 
-export interface DebouncedText {
+export type DebouncedText = {
 	text: string;
 	settled: string;
 	pending: boolean;
 	change: (text: string) => void;
 	clear: () => void;
-}
+};
 
 export function useDebouncedText(): DebouncedText {
 	const [text, setText] = useState('');

@@ -16,13 +16,13 @@ import type { SessionView } from '@/shared/backend/lib/authSession';
 
 type Handler = (...args: unknown[]) => void;
 
-interface FakeEmitter {
+type FakeEmitter = {
 	handlers: Record<string, Handler[]>;
 	on: jest.Mock;
 	trigger: (event: string, ...args: unknown[]) => void;
-}
+};
 
-interface FakeSocket {
+type FakeSocket = {
 	id: string;
 	io: FakeEmitter;
 	connected: boolean;
@@ -33,7 +33,7 @@ interface FakeSocket {
 	connect: jest.Mock;
 	disconnect: jest.Mock;
 	trigger: (event: string, ...args: unknown[]) => void;
-}
+};
 
 function createFakeEmitter(): FakeEmitter {
 	const emitter: FakeEmitter = {
@@ -137,7 +137,7 @@ afterEach(() => {
 
 describe('socketStore handshake', () => {
 	it('sends the store token and the device fields on connect', async () => {
-		await expect(readHandshake()).resolves.toEqual({
+		await expect(readHandshake()).resolves.toStrictEqual({
 			token: 'token-1',
 			...mockDevice,
 			appVersion: '1.2.3',

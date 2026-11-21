@@ -6,13 +6,13 @@ import type { QueueItem } from '@/shared/playback/lib/playback';
 import { UpNextRow } from '@/features/playback/features/now-playing-panel/components/presenters/UpNextRow';
 import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
 
-interface UpNextSectionProps {
+type UpNextSectionProps = {
 	items: QueueItem[];
 	total: number;
 	styles: NowPlayingPanelStyles;
 	onPlay: (itemId: string) => void;
 	onOpenQueue: () => void;
-}
+};
 
 export function UpNextSection({ items, total, styles, onPlay, onOpenQueue }: UpNextSectionProps) {
 	return (

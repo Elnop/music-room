@@ -17,11 +17,11 @@ const TAB_ICONS: Record<string, PixelIconSource> = {
 	ProfileTab: UserSolid,
 };
 
-interface TabIconProps {
+type TabIconProps = {
 	routeName: string;
 	focused: boolean;
 	color: string;
-}
+};
 
 function TabIcon({ routeName, focused, color }: TabIconProps) {
 	const { theme } = useTheme();

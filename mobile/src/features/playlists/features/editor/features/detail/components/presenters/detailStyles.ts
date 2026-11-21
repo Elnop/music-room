@@ -3,7 +3,7 @@ import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
 import type { Theme } from '@/shared/theme/lib/types';
 
 export function createDetailStyles(theme: Theme, topInset: number) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -19,4 +19,5 @@ export function createDetailStyles(theme: Theme, topInset: number) {
 			alignSelf: 'center',
 		},
 	});
+	return styles;
 }

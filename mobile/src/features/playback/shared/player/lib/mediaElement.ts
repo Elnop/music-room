@@ -1,4 +1,4 @@
-export interface MediaElement {
+export type MediaElement = {
 	src: string;
 	currentTime: number;
 	volume: number;
@@ -14,11 +14,11 @@ export interface MediaElement {
 	removeAttribute(name: string): void;
 	canPlayType(type: string): string;
 	addEventListener(type: string, listener: () => void): void;
-}
+};
 
-interface BrowserDocument {
+type BrowserDocument = {
 	createElement(tag: 'audio'): MediaElement;
-}
+};
 
 const MEDIA_EVENTS = [
 	'loadedmetadata',

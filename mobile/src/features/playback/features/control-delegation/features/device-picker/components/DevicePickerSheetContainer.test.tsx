@@ -202,7 +202,7 @@ describe('DevicePickerSheetContainer', () => {
 		fireEvent.press(screen.getByLabelText('Tablette de Léa'));
 		await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'est plus en ligne"));
 		expect(onClose).not.toHaveBeenCalled();
-		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+		expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
 	});
 
 	it('shows the spinner, not the old list, while reloading on reopen', async () => {

@@ -8,11 +8,11 @@ import type { createStyles } from '@/features/playback/features/player-modal/com
 import { PlayerCarouselSlot } from '@/features/playback/features/player-modal/components/presenters/PlayerCarouselSlot';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-interface PlayerArtworkCarouselProps {
+type PlayerArtworkCarouselProps = {
 	styles: ReturnType<typeof createStyles>;
 	carousel: ArtworkCarousel;
 	colors: { text: string; textSecondary: string };
-}
+};
 
 export function PlayerArtworkCarousel({ styles, carousel, colors }: PlayerArtworkCarouselProps) {
 	const size = carousel.artworkSize;

@@ -5,10 +5,10 @@ import type { useForgotPasswordMutation } from '@/features/user/features/auth/sh
 
 const RESEND_COOLDOWN_S = 60;
 
-interface ResendResetCode {
+type ResendResetCode = {
 	resend: () => Promise<void>;
 	cooldown: number;
-}
+};
 
 export function useResendResetCode(
 	email: string,

@@ -14,7 +14,7 @@ import type {
 
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Playlists'>;
 
-export interface LibraryScreen {
+export type LibraryScreen = {
 	isInitialLoading: boolean;
 	owned: Playlist[];
 	shared: Playlist[];
@@ -23,7 +23,7 @@ export interface LibraryScreen {
 	openPlaylist: (id: string) => void;
 	createPlaylist: () => void;
 	bottomPadding: number;
-}
+};
 
 export function useLibraryScreen(navigation: Navigation): LibraryScreen {
 	const userId = useSession(session => session.user?.id);

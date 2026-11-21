@@ -20,9 +20,9 @@ import { PlaylistCardMenuContainer } from '@/features/playlists/features/editor/
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList & EventStackParamList>();
 const layout = screenLayout(true);
 
-interface PlaylistsNavigatorProps {
+type PlaylistsNavigatorProps = {
 	initialRouteName: 'Home' | 'Playlists';
-}
+};
 
 export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps) {
 	const stackOptions = useStackOptions();

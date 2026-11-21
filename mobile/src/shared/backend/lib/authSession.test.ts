@@ -12,7 +12,7 @@ import type { SessionView } from '@/shared/backend/lib/authSession';
 
 describe('authSession', () => {
 	it('reads signed out before the auth store registers', () => {
-		expect(getSession()).toEqual({ user: null, accessToken: null, isAuthenticated: false });
+		expect(getSession()).toStrictEqual({ user: null, accessToken: null, isAuthenticated: false });
 	});
 
 	it('reads the registered session, inside and outside React', () => {

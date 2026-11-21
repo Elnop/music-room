@@ -178,7 +178,7 @@ describe('transferTo from this phone', () => {
 			positionMs: 42_000,
 			playing: { queueItemId: 'i1' },
 		});
-		expect(useConnectStore.getState().target).toEqual({
+		expect(useConnectStore.getState().target).toStrictEqual({
 			kind: 'remote',
 			ownerId: 'me',
 			deviceId: 'pc',
@@ -200,7 +200,7 @@ describe('transferTo from this phone', () => {
 		await expect(transferTo(lea, 'lea-tab')).resolves.toBe(true);
 
 		const body = transfer.mock.calls[0][0];
-		expect(body.playing).toEqual({
+		expect(body.playing).toStrictEqual({
 			track: expect.objectContaining({ trackUri: soundCloudTrack.permalink_url }),
 		});
 		expect(body.positionMs).toBe(10_000);
@@ -238,7 +238,7 @@ describe('transferTo from a remote device', () => {
 			playing: { queueItemId: 'i2' },
 			source: { userId: 'me', deviceId: 'pc' },
 		});
-		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+		expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
 	});
 
 	it("sends Léa's current item as a track to my PC", async () => {
@@ -281,7 +281,7 @@ describe('transferTo a track the remote device plays off the queue', () => {
 
 		expect(transfer).not.toHaveBeenCalled();
 		expect(showError).toHaveBeenCalledWith('Ce titre ne peut pas être transféré');
-		expect(useConnectStore.getState().target).toEqual(target);
+		expect(useConnectStore.getState().target).toStrictEqual(target);
 		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 
@@ -292,7 +292,7 @@ describe('transferTo a track the remote device plays off the queue', () => {
 
 		expect(transfer).not.toHaveBeenCalled();
 		expect(showError).toHaveBeenCalledWith('Ce titre ne peut pas être transféré');
-		expect(useConnectStore.getState().target).toEqual(target);
+		expect(useConnectStore.getState().target).toStrictEqual(target);
 	});
 });
 
@@ -321,7 +321,7 @@ describe('transferTo refused', () => {
 		await expect(transferTo(lea, 'lea-tab')).resolves.toBe(false);
 
 		expect(showError).toHaveBeenCalledWith(message);
-		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+		expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
 		expect(stop).not.toHaveBeenCalled();
 		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
@@ -334,7 +334,7 @@ describe('transferTo refused', () => {
 
 		await expect(transferTo(lea, 'lea-tab')).resolves.toBe(false);
 
-		expect(useConnectStore.getState().target).toEqual(target);
+		expect(useConnectStore.getState().target).toStrictEqual(target);
 	});
 });
 
@@ -353,7 +353,7 @@ describe('transferTo with nothing playing', () => {
 		});
 		await expect(transferTo(me, 'phone')).resolves.toBe(true);
 		expect(transfer).not.toHaveBeenCalled();
-		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+		expect(useConnectStore.getState().target).toStrictEqual({ kind: 'local' });
 	});
 });
 

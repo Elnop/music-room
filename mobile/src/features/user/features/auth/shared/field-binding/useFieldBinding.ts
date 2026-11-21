@@ -1,11 +1,11 @@
 import { useController } from 'react-hook-form';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
-export interface FieldBinding {
+export type FieldBinding = {
 	value: string;
 	onChangeText: (text: string) => void;
 	error?: string;
-}
+};
 
 export function useFieldBinding<T extends FieldValues>(
 	control: Control<T>,

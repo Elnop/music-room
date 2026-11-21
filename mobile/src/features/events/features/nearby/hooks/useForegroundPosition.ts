@@ -16,11 +16,11 @@ export type PositionState =
 	| { status: 'timed-out' }
 	| { status: 'located'; position: Coordinates };
 
-interface ForegroundPosition {
+type ForegroundPosition = {
 	state: PositionState;
 	requestPermission: () => void;
 	openSettings: () => void;
-}
+};
 
 const WATCH_OPTIONS: Location.LocationOptions = {
 	accuracy: Location.Accuracy.Balanced,

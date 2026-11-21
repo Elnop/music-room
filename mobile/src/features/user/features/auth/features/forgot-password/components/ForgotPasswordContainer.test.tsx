@@ -74,7 +74,7 @@ describe('ForgotPasswordContainer', () => {
 			expect(navigate).toHaveBeenCalledWith('ResetPassword', { email: 'a@example.com' })
 		);
 		expect(request().url).toMatch(/\/api\/auth\/forgot-password$/u);
-		expect(request().body).toEqual({ email: 'a@example.com' });
+		expect(request().body).toStrictEqual({ email: 'a@example.com' });
 	});
 
 	it('refuses an invalid email without a request', () => {

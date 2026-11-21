@@ -5,12 +5,12 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Text } from '@/shared/theme/components/Text';
 
-interface ToggleCardProps {
+type ToggleCardProps = {
 	label: string;
 	description: string;
 	value: boolean;
 	onValueChange: (value: boolean) => void;
-}
+};
 
 export function ToggleCard({ label, description, value, onValueChange }: ToggleCardProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -29,7 +29,7 @@ export function ToggleCard({ label, description, value, onValueChange }: ToggleC
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		card: {
 			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.md,
@@ -56,4 +56,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

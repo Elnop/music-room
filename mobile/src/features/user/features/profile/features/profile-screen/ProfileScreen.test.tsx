@@ -133,7 +133,7 @@ describe('ProfileScreen on wide screens', () => {
 		render(<ProfileContainer />);
 		fireEvent.press(screen.getByRole('button', { name: 'Modifier le profil' }));
 		fireEvent.press(screen.getByRole('button', { name: 'Réglages' }));
-		expect(mockNavigate.mock.calls).toEqual([['EditProfile'], ['Settings']]);
+		expect(mockNavigate.mock.calls).toStrictEqual([['EditProfile'], ['Settings']]);
 	});
 
 	it('shows a single version label, the build one', () => {

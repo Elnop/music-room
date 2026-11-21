@@ -15,12 +15,12 @@ import type { PlaylistStackParamList } from '@/features/playlists/shared/playlis
 const PERMISSION_DENIED =
 	"Autorisez l'accès à vos photos dans les réglages pour choisir une cover.";
 
-interface CoverActions {
+type CoverActions = {
 	isPremium: boolean;
 	isUploading: boolean;
 	change: () => void;
 	remove: () => void;
-}
+};
 
 export function useCoverActions(
 	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'getParent'>,

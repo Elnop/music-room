@@ -1,16 +1,16 @@
 import type { AddQueueItemBody, PlaybackState } from '@/shared/playback/lib/playback';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
-export interface PlaybackActions {
+export type PlaybackActions = {
 	addToQueue: (track: AddQueueItemBody) => Promise<boolean>;
 	playNext: (track: AddQueueItemBody) => Promise<boolean>;
 	playListTrack: (track: SoundCloudTrack) => Promise<void>;
 	playPlaylist: (playlistId: string, startTrackId?: string) => Promise<string>;
 	pause: () => void;
 	resume: () => void;
-}
+};
 
-export interface PlaylistPlayback {
+export type PlaylistPlayback = {
 	playingUri: string | null;
 	state: PlaybackState | null;
-}
+};

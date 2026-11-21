@@ -1,7 +1,7 @@
-interface RadarSpot {
+type RadarSpot = {
 	left: number;
 	top: number;
-}
+};
 
 const MAX_ANGLE = 70;
 

@@ -17,13 +17,13 @@ import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-sol
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
-interface AddableTrackRowProps {
+type AddableTrackRowProps = {
 	track: SoundCloudTrack;
 	isAdded: boolean;
 	onAdd: (track: SoundCloudTrack) => void;
 	onAddToQueue: (track: SoundCloudTrack) => void;
 	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
-}
+};
 
 export const AddableTrackRow = React.memo(function AddableTrackRow({
 	track,
@@ -77,7 +77,7 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 });
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		trackRow: {
 			marginBottom: theme.spacing.xs,
 		},
@@ -127,4 +127,5 @@ function createStyles(theme: Theme) {
 			backgroundColor: theme.colors.success,
 		},
 	});
+	return styles;
 }

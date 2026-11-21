@@ -11,7 +11,7 @@ export const PANEL_ARTWORK_SIZE = NOW_PLAYING_PANEL_WIDTH - 2 * GUTTER;
 export const UP_NEXT_ARTWORK_SIZE = 40;
 
 export function createStyles(theme: Theme, separator: string) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		panel: {
 			width: NOW_PLAYING_PANEL_WIDTH,
 			borderLeftWidth: 1,
@@ -119,6 +119,7 @@ export function createStyles(theme: Theme, separator: string) {
 			color: theme.colors.text,
 		},
 	});
+	return styles;
 }
 
 export type NowPlayingPanelStyles = ReturnType<typeof createStyles>;

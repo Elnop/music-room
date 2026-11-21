@@ -19,11 +19,11 @@ export function useRemoveTrack() {
 	});
 }
 
-interface MoveVariables {
+type MoveVariables = {
 	playlistId: string;
 	trackId: string;
 	afterRank: string | null;
-}
+};
 
 export function useMoveTrack() {
 	const client = useQueryClient();

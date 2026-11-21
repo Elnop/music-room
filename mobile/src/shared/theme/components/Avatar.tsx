@@ -9,12 +9,12 @@ import { avatarColor, avatarInitials } from '@/shared/theme/lib/avatarInitials';
 import { displayText } from '@/shared/theme/lib/pixelFrame';
 import { AvatarPhoto } from '@/shared/theme/components/AvatarPhoto';
 
-interface AvatarProps {
+type AvatarProps = {
 	uri?: string;
 	size?: 'sm' | 'md' | 'lg' | 'xl';
 	name?: string;
 	style?: StyleProp<ViewStyle>;
-}
+};
 
 const SIZE_MAP = {
 	sm: 32,
@@ -66,7 +66,7 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			backgroundColor: theme.colors.surfaceAlt,
 			justifyContent: 'center',
@@ -80,4 +80,5 @@ function createStyles(theme: Theme) {
 			fontFamily: theme.typography.families.display,
 		},
 	});
+	return styles;
 }

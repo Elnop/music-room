@@ -9,7 +9,7 @@ describe('showAlert (web)', () => {
 		showAlert('Supprimer ?', 'Définitif.', buttons);
 		showAlert('Erreur', 'Réessayez.', []);
 
-		expect(useAlertStore.getState().queue).toEqual([
+		expect(useAlertStore.getState().queue).toStrictEqual([
 			{ title: 'Supprimer ?', message: 'Définitif.', buttons },
 			{ title: 'Erreur', message: 'Réessayez.', buttons: [] },
 		]);

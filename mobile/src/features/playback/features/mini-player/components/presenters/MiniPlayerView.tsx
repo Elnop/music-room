@@ -16,9 +16,9 @@ import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-sol
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
 
-interface MiniPlayerViewProps {
+type MiniPlayerViewProps = {
 	data: MiniPlayerData;
-}
+};
 
 export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 	const { theme } = useTheme();

@@ -38,14 +38,14 @@ async function loadMembers(client: QueryClient, id: string): Promise<PlaylistMem
 	}
 }
 
-export interface SharingMembers {
+export type SharingMembers = {
 	members: PlaylistMember[];
 	isLoading: boolean;
 	busy: boolean;
 	refetch: () => void;
 	add: (user: UserSummary, asViewer: boolean, canEdit: boolean) => void;
 	remove: (userId: string, isPrivate: boolean) => Promise<void>;
-}
+};
 
 export function useSharingMembers(id: string): SharingMembers {
 	const client = useQueryClient();

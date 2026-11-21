@@ -9,14 +9,14 @@ import type {
 	PlaylistDetailScreen,
 } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistDetailScreen';
 
-interface OwnerActions {
+type OwnerActions = {
 	sheetVisible: boolean;
 	openSheet: () => void;
 	closeSheet: () => void;
 	edit: () => void;
 	sharing: () => void;
 	remove: () => void;
-}
+};
 
 export function useOwnerActions(
 	navigation: DetailNavigation,

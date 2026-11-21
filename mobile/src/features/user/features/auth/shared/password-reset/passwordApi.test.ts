@@ -22,9 +22,9 @@ describe('passwordApi', () => {
 
 		expect(apiRequest).toHaveBeenCalledTimes(2);
 		expect(jest.mocked(apiRequest).mock.calls[0][0]).toBe('/api/auth/forgot-password');
-		expect(bodyOf(0)).toEqual({ email: 'a@example.com' });
+		expect(bodyOf(0)).toStrictEqual({ email: 'a@example.com' });
 		expect(jest.mocked(apiRequest).mock.calls[1][0]).toBe('/api/auth/reset-password');
-		expect(bodyOf(1)).toEqual({
+		expect(bodyOf(1)).toStrictEqual({
 			email: 'a@example.com',
 			code: '123456',
 			newPassword: 'NewSecret1!',

@@ -16,11 +16,11 @@ import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import { logger } from '@/shared/logging/logger';
 import { getPlayerState } from '@/features/playback/shared/player/stores/playerStore';
 
-interface Playback {
+type Playback = {
 	playing: TransferRequest['playing'];
 	positionMs: number;
 	source?: TransferRequest['source'];
-}
+};
 
 function fromQueueTrack(track: QueueTrack): AddQueueItemBody {
 	return {

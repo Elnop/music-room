@@ -6,9 +6,9 @@ import { useSocketStore } from '@/shared/backend/socketStore';
 import type { PlaylistDeletedEvent } from '@/features/playlists/shared/playlist/lib/types';
 import { PLAYLIST_SOCKET_RULES } from '@/features/playlists/features/editor/features/detail/lib/playlistSocketRules';
 
-interface PlaylistRoom {
+type PlaylistRoom = {
 	deleted: boolean;
-}
+};
 
 export function usePlaylistRoom(playlistId: string): PlaylistRoom {
 	const socket = useSocketStore(state => state.socket);
