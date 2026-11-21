@@ -20,9 +20,9 @@ Each native module was already isolated in one service or hook. That file gets a
 | `features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.ts` | Facebook Android SDK: Facebook JavaScript SDK, `FB.login` |
 | `features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web.ts` | Loads the two SDK scripts on the sign-in, sign-up and linked-accounts screens only, and mounts Google's button |
 | `features/playback/shared/player/lib/audioPlayer.web.ts` | `expo-audio`: one `<audio>` element for the page, fed natively or by hls.js |
-| `features/playback/lib/audioMode.web.ts` | The audio session setup: a tab has none (no-op) |
+| `features/playback/lib/configureAudioMode.web.ts` | The audio session setup: a tab has none (no-op) |
 | `features/playback/lib/jsKeepAlive.web.ts` | The Android headless task that keeps JavaScript running in the background: a tab keeps its timers (no-op) |
-| `features/playback/features/media-session/useMediaSession.web.ts` | `expo-media-control`: the browser's Media Session API |
+| `features/playback/features/media-session/hooks/useMediaSession.web.ts` | `expo-media-control`: the browser's Media Session API |
 | `features/events/shared/events/lib/geocoder.web.ts` | `expo-location` `geocodeAsync`, missing on the web: the backend route `GET /api/events/geocode` |
 | `features/events/features/event-form/lib/pickDateTime.web.ts` | The Android date and time pickers: a modal `<dialog>` with a `datetime-local` field |
 | `features/events/features/nearby/lib/beaconScanner.web.ts` | The BLE scan: always reports « unsupported » |
@@ -53,7 +53,7 @@ Every adaptation keys on `isWide` (tablet or desktop), so a phone, and Android, 
 
 The browser is a full player and a device like a phone: it registers at its socket connection, appears in **Mes appareils** and in the device picker, reports what it plays with `listening:update`, and obeys `control:command`.
 
-- **HLS**: the backend returns the SoundCloud HLS stream when there is one, else the progressive one (`backend/src/features/soundcloud/services/soundcloud-stream.service.ts`). `streamSource.ts` lets the `<audio>` element play it itself when the browser reads HLS (`canPlayType('application/vnd.apple.mpegurl')`, Safari); elsewhere `hls.js` feeds the element, transport only. A fatal hls.js or element error reports `failed`, and the shared `useStreamWatchdog` renews the URL, as on Android. The queue, auto-advance, next-track prefetch and the 30-minute URL renewal are the shared hooks.
+- **HLS**: the backend returns the SoundCloud HLS stream when there is one, else the progressive one (`backend/src/features/soundcloud/services/soundcloud-stream.service.ts`). `attachStream.ts` lets the `<audio>` element play it itself when the browser reads HLS (`canPlayType('application/vnd.apple.mpegurl')`, Safari); elsewhere `hls.js` feeds the element, transport only. A fatal hls.js or element error reports `failed`, and the shared `useStreamWatchdog` renews the URL, as on Android. The queue, auto-advance, next-track prefetch and the 30-minute URL renewal are the shared hooks.
 - **Progressive-only tracks**: outside Safari, every URL goes to hls.js, which reads HLS playlists only; a track SoundCloud offers only as progressive is therefore expected to fail there (not yet checked in a browser).
 - **Media Session**: `useMediaSession.web.ts` sends the title, artist, artwork, state and position to `navigator.mediaSession`, so the keyboard's media keys and the browser's media notification work; play, pause, next, previous and seek follow the native hook's rules (no seek on a remote device, no next at the end of the queue).
 - **Autoplay**: a browser refuses to play before the user interacts with the page. When `play()` is rejected (`NotAllowedError`), the player store goes back to paused, so the controller never sees « playing », and the app shows « Cliquer pour activer le son » (`hooks/useAutoplayPrompt.ts`). « Activer le son » calls `play()` inside the click, as Safari requires. It happens typically when a friend's remote command reaches a tab nobody has clicked yet.

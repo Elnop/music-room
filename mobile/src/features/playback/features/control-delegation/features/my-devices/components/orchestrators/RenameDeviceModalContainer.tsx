@@ -15,21 +15,9 @@ export function RenameDeviceModalContainer({
 	onClose,
 	onSubmit,
 }: RenameDeviceModalProps) {
-	const { name, onChangeName, error, handleSave, handleReset } = useRenameDeviceForm({
-		deviceName,
-		onSubmit,
-	});
+	const form = useRenameDeviceForm({ deviceName, onSubmit });
 
 	return (
-		<RenameDeviceModalView
-			deviceName={deviceName}
-			saving={saving}
-			name={name}
-			error={error}
-			onChangeName={onChangeName}
-			onClose={onClose}
-			onSave={handleSave}
-			onReset={handleReset}
-		/>
+		<RenameDeviceModalView deviceName={deviceName} saving={saving} form={form} onClose={onClose} />
 	);
 }

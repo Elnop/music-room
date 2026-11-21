@@ -1,0 +1,3 @@
+export const SWIPE_TRACK_THRESHOLD = 80;
+
+export const SWIPE_FLICK_VELOCITY = 800;

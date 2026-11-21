@@ -1,7 +1,7 @@
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 import { profileApi } from '@/features/user/features/profile/shared/profile/lib/profileApi';
 import { privacyApi } from '@/features/user/features/profile/shared/profile/lib/privacyApi';
-import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
+import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/musicControlApi';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { createStore } from 'zustand';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';

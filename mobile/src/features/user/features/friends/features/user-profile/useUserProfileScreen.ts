@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useScreenTitle } from '@/shared/screen-title/useScreenTitle';
-import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
 import { controlErrorMessage } from '@/shared/control-error/controlErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';

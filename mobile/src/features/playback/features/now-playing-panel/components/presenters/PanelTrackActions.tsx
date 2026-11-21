@@ -1,34 +1,26 @@
 import React, { useRef } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { useMeasuredPress } from '@/shared/theme/hooks/useMeasuredPress';
-import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { Text } from '@/shared/theme/components/Text';
 import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
+import { Text } from '@/shared/theme/components/Text';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
-import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
+import { useMeasuredPress } from '@/shared/theme/hooks/useMeasuredPress';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type { PanelTrackActions as PanelTrackActionsData } from '@/features/playback/features/now-playing-panel/nowPlayingPanelTypes';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
 type PanelTrackActionsProps = {
 	title: string;
 	shareUrl: string;
-	styles: NowPlayingPanelStyles;
-	onAddToPlaylist: (anchor?: MenuAnchor) => void;
-	onMoreActions: (anchor?: MenuAnchor) => void;
+	data: PanelTrackActionsData;
 };
 
-export function PanelTrackActions({
-	title,
-	shareUrl,
-	styles,
-	onAddToPlaylist,
-	onMoreActions,
-}: PanelTrackActionsProps) {
-	const { theme } = useTheme();
+export function PanelTrackActions({ title, shareUrl, data }: PanelTrackActionsProps) {
+	const { styles, theme } = useThemedStyles(createStyles);
 	const addButton = useRef<View>(null);
-	const pressAdd = useMeasuredPress(addButton, onAddToPlaylist);
+	const pressAdd = useMeasuredPress(addButton, data.onAddToPlaylist);
 
 	return (
 		<View style={styles.actions}>
@@ -43,7 +35,29 @@ export function PanelTrackActions({
 				</Pressable>
 			</View>
 			<ShareLinkButton url={shareUrl} title={title} style={styles.shareButton} />
-			<TrackActionsButton onPress={onMoreActions} />
+			<TrackActionsButton onPress={data.onMoreActions} />
 		</View>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		actions: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
+		pill: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.xs,
+			paddingVertical: theme.spacing.xs,
+			paddingHorizontal: theme.spacing.md,
+			borderWidth: theme.borders.hairline,
+			borderColor: theme.colors.border,
+		},
+		shareButton: { alignSelf: 'auto' },
+		pillLabel: {
+			fontSize: theme.typography.sizes.sm,
+			fontFamily: theme.typography.families.semibold,
+			color: theme.colors.text,
+		},
+	});
+	return styles;
 }

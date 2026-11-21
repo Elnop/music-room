@@ -1,4 +1,4 @@
-import type { NowPlayingTrack } from '@/features/playback/shared/player/lib/types';
+import type { NowPlayingTrack } from '@/features/playback/shared/player/types/playerTypes';
 
 export function trackSummary(track: NowPlayingTrack | null, deviceLabel: string | null): string[] {
 	return [

@@ -1,5 +1,5 @@
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { queueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { playbackActions } from '@/features/playback/lib/playbackActions';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -16,8 +16,8 @@ const pause = jest.fn();
 const resume = jest.fn();
 
 beforeEach(() => {
-	useQueueStore.setState({ addItem, playNext, playListTrack, playPlaylist });
-	usePlayerStore.setState({ pause, resume });
+	queueStore.setState({ addItem, playNext, playListTrack, playPlaylist });
+	playerStore.setState({ pause, resume });
 });
 
 describe('playbackActions', () => {
@@ -34,7 +34,7 @@ describe('playbackActions', () => {
 		expect(playNext).toHaveBeenCalledWith(track);
 		expect(playListTrack).toHaveBeenCalledWith(listTrack);
 		expect(playPlaylist).toHaveBeenCalledWith('p1', 't3');
-		expect(pause).toHaveBeenCalled();
-		expect(resume).toHaveBeenCalled();
+		expect(pause).toHaveBeenCalledWith();
+		expect(resume).toHaveBeenCalledWith();
 	});
 });

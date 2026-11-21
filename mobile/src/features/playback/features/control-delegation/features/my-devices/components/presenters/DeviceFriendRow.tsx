@@ -1,75 +1,52 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
-import type { FriendUserSummary } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 import { Text } from '@/shared/theme/components/Text';
+import { friendName } from '@/features/playback/features/control-delegation/features/my-devices/lib/devicePermissions';
+import { friendRowLayout } from '@/features/playback/features/control-delegation/features/my-devices/lib/friendRowLayout';
+import type { FriendLicense } from '@/features/playback/features/control-delegation/features/my-devices/myDevicesTypes';
 
-interface DeviceFriendRowProps {
-	friend: FriendUserSummary;
+type DeviceFriendRowProps = {
+	license: FriendLicense;
 	deviceName: string;
-	value: boolean;
-	disabled: boolean;
-	isPending: boolean;
-	allDevices: boolean;
 	onToggle: (next: boolean) => void;
-	testID?: string;
+};
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		...friendRowLayout(theme),
+		friendName: { fontSize: theme.typography.sizes.mdl, color: theme.colors.text },
+		hint: {
+			fontSize: theme.typography.sizes.sm,
+			color: theme.colors.textSecondary,
+			marginTop: theme.spacing.xxs,
+		},
+	});
+	return styles;
 }
 
-export function DeviceFriendRow({
-	friend,
-	deviceName,
-	value,
-	disabled,
-	isPending,
-	allDevices,
-	onToggle,
-	testID,
-}: DeviceFriendRowProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const name = friend.displayName || friend.username;
+export function DeviceFriendRow({ license, deviceName, onToggle }: DeviceFriendRowProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const { friend, disabled } = license;
+	const name = friendName(friend);
 
 	return (
-		<View style={styles.friendRow} testID={testID}>
+		<View style={styles.friendRow} testID={`license-row-${license.key}`}>
 			<Avatar size="sm" name={name} uri={friend.avatarUrl ?? undefined} />
 			<View style={styles.textContainer}>
 				<Text style={styles.friendName}>{name}</Text>
-				{allDevices && <Text style={styles.hint}>Contrôle tous mes appareils</Text>}
+				{license.allDevices && <Text style={styles.hint}>Contrôle tous mes appareils</Text>}
 			</View>
 			<ThemedSwitch
-				value={value}
+				value={license.value}
 				onValueChange={onToggle}
 				disabled={disabled}
 				accessibilityLabel={`${name} sur ${deviceName}`}
-				accessibilityState={{ disabled, busy: isPending }}
+				accessibilityState={{ disabled, busy: license.isPending }}
 			/>
 		</View>
 	);
-}
-
-function createStyles(theme: Theme) {
-	return StyleSheet.create({
-		friendRow: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingVertical: theme.spacing.sm,
-			gap: theme.spacing.md,
-		},
-		textContainer: {
-			flex: 1,
-			marginRight: theme.spacing.sm,
-		},
-		friendName: {
-			fontSize: 15,
-			color: theme.colors.text,
-		},
-		hint: {
-			fontSize: 12,
-			color: theme.colors.textSecondary,
-			marginTop: 2,
-		},
-	});
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { useActiveQueue } from '@/features/playback/shared/player/stores/queueStore';
+import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
+import { useActiveQueue } from '@/features/playback/shared/player/hooks/useActiveQueue';
 import { selectPlaysPlaylist } from '@/features/playback/shared/player/lib/queueSelectors';
 import { playbackActions } from '@/features/playback/lib/playbackActions';
 import type {
@@ -18,9 +18,9 @@ export function PlaylistPlaybackContainer({
 	playlistId,
 	children,
 }: PlaylistPlaybackContainerProps) {
-	const queueItemId = usePlayerStore(state => state.queueItemId);
-	const playbackState = usePlayerStore(state => state.playbackState);
-	const uri = usePlayerStore(state => state.currentTrack?.permalink_url ?? null);
+	const queueItemId = usePlayerState(state => state.queueItemId);
+	const playbackState = usePlayerState(state => state.playbackState);
+	const uri = usePlayerState(state => state.currentTrack?.permalink_url ?? null);
 	const fromPlaylist = selectPlaysPlaylist(useActiveQueue(), queueItemId, playlistId);
 	return (
 		<>

@@ -104,7 +104,7 @@ describe('RenameDeviceModalContainer', () => {
 		);
 
 		fireEvent.press(screen.getByText('Annuler'));
-		expect(onClose).toHaveBeenCalled();
+		expect(onClose).toHaveBeenCalledWith(undefined);
 
 		fireEvent.press(screen.getByLabelText('Fermer'));
 		expect(onClose).toHaveBeenCalledTimes(2);

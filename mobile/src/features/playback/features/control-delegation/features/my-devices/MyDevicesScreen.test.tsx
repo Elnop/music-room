@@ -7,15 +7,16 @@ import type { StoreApi } from 'zustand';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
-import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
+import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/musicControlApi';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import type {
 	FriendUserSummary,
 	UserDeviceWithLicenses,
-} from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+} from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
 import { MyDevicesContainer } from '@/features/playback/features/control-delegation/features/my-devices/components/orchestrators/MyDevicesContainer';
 import { logger } from '@/shared/logging/logger';
 import { noop } from '@test-utils/noop';
+import { fail, ok } from '@test-utils/fetchResponses';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -46,23 +47,6 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 const fetchMock = jest.fn();
-
-function jsonResponse(status: number, body: object): Response {
-	return {
-		ok: status >= 200 && status < 300,
-		status,
-		statusText: '',
-		json: () => Promise.resolve(body),
-		text: () => Promise.resolve(JSON.stringify(body)),
-	} as unknown as Response;
-}
-
-function ok(data: object) {
-	return jsonResponse(200, { success: true, data });
-}
-function fail(status: number, code: string, message: string) {
-	return jsonResponse(status, { success: false, error: { code, message } });
-}
 
 const alice: FriendUserSummary = { id: 'user-a', username: 'alice' };
 const bob: FriendUserSummary = { id: 'user-b', username: 'bob', displayName: 'Bob' };
@@ -238,7 +222,7 @@ describe('MyDevicesScreen', () => {
 
 		fireEvent(toggle('Bob sur Tablet'), 'valueChange', true);
 
-		await waitFor(() => expect(showSuccess).toHaveBeenCalled());
+		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Bob peut contrôler Tablet'));
 		expect(requests()[1]).toMatchObject({ method: 'POST', authorization: 'Bearer access' });
 		expect(requests()[1].url).toMatch(
 			/\/api\/music-control\/devices\/device-2\/licenses\/user-b$/u
@@ -269,7 +253,7 @@ describe('MyDevicesScreen', () => {
 
 		fireEvent(toggle('alice sur Phone'), 'valueChange', false);
 
-		await waitFor(() => expect(showSuccess).toHaveBeenCalled());
+		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('alice ne contrôle plus Phone'));
 		expect(requests()[1]).toMatchObject({ method: 'DELETE' });
 		expect(requests()[1].url).toMatch(
 			/\/api\/music-control\/devices\/device-1\/licenses\/user-a$/u
@@ -376,91 +360,87 @@ describe('MyDevicesScreen', () => {
 		expect(screen.queryByText('Impossible de charger vos appareils')).toBeNull();
 		expect(screen.UNSAFE_getByType(ScrollView).props.refreshControl.props.refreshing).toBe(false);
 	});
+});
 
-	describe('rename (#352)', () => {
-		const renamed = { ...tablet, deviceName: 'Salon' };
+describe('MyDevicesScreen rename (#352)', () => {
+	const renamed = { ...tablet, deviceName: 'Salon' };
 
-		async function openRename(name = 'Tablet'): Promise<void> {
-			fireEvent.press(screen.getByLabelText(`Renommer l'appareil ${name}`));
-			await screen.findByText("Renommer l'appareil");
-		}
+	async function openRename(name = 'Tablet'): Promise<void> {
+		fireEvent.press(screen.getByLabelText(`Renommer l'appareil ${name}`));
+		await screen.findByText("Renommer l'appareil");
+	}
 
-		it('opens the form with the current name', async () => {
-			await renderLoaded([phone, tablet], [alice]);
+	it('opens the form with the current name', async () => {
+		await renderLoaded([phone, tablet], [alice]);
 
-			await openRename();
+		await openRename();
 
-			expect(screen.getByDisplayValue('Tablet')).toBeTruthy();
+		expect(screen.getByDisplayValue('Tablet')).toBeTruthy();
+	});
+
+	it('saves the trimmed name, reloads the list and shows a toast', async () => {
+		await renderLoaded([phone, tablet], [alice]);
+		await openRename();
+		fetchMock.mockResolvedValueOnce(ok({ device: renamed }));
+		fetchMock.mockResolvedValueOnce(ok({ devices: [phone, renamed] }));
+
+		fireEvent.changeText(screen.getByDisplayValue('Tablet'), '  Salon ');
+		fireEvent.press(screen.getByText('Enregistrer'));
+
+		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
+		expect(requests()[1]).toMatchObject({
+			method: 'PATCH',
+			authorization: 'Bearer access',
+			body: { name: 'Salon' },
 		});
+		expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2$/u);
+		await waitFor(() => expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Salon/u));
+		expect(screen.queryByText("Renommer l'appareil")).toBeNull();
+	});
 
-		it('saves the trimmed name, reloads the list and shows a toast', async () => {
-			await renderLoaded([phone, tablet], [alice]);
-			await openRename();
-			fetchMock.mockResolvedValueOnce(ok({ device: renamed }));
-			fetchMock.mockResolvedValueOnce(ok({ devices: [phone, renamed] }));
+	it("goes back to the system name with « Nom d'origine »", async () => {
+		await renderLoaded([phone, renamed], [alice]);
+		await openRename('Salon');
+		fetchMock.mockResolvedValueOnce(ok({ device: tablet }));
+		fetchMock.mockResolvedValueOnce(ok({ devices: [phone, tablet] }));
 
-			fireEvent.changeText(screen.getByDisplayValue('Tablet'), '  Salon ');
-			fireEvent.press(screen.getByText('Enregistrer'));
+		fireEvent.press(screen.getByText("Nom d'origine"));
 
-			await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
-			expect(requests()[1]).toMatchObject({
-				method: 'PATCH',
-				authorization: 'Bearer access',
-				body: { name: 'Salon' },
-			});
-			expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2$/u);
-			await waitFor(() =>
-				expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Salon/u)
-			);
-			expect(screen.queryByText("Renommer l'appareil")).toBeNull();
-		});
+		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
+		expect(requests()[1]).toMatchObject({ method: 'PATCH', body: { name: null } });
+		await waitFor(() => expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Tablet/u));
+	});
 
-		it("goes back to the system name with « Nom d'origine »", async () => {
-			await renderLoaded([phone, renamed], [alice]);
-			await openRename('Salon');
-			fetchMock.mockResolvedValueOnce(ok({ device: tablet }));
-			fetchMock.mockResolvedValueOnce(ok({ devices: [phone, tablet] }));
+	it('refuses an empty name without calling the server', async () => {
+		await renderLoaded([phone, tablet], [alice]);
+		await openRename();
 
-			fireEvent.press(screen.getByText("Nom d'origine"));
+		fireEvent.changeText(screen.getByDisplayValue('Tablet'), '   ');
+		fireEvent.press(screen.getByText('Enregistrer'));
 
-			await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
-			expect(requests()[1]).toMatchObject({ method: 'PATCH', body: { name: null } });
-			await waitFor(() =>
-				expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Tablet/u)
-			);
-		});
+		expect(await screen.findByText('Saisissez un nom')).toBeTruthy();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+	});
 
-		it('refuses an empty name without calling the server', async () => {
-			await renderLoaded([phone, tablet], [alice]);
-			await openRename();
+	it('keeps the form open and shows a French toast when the device is gone', async () => {
+		await renderLoaded([phone, tablet], [alice]);
+		await openRename();
+		fetchMock.mockResolvedValueOnce(fail(404, 'DEVICE_NOT_FOUND', 'Device not found'));
 
-			fireEvent.changeText(screen.getByDisplayValue('Tablet'), '   ');
-			fireEvent.press(screen.getByText('Enregistrer'));
+		fireEvent.press(screen.getByText('Enregistrer'));
 
-			expect(await screen.findByText('Saisissez un nom')).toBeTruthy();
-			expect(fetchMock).toHaveBeenCalledTimes(1);
-		});
+		await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'existe plus"));
+		expect(screen.getByText("Renommer l'appareil")).toBeTruthy();
+		expect(showSuccess).not.toHaveBeenCalled();
+	});
 
-		it('keeps the form open and shows a French toast when the device is gone', async () => {
-			await renderLoaded([phone, tablet], [alice]);
-			await openRename();
-			fetchMock.mockResolvedValueOnce(fail(404, 'DEVICE_NOT_FOUND', 'Device not found'));
+	it('closes the form with « Annuler » without calling the server', async () => {
+		await renderLoaded([phone, tablet], [alice]);
+		await openRename();
 
-			fireEvent.press(screen.getByText('Enregistrer'));
+		fireEvent.press(screen.getByText('Annuler'));
 
-			await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'existe plus"));
-			expect(screen.getByText("Renommer l'appareil")).toBeTruthy();
-			expect(showSuccess).not.toHaveBeenCalled();
-		});
-
-		it('closes the form with « Annuler » without calling the server', async () => {
-			await renderLoaded([phone, tablet], [alice]);
-			await openRename();
-
-			fireEvent.press(screen.getByText('Annuler'));
-
-			await waitFor(() => expect(screen.queryByText("Renommer l'appareil")).toBeNull());
-			expect(fetchMock).toHaveBeenCalledTimes(1);
-		});
+		await waitFor(() => expect(screen.queryByText("Renommer l'appareil")).toBeNull());
+		expect(fetchMock).toHaveBeenCalledTimes(1);
 	});
 });

@@ -1,124 +1,63 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
-import { Pressable } from '@/shared/theme/components/Pressable';
-import { Artwork } from '@/shared/theme/components/Artwork';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { useSwipeRemove } from '@/features/playback/features/queue-modal/hooks/useSwipeRemove';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
-import { QueueTrackDetails } from '@/features/playback/features/queue-modal/components/presenters/QueueTrackDetails';
-import {
-	createRowStyles,
-	formatDuration,
-} from '@/features/playback/features/queue-modal/components/presenters/queueModalStyles';
-import type { QueueItem } from '@/features/playback/shared/player/lib/queue.types';
-import { Text } from '@/shared/theme/components/Text';
-import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
-import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
-import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
+import { pixelRow } from '@/shared/theme/lib/pixelFrame';
+import { QueueRowMain } from '@/features/playback/features/queue-modal/components/presenters/QueueRowMain';
+import { QueueRowDeleteAction } from '@/features/playback/features/queue-modal/components/presenters/QueueRowDeleteAction';
+import { QueueDragHandle } from '@/features/playback/features/queue-modal/components/presenters/QueueDragHandle';
+import type { QueueItem } from '@/features/playback/shared/player/types/queueTypes';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import type {
+	QueueRowActions,
+	QueueRowDrag,
+} from '@/features/playback/features/queue-modal/queueModalTypes';
 
-interface QueueItemRowProps {
+type QueueItemRowProps = {
 	item: QueueItem;
 	isCurrent?: boolean;
-	onPlay: (itemId: string) => void;
-	onRemove: (itemId: string) => Promise<boolean>;
-	onDragStart?: () => void;
-	isDragActive?: boolean;
-	onShowActions?: (item: QueueItem, anchor?: MenuAnchor) => void;
-}
+	actions: QueueRowActions;
+	drag?: QueueRowDrag;
+};
 
-export function QueueItemRow({
-	item,
-	isCurrent = false,
-	onPlay,
-	onRemove,
-	onDragStart,
-	isDragActive = false,
-	onShowActions,
-}: QueueItemRowProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createRowStyles(theme), [theme]);
-	const swipeableRef = React.useRef<Swipeable>(null);
-	const { track } = item;
-	const contextMenu = useContextMenu(onShowActions ? () => onShowActions(item) : undefined);
-
-	async function handleRemove() {
-		const removed = await onRemove(item.id);
-		if (!removed) swipeableRef.current?.close();
-	}
-
-	function renderRightActions() {
-		return (
-			<Pressable
-				style={styles.deleteButton}
-				onPress={handleRemove}
-				accessibilityRole="button"
-				accessibilityLabel={`Retirer ${track.title}`}
-			>
-				<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
-				<Text style={styles.deleteText}>Retirer</Text>
-			</Pressable>
-		);
-	}
+export function QueueItemRow({ item, isCurrent = false, actions, drag }: QueueItemRowProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const { swipeableRef, handleRemove } = useSwipeRemove(() => actions.onRemove(item.id));
+	const contextMenu = useContextMenu(() => actions.onShowActions(item));
 
 	return (
 		<Swipeable
 			ref={swipeableRef}
-			renderRightActions={renderRightActions}
+			renderRightActions={() => (
+				<QueueRowDeleteAction title={item.track.title} onRemove={handleRemove} />
+			)}
 			overshootRight={false}
 			friction={2}
 		>
 			<View
 				{...contextMenu}
-				style={[styles.row, isCurrent && styles.rowCurrent, isDragActive && styles.rowActive]}
+				style={[styles.row, isCurrent && styles.rowCurrent, drag?.isDragActive && styles.rowActive]}
 			>
-				<Pressable
-					onPress={() => onPlay(item.id)}
-					onLongPress={onShowActions ? () => onShowActions(item) : undefined}
-					style={styles.rowMain}
-					accessibilityRole="button"
-					accessibilityLabel={`Lire ${track.title}`}
-					accessibilityState={{ selected: isCurrent }}
-					testID={`queue-item-${item.id}`}
-				>
-					<Artwork uri={track.albumArt} size={42} />
-
-					<QueueTrackDetails
-						title={track.title}
-						artist={track.artist}
-						isCurrent={isCurrent}
-						styles={styles}
-					/>
-
-					{isCurrent ? (
-						<PixelIcon
-							icon={SoundOnSolid}
-							size={18}
-							color={theme.colors.primary}
-							style={styles.playingIcon}
-							accessibilityLabel="En cours de lecture"
-						/>
-					) : null}
-
-					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
-				</Pressable>
-
-				{onShowActions && <TrackActionsButton onPress={anchor => onShowActions(item, anchor)} />}
-
-				{onDragStart && (
-					<Pressable
-						onPressIn={onDragStart}
-						hitSlop={10}
-						style={styles.dragHandle}
-						accessibilityRole="button"
-						accessibilityLabel="Réordonner"
-					>
-						<PixelIcon icon={BarsSolid} size={24} color={theme.colors.textSecondary} />
-					</Pressable>
-				)}
+				<QueueRowMain item={item} isCurrent={isCurrent} actions={actions} />
+				<TrackActionsButton onPress={anchor => actions.onShowActions(item, anchor)} />
+				{drag?.onDragStart && <QueueDragHandle onDragStart={drag.onDragStart} />}
 			</View>
 		</Swipeable>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		row: pixelRow(theme),
+		rowCurrent: {
+			backgroundColor: theme.colors.surfaceAlt,
+		},
+		rowActive: {
+			...theme.shadows.large,
+		},
+	});
+	return styles;
 }

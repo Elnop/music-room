@@ -1,5 +1,5 @@
+import { STREAM_RENEW_MARGIN_MS } from '@/features/playback/shared/player/configs/playerConfig';
 import {
-	STREAM_RENEW_MARGIN_MS,
 	isStreamStale,
 	streamPrefetch,
 } from '@/features/playback/shared/player/lib/streamPrefetch';

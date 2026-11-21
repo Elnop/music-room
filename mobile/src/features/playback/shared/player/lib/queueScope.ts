@@ -1,16 +1,11 @@
 import { ApiError } from '@/shared/backend/lib/api';
 import { getSession } from '@/shared/backend/lib/authSession';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { showError } from '@/shared/theme/lib/toast';
-import type { ActionScope } from '@/features/playback/shared/player/lib/queue.types';
-
-export type StepOptions = {
-	errorMessage?: string | ((error: unknown) => string);
-	stopWhenEmpty?: boolean;
-};
+import type { ActionScope } from '@/features/playback/shared/player/types/queueTypes';
 
 export function actionScope(): ActionScope {
-	const { target } = useConnectStore.getState();
+	const { target } = connectStore.getState();
 	const me = getSession().user?.id ?? null;
 	if (target.kind === 'local') return { ownerId: me, remote: false, call: {} };
 	return {
@@ -32,6 +27,6 @@ export function handleRemoteRefusal(scope: ActionScope, error: unknown): boolean
 	} else {
 		return false;
 	}
-	useConnectStore.getState().setLocal();
+	connectStore.getState().setLocal();
 	return true;
 }

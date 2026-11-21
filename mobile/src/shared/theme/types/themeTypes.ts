@@ -10,6 +10,8 @@ export type ThemeName = 'original';
 
 export type ThemeColors = {
 	primary: string;
+	primaryTint: string;
+	primaryTintStrong: string;
 
 	background: string;
 	surface: string;

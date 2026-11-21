@@ -1,19 +1,14 @@
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { FONT_FAMILIES } from '@/shared/theme/configs/fontsConfig';
 
-export function sheetHeaderStyles(theme: Theme, insets: { top: number }, separator: string) {
+function headerBarStyles(theme: Theme, separator: string) {
 	return {
-		container: {
-			flex: 1,
-			backgroundColor: theme.colors.background,
-			paddingTop: insets.top,
-		},
 		header: {
 			flexDirection: 'row' as const,
 			alignItems: 'center' as const,
-			paddingHorizontal: 16,
-			paddingVertical: 12,
-			borderBottomWidth: 1,
+			paddingHorizontal: theme.spacing.md,
+			paddingVertical: theme.spacing.smd,
+			borderBottomWidth: theme.borders.hairline,
 			borderBottomColor: separator,
 		},
 		closeButton: {
@@ -23,11 +18,22 @@ export function sheetHeaderStyles(theme: Theme, insets: { top: number }, separat
 			alignItems: 'center' as const,
 			backgroundColor: theme.colors.surface,
 		},
+	};
+}
+
+export function sheetHeaderStyles(theme: Theme, insets: { top: number }, separator: string) {
+	return {
+		container: {
+			flex: 1,
+			backgroundColor: theme.colors.background,
+			paddingTop: insets.top,
+		},
+		...headerBarStyles(theme, separator),
 		title: {
 			flex: 1,
 			marginRight: 40,
 			textAlign: 'center' as const,
-			fontSize: 18,
+			fontSize: theme.typography.sizes.lgx,
 			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.text,
 		},

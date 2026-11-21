@@ -1,11 +1,7 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand';
+import type { AutoplayState } from '@/features/playback/shared/player/types/playerTypes';
 
-type AutoplayState = {
-	blocked: boolean;
-	setBlocked: (blocked: boolean) => void;
-};
-
-export const useAutoplayStore = create<AutoplayState>(set => ({
+export const autoplayStore = createStore<AutoplayState>(set => ({
 	blocked: false,
 	setBlocked: blocked => set({ blocked }),
 }));

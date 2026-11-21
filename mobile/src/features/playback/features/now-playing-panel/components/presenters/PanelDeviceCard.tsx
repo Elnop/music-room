@@ -1,45 +1,29 @@
 import React from 'react';
-import { View } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { Pressable } from '@/shared/theme/components/Pressable';
+import { StyleSheet, View } from 'react-native';
 import { Text } from '@/shared/theme/components/Text';
-import type { NowPlayingPanelStyles } from '@/features/playback/features/now-playing-panel/components/presenters/nowPlayingPanelStyles';
-import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
-import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import { PanelCard } from '@/features/playback/features/now-playing-panel/components/presenters/PanelCard';
+import { PanelDeviceIcon } from '@/features/playback/features/now-playing-panel/components/presenters/PanelDeviceIcon';
 
 type PanelDeviceCardProps = {
 	deviceLabel: string;
 	isRemote: boolean;
-	styles: NowPlayingPanelStyles;
 	onOpenDevices: () => void;
 };
 
-export function PanelDeviceCard({
-	deviceLabel,
-	isRemote,
-	styles,
-	onOpenDevices,
-}: PanelDeviceCardProps) {
-	const { theme } = useTheme();
+export function PanelDeviceCard({ deviceLabel, isRemote, onOpenDevices }: PanelDeviceCardProps) {
+	const { styles } = useThemedStyles(createStyles);
+	const link = {
+		label: 'Changer',
+		accessibilityLabel: "Choisir l'appareil",
+		onPress: onOpenDevices,
+	};
+
 	return (
-		<View style={styles.card}>
-			<View style={styles.cardHeader}>
-				<Text style={styles.cardTitle} accessibilityRole="header">
-					Appareil
-				</Text>
-				<Pressable onPress={onOpenDevices} accessibilityLabel="Choisir l'appareil">
-					<Text style={styles.link}>Changer</Text>
-				</Pressable>
-			</View>
+		<PanelCard title="Appareil" link={link}>
 			<View style={styles.device}>
-				<View style={styles.deviceIcon}>
-					<PixelIcon
-						icon={isRemote ? PhoneRingingLowSolid : LaptopSolid}
-						size={20}
-						color={isRemote ? theme.colors.primary : theme.colors.text}
-					/>
-				</View>
+				<PanelDeviceIcon isRemote={isRemote} />
 				<View style={styles.deviceText}>
 					<Text style={styles.caption}>Lecture sur</Text>
 					<Text style={[styles.deviceName, isRemote && styles.remoteName]} numberOfLines={1}>
@@ -47,6 +31,21 @@ export function PanelDeviceCard({
 					</Text>
 				</View>
 			</View>
-		</View>
+		</PanelCard>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		device: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md },
+		deviceText: { flex: 1, minWidth: 0 },
+		caption: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
+		deviceName: {
+			fontSize: theme.typography.sizes.md,
+			fontFamily: theme.typography.families.semibold,
+			color: theme.colors.text,
+		},
+		remoteName: { color: theme.colors.primary },
+	});
+	return styles;
 }

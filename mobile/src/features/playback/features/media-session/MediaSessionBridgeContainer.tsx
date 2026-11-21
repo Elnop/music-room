@@ -1,4 +1,4 @@
-import { useMediaSession } from '@/features/playback/features/media-session/useMediaSession';
+import { useMediaSession } from '@/features/playback/features/media-session/hooks/useMediaSession';
 
 export function MediaSessionBridgeContainer(): null {
 	useMediaSession();

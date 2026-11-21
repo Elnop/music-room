@@ -1,55 +1,41 @@
 import React from 'react';
 import { View } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated';
-import type { SharedValue } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { Artwork } from '@/shared/theme/components/Artwork';
-import { Text } from '@/shared/theme/components/Text';
-import type { CarouselSlot } from '@/features/playback/features/player-modal/hooks/useArtworkCarousel';
-import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { PlayerCarouselCaption } from '@/features/playback/features/player-modal/components/presenters/PlayerCarouselCaption';
+import { useCarouselSlotMotion } from '@/features/playback/features/player-modal/hooks/useCarouselSlotMotion';
+import { createCarouselStyles } from '@/features/playback/features/player-modal/lib/createCarouselStyles';
+import { boxWidth } from '@/features/playback/features/player-modal/lib/dynamicStyles';
+import type {
+	CarouselMotion,
+	CarouselSlot,
+	PlayerColors,
+} from '@/features/playback/features/player-modal/playerModalTypes';
 
-interface PlayerCarouselSlotProps {
-	styles: ReturnType<typeof createStyles>;
+type PlayerCarouselSlotProps = {
 	slot: CarouselSlot;
-	center: SharedValue<number>;
-	drag: SharedValue<number>;
+	motion: CarouselMotion;
 	size: number;
-	step: number;
-	colors: { text: string; textSecondary: string };
-}
+	colors: Pick<PlayerColors, 'text' | 'textSecondary'>;
+};
 
-export function PlayerCarouselSlot({
-	styles,
-	slot,
-	center,
-	drag,
-	size,
-	step,
-	colors,
-}: PlayerCarouselSlotProps) {
-	const position = useAnimatedStyle(() => ({
-		transform: [{ translateX: (slot.index - center.value) * step + drag.value }],
-	}));
-	const textFade = useAnimatedStyle(() => {
-		const distance = Math.abs(slot.index - center.value + drag.value / step);
-		return { opacity: interpolate(distance, [0, 0.6], [1, 0], 'clamp') };
-	});
+export function PlayerCarouselSlot({ slot, motion, size, colors }: PlayerCarouselSlotProps) {
+	const { styles, theme } = useThemedStyles(createCarouselStyles);
+	const { position, textFade } = useCarouselSlotMotion(slot.index, motion);
 
 	return (
-		<Animated.View
-			style={[styles.slot, { width: size + styles.artworkShadow.borderWidth * 2 }, position]}
-		>
+		<Animated.View style={[styles.slot, boxWidth(size + theme.borders.thick * 2), position]}>
 			<View style={styles.artworkShadow}>
 				<Artwork uri={slot.uri} size={size} style={styles.artwork} iconSize={64} />
 			</View>
 			<Animated.View style={[styles.slotText, textFade]}>
-				<View style={styles.titleBox}>
-					<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
-						{slot.title}
-					</Text>
-				</View>
-				<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-					{slot.artist}
-				</Text>
+				<PlayerCarouselCaption
+					title={slot.title}
+					artist={slot.artist}
+					colors={colors}
+					titleLines={2}
+				/>
 			</Animated.View>
 		</Animated.View>
 	);

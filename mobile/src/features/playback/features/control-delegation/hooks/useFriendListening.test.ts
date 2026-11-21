@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-native';
 import { useFriendListening } from '@/features/playback/features/control-delegation/hooks/useFriendListening';
 import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { controlErrorMessage } from '@/shared/control-error/controlErrorMessage';
-import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi';
+import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/musicControlApi';
 import { logger } from '@/shared/logging/logger';
 
 const mockSocket = {
@@ -26,9 +26,6 @@ const mockSetCurrentItem = jest.fn();
 const mockSetLocal = jest.fn();
 
 let mockReader: (() => number) | null = null;
-function setPositionReader(r: (() => number) | null) {
-	mockReader = r;
-}
 
 jest.mock('@/shared/backend/hooks/useSocketState', () => ({
 	useSocketState: (selector: (state: typeof mockSocketState) => unknown) =>
@@ -43,19 +40,26 @@ jest.mock('@/shared/backend/lib/authSession', () => ({
 }));
 
 jest.mock('@/features/playback/shared/player/stores/playerStore', () => ({
-	usePlayerStore: Object.assign(
-		(selector: (state: typeof mockPlayerState) => unknown) => selector(mockPlayerState),
-		{ getState: () => ({ pause: mockPause, resume: mockResume, playTrack: mockPlayTrack }) }
-	),
+	playerStore: {
+		getState: () => ({ pause: mockPause, resume: mockResume, playTrack: mockPlayTrack }),
+	},
+}));
+
+jest.mock('@/features/playback/shared/player/hooks/usePlayerState', () => ({
+	usePlayerState: (selector: (state: typeof mockPlayerState) => unknown) =>
+		selector(mockPlayerState),
+}));
+
+jest.mock('@/features/playback/shared/player/lib/positionReader', () => ({
 	readPositionMs: () => (mockReader ? mockReader() : null),
 }));
 
 jest.mock('@/features/playback/shared/player/stores/queueStore', () => ({
-	useQueueStore: { getState: () => ({ setCurrentItem: mockSetCurrentItem }) },
+	queueStore: { getState: () => ({ setCurrentItem: mockSetCurrentItem }) },
 }));
 
 jest.mock('@/features/playback/shared/player/stores/connectStore', () => ({
-	useConnectStore: { getState: () => ({ setLocal: mockSetLocal }) },
+	connectStore: { getState: () => ({ setLocal: mockSetLocal }) },
 }));
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -72,7 +76,7 @@ jest.mock('@/shared/backend/deviceService', () => ({
 }));
 
 jest.mock(
-	'@/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi',
+	'@/features/playback/features/control-delegation/shared/delegation/musicControlApi',
 	() => ({
 		musicControlApi: { getControllableDevices: jest.fn() },
 	})
@@ -113,7 +117,7 @@ describe('useMusicControlEmitter', () => {
 	});
 
 	it('sends the rounded position of the registered reader', async () => {
-		setPositionReader(() => 12_345.6);
+		mockReader = () => 12_345.6;
 		const { unmount } = renderHook(() => useMusicControlEmitter());
 		await act(async () => {
 			await Promise.resolve();
@@ -129,11 +133,11 @@ describe('useMusicControlEmitter', () => {
 		});
 
 		unmount();
-		setPositionReader(null);
+		mockReader = null;
 	});
 
 	it('sends 0 when the reader returns a non-finite position', async () => {
-		setPositionReader(() => Number.NaN);
+		mockReader = () => Number.NaN;
 		const { unmount } = renderHook(() => useMusicControlEmitter());
 		await act(async () => {
 			await Promise.resolve();
@@ -149,12 +153,12 @@ describe('useMusicControlEmitter', () => {
 		});
 
 		unmount();
-		setPositionReader(null);
+		mockReader = null;
 	});
 
 	it('emits again with the new position when a seek happens', async () => {
 		let position = 1000;
-		setPositionReader(() => position);
+		mockReader = () => position;
 		const { rerender, unmount } = renderHook(() => useMusicControlEmitter());
 		await act(async () => {
 			await Promise.resolve();
@@ -179,7 +183,7 @@ describe('useMusicControlEmitter', () => {
 
 		mockPlayerState.seekCount = 0;
 		unmount();
-		setPositionReader(null);
+		mockReader = null;
 	});
 });
 
@@ -234,7 +238,7 @@ describe('useMusicControlEmitter control:command', () => {
 			5000
 		);
 		expect(mockSetCurrentItem).not.toHaveBeenCalled();
-		expect(mockSetLocal).toHaveBeenCalled();
+		expect(mockSetLocal).toHaveBeenCalledWith();
 		unmount();
 	});
 
@@ -242,25 +246,14 @@ describe('useMusicControlEmitter control:command', () => {
 		const { handle, unmount } = await commandHandler();
 		handle({ action: 'pause', fromUserId: 'friend' });
 		handle({ action: 'play', fromUserId: 'friend' });
-		expect(mockPause).toHaveBeenCalled();
-		expect(mockResume).toHaveBeenCalled();
+		expect(mockPause).toHaveBeenCalledWith();
+		expect(mockResume).toHaveBeenCalledWith();
 		expect(mockSetLocal).not.toHaveBeenCalled();
 		unmount();
 	});
 });
 
 const FRIEND = 'friend-1';
-
-function device(deviceId: string) {
-	return {
-		deviceId,
-		deviceName: deviceId,
-		platform: 'android',
-		model: 'Pixel',
-		lastSeenAt: '2026-10-09T00:00:00Z',
-		access: 'license' as const,
-	};
-}
 
 function status(deviceId: string) {
 	return {
@@ -276,13 +269,15 @@ function status(deviceId: string) {
 function controllable(ids: string[], allDevices = false) {
 	return {
 		allDevices,
-		devices: ids.map(device),
+		devices: ids.map(deviceId => ({
+			deviceId,
+			deviceName: deviceId,
+			platform: 'android',
+			model: 'Pixel',
+			lastSeenAt: '2026-10-09T00:00:00Z',
+			access: 'license' as const,
+		})),
 	};
-}
-
-function handler(event: string) {
-	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
-	return calls[calls.length - 1]?.[1] as (data: unknown) => void;
 }
 
 function emitted(event: string) {
@@ -301,8 +296,10 @@ async function renderFriend() {
 }
 
 async function receive(event: string, data: unknown) {
+	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
+	const handle = calls[calls.length - 1]?.[1] as (data: unknown) => void;
 	await act(async () => {
-		handler(event)(data);
+		handle(data);
 	});
 }
 
@@ -388,7 +385,10 @@ describe('useFriendListening', () => {
 
 		expect(emitted('listening:subscribe')).toHaveLength(0);
 		expect(result.current.canControl).toBe(false);
-		expect(logger.error).toHaveBeenCalled();
+		expect(logger.error).toHaveBeenCalledWith(
+			'[MusicControl] Load controllable devices failed:',
+			expect.any(Error)
+		);
 		unmount();
 	});
 

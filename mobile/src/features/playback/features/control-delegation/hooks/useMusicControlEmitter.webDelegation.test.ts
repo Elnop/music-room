@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react-native';
 import type { AlertButton } from 'react-native';
 import { usePlayerAudio } from '@/features/playback/shared/player/hooks/usePlayerAudio';
 import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { autoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
 import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { showAlert } from '@/shared/alerts/showAlert';
 import type { DeviceCommand } from '@/shared/playback/types/queueTypes';
@@ -17,7 +17,7 @@ jest.mock('@/features/playback/shared/player/lib/audioPlayer', () =>
 	jest.requireActual('@/features/playback/shared/player/lib/audioPlayer.web')
 );
 jest.mock('hls.js', () => ({ __esModule: true, default: { isSupported: () => false } }));
-jest.mock('@/features/playback/shared/player/lib/streamApi', () => ({
+jest.mock('@/features/playback/shared/player/lib/fetchStreamUrl', () => ({
 	fetchStreamUrl: () =>
 		Promise.resolve({ streamUrl: 'https://cdn/stream.m3u8', expiresAt: Date.now() + 1_800_000 }),
 }));
@@ -111,8 +111,8 @@ beforeEach(() => {
 	jest.clearAllMocks();
 	Object.assign(media, { paused: true, ended: false, readyState: 0, duration: Number.NaN });
 	media.playResult = () => Promise.resolve();
-	usePlayerStore.setState(usePlayerStore.getInitialState());
-	useAutoplayStore.setState({ blocked: false });
+	playerStore.setState(playerStore.getInitialState());
+	autoplayStore.setState({ blocked: false });
 });
 
 afterEach(() => jest.useRealTimers());
@@ -146,8 +146,8 @@ describe('the browser as a delegated device', () => {
 
 		await receiveTrack();
 
-		expect(media.play).toHaveBeenCalled();
-		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		expect(media.play).toHaveBeenCalledWith();
+		expect(playerStore.getState().playbackState).toBe('paused');
 		expect(sentStatuses().some(status => status.isPlaying)).toBe(false);
 		expect(sentStatuses().at(-1)).toMatchObject({ track: { title: 'Song' }, isPlaying: false });
 		const [title, , buttons] = (showAlert as jest.Mock).mock.calls[0] as [
@@ -158,11 +158,12 @@ describe('the browser as a delegated device', () => {
 		expect(title).toBe('Cliquer pour activer le son');
 
 		media.playResult = () => Promise.resolve();
-		await act(async () => buttons.find(button => button.text === 'Activer le son')?.onPress?.());
+		const activateSound = buttons.find(button => button.text === 'Activer le son');
+		await act(async () => activateSound?.onPress?.());
 		await settle();
 
 		expect(media.paused).toBe(false);
-		expect(useAutoplayStore.getState().blocked).toBe(false);
+		expect(autoplayStore.getState().blocked).toBe(false);
 		expect(sentStatuses().at(-1)).toMatchObject({ isPlaying: true });
 		unmount();
 	});

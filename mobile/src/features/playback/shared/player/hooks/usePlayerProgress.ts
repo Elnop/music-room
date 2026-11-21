@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
+import { usePlayer } from '@/features/playback/shared/player/hooks/usePlayer';
 
 type PlayerProgress = {
 	currentTime: number;
@@ -21,7 +21,7 @@ export function usePlayerProgress(): PlayerProgress {
 		}, 100);
 
 		return () => clearInterval(interval);
-	}, [player, player?.isLoaded, player?.playing]);
+	}, [player]);
 
 	return {
 		currentTime,

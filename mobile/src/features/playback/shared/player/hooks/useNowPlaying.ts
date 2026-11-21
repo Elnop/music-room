@@ -1,86 +1,9 @@
-import { useCallback, useMemo } from 'react';
-import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
-import { usePlayerProgress } from '@/features/playback/shared/player/hooks/usePlayerProgress';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import {
-	previousAction,
-	selectHasNext,
-	selectHasPrevious,
-} from '@/features/playback/shared/player/lib/queueNavigation';
+import { useLocalNowPlaying } from '@/features/playback/shared/player/hooks/useLocalNowPlaying';
 import { useRemoteNowPlaying } from '@/features/playback/shared/player/hooks/useRemoteNowPlaying';
-
-import type { NowPlaying, NowPlayingTrack } from '@/features/playback/shared/player/lib/types';
-import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-
-export type { NowPlaying, NowPlayingTrack } from '@/features/playback/shared/player/lib/types';
+import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useNowPlaying(): NowPlaying {
 	const remote = useRemoteNowPlaying();
-	const { player, seekTo } = usePlayer();
-	const { currentTime, duration } = usePlayerProgress();
-	const currentTrack = usePlayerStore(state => state.currentTrack);
-	const playbackState = usePlayerStore(state => state.playbackState);
-	const queueItemId = usePlayerStore(state => state.queueItemId);
-	const needsStreamLoad = usePlayerStore(state => state.needsStreamLoad);
-	const restoredPositionMs = usePlayerStore(state => state.startPositionMs ?? 0);
-	const queue = useActiveQueue();
-	const queueNext = useCallback(() => useQueueStore.getState().next(), []);
-	const queuePrevious = useCallback(() => useQueueStore.getState().previous(), []);
-
-	const localTrack = useMemo<NowPlayingTrack | null>(
-		() =>
-			currentTrack
-				? {
-						id: currentTrack.id,
-						title: currentTrack.title,
-						artist: currentTrack.user.username,
-						artworkUrl: currentTrack.artwork_url || currentTrack.user.avatar_url || null,
-					}
-				: null,
-		[currentTrack]
-	);
-
-	const localHasPrevious = selectHasPrevious(queue) && queueItemId !== null;
-	const localPositionMs = needsStreamLoad ? restoredPositionMs : currentTime * 1000;
-
-	const localPrevious = useCallback(() => {
-		if (!player) return;
-		if (previousAction(localPositionMs / 1000, localHasPrevious) === 'restart') {
-			seekTo(0);
-		} else {
-			void queuePrevious();
-		}
-	}, [player, seekTo, localPositionMs, localHasPrevious, queuePrevious]);
-
-	const next = useCallback(() => {
-		void queueNext();
-	}, [queueNext]);
-
-	const isPlaying = playbackState === 'playing';
-	const canToggle = Boolean(currentTrack) && (isPlaying || playbackState === 'paused');
-
-	function toggle() {
-		if (!canToggle || !player) return;
-		const { pause, resume } = usePlayerStore.getState();
-		if (isPlaying) pause();
-		else resume();
-	}
-
-	if (remote) return remote;
-
-	return {
-		isRemote: false,
-		track: localTrack,
-		isPlaying,
-		isLoading: playbackState === 'loading',
-		canToggle,
-		positionMs: localPositionMs,
-		durationMs: needsStreamLoad && currentTrack ? currentTrack.duration : duration * 1000,
-		deviceLabel: null,
-		toggle,
-		next,
-		previous: localPrevious,
-		hasNext: selectHasNext(queue),
-		hasPrevious: localHasPrevious,
-	};
+	const local = useLocalNowPlaying();
+	return remote ?? local;
 }

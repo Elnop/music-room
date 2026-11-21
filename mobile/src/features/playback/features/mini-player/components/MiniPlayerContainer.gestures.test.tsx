@@ -4,8 +4,8 @@ import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { MiniPlayerContainer } from '@/features/playback/features/mini-player/components/MiniPlayerContainer';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 import { hapticTap } from '@/shared/theme/lib/haptics';
 
 jest.mock('@/shared/theme/lib/haptics', () => ({
@@ -72,7 +72,7 @@ describe('MiniPlayerContainer gestures (#311)', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		mockNowPlaying = nowPlaying();
-		usePlayerStore.setState({ isModalOpen: false });
+		playerStore.setState({ isModalOpen: false });
 	});
 
 	it('swipes left to the next track', () => {
@@ -131,7 +131,7 @@ describe('MiniPlayerContainer gestures (#311)', () => {
 	it('swipes up to open the player modal', () => {
 		render(<MiniPlayerContainer />);
 		swipe(0, -80);
-		expect(usePlayerStore.getState().isModalOpen).toBe(true);
+		expect(playerStore.getState().isModalOpen).toBe(true);
 		expect(mockNowPlaying.next).not.toHaveBeenCalled();
 		expect(hapticTap).not.toHaveBeenCalled();
 	});
@@ -142,7 +142,7 @@ describe('MiniPlayerContainer gestures (#311)', () => {
 		expect(mockNowPlaying.toggle).toHaveBeenCalledTimes(1);
 		expect(hapticTap).toHaveBeenCalledTimes(1);
 		fireEvent.press(screen.getByText('Song'));
-		expect(usePlayerStore.getState().isModalOpen).toBe(true);
+		expect(playerStore.getState().isModalOpen).toBe(true);
 	});
 
 	it('taps once on the next button', () => {
