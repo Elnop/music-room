@@ -80,7 +80,6 @@ jest.mock('@react-native-community/slider', () => {
 	};
 });
 
-// The library needs native drag: render the header and empty state plainly.
 jest.mock('react-native-reorderable-list', () => {
 	const { View } = jest.requireActual('react-native');
 	return {
@@ -229,7 +228,6 @@ describe('PlayerModalContainer swipe down', () => {
 		expect(usePlayerStore.getState().isModalOpen).toBe(false);
 	});
 
-	// fireGestureHandler skips activation rules: check them on the gesture itself.
 	it('starts on a downward drag only and gives way to horizontal moves', () => {
 		render(<PlayerModalContainer {...sheets} />);
 		const { config } = getByGestureTestId('player-modal-pan') as PanGesture;
@@ -260,7 +258,6 @@ describe('PlayerModalContainer slider for a screen reader', () => {
 		user: { id: 1, username: 'x', avatar_url: null, permalink_url: '' },
 		playable: true,
 	};
-	// The accessible wrapper, not the mocked slider: the real RN View path.
 	const seekControl = () => screen.getByRole('adjustable', { name: 'Position de lecture' });
 	const action = (actionName: string) =>
 		fireEvent(seekControl(), 'accessibilityAction', {
@@ -306,7 +303,6 @@ describe('PlayerModalContainer slider for a screen reader', () => {
 
 		act(() => slider().props.onSlidingComplete(120));
 		expect(mockSeekTo).toHaveBeenCalledWith(120);
-		// The player still reports 0:30: the thumb must not jump back.
 		expect(slider().props.value).toBe(120);
 	});
 
@@ -431,7 +427,6 @@ describe('PlayerModalContainer haptics', () => {
 	it('taps once on previous', () => {
 		render(<PlayerModalContainer {...sheets} />);
 		fireEvent.press(screen.getByLabelText('Piste précédente'));
-		// Past a few seconds, previous restarts the track.
 		expect(mockSeekTo).toHaveBeenCalledWith(0);
 		expect(hapticTap).toHaveBeenCalledTimes(1);
 	});
@@ -645,7 +640,6 @@ describe('PlayerModalContainer artwork swipe', () => {
 		]);
 	});
 
-	// fireGestureHandler skips activation rules: check them on the gesture itself.
 	it('starts on a horizontal drag and gives way to the vertical dismiss', () => {
 		render(<PlayerModalContainer {...sheets} />);
 		const { config } = getByGestureTestId('player-artwork-pan') as PanGesture;

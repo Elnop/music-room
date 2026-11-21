@@ -1,7 +1,6 @@
 export const queryKeys = {
 	auth: {
 		all: ['auth'] as const,
-		/** Per user, so a next account never reads the previous one's list. */
 		providers: (userId: string) => [...queryKeys.auth.all, 'providers', userId] as const,
 	},
 	playlists: {

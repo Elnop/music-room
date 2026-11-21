@@ -7,7 +7,6 @@ import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
-/** The track drawn as pixel blocks; the slider stays on top, invisible, to seek. */
 const SEGMENTS = 24;
 
 const formatTime = (seconds: number): string => {
@@ -18,7 +17,6 @@ const formatTime = (seconds: number): string => {
 };
 
 interface PlayerProgressSliderProps {
-	/** The full player stacks the times under the slider; the desktop player bar sets them on its sides. */
 	styles: {
 		progressContainer: StyleProp<ViewStyle>;
 		slider: StyleProp<ViewStyle>;

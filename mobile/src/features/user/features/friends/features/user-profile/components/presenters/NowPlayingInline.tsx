@@ -20,7 +20,6 @@ interface NowPlayingInlineProps {
 	isPlaying: boolean;
 	onPlay: () => void;
 	onPause: () => void;
-	/** False for a device I may not control: no play/pause button. */
 	controllable?: boolean;
 }
 

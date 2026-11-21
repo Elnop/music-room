@@ -2,13 +2,16 @@ import { ApiError } from '@/shared/backend/lib/api';
 import { logger } from '@/shared/logging/logger';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import type { LoginInput, RegisterInput } from './validators';
-import type { AuthResponse, OAuthProvider, RegisterResult } from '@/features/user/features/auth/types';
+import type {
+	AuthResponse,
+	OAuthProvider,
+	RegisterResult,
+} from '@/features/user/features/auth/types';
 import * as authApi from './authApi';
 import { signInWithGoogle } from './googleSignIn';
 import { signInWithFacebook } from './facebookSignIn';
 import { isSignInCancelled } from './signInCancelled';
 
-/** RootNavigator then shows the app. */
 async function open(response: AuthResponse): Promise<void> {
 	if (!response.session) throw new Error('The backend did not return a session');
 	await useAuthStore.getState().startSession(response.user, response.session);
@@ -16,7 +19,6 @@ async function open(response: AuthResponse): Promise<void> {
 
 export async function login(input: LoginInput): Promise<void> {
 	const response = await authApi.login(input);
-	// Without a session the user stays on the login screen.
 	if (response.session) await open(response);
 }
 

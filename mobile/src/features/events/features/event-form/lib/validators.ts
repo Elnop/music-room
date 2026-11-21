@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-/** Same limits as the backend (features/events/events.validators.ts). */
 export const EVENT_LIMITS = {
 	NAME_MAX: 100,
 	TEXT_MAX: 500,

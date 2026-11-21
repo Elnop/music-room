@@ -9,7 +9,10 @@ import {
 import { GenreChip } from '@/shared/theme/components/GenreChip';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/lib/types';
-import type { FilteredProfile, FriendPlaylistSummary } from '@/features/user/features/friends/types';
+import type {
+	FilteredProfile,
+	FriendPlaylistSummary,
+} from '@/features/user/features/friends/types';
 import { FriendPlaylistCard } from './FriendPlaylistCard';
 import { HiddenFieldNote } from './HiddenFieldNote';
 import { Text } from '@/shared/theme/components/Text';
@@ -22,7 +25,6 @@ interface UserProfileWideSectionsProps {
 	listening?: React.ReactNode;
 }
 
-/** A field the server leaves out is hidden by privacy; null or empty means the user left it blank. */
 function infoRows(profile: FilteredProfile): ProfileInfoRow[] {
 	const rows: ProfileInfoRow[] = [{ label: "Nom d'utilisateur", value: `@${profile.username}` }];
 	if (profile.email) rows.push({ label: 'Email', value: profile.email });

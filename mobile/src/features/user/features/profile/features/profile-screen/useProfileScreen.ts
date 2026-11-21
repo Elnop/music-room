@@ -2,7 +2,10 @@ import { useCallback, useState } from 'react';
 import { showAlert } from '@/shared/alerts/alert';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useUserMusicPreferences, useUserStats } from '@/features/user/features/profile/shared/profile/hooks/useProfileQueries';
+import {
+	useUserMusicPreferences,
+	useUserStats,
+} from '@/features/user/features/profile/shared/profile/hooks/useProfileQueries';
 import type { ProfileStackParamList } from '@/features/user/features/profile/types';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { logout, useSession } from '@/shared/backend/lib/authSession';
@@ -31,11 +34,7 @@ export function useProfileScreen() {
 	}, [navigation]);
 
 	const refetchData = useCallback(async () => {
-		try {
-			await Promise.all([preferencesQuery.refetch(), statsQuery.refetch()]);
-		} catch {
-			// Data is optional, and errors during logout are expected.
-		}
+		await Promise.all([preferencesQuery.refetch(), statsQuery.refetch()]);
 	}, [preferencesQuery, statsQuery]);
 
 	useFocusEffect(

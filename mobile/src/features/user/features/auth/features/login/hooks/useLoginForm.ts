@@ -5,10 +5,16 @@ import { ApiError } from '@/shared/backend/lib/api';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showWarning } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
-import { loginSchema, type LoginInput } from '@/features/user/features/auth/shared/sign-in/lib/validators';
+import {
+	loginSchema,
+	type LoginInput,
+} from '@/features/user/features/auth/shared/sign-in/lib/validators';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { useLoginMutation } from '@/features/user/features/auth/shared/sign-in/hooks/useSignInMutations';
-import { useFieldBinding, type FieldBinding } from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
+import {
+	useFieldBinding,
+	type FieldBinding,
+} from '@/features/user/features/auth/shared/field-binding/useFieldBinding';
 import { useFocusedErrorToast } from './useFocusedErrorToast';
 
 const REDIRECT_DELAY_MS = 1500;
@@ -23,7 +29,6 @@ interface LoginForm {
 	goToRegister: () => void;
 }
 
-/** Failures toast only while the screen is focused; an unverified account goes to the code screen. */
 export function useLoginForm(
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>
 ): LoginForm {

@@ -9,7 +9,7 @@
     "presenters-are-pure": 151,
     "presenters-render-presenters": 9,
     "not-to-dev-dep": 2,
-    "oxlint": 5205
+    "oxlint": 4564
   },
   "allowedPaths": {
     "no-asyncstorage-outside-storage": [

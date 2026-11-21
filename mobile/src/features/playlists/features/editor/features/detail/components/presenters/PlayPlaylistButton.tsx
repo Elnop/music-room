@@ -4,7 +4,6 @@ import type { PlayPlaylist } from '@/features/playlists/features/editor/features
 import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-solid.svg';
 import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
 
-/** In the header, so it scrolls with the list and never covers a row. */
 export function PlayPlaylistButton({ play }: { play: PlayPlaylist }) {
 	return (
 		<KeyButton

@@ -5,7 +5,6 @@ import { usePlayerStore } from '@/features/playback/shared/player/stores/playerS
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { isLocalTarget } from '@/features/playback/shared/player/stores/connectStore';
 
-/** Once per loaded track, local mode only: in remote mode the playing device advances itself. */
 export function useQueueAutoAdvance(player: AudioPlayer): void {
 	const { didJustFinish } = useAudioPlayerStatus(player);
 	const loadCounter = usePlayerStore(state => state.loadCounter);

@@ -10,7 +10,6 @@ import { onBackendError } from '@/shared/backend/lib/backendErrors';
 import { logger } from '@/shared/logging/logger';
 import { FONT_ASSETS } from '@/shared/theme/lib/fonts';
 
-// Before the first render: navigation reads its initial state from the address bar.
 onBackendError((level, message, context) => logger[level](message, context));
 restoreRedirectedPath();
 
@@ -22,7 +21,6 @@ export default function App() {
 		initializeFacebookSDK();
 	}, []);
 
-	// A failed font load falls back to the system font.
 	if (!fontsLoaded && !fontError) return null;
 
 	return (

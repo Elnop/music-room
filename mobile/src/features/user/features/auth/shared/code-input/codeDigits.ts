@@ -1,15 +1,12 @@
 const CODE_LENGTH = 6;
 
-/** Well above CODE_LENGTH, so a paste with spaces or newlines reaches fillCodeDigits whole. */
 export const CODE_INPUT_MAX_LENGTH = 32;
 
 interface CodeFillResult {
 	code: string[];
-	/** Null leaves the focus where it is. */
 	focusIndex: number | null;
 }
 
-/** Digits spread from `index` onwards, anything else is dropped; null means ignore the change. */
 export function fillCodeDigits(
 	code: readonly string[],
 	index: number,
@@ -23,15 +20,12 @@ export function fillCodeDigits(
 
 	const previous = code[index] ?? '';
 	let digits = text.replace(/\D/g, '');
-	// A whole code pasted next to the box's existing digit arrives with it,
-	// before or after: keep only the pasted code.
 	if (previous && digits.length === CODE_LENGTH + 1) {
 		if (digits.startsWith(previous)) digits = digits.slice(1);
 		else if (digits.endsWith(previous)) digits = digits.slice(0, -1);
 	}
 	if (!digits) return null;
 
-	// A whole code, pasted or autofilled into any box, fills every box.
 	if (digits.length >= CODE_LENGTH) {
 		return { code: digits.slice(0, CODE_LENGTH).split(''), focusIndex: null };
 	}

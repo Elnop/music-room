@@ -17,7 +17,6 @@ export interface FriendProfile {
 	avatarUrl?: string;
 }
 
-/** A profile suggested for its shared genres; avatarUrl follows its privacy settings. */
 export interface RecommendedProfile {
 	id: string;
 	username: string;
@@ -28,7 +27,6 @@ export interface RecommendedProfile {
 }
 
 export interface ProfileRecommendations {
-	/** False when the user has chosen no genre: profiles is then empty. */
 	hasPreferences: boolean;
 	profiles: RecommendedProfile[];
 }

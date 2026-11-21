@@ -11,12 +11,10 @@ import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/che
 
 interface SectionHeaderProps {
 	icon: PixelIconSource;
-	/** Read by screen readers; on screen the icon and the count stand for it. */
 	title: string;
 	count: number;
 	open?: boolean;
 	onToggle?: () => void;
-	/** Only for a section that does not fold. */
 	action?: React.ReactNode;
 }
 

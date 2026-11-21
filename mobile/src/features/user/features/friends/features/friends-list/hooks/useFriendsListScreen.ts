@@ -4,7 +4,10 @@ import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { showError } from '@/shared/theme/lib/toast';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
-import { useFriendsList, useControlPermissions } from '@/features/user/features/friends/shared/follows/hooks/useFriendsQueries';
+import {
+	useFriendsList,
+	useControlPermissions,
+} from '@/features/user/features/friends/shared/follows/hooks/useFriendsQueries';
 import { useToggleControlMutation } from '@/features/user/features/friends/shared/follows/hooks/useFriendsMutations';
 import { useDebouncedUserSearch } from './useDebouncedUserSearch';
 
@@ -25,7 +28,6 @@ export function useFriendsListScreen(onNavigateToProfile: (userId: string) => vo
 	const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
 	const [isRefreshingFriends, setIsRefreshingFriends] = useState(false);
 
-	// Only a successful empty answer opens the search: a disabled or failed query must leave the friends tab.
 	const hasCheckedEmptyRef = useRef(false);
 	useEffect(() => {
 		if (hasLoadedFriends && friends.length === 0 && !hasCheckedEmptyRef.current) {

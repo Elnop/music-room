@@ -4,7 +4,10 @@ import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showSuccess } from '@/shared/theme/lib/toast';
 import type { AuthStackParamList } from '@/features/user/features/auth/types';
 import { newPasswordError } from '@/features/user/features/auth/features/reset-password/passwordRules';
-import { useCodeInput, type CodeInput } from '@/features/user/features/auth/shared/code-input/useCodeInput';
+import {
+	useCodeInput,
+	type CodeInput,
+} from '@/features/user/features/auth/shared/code-input/useCodeInput';
 import {
 	useForgotPasswordMutation,
 	useResetPasswordMutation,
@@ -44,7 +47,6 @@ export function useResetPassword(
 
 	const submit = () => {
 		const fullCode = code.digits.join('');
-		// The button waits for the six digits; nothing to show here.
 		if (fullCode.length !== 6) return;
 		const invalid = newPasswordError(newPassword, confirmation);
 		setPasswordError(invalid);

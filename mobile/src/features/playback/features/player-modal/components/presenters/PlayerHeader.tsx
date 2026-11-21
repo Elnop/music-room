@@ -13,7 +13,6 @@ interface PlayerHeaderProps {
 	colors: {
 		textSecondary: string;
 	};
-	/** A dialog closes with ×, without the swipe handle of the phone's sheet. */
 	dialog?: boolean;
 	isLoading?: boolean;
 	onClose: () => void;

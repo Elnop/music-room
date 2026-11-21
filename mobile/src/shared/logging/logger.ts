@@ -1,5 +1,3 @@
-// The only mobile code allowed to touch `console`.
-// `debug` and `info` print in development builds only; `warn` and `error` always reach logcat.
 type LogMethod = (message: string, context?: unknown) => void;
 
 function write(print: (...args: unknown[]) => void, message: string, context: unknown): void {

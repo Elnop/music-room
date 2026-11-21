@@ -2,7 +2,6 @@ import { usePlaybackControls } from '@/features/playback/shared/player/hooks/use
 import { SEEK_STEP_S } from '@/features/playback/shared/player/lib/constants';
 import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
 
-/** As with the player's buttons, a remote device is never seeked. */
 export function usePlayerShortcuts(): KeyboardShortcut[] {
 	const controls = usePlaybackControls();
 	const seek = (action: 'increment' | 'decrement') => {

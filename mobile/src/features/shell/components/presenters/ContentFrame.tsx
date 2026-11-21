@@ -14,9 +14,7 @@ import type { Theme } from '@/shared/theme/lib/types';
 
 interface ContentContainerProps {
 	width: ContentWidth;
-	/** App screens, not auth ones: the side bar and the now playing panel take their share of the window. */
 	besideSidebar?: boolean;
-	/** The screen centres its own content with useContentColumn. */
 	scrollsAtEdge?: boolean;
 	panelOpen?: boolean;
 	children: React.ReactNode;

@@ -2,11 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '@/shared/backend/lib/apiConfig';
 import { reportBackendError } from './backendErrors';
 
-// Changeable without a rebuild: every HTTP client and the socket read it at call time.
-
 const STORAGE_KEY = 'zumik.backendUrl';
 
-/** Parsed by hand: React Native's URL polyfill does not implement `hostname`, `search` or `hash`. */
 const URL_PARTS = /^(https?):\/\/([^/?#@\s]*)\/*$/i;
 const AUTHORITY = /^(\[[0-9a-f:.]+\]|[a-z0-9-]+(?:\.[a-z0-9-]+)*)(?::(\d{1,5}))?$/i;
 
@@ -20,7 +17,6 @@ type Listener = (url: string) => void;
 let currentUrl = DEFAULT_BACKEND_URL;
 const listeners = new Set<Listener>();
 
-/** Null unless `http(s)://host[:port]`, with nothing else. */
 export function normalize(input: string): string | null {
 	const parts = URL_PARTS.exec(input.trim());
 	if (!parts) return null;
@@ -47,7 +43,11 @@ export async function loadBackendUrl(): Promise<string> {
 		const url = stored ? normalize(stored) : null;
 		update(url ?? DEFAULT_BACKEND_URL);
 	} catch (error) {
-		reportBackendError('warn', '[BackendUrl] Could not read the stored address, using the default:', error);
+		reportBackendError(
+			'warn',
+			'[BackendUrl] Could not read the stored address, using the default:',
+			error
+		);
 		update(DEFAULT_BACKEND_URL);
 	}
 	return currentUrl;

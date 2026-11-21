@@ -4,12 +4,8 @@ import * as playlistApi from './playlistApi';
 import type { Playlist, PlaylistUpdatedEvent, PlaylistWithTracks } from './types';
 import { applyPlaylistEvent, sortByRank } from './playlistSync';
 
-// The user's list and one detail per playlist live in the query cache; these helpers
-// patch it in the order doc/features/playlist-concurrency.md describes.
-
 const detailKey = queryKeys.playlists.detail;
 
-/** A newer track list applied by an event while the request was in flight is kept. */
 export async function loadPlaylist(client: QueryClient, id: string): Promise<PlaylistWithTracks> {
 	const fetched = await playlistApi.fetchPlaylistById(id);
 	const shown = client.getQueryData<PlaylistWithTracks>(detailKey(id));
@@ -18,7 +14,6 @@ export async function loadPlaylist(client: QueryClient, id: string): Promise<Pla
 		: { ...fetched, tracks: sortByRank(fetched.tracks) };
 }
 
-/** Fetches the playlist into the cache even when no screen observes it; rejects on failure. */
 export function refreshPlaylist(client: QueryClient, id: string): Promise<PlaylistWithTracks> {
 	return client.fetchQuery({
 		queryKey: detailKey(id),
@@ -37,7 +32,6 @@ export function isOnScreen(client: QueryClient, id: string): boolean {
 	);
 }
 
-/** A failure stays in the query. */
 export async function reloadIfOnScreen(client: QueryClient, id: string): Promise<void> {
 	if (!isOnScreen(client, id)) return;
 	await client.refetchQueries({ queryKey: detailKey(id), exact: true, type: 'active' });
@@ -56,7 +50,6 @@ function applyTrackEvent(
 	return 'applied';
 }
 
-/** Applies a track event, then reloads the playlist when its versions do not follow. */
 export async function settleTrackEvent(
 	client: QueryClient,
 	event: PlaylistUpdatedEvent
@@ -99,7 +92,6 @@ export function dropFromList(client: QueryClient, id: string): void {
 	);
 }
 
-/** Forgets a deleted playlist's detail, once no screen shows it. */
 export function forgetPlaylist(client: QueryClient, id: string): void {
 	client.removeQueries({ queryKey: detailKey(id), exact: true });
 	client.removeQueries({ queryKey: queryKeys.playlists.members(id), exact: true });

@@ -12,7 +12,6 @@ jest.mock('expo-constants', () => ({
 }));
 
 jest.mock('@react-native-google-signin/google-signin', () => {
-	// The package's exports map hides its helpers; this mirrors the library's documented check.
 	const isCancelledResponse = (response: { type: string }) => response.type === 'cancelled';
 	return {
 		GoogleSignin: {

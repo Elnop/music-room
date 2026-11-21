@@ -8,9 +8,7 @@ export interface CodeInput {
 	digits: string[];
 	isComplete: boolean;
 	setBoxRef: (index: number) => (input: TextInput | null) => void;
-	/** Returns the full code when this change completes it. */
 	changeDigit: (index: number, text: string) => string | null;
-	/** Backspace in an empty box moves the focus to the previous one. */
 	pressKey: (index: number, key: string) => void;
 	focusFirst: () => void;
 	reset: () => void;

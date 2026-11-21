@@ -1,5 +1,3 @@
-// The sharing screen manages: public/open nothing, public/restricted editors,
-// private/open viewers (who can also edit), private/restricted viewers and editors.
 export interface SharingMode {
 	isPrivate: boolean;
 	isEditRestricted: boolean;

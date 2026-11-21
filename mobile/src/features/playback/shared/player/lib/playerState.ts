@@ -17,7 +17,6 @@ export interface PlayerState {
 
 	playbackState: PlaybackState;
 
-	// Derived from playbackState, kept for legacy callers
 	isPlaying: boolean;
 	loading: boolean;
 	error: string | null;

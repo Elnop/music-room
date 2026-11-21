@@ -13,7 +13,6 @@ interface TokenRefreshDeps {
 	endSessionLocally: () => Promise<void>;
 }
 
-/** Concurrent callers share the request in flight and get its outcome. */
 export function createTokenRefresh({
 	set,
 	get,
@@ -39,8 +38,6 @@ export function createTokenRefresh({
 				errorType: error?.constructor?.name,
 			});
 
-			// Only a 401 means the backend refused the refresh token; anything else is an outage.
-			// Waiting callers get the same false, so none retries with the stale token.
 			if (error instanceof ApiError && error.status === 401) {
 				logger.warn('[AuthStore] Refresh token refused, ending the session locally');
 				await endSessionLocally();
@@ -58,7 +55,6 @@ export function createTokenRefresh({
 
 		const { refreshToken } = get();
 		if (!refreshToken) {
-			// Locally, not through logout(): its backend call would refresh again.
 			logger.warn('[AuthStore] No refresh token available, ending the session locally');
 			await endSessionLocally();
 			return false;

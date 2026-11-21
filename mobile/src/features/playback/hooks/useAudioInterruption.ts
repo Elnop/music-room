@@ -4,7 +4,6 @@ import type { AudioPlayer } from '@/features/playback/shared/player/lib/types';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { isLocalTarget } from '@/features/playback/shared/player/stores/connectStore';
 
-/** Mirrors into the store the pauses and resumes the system makes behind the app's back (calls, unplugged headsets). */
 export function useAudioInterruption(player: AudioPlayer): void {
 	const status = useAudioPlayerStatus(player);
 	const lastRef = useRef<{ id: number; playing: boolean } | null>(null);

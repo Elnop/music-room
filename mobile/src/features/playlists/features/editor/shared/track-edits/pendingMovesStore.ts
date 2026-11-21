@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
 interface PendingMovesState {
-	/** Moves sent or queued and not answered yet: the drag stays off meanwhile. */
 	count: number;
 	change: (delta: 1 | -1) => void;
 }

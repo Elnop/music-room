@@ -3,11 +3,9 @@ import { useRenameDeviceForm } from '@/features/playback/features/control-delega
 import { RenameDeviceModalView } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/RenameDeviceModalView';
 
 interface RenameDeviceModalProps {
-	/** Null hides the modal. */
 	deviceName: string | null;
 	saving: boolean;
 	onClose: () => void;
-	/** Null goes back to the system name. */
 	onSubmit: (name: string | null) => void;
 }
 

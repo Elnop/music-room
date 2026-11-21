@@ -14,8 +14,12 @@ import { EmailVerificationContainer } from './EmailVerificationContainer';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
-jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
+	signInWithGoogle: jest.fn(),
+}));
+jest.mock('@/features/user/features/auth/shared/sign-in/lib/facebookSignIn', () => ({
+	signInWithFacebook: jest.fn(),
+}));
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
@@ -62,7 +66,6 @@ afterEach(() => {
 
 const PARAMS = { userId: 'user-a', email: 'a@example.com' };
 
-/** Pastes a whole code in the first box, as an autofill does. */
 function typeCode(code: string) {
 	fireEvent.changeText(screen.getAllByDisplayValue('')[0], code);
 }

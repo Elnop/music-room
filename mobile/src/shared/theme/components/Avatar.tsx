@@ -32,7 +32,6 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 	const [failed, setFailed] = React.useState<string | null>(null);
 	const photo = source && failed !== source ? source : undefined;
 	const initials = avatarInitials(name);
-	// Initials fill about 40% of the circle, the usual ratio for letter avatars.
 	const { fontSize } = displayText(
 		theme,
 		dimension * (initials.length > 1 ? 0.38 : 0.44),
@@ -52,7 +51,6 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 				style,
 			]}
 		>
-			{/* The initials stay until the photo has loaded, and come back when it cannot. */}
 			{loaded !== photo && <Text style={[styles.initials, { fontSize }]}>{initials}</Text>}
 			{photo && (
 				<AvatarPhoto

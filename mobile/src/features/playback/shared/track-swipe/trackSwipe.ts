@@ -1,4 +1,3 @@
-/** Past this horizontal distance, or this flick speed, a swipe changes track. */
 const SWIPE_TRACK_THRESHOLD = 80;
 export const SWIPE_FLICK_VELOCITY = 800;
 

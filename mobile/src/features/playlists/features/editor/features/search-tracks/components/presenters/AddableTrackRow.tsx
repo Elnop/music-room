@@ -25,7 +25,6 @@ interface AddableTrackRowProps {
 	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
 }
 
-/** Memoized: adding one track redraws that row only, so its check shows at once. */
 export const AddableTrackRow = React.memo(function AddableTrackRow({
 	track,
 	isAdded,
@@ -41,7 +40,6 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 			<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
 				<Pressable
 					style={styles.trackItem}
-					// An added track keeps its long press: only the tap is a no-op.
 					onPress={() => !isAdded && onAdd(track)}
 					onLongPress={() => onShowActions(track)}
 					accessibilityLabel={`${track.title}, ${track.user.username}`}
@@ -80,7 +78,6 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		// Spacing outside the swipe, so the queue panel matches the row's height.
 		trackRow: {
 			marginBottom: theme.spacing.xs,
 		},
@@ -89,7 +86,6 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			paddingHorizontal: theme.spacing.md,
 			paddingVertical: theme.spacing.sm,
-			// Opaque so the queue panel stays hidden behind the row until swiped.
 			backgroundColor: theme.colors.background,
 		},
 		artwork: {

@@ -9,7 +9,6 @@ import { PlaylistCardMenuContainer } from '@/features/playlists/features/editor/
 
 type HomeScreenProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'>;
 
-/** Features never import each other, so the events and profiles sections are passed in here. */
 export function HomeScreen(props: HomeScreenProps) {
 	return (
 		<PlanContainer>

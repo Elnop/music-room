@@ -10,10 +10,9 @@ export const createDetailStyles = (theme: Theme, topInset: number) =>
 		},
 		list: {
 			flexGrow: 1,
-			paddingTop: topInset + 60, // Space for the floating header
+			paddingTop: topInset + 60,
 			paddingBottom: theme.spacing.xxl,
 		},
-		// The screen spans the window on wide screens, for its gradient; its content keeps a column.
 		column: {
 			width: '100%',
 			maxWidth: CONTENT_MAX_WIDTH.content,

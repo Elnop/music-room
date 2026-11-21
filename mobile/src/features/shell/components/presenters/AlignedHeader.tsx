@@ -5,7 +5,6 @@ import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
 import { SCREEN_WIDTHS } from '@/features/shell/lib/screenWidths';
 
-/** Laid out in the screen's column so its buttons line up with the content. */
 export function AlignedHeader({ options, back, route, navigation }: NativeStackHeaderProps) {
 	const column = SCREEN_WIDTHS[route.name];
 	const {

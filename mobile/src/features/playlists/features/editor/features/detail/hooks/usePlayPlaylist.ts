@@ -10,7 +10,6 @@ export interface PlayPlaylist {
 	playFrom: (track: { id: string; trackUri: string }) => void;
 }
 
-/** While this device plays the playlist, the button pauses and resumes without a request. */
 export function usePlayPlaylist(
 	playlistId: string,
 	playback: PlaybackActions & PlaylistPlayback
@@ -18,7 +17,6 @@ export function usePlayPlaylist(
 	const { playingUri, state } = playback;
 	const [pending, setPending] = useState(false);
 	const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
-	// Guards a second tap before the re-render that disables the button.
 	const pendingRef = useRef(false);
 	const playing = state === 'playing';
 
@@ -44,7 +42,6 @@ export function usePlayPlaylist(
 	};
 
 	const playFrom = async (track: { id: string; trackUri: string }) => {
-		// The current track keeps playing: a tap on it does not restart it.
 		if (pendingRef.current || track.trackUri === playingUri) return;
 		await start(track.id);
 	};

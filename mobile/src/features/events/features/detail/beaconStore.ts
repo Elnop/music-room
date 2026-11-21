@@ -10,10 +10,8 @@ import {
 type BeaconStatus = 'idle' | 'starting' | 'broadcasting';
 
 interface BeaconState {
-	/** The event whose beacon this phone broadcasts (one at a time). */
 	eventId: string | null;
 	status: BeaconStatus;
-	/** Resolves with the reason it could not start, or null once broadcasting. */
 	start: (event: {
 		id: string;
 		beaconMinor: number;
@@ -22,7 +20,6 @@ interface BeaconState {
 	stop: () => void;
 }
 
-// setTimeout cannot wait longer than about 24.8 days.
 const MAX_TIMER_MS = 2_147_483_647;
 let endTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -47,7 +44,6 @@ export const useBeaconStore = create<BeaconState>((set, get) => ({
 		}
 		if (get().eventId !== event.id) return null;
 		set({ status: 'broadcasting' });
-		// Broadcasting stops on its own when the event ends.
 		const left = Math.min(Date.parse(event.endsAt) - Date.now(), MAX_TIMER_MS);
 		endTimer = setTimeout(() => get().stop(), Math.max(0, left));
 		return null;

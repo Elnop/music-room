@@ -6,7 +6,6 @@ import type { AdvertiseFailure } from '@/features/events/features/detail/beaconA
 import type { MusicEvent } from '@/features/events/lib/types';
 
 export interface BeaconBroadcast {
-	/** Only while the event is on. */
 	available: boolean;
 	active: boolean;
 	starting: boolean;

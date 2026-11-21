@@ -7,7 +7,6 @@ import { signInWithGoogle } from '@/features/user/features/auth/shared/sign-in/l
 import { signInWithFacebook } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
 import type { LinkedProvidersResponse, OAuthProvider } from '@/features/user/features/auth/types';
 
-/** The screens using these hooks are signed in. */
 function accessToken(): string {
 	const token = useAuthStore.getState().accessToken;
 	if (!token) throw new Error('No access token available');
@@ -33,7 +32,6 @@ export function useLinkedProviders() {
 	});
 }
 
-/** A cancelled provider sign-in rejects with Error('SIGN_IN_CANCELLED') before any request. */
 export function useLinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();
@@ -46,7 +44,6 @@ export function useLinkProvider() {
 	});
 }
 
-/** Refetches before resolving: a failed refetch fails the unlink. */
 export function useUnlinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();

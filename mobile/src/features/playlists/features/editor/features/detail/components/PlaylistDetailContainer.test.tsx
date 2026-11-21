@@ -58,7 +58,6 @@ interface MockListProps {
 	refreshControl: React.ReactElement<{ onRefresh: () => void }>;
 }
 let mockList: MockListProps;
-// The list needs native drag: its rows render plainly, and the test reorders through its props.
 jest.mock('@/shared/theme/components/ReorderableList', () => {
 	const { View } = jest.requireActual('react-native');
 	return {
@@ -143,7 +142,6 @@ async function renderScreen(playlist: Partial<PlaylistWithTracks> | null = {}) {
 	return view;
 }
 
-/** The last headerRight given to the native header, rendered on its own. */
 const renderHeaderRight = () => {
 	const options = navigation.setOptions.mock.calls.at(-1)?.[0] as {
 		headerRight: () => React.ReactElement;
@@ -151,7 +149,6 @@ const renderHeaderRight = () => {
 	return render(options.headerRight());
 };
 
-/** Presses the header's ⋯ through its element: fireEvent only reaches the latest render. */
 const openOwnerSheet = () => {
 	const options = navigation.setOptions.mock.calls.at(-1)?.[0] as {
 		headerRight: () => React.ReactElement<{
@@ -179,8 +176,6 @@ afterEach(() => {
 	jest.restoreAllMocks();
 });
 
-// Adding or removing the native header subview while the screen re-attaches
-// crashes on Android, so headerRight never goes undefined.
 describe('PlaylistDetailContainer header button', () => {
 	it('keeps headerRight set, without the options button, while the playlist loads', () => {
 		routes.routes[`GET /api/playlists/${ID}`] = () => new Promise(() => undefined);
@@ -357,7 +352,6 @@ describe('PlaylistDetailContainer owner actions (#342)', () => {
 	const defaultOS = Platform.OS;
 	beforeEach(() => {
 		jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
-		// The sheet runs its action at once on Android (on iOS, after onDismiss).
 		Platform.OS = 'android';
 	});
 	afterEach(() => {

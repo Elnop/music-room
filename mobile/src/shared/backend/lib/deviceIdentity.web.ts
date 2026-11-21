@@ -1,4 +1,3 @@
-// expo-device leaves the model and the name empty on the web: both come from the user agent.
 const BROWSERS: [RegExp, string][] = [
 	[/Edg(A|iOS)?\//, 'Edge'],
 	[/OPR\//, 'Opera'],
@@ -28,7 +27,6 @@ function describe(joiner: string): string | null {
 	return browser ?? system;
 }
 
-/** Sent in English to the backend logs. */
 export function getModelName(): string | null {
 	return describe('on');
 }

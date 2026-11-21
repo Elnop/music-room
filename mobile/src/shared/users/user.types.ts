@@ -1,4 +1,3 @@
-
 export type VisibilityLevel = 'public' | 'friends_only' | 'private';
 
 export type MusicGenre =
@@ -81,7 +80,6 @@ export interface AvatarResponse {
 	avatarUrl: string | null;
 }
 
-/** Fields hidden by privacy are undefined; visible ones are present, even if empty. */
 export interface FilteredProfile {
 	id: string;
 	username: string;
@@ -101,4 +99,3 @@ export const VISIBILITY_LABELS: Record<VisibilityLevel, string> = {
 	friends_only: 'Amis seulement',
 	private: 'Privé',
 };
-

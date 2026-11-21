@@ -11,7 +11,6 @@ export function useAddTrack() {
 	});
 }
 
-/** Optimistic: the track leaves the screen before the answer. */
 export function useRemoveTrack() {
 	const client = useQueryClient();
 	return useMutation({

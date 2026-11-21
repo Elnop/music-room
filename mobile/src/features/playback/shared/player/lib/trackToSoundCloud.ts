@@ -49,7 +49,6 @@ export function queueTrackToSoundCloud(track: QueueTrack): SoundCloudTrack {
 	});
 }
 
-/** The stream URL is fetched later from `permalink_url`. */
 export function trackToSoundCloud(track: Track): SoundCloudTrack;
 export function trackToSoundCloud(item: QueueItem): SoundCloudTrack;
 export function trackToSoundCloud(input: Track | QueueItem): SoundCloudTrack {

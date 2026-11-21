@@ -16,7 +16,6 @@ type Navigation = NativeStackNavigationProp<EventStackParamList, 'EventDetail'>;
 export interface EventDetailScreen {
 	event: MusicEvent | undefined;
 	isLoading: boolean;
-	/** The event could not be loaded (other than deleted). */
 	failed: boolean;
 	isOrganizer: boolean;
 	isDeleting: boolean;
