@@ -1,16 +1,19 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Avatar } from '@/shared/theme/components/Avatar';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { headerFacts } from '@/features/playlists/features/editor/features/detail/lib/headerFacts';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
+import { BylineCollaborators } from '@/features/playlists/features/editor/features/detail/components/presenters/BylineCollaborators';
 import { Text } from '@/shared/theme/components/Text';
-import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
-export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
-	const { styles, theme } = useThemedStyles(createStyles);
+type PlaylistBylineProps = {
+	playlist: PlaylistWithTracks;
+};
+
+export function PlaylistByline({ playlist }: PlaylistBylineProps) {
+	const { styles } = useThemedStyles(createStyles);
 	const { trackLabel, ownerName, collaboratorLabel } = headerFacts(playlist);
 
 	return (
@@ -21,13 +24,7 @@ export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 			</Text>
 			<Text style={styles.separator}>•</Text>
 			<Text style={styles.secondary}>{trackLabel}</Text>
-			{collaboratorLabel && (
-				<>
-					<Text style={styles.separator}>•</Text>
-					<PixelIcon icon={UsersSolid} size={14} color={theme.colors.primary} />
-					<Text style={styles.collaborators}>{collaboratorLabel}</Text>
-				</>
-			)}
+			{collaboratorLabel && <BylineCollaborators label={collaboratorLabel} />}
 		</View>
 	);
 }
@@ -54,11 +51,6 @@ function createStyles(theme: Theme) {
 			marginHorizontal: theme.spacing.xs,
 		},
 		secondary: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
-		collaborators: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.primary,
-			fontFamily: theme.typography.families.semibold,
-		},
 	});
 	return styles;
 }

@@ -1,11 +1,8 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import { jpegFormData } from '@/shared/backend/lib/jpegFormData';
 import type {
-	CoverResponse,
 	Playlist,
 	PlaylistWithTracks,
-} from '@/features/playlists/shared/playlist/lib/types';
-import type { PlaylistInput } from '@/features/playlists/shared/playlist/lib/validators';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 
 export async function fetchPlaylists(): Promise<Playlist[]> {
 	const data = await apiRequest<{ playlists: Playlist[] }>('/api/playlists');
@@ -25,36 +22,4 @@ export async function fetchUserPublicPlaylists(userId: string): Promise<Playlist
 export async function fetchPlaylistById(id: string): Promise<PlaylistWithTracks> {
 	const data = await apiRequest<{ playlist: PlaylistWithTracks }>(`/api/playlists/${id}`);
 	return data.playlist;
-}
-
-export async function createPlaylist(input: PlaylistInput): Promise<Playlist> {
-	const data = await apiRequest<{ playlist: Playlist }>('/api/playlists', {
-		method: 'POST',
-		body: JSON.stringify(input),
-	});
-	return data.playlist;
-}
-
-export async function updatePlaylist(
-	id: string,
-	updates: Partial<PlaylistInput>
-): Promise<Playlist> {
-	const data = await apiRequest<{ playlist: Playlist }>(`/api/playlists/${id}`, {
-		method: 'PATCH',
-		body: JSON.stringify(updates),
-	});
-	return data.playlist;
-}
-
-export async function deletePlaylist(id: string): Promise<void> {
-	await apiRequest(`/api/playlists/${id}`, { method: 'DELETE' });
-}
-
-export async function uploadCover(id: string, uri: string): Promise<CoverResponse> {
-	const form = await jpegFormData('cover', uri, 'cover.jpg');
-	return apiRequest<CoverResponse>(`/api/playlists/${id}/cover`, { method: 'PUT', body: form });
-}
-
-export async function removeCover(id: string): Promise<CoverResponse> {
-	return apiRequest<CoverResponse>(`/api/playlists/${id}/cover`, { method: 'DELETE' });
 }

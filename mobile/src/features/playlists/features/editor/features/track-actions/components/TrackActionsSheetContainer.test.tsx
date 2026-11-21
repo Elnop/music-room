@@ -5,7 +5,7 @@ import { TrackActionsSheetContainer } from '@/features/playlists/features/editor
 import { testPlayback } from '@test-utils/testPlaybackConfig';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
-import type { Playlist } from '@/features/playlists/shared/playlist/lib/types';
+import type { Playlist } from '@/features/playlists/shared/playlist/playlistTypes';
 import { logger } from '@/shared/logging/logger';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
@@ -119,7 +119,7 @@ describe('TrackActionsSheetContainer', () => {
 	it('plays next through the queue store and closes', () => {
 		renderSheet();
 		fireEvent.press(screen.getByText('Lire ensuite'));
-		expect(onClose).toHaveBeenCalled();
+		expect(onClose).toHaveBeenCalledWith();
 		expect(playNext).toHaveBeenCalledWith(track);
 		expect(addItem).not.toHaveBeenCalled();
 	});
@@ -127,7 +127,7 @@ describe('TrackActionsSheetContainer', () => {
 	it('adds to the end of the queue through the queue store and closes', () => {
 		renderSheet();
 		fireEvent.press(screen.getByText("Ajouter à la file d'attente"));
-		expect(onClose).toHaveBeenCalled();
+		expect(onClose).toHaveBeenCalledWith();
 		expect(addItem).toHaveBeenCalledWith(track);
 	});
 
@@ -143,7 +143,7 @@ describe('TrackActionsSheetContainer', () => {
 		expect(screen.queryByText('Read only')).toBeNull();
 
 		fireEvent.press(screen.getByText('Collab'));
-		expect(onClose).toHaveBeenCalled();
+		expect(onClose).toHaveBeenCalledWith();
 		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Ajouté à « Collab »'));
 		expect(routes.fetchMock.mock.calls.at(-1)?.[1]?.body).toBe(JSON.stringify(track));
 	});
@@ -172,11 +172,17 @@ describe('TrackActionsSheetContainer', () => {
 			.mockResolvedValue({ action: Share.sharedAction, activityType: null });
 		renderSheet();
 		fireEvent.press(screen.getByText('Partager'));
-		expect(onClose).toHaveBeenCalled();
+		expect(onClose).toHaveBeenCalledWith();
 		expect(shareSpy).toHaveBeenCalledWith(
 			expect.objectContaining({ message: track.trackUri, url: track.trackUri })
 		);
-		await waitFor(() => expect(shareSpy).toHaveBeenCalled());
+		await waitFor(() =>
+			expect(shareSpy).toHaveBeenCalledWith({
+				message: track.trackUri,
+				url: track.trackUri,
+				title: track.title,
+			})
+		);
 		expect(showSuccess).not.toHaveBeenCalled();
 	});
 
@@ -191,7 +197,13 @@ describe('TrackActionsSheetContainer', () => {
 		jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.dismissedAction });
 		renderSheet();
 		fireEvent.press(screen.getByText('Partager'));
-		await waitFor(() => expect(Share.share).toHaveBeenCalled());
+		await waitFor(() =>
+			expect(Share.share).toHaveBeenCalledWith({
+				message: track.trackUri,
+				url: track.trackUri,
+				title: track.title,
+			})
+		);
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(showError).not.toHaveBeenCalled();
 	});
@@ -238,14 +250,14 @@ describe('TrackActionsSheetContainer new playlist', () => {
 		fireEvent.press(screen.getByText('Créer et ajouter'));
 
 		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Ajouté à « Song »'));
-		expect(onClose).toHaveBeenCalled();
+		expect(onClose).toHaveBeenCalledWith();
 		const sent = routes.fetchMock.mock.calls.map(([, init]) => init?.body);
 		expect(routes.calls()).toContain('POST /api/playlists');
 		expect(sent).toContain(JSON.stringify({ name: 'Song' }));
 		expect(sent).toContain(JSON.stringify(track));
 		await waitFor(() =>
-			expect(client.getQueryData<Playlist[]>(queryKeys.playlists.list())?.map(p => p.id)).toContain(
-				'new'
+			expect(client.getQueryData<Playlist[]>(queryKeys.playlists.list())).toContainEqual(
+				expect.objectContaining({ id: 'new' })
 			)
 		);
 	});

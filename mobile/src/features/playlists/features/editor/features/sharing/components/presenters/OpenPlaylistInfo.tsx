@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
+import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/createSharingStyles';
 import { Text } from '@/shared/theme/components/Text';
 import InfoCircleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/info-circle-solid.svg';
 
@@ -42,7 +42,7 @@ function createStyles(theme: Theme) {
 		text: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
-			lineHeight: 20,
+			lineHeight: theme.typography.lineHeights.md,
 		},
 	});
 	return styles;

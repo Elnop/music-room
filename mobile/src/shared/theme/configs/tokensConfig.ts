@@ -23,12 +23,23 @@ export const PIXEL_TYPOGRAPHY = {
 	families: FONT_FAMILIES,
 	sizes: {
 		xs: 10,
+		xsm: 11,
 		sm: 12,
+		smd: 13,
 		md: 14,
+		mlg: 15,
 		lg: 16,
+		lxl: 17,
 		xl: 20,
 		xxl: 24,
 		xxxl: 32,
+	},
+	lineHeights: {
+		sm: 18,
+		md: 20,
+	},
+	letterSpacings: {
+		wide: 1,
 	},
 	displayScale: {
 		title: 1.5,
@@ -82,10 +93,13 @@ export const GENRE_COLORS = {
 
 export const SPACING = {
 	xxs: 2,
+	xxsm: 3,
 	xs: 4,
 	xsm: 6,
 	sm: 8,
+	sml: 10,
 	smd: 12,
+	mds: 14,
 	md: 16,
 	lg: 24,
 	xl: 32,
@@ -94,8 +108,22 @@ export const SPACING = {
 
 export const CONTROL_SIZES = {
 	iconButton: 32,
+	headerButton: 36,
 	buttonCompact: 28,
 	searchBar: 44,
 	button: 52,
 	toast: 56,
+	rowIcon: 36,
+	swipeAction: 100,
+	resultsList: 200,
+	headerBadge: 30,
+	tableArtwork: 40,
+	trackArtwork: 42,
+	addTrackTile: 48,
+	coverBand: 260,
+	transparentHeader: 60,
+	tableIndexColumn: 40,
+	tableDurationColumn: 56,
+	tableTrailingColumn: 80,
+	playlistPicker: 360,
 } as const;

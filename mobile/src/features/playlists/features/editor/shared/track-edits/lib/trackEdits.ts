@@ -1,12 +1,10 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
-import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
-import {
-	reloadIfOnScreen,
-	settleTrackEvent,
-} from '@/features/playlists/shared/playlist/lib/playlistCache';
+import { reloadIfOnScreen } from '@/features/playlists/shared/playlist/lib/playlistCache';
+import { settleTrackEvent } from '@/features/playlists/features/editor/shared/track-edits/lib/settleTrackEvent';
 
 export async function addTrack(
 	client: QueryClient,

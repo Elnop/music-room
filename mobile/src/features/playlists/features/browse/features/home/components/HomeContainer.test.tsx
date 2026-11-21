@@ -8,7 +8,7 @@ import { logger } from '@/shared/logging/logger';
 import type {
 	Playlist,
 	PlaylistStackParamList,
-} from '@/features/playlists/shared/playlist/lib/types';
+} from '@/features/playlists/shared/playlist/playlistTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/mockFetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
@@ -69,7 +69,7 @@ let clear: () => void = noop;
 function renderHome(nearbyEvents?: React.ReactNode) {
 	const view = renderWithClient(
 		<HomeContainer
-			actionsFor={() => undefined}
+			onPlaylistActions={() => undefined}
 			route={{ key: 'k', name: 'Home' } as Props['route']}
 			navigation={navigation as unknown as Props['navigation']}
 			nearbyEvents={nearbyEvents}
