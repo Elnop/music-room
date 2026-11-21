@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, render } from '@testing-library/react-native';
 import { MediaSessionBridgeContainer } from '@/features/playback/features/media-session/MediaSessionBridgeContainer';
-import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
+import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 import type { MediaControlEvent } from 'expo-media-control';
 
 const mockListeners: ((event: MediaControlEvent) => void)[] = [];
@@ -30,7 +30,7 @@ jest.mock('expo-media-control', () => ({
 }));
 
 const mockSeekTo = jest.fn();
-jest.mock('@/features/playback/shared/player/lib/PlayerContext', () => ({
+jest.mock('@/features/playback/shared/player/hooks/usePlayer', () => ({
 	usePlayer: () => ({ seekTo: mockSeekTo }),
 }));
 
@@ -74,9 +74,9 @@ function nowPlaying(overrides: Partial<NowPlaying> = {}): NowPlaying {
 
 function emit(command: string, data?: unknown) {
 	act(() => {
-		mockListeners.forEach(listener =>
-			listener({ command, data, timestamp: 0 } as MediaControlEvent)
-		);
+		for (const listener of mockListeners) {
+			listener({ command, data, timestamp: 0 } as MediaControlEvent);
+		}
 	});
 }
 
@@ -290,14 +290,14 @@ describe('MediaSessionBridgeContainer', () => {
 
 		mockNowPlaying = nowPlaying({ track: null, isPlaying: false, positionMs: 0 });
 		view.rerender(<MediaSessionBridgeContainer />);
-		expect(MediaControl.disableMediaControls).toHaveBeenCalled();
+		expect(MediaControl.disableMediaControls).toHaveBeenCalledWith();
 	});
 
 	it('removes the controls and its listener on unmount (logout)', () => {
 		const view = render(<MediaSessionBridgeContainer />);
 		view.unmount();
 
-		expect(mockRemoveListener).toHaveBeenCalled();
-		expect(MediaControl.disableMediaControls).toHaveBeenCalled();
+		expect(mockRemoveListener).toHaveBeenCalledWith();
+		expect(MediaControl.disableMediaControls).toHaveBeenCalledWith();
 	});
 });

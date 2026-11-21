@@ -1,40 +1,23 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { KeyButton } from '@/shared/theme/components/KeyButton';
-import { Text } from '@/shared/theme/components/Text';
-import type { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
-import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { PlayerDeviceKey } from '@/features/playback/features/player-modal/components/presenters/PlayerDeviceKey';
+import type { Theme } from '@/shared/theme/types/themeTypes';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 
 type PlayerBottomBarProps = {
-	styles: ReturnType<typeof createStyles>;
 	deviceLabel: string | null;
 	onOpenDevices: () => void;
 	onOpenQueue: () => void;
 };
 
-export function PlayerBottomBar({
-	styles,
-	deviceLabel,
-	onOpenDevices,
-	onOpenQueue,
-}: PlayerBottomBarProps) {
+export function PlayerBottomBar({ deviceLabel, onOpenDevices, onOpenQueue }: PlayerBottomBarProps) {
+	const { styles } = useThemedStyles(createStyles);
+
 	return (
 		<View style={styles.bottomBar}>
-			<KeyButton
-				icon={PhoneRingingLowSolid}
-				onPress={onOpenDevices}
-				accessibilityLabel="Choisir l'appareil"
-				appearance={{ tone: 'device', size: 54, style: styles.deviceKey }}
-			>
-				<Text
-					style={styles.deviceText}
-					numberOfLines={1}
-					accessibilityLabel={deviceLabel ? `Lecture sur ${deviceLabel}` : undefined}
-				>
-					{deviceLabel ? `Sur ${deviceLabel}` : 'Ce téléphone'}
-				</Text>
-			</KeyButton>
+			<PlayerDeviceKey deviceLabel={deviceLabel} onOpenDevices={onOpenDevices} />
 			<KeyButton
 				icon={PlaylistSolid}
 				onPress={onOpenQueue}
@@ -43,4 +26,18 @@ export function PlayerBottomBar({
 			/>
 		</View>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		bottomBar: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			gap: theme.spacing.md,
+			paddingHorizontal: theme.spacing.lg,
+			marginTop: theme.spacing.lg,
+		},
+	});
+	return styles;
 }

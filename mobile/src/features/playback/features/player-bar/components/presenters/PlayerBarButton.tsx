@@ -1,52 +1,53 @@
 import React from 'react';
-import { ActivityIndicator } from 'react-native';
+import { StyleSheet } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { PixelIcon } from '@/shared/theme/components/PixelIcon';
-import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
 import { Pressable } from '@/shared/theme/components/Pressable';
-import { DISABLED_OPACITY } from '@/features/playback/features/player-bar/components/presenters/playerBarStyles';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
+import type { Theme } from '@/shared/theme/types/themeTypes';
+import { PlayerBarButtonIcon } from '@/features/playback/features/player-bar/components/presenters/PlayerBarButtonIcon';
 
-interface PlayerBarButtonProps {
+type PlayerBarButtonProps = {
 	icon: PixelIconSource;
 	label: string;
 	onPress: () => void;
-	color: string;
-	style: StyleProp<ViewStyle>;
-	size?: number;
-	disabled?: boolean;
-	busy?: boolean;
-	selected?: boolean;
-}
+	appearance?: { color?: string; style?: StyleProp<ViewStyle> };
+	state?: { disabled?: boolean; busy?: boolean; selected?: boolean };
+};
 
 export function PlayerBarButton({
 	icon,
 	label,
 	onPress,
-	color,
-	style,
-	size = 20,
-	disabled = false,
-	busy = false,
-	selected,
+	appearance = {},
+	state = {},
 }: PlayerBarButtonProps) {
+	const { styles, theme } = useThemedStyles(createStyles);
+	const disabled = state.disabled ?? false;
+	const busy = state.busy ?? false;
+	const color = appearance.color ?? (state.selected ? theme.colors.primary : theme.colors.text);
+
 	return (
 		<Pressable
-			style={style}
+			style={[styles.button, appearance.style]}
 			onPress={onPress}
 			disabled={disabled}
 			accessibilityLabel={label}
-			accessibilityState={{ disabled, busy, selected }}
+			accessibilityState={{ disabled, busy, selected: state.selected }}
 		>
-			{busy ? (
-				<ActivityIndicator size="small" color={color} />
-			) : (
-				<PixelIcon
-					icon={icon}
-					size={size}
-					color={color}
-					style={disabled ? { opacity: DISABLED_OPACITY } : undefined}
-				/>
-			)}
+			<PlayerBarButtonIcon icon={icon} color={color} state={{ disabled, busy }} />
 		</Pressable>
 	);
+}
+
+function createStyles(theme: Theme) {
+	const styles = StyleSheet.create({
+		button: {
+			width: theme.controls.iconButtonLarge,
+			height: theme.controls.iconButtonLarge,
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+	});
+	return styles;
 }

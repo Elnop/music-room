@@ -1,87 +1,31 @@
 import { useEffect } from 'react';
 import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 import { useSession } from '@/shared/backend/hooks/useSession';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import { controlErrorMessage } from '@/shared/control-error/controlErrorMessage';
-import type { ControlError } from '@/shared/control-error/controlErrorTypes';
-import {
-	acquireListening,
-	releaseListening,
-} from '@/features/playback/shared/listening-rooms/listeningRooms';
-import { showError } from '@/shared/theme/lib/toast';
-import type { UserListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
-import type { ControlRevokedPayload } from '@/features/playback/features/control-delegation/shared/delegation/lib/device.types';
-import { logger } from '@/shared/logging/logger';
+import { useConnectState } from '@/features/playback/shared/player/hooks/useConnectState';
+import { useRemoteQueue } from '@/features/playback/hooks/useRemoteQueue';
+import { bindControl, bindListening } from '@/features/playback/lib/remoteListening';
 
 export function useRemoteTarget(): void {
 	const socket = useSocketState(state => state.socket);
 	const isConnected = useSocketState(state => state.isConnected);
-	const userId = useSession(state => state?.user?.id ?? null);
-	const ownerId = useConnectStore(state =>
+	const ownerId = useConnectState(state =>
 		state.target.kind === 'remote' ? state.target.ownerId : null
 	);
-	const deviceId = useConnectStore(state =>
+	const deviceId = useConnectState(state =>
 		state.target.kind === 'remote' ? state.target.deviceId : null
 	);
-
-	useEffect(() => {
-		if (!ownerId || ownerId === userId) return;
-		const { load, forget } = useQueueStore.getState();
-		void load(ownerId);
-		return () => forget(ownerId);
-	}, [ownerId, userId]);
+	useRemoteQueue(
+		ownerId,
+		useSession(state => state?.user?.id ?? null)
+	);
 
 	useEffect(() => {
 		if (!socket || !isConnected || !ownerId || !deviceId) return;
-		const { setLocal, setRemoteStatus, setControlPending } = useConnectStore.getState();
-
-		function handleStatus(status: UserListeningStatus) {
-			if (status.ownerId !== ownerId) return;
-			const device = status.devices.find(d => d.device.deviceId === deviceId);
-			if (!device) {
-				setLocal('Appareil hors ligne');
-				return;
-			}
-			setRemoteStatus(device);
-		}
-
-		function handleRevoked(payload: ControlRevokedPayload) {
-			if (payload.ownerId === ownerId) setLocal('Accès retiré');
-		}
-
-		function handleListeningError(err: { code: string; message: string }) {
-			logger.error('[RemoteTarget] Listening error:', err);
-			if (err.code === 'NOT_AUTHORIZED') setLocal('Accès refusé à cet appareil');
-		}
-
-		function handleControlError(err: ControlError) {
-			if (!useConnectStore.getState().controlPending) return;
-			setControlPending(false);
-			logger.error('[RemoteTarget] Control error:', err);
-			showError(controlErrorMessage(err));
-		}
-
-		function handleControlSuccess(reply: { targetUserId: string; targetDeviceId: string }) {
-			if (reply.targetUserId === ownerId && reply.targetDeviceId === deviceId) {
-				setControlPending(false);
-			}
-		}
-
-		socket.on('listening:status', handleStatus);
-		socket.on('listening:error', handleListeningError);
-		socket.on('control:revoked', handleRevoked);
-		socket.on('control:error', handleControlError);
-		socket.on('control:success', handleControlSuccess);
-		acquireListening(socket, ownerId);
-
+		const unbindListening = bindListening(socket, { ownerId, deviceId });
+		const unbindControl = bindControl(socket, { ownerId, deviceId });
 		return () => {
-			socket.off('listening:status', handleStatus);
-			socket.off('listening:error', handleListeningError);
-			socket.off('control:revoked', handleRevoked);
-			socket.off('control:error', handleControlError);
-			socket.off('control:success', handleControlSuccess);
-			releaseListening(socket, ownerId);
+			unbindListening();
+			unbindControl();
 		};
 	}, [socket, isConnected, ownerId, deviceId]);
 }

@@ -31,6 +31,7 @@ export const PIXEL_TYPOGRAPHY = {
 		mlg: 15,
 		lg: 16,
 		lxl: 17,
+		lgxl: 18,
 		xl: 20,
 		xxl: 24,
 		xxlg: 28,
@@ -107,6 +108,7 @@ export const SPACING = {
 	smd: 12,
 	mds: 14,
 	md: 16,
+	mdl: 20,
 	lg: 24,
 	xl: 32,
 	xlg: 40,
@@ -116,6 +118,11 @@ export const SPACING = {
 
 export const CONTROL_SIZES = {
 	iconButton: 32,
+	iconButtonLarge: 36,
+	iconButtonXl: 40,
+	thumbnail: 40,
+	slider: 20,
+	playerBar: 80,
 	headerButton: 36,
 	buttonCompact: 28,
 	searchBar: 44,

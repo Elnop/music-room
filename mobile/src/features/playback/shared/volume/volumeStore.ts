@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand';
 
 type VolumeState = {
 	volume: number;
@@ -7,7 +7,7 @@ type VolumeState = {
 	toggleMute: () => void;
 };
 
-export const useVolumeStore = create<VolumeState>(set => ({
+export const volumeStore = createStore<VolumeState>(set => ({
 	volume: 1,
 	muted: false,
 	setVolume: volume => set({ volume: Math.min(1, Math.max(0, volume)), muted: volume <= 0 }),

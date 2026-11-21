@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
 import { showError } from '@/shared/theme/lib/toast';
 
 export function PlayerErrorToastContainer(): null {
-	const error = usePlayerStore(state => state.error);
-	const currentTrack = usePlayerStore(state => state.currentTrack);
-	const clearError = usePlayerStore(state => state.clearError);
+	const error = usePlayerState(state => state.error);
+	const currentTrack = usePlayerState(state => state.currentTrack);
+	const clearError = usePlayerState(state => state.clearError);
 
 	const hasShownRef = useRef(false);
 	const shouldShow = Boolean(error) && !currentTrack;

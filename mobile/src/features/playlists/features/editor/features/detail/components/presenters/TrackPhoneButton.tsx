@@ -5,8 +5,8 @@ import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { formatDuration } from '@/shared/formatting/formatters';
 import { TrackPhoneArtwork } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackPhoneArtwork';
-import { TrackPhoneInfo } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackPhoneInfo';
-import { TrackPlayingIndicator } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackPlayingIndicator';
+import { TrackRowInfo } from '@/shared/theme/components/TrackRowInfo';
+import { TrackPlayingIndicator } from '@/shared/theme/components/TrackPlayingIndicator';
 import {
 	rowAccessibility,
 	rowLabel,
@@ -38,7 +38,7 @@ export function TrackPhoneButton({ track, state, actions }: TrackPhoneButtonProp
 			style={styles.trackPressable}
 		>
 			<TrackPhoneArtwork uri={track.albumArt} unavailable={state.unavailable} />
-			<TrackPhoneInfo track={track} state={state} />
+			<TrackRowInfo track={track} state={state} />
 			<TrackPlayingIndicator state={state} />
 			{track.durationMs ? (
 				<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>

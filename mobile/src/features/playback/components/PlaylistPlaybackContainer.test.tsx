@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { queueStore } from '@/features/playback/shared/player/stores/queueStore';
 import type { PlaylistPlayback } from '@/shared/playback/types/playbackActionsTypes';
 import type { QueueItem } from '@/shared/playback/types/queueTypes';
 import { PlaylistPlaybackContainer } from '@/features/playback/components/PlaylistPlaybackContainer';
@@ -30,10 +30,10 @@ function playbackOf(playlistId: string) {
 
 beforeEach(() => {
 	signIn('me');
-	useQueueStore.setState({
+	queueStore.setState({
 		queues: { me: { currentItemId: 'q1', items: [item], version: 1 } },
 	});
-	usePlayerStore.setState({
+	playerStore.setState({
 		queueItemId: 'q1',
 		playbackState: 'playing',
 		currentTrack: { permalink_url: URI } as never,

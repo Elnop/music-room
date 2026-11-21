@@ -3,21 +3,19 @@ import type { AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
+import { useLastTrackPersistence } from '@/features/playback/hooks/useLastTrackPersistence';
 import {
 	LAST_TRACK_PLAY_SAVE_DELAY_MS,
 	LAST_TRACK_SAVE_INTERVAL_MS,
-	useLastTrackPersistence,
-} from '@/features/playback/hooks/useLastTrackPersistence';
+} from '@/features/playback/lastTrackConfig';
 import { lastTrackStorage } from '@/shared/playback/lastTrackStorage';
 import type { LastTrackEntry } from '@/shared/playback/types/playbackTypes';
-import {
-	usePlayerStore,
-	setPositionReader,
-} from '@/features/playback/shared/player/stores/playerStore';
+import { setPositionReader } from '@/features/playback/shared/player/lib/positionReader';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { queueTrackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import type { UserProfile } from '@/shared/users/userTypes';
 
@@ -48,7 +46,7 @@ const other = queueTrackToSoundCloud({
 	title: 'Other',
 });
 
-const initialPlayerState = usePlayerStore.getState();
+const initialPlayerState = playerStore.getState();
 let position = 0;
 let appStateListener: ((state: AppStateStatus) => void) | null = null;
 
@@ -96,8 +94,8 @@ beforeEach(async () => {
 		appStateListener = listener as (state: AppStateStatus) => void;
 		return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>;
 	});
-	usePlayerStore.setState(initialPlayerState, true);
-	useConnectStore.setState({
+	playerStore.setState(initialPlayerState, true);
+	connectStore.setState({
 		target: { kind: 'local' },
 		remoteStatus: null,
 		controlPending: false,
@@ -120,7 +118,7 @@ describe('useLastTrackPersistence restore', () => {
 		await lastTrackStorage.save('me', saved);
 		await mount();
 
-		const state = usePlayerStore.getState();
+		const state = playerStore.getState();
 		expect(state.currentTrack?.permalink_url).toBe(saved.track.trackUri);
 		expect(state.currentTrack?.title).toBe('Song');
 		expect(state.queueItemId).toBe('q1');
@@ -132,33 +130,33 @@ describe('useLastTrackPersistence restore', () => {
 
 	it('leaves the player empty without an entry', async () => {
 		await mount();
-		expect(usePlayerStore.getState().currentTrack).toBeNull();
+		expect(playerStore.getState().currentTrack).toBeNull();
 	});
 
 	it("does not restore another user's entry", async () => {
 		await lastTrackStorage.save('someone-else', saved);
 		await mount();
-		expect(usePlayerStore.getState().currentTrack).toBeNull();
+		expect(playerStore.getState().currentTrack).toBeNull();
 	});
 
 	it('does not restore in remote mode', async () => {
 		await lastTrackStorage.save('me', saved);
-		useConnectStore.setState({
+		connectStore.setState({
 			target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' },
 			remoteStatus: null,
 			controlPending: false,
 		});
 		await mount();
-		expect(usePlayerStore.getState().currentTrack).toBeNull();
+		expect(playerStore.getState().currentTrack).toBeNull();
 	});
 
 	it('keeps a track the user started before the restore resolved', async () => {
 		await lastTrackStorage.save('me', saved);
 		renderHook(() => useLastTrackPersistence());
-		act(() => usePlayerStore.getState().playTrack(other, null));
+		act(() => playerStore.getState().playTrack(other, null));
 		await flush();
 
-		expect(usePlayerStore.getState().currentTrack?.title).toBe('Other');
+		expect(playerStore.getState().currentTrack?.title).toBe('Other');
 		expect((await stored())?.track.title).toBe('Other');
 	});
 
@@ -166,7 +164,7 @@ describe('useLastTrackPersistence restore', () => {
 		await AsyncStorage.setItem('zumik:lastTrack:me', '{oops');
 		await mount();
 
-		expect(usePlayerStore.getState().currentTrack).toBeNull();
+		expect(playerStore.getState().currentTrack).toBeNull();
 		expect(await AsyncStorage.getItem('zumik:lastTrack:me')).toBeNull();
 	});
 
@@ -174,14 +172,14 @@ describe('useLastTrackPersistence restore', () => {
 		testSessionStore.setState({ user: null, isAuthenticated: false });
 		await lastTrackStorage.save('me', saved);
 		await mount();
-		expect(usePlayerStore.getState().currentTrack).toBeNull();
+		expect(playerStore.getState().currentTrack).toBeNull();
 	});
 });
 
 describe('useLastTrackPersistence save', () => {
 	it('saves on track change, with no stream URL', async () => {
 		await mount();
-		act(() => usePlayerStore.getState().playTrack(other, 'q2'));
+		act(() => playerStore.getState().playTrack(other, 'q2'));
 		await flush();
 
 		expect(await stored()).toStrictEqual({
@@ -196,7 +194,7 @@ describe('useLastTrackPersistence save', () => {
 			queueItemId: 'q2',
 			positionMs: 0,
 		});
-		act(() => usePlayerStore.getState().setStreamUrl('https://cf-media/stream'));
+		act(() => playerStore.getState().setStreamUrl('https://cf-media/stream'));
 		await flush();
 		expect(await AsyncStorage.getItem('zumik:lastTrack:me')).not.toContain('cf-media');
 	});
@@ -204,11 +202,11 @@ describe('useLastTrackPersistence save', () => {
 	it('saves the position on pause', async () => {
 		await mount();
 		act(() => {
-			usePlayerStore.getState().playTrack(other, null);
-			usePlayerStore.getState().setPlaybackPlaying();
+			playerStore.getState().playTrack(other, null);
+			playerStore.getState().setPlaybackPlaying();
 		});
 		position = 75_000;
-		act(() => usePlayerStore.getState().pause());
+		act(() => playerStore.getState().pause());
 		await flush();
 
 		expect((await stored())?.positionMs).toBe(75_000);
@@ -218,8 +216,8 @@ describe('useLastTrackPersistence save', () => {
 		jest.useFakeTimers();
 		await mount();
 		act(() => {
-			usePlayerStore.getState().playTrack(other, null);
-			usePlayerStore.getState().setPlaybackPlaying();
+			playerStore.getState().playTrack(other, null);
+			playerStore.getState().setPlaybackPlaying();
 		});
 		await flush();
 		act(() => jest.advanceTimersByTime(LAST_TRACK_PLAY_SAVE_DELAY_MS));
@@ -239,8 +237,8 @@ describe('useLastTrackPersistence save', () => {
 		await lastTrackStorage.save('me', saved);
 		await mount();
 		act(() => {
-			usePlayerStore.getState().resume();
-			usePlayerStore.getState().setPlaybackPlaying();
+			playerStore.getState().resume();
+			playerStore.getState().setPlaybackPlaying();
 		});
 		await flush();
 		position = 0;
@@ -257,7 +255,7 @@ describe('useLastTrackPersistence save', () => {
 	it('saves a seek on a restored track', async () => {
 		await lastTrackStorage.save('me', saved);
 		await mount();
-		act(() => usePlayerStore.getState().setRestoredPosition(90_000));
+		act(() => playerStore.getState().setRestoredPosition(90_000));
 		await flush();
 
 		expect((await stored())?.positionMs).toBe(90_000);
@@ -266,8 +264,8 @@ describe('useLastTrackPersistence save', () => {
 	it('saves when the app goes to the background', async () => {
 		await mount();
 		act(() => {
-			usePlayerStore.getState().playTrack(other, null);
-			usePlayerStore.getState().setPlaybackPlaying();
+			playerStore.getState().playTrack(other, null);
+			playerStore.getState().setPlaybackPlaying();
 		});
 		await flush();
 		position = 33_000;
@@ -281,20 +279,20 @@ describe('useLastTrackPersistence save', () => {
 	it('deletes the entry when the player is emptied', async () => {
 		await lastTrackStorage.save('me', saved);
 		await mount();
-		act(() => usePlayerStore.getState().setTrackUnavailableError('gone'));
+		act(() => playerStore.getState().setTrackUnavailableError('gone'));
 		await flush();
 
 		expect(await stored()).toBeNull();
 	});
 
 	it('saves nothing in remote mode', async () => {
-		useConnectStore.setState({
+		connectStore.setState({
 			target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' },
 			remoteStatus: null,
 			controlPending: false,
 		});
 		await mount();
-		act(() => usePlayerStore.getState().playTrack(other, null));
+		act(() => playerStore.getState().playTrack(other, null));
 		await flush();
 
 		expect(await stored()).toBeNull();
@@ -314,20 +312,20 @@ describe('logout (#312)', () => {
 		await lastTrackStorage.save('b', { ...saved, track: bTrack });
 		const view = await mount();
 		act(() => {
-			usePlayerStore.getState().playTrack(other, null);
-			usePlayerStore.getState().setPlaybackPlaying();
+			playerStore.getState().playTrack(other, null);
+			playerStore.getState().setPlaybackPlaying();
 		});
 		await flush();
 
 		await act(async () => mockLogout());
-		expect(usePlayerStore.getState().currentTrack).toBeNull();
+		expect(playerStore.getState().currentTrack).toBeNull();
 		await act(async () =>
 			testSessionStore.setState({ user: { id: 'b' } as UserProfile, isAuthenticated: true })
 		);
 		view.rerender({});
 		await flush();
 
-		expect(usePlayerStore.getState().currentTrack?.title).toBe('B song');
+		expect(playerStore.getState().currentTrack?.title).toBe('B song');
 		expect((await lastTrackStorage.load('b'))?.track.title).toBe('B song');
 		expect(await stored()).toBeNull();
 	});

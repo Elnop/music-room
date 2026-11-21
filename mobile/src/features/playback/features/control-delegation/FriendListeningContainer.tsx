@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import { useFriendListening } from '@/features/playback/features/control-delegation/hooks/useFriendListening';
-import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
 
 interface FriendListeningContainerProps {
 	userId: string;

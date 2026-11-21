@@ -1,45 +1,29 @@
 import React from 'react';
 import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
-import { useQueueModal } from '@/features/playback/features/queue-modal/useQueueModal';
+import { useQueueModal } from '@/features/playback/features/queue-modal/hooks/useQueueModal';
 import { QueueModalView } from '@/features/playback/features/queue-modal/components/presenters/QueueModalView';
 
-type QueueModalProps = {
+type QueueModalContainerProps = {
 	visible: boolean;
 	onClose: () => void;
 	TrackActionsSheet: TrackActionsSheetComponent;
 };
 
-export function QueueModalContainer({ visible, onClose, TrackActionsSheet }: QueueModalProps) {
-	const {
-		theme,
-		styles,
-		current,
-		upcoming,
-		isMoving,
-		actionTrack,
-		showActions,
-		closeActions,
-		handlePlay,
-		handleReorder,
-		removeItem,
-	} = useQueueModal();
+export function QueueModalContainer({
+	visible,
+	onClose,
+	TrackActionsSheet,
+}: QueueModalContainerProps) {
+	const { list, rowActions, actionSheet } = useQueueModal();
 
 	return (
 		<QueueModalView
 			TrackActionsSheet={TrackActionsSheet}
 			visible={visible}
 			onClose={onClose}
-			theme={theme}
-			styles={styles}
-			current={current}
-			upcoming={upcoming}
-			isMoving={isMoving}
-			actionTrack={actionTrack}
-			onPlay={handlePlay}
-			onRemove={removeItem}
-			onReorder={handleReorder}
-			onShowActions={showActions}
-			onCloseActions={closeActions}
+			list={list}
+			rowActions={rowActions}
+			actionSheet={actionSheet}
 		/>
 	);
 }

@@ -3,7 +3,7 @@ import { createStore } from 'zustand';
 import { useQueueSync } from '@/features/playback/hooks/useQueueSync';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
-import type { QueueState } from '@/features/playback/shared/player/lib/queue.types';
+import type { QueueState } from '@/features/playback/shared/player/types/queueTypes';
 import type { UserProfile } from '@/shared/users/userTypes';
 
 const mockSocket = {
@@ -29,12 +29,12 @@ jest.mock('@/shared/backend/hooks/useSocketState', () => ({
 		selector(mockSocketState),
 }));
 
-jest.mock('@/features/playback/shared/player/stores/queueStore', () => ({
-	useQueueStore: (selector: (state: typeof mockQueueState) => unknown) => selector(mockQueueState),
+jest.mock('@/features/playback/shared/player/hooks/useQueueState', () => ({
+	useQueueState: (selector: (state: typeof mockQueueState) => unknown) => selector(mockQueueState),
 }));
 
 jest.mock('@/features/playback/shared/player/stores/connectStore', () => ({
-	useConnectStore: { getState: () => ({ target: mockTarget }) },
+	connectStore: { getState: () => ({ target: mockTarget }) },
 }));
 
 const testSessionStore = createStore<SessionView>(() => ({

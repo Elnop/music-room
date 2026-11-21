@@ -1,14 +1,14 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { useRemoteTarget } from '@/features/playback/hooks/useRemoteTarget';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { showError, showInfo } from '@/shared/theme/lib/toast';
 import type {
 	ListeningStatus,
 	UserListeningStatus,
-} from '@/features/playback/shared/player/lib/listening.types';
+} from '@/features/playback/shared/player/types/listeningTypes';
 import type { UserProfile } from '@/shared/users/userTypes';
 import { logger } from '@/shared/logging/logger';
 
@@ -28,7 +28,7 @@ jest.mock('@/shared/backend/hooks/useSocketState', () => ({
 }));
 
 jest.mock('@/features/playback/shared/player/stores/queueStore', () => ({
-	useQueueStore: { getState: () => ({ load: mockLoad, forget: mockForget }) },
+	queueStore: { getState: () => ({ load: mockLoad, forget: mockForget }) },
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -75,14 +75,14 @@ function handler<T>(event: string) {
 }
 
 function connect() {
-	return useConnectStore.getState();
+	return connectStore.getState();
 }
 
 beforeEach(() => {
 	jest.clearAllMocks();
 	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	testSessionStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
-	useConnectStore.setState({
+	connectStore.setState({
 		target: { kind: 'local' },
 		remoteStatus: null,
 		controlPending: false,

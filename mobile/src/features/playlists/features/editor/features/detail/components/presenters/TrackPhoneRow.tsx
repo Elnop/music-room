@@ -4,7 +4,7 @@ import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton
 import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { pixelRow } from '@/shared/theme/lib/pixelFrame';
-import { TrackPhoneDragHandle } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackPhoneDragHandle';
+import { TrackDragHandle } from '@/shared/theme/components/TrackDragHandle';
 import { TrackPhoneButton } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackPhoneButton';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { Track } from '@/shared/tracks/types/trackTypes';
@@ -34,7 +34,7 @@ export function TrackPhoneRow({ track, state, actions }: TrackPhoneRowProps) {
 		>
 			<TrackPhoneButton track={track} state={state} actions={actions} />
 			{actions.onShowActions && <TrackActionsButton onPress={actions.onShowActions} />}
-			{actions.onDragStart && <TrackPhoneDragHandle onDragStart={actions.onDragStart} />}
+			{actions.onDragStart && <TrackDragHandle onDragStart={actions.onDragStart} />}
 		</View>
 	);
 }

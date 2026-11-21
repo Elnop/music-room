@@ -1,14 +1,12 @@
 import { createStore } from 'zustand';
-import {
-	activeOwnerId,
-	useConnectStore,
-} from '@/features/playback/shared/player/stores/connectStore';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
+import { activeOwnerId } from '@/features/playback/shared/player/lib/connectTarget';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { showInfo } from '@/shared/theme/lib/toast';
-import type { ListeningStatus } from '@/features/playback/shared/player/lib/listening.types';
+import type { ListeningStatus } from '@/features/playback/shared/player/types/listeningTypes';
 import type { UserProfile } from '@/shared/users/userTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -49,13 +47,13 @@ registerAuthSession({
 const mockStop = jest.fn();
 
 function connect() {
-	return useConnectStore.getState();
+	return connectStore.getState();
 }
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	usePlayerStore.setState({ stop: mockStop });
-	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+	playerStore.setState({ stop: mockStop });
+	connectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 	testSessionStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 });
 

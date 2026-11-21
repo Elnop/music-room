@@ -1,76 +1,23 @@
 import { useEffect, useRef } from 'react';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { streamPrefetch } from '@/features/playback/shared/player/lib/streamPrefetch';
-import { fetchStreamUrl } from '@/features/playback/shared/player/lib/streamApi';
-import { ApiError } from '@/shared/backend/lib/api';
-import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
-import { logger } from '@/shared/logging/logger';
-import { FETCH_TIMEOUT_MS } from '@/features/playback/shared/player/lib/constants';
+import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
+import { loadStream } from '@/features/playback/shared/player/lib/loadStream';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 
 export function useStreamLoader(): void {
-	const currentTrack = usePlayerStore(state => state.currentTrack);
-	const loadCounter = usePlayerStore(state => state.loadCounter);
-	const setStreamUrl = usePlayerStore(state => state.setStreamUrl);
-	const setTrackUnavailableError = usePlayerStore(state => state.setTrackUnavailableError);
+	const currentTrack = usePlayerState(state => state.currentTrack);
+	const loadCounter = usePlayerState(state => state.loadCounter);
+	const loadCounterRef = useRef(loadCounter);
 
-	const currentLoadCounterRef = useRef(loadCounter);
 	useEffect(() => {
-		currentLoadCounterRef.current = loadCounter;
+		loadCounterRef.current = loadCounter;
 	}, [loadCounter]);
 
 	useEffect(() => {
 		if (!currentTrack) {
-			setStreamUrl(null);
+			playerStore.getState().setStreamUrl(null);
 			return;
 		}
-
-		if (usePlayerStore.getState().needsStreamLoad) return;
-
-		const thisLoadCounter = loadCounter;
-
-		async function loadStream() {
-			if (!currentTrack) return;
-
-			const prefetched = streamPrefetch.take(
-				usePlayerStore.getState().queueItemId,
-				currentTrack.permalink_url
-			);
-			if (prefetched) {
-				setStreamUrl(prefetched.streamUrl, prefetched.expiresAt, prefetched.protocol);
-				return;
-			}
-
-			const controller = new AbortController();
-			const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-			try {
-				const {
-					streamUrl: url,
-					expiresAt,
-					protocol,
-				} = await fetchStreamUrl(currentTrack.permalink_url, controller.signal);
-				clearTimeout(timeoutId);
-				if (currentLoadCounterRef.current !== thisLoadCounter) return;
-				setStreamUrl(url, expiresAt, protocol);
-			} catch (err) {
-				clearTimeout(timeoutId);
-				if (currentLoadCounterRef.current !== thisLoadCounter) return;
-
-				if (controller.signal.aborted) {
-					logger.error('🔴 [PlayerLoader] Fetch timeout!');
-					setTrackUnavailableError('Chargement trop long, réessayez');
-				} else if (err instanceof ApiError && err.status === 404) {
-					setTrackUnavailableError("Ce titre n'est plus disponible");
-				} else if (err instanceof ApiError && err.status !== undefined && err.status >= 400) {
-					logger.error('🔴 [PlayerLoader] Server error details:', err.message);
-					setTrackUnavailableError(apiErrorMessage(err, 'Impossible de charger ce titre'));
-				} else {
-					logger.error('🔴 [PlayerLoader] Error:', err instanceof Error ? err.message : err);
-					setTrackUnavailableError(apiErrorMessage(err, 'Erreur de chargement du titre'));
-				}
-			}
-		}
-
-		loadStream();
-	}, [loadCounter, currentTrack, setStreamUrl, setTrackUnavailableError]);
+		if (playerStore.getState().needsStreamLoad) return;
+		void loadStream(currentTrack, () => loadCounterRef.current === loadCounter);
+	}, [loadCounter, currentTrack]);
 }

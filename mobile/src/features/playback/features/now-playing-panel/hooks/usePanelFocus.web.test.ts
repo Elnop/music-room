@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-native';
-import { PANEL_CLOSE_ID, PANEL_ID } from '@/features/playback/shared/player/lib/constants';
+import { PANEL_CLOSE_ID, PANEL_ID } from '@/features/playback/shared/player/configs/playerConfig';
 import { usePanelFocus } from '@/features/playback/features/now-playing-panel/hooks/usePanelFocus.web';
 
 type Listener = (event: object) => void;
@@ -29,12 +29,16 @@ let panel: FakeElement;
 const fakeDocument = {
 	activeElement: null as FakeElement | null,
 	body: element(),
-	getElementById: (id: string) => (id === PANEL_ID ? panel : id === PANEL_CLOSE_ID ? close : null),
+	getElementById: (id: string) => elementsById()[id] ?? null,
 };
+
+function elementsById(): Record<string, FakeElement> {
+	return { [PANEL_ID]: panel, [PANEL_CLOSE_ID]: close };
+}
 
 function keydown(key: string) {
 	const event = { key, defaultPrevented: false, preventDefault: jest.fn() };
-	listeners.forEach(listener => listener(event));
+	for (const listener of listeners) listener(event);
 	return event;
 }
 
@@ -55,19 +59,19 @@ describe('usePanelFocus (web)', () => {
 	it('moves the focus to the close button, and Escape closes', () => {
 		const onClose = jest.fn();
 		renderHook(() => usePanelFocus(onClose));
-		expect(close.focus).toHaveBeenCalled();
+		expect(close.focus).toHaveBeenCalledWith();
 		keydown('Enter');
 		expect(onClose).not.toHaveBeenCalled();
 		const event = keydown('Escape');
-		expect(onClose).toHaveBeenCalled();
-		expect(event.preventDefault).toHaveBeenCalled();
+		expect(onClose).toHaveBeenCalledWith();
+		expect(event.preventDefault).toHaveBeenCalledWith();
 	});
 
 	it('gives the focus back to the opener once closed', () => {
 		const { unmount } = renderHook(() => usePanelFocus(jest.fn()));
 		fakeDocument.activeElement = fakeDocument.body;
 		unmount();
-		expect(opener.focus).toHaveBeenCalled();
+		expect(opener.focus).toHaveBeenCalledWith();
 		expect(listeners.size).toBe(0);
 	});
 

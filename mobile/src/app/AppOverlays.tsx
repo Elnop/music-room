@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { KeyboardShortcuts } from '@/app/KeyboardShortcuts';
 import { PlayerModalContainer } from '@/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer';
 import { PlayerErrorToastContainer } from '@/features/playback/features/player-modal/components/orchestrators/PlayerErrorToastContainer';
-import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
+import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/playerSheetsTypes';
 
 type AppOverlaysProps = {
 	sheets: PlayerSheets;

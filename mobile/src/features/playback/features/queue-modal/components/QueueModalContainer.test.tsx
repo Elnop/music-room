@@ -2,12 +2,12 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { QueueModalContainer } from '@/features/playback/features/queue-modal/components/QueueModalContainer';
-import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
-import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
+import { queueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import type { UserProfile } from '@/shared/users/userTypes';
-import type { QueueItem, QueueState } from '@/features/playback/shared/player/lib/queue.types';
+import type { QueueItem, QueueState } from '@/features/playback/shared/player/types/queueTypes';
 
 jest.mock('@/shared/theme/hooks/useTheme', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/configs/originalThemeConfig');
@@ -93,7 +93,7 @@ function item(id: string): QueueItem {
 
 let nextVersion = 0;
 function setQueue(state: Pick<QueueState, 'currentItemId' | 'items'>, ownerId = 'owner') {
-	return useQueueStore.getState().applyState({ ownerId, version: ++nextVersion, ...state });
+	return queueStore.getState().applyState({ ownerId, version: ++nextVersion, ...state });
 }
 
 function titles() {
@@ -105,7 +105,7 @@ async function renderModal() {
 	await act(async () => {});
 }
 
-const initialQueue = useQueueStore.getState();
+const initialQueue = queueStore.getState();
 
 const testSessionStore = createStore<SessionView>(() => ({
 	user: { id: 'owner' } as UserProfile,
@@ -120,9 +120,9 @@ registerAuthSession({
 });
 
 beforeEach(() => {
-	useQueueStore.setState(initialQueue, true);
+	queueStore.setState(initialQueue, true);
 	testSessionStore.setState({ user: { id: 'owner' } as UserProfile });
-	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+	connectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 });
 
 describe('QueueModalContainer', () => {
@@ -169,7 +169,7 @@ describe('QueueModalContainer', () => {
 
 	it('plays a tapped item', async () => {
 		const playItem = jest.fn().mockResolvedValue('played');
-		useQueueStore.setState({ playItem });
+		queueStore.setState({ playItem });
 		setQueue({ currentItemId: 'a', items: ['a', 'b'].map(item) });
 		await renderModal();
 
@@ -187,12 +187,12 @@ describe('QueueModalContainer', () => {
 
 	it("shows the friend's queue in remote mode on their device, mine again after", async () => {
 		setQueue({ currentItemId: 'a', items: ['a', 'b'].map(item) });
-		useConnectStore.setState({ target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet' } });
+		connectStore.setState({ target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet' } });
 		setQueue({ currentItemId: 'c', items: ['c', 'd'].map(item) }, 'friend');
 		await renderModal();
 		expect(titles()).toStrictEqual(['Title c', 'Title d']);
 
-		act(() => useConnectStore.setState({ target: { kind: 'local' } }));
+		act(() => connectStore.setState({ target: { kind: 'local' } }));
 		expect(titles()).toStrictEqual(['Title a', 'Title b']);
 	});
 });

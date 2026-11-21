@@ -1,7 +1,7 @@
 import React from 'react';
 import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { TrackDeleteAction } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackDeleteAction';
+import { TrackDeleteAction } from '@/shared/theme/components/TrackDeleteAction';
 import { TrackPhoneRow } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackPhoneRow';
 import { TrackTableRow } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackTableRow';
 import {
@@ -21,6 +21,16 @@ type SwipeableTrackItemProps = {
 	position?: number;
 };
 
+function deleteAction(track: Track, handlers: TrackItemHandlers) {
+	return (
+		<TrackDeleteAction
+			title={track.title}
+			actionLabel="Supprimer"
+			onDelete={() => handlers.onDelete(track.id)}
+		/>
+	);
+}
+
 export function SwipeableTrackItem({
 	track,
 	handlers,
@@ -33,11 +43,7 @@ export function SwipeableTrackItem({
 	return (
 		<QueueSwipe
 			onAddToQueue={state.unavailable ? undefined : handlers.onAddToQueue}
-			rightActions={
-				state.disabled ? undefined : (
-					<TrackDeleteAction track={track} onDelete={handlers.onDelete} />
-				)
-			}
+			rightActions={state.disabled ? undefined : deleteAction(track, handlers)}
 		>
 			{isWide && position !== undefined ? (
 				<TrackTableRow track={track} position={position} {...row} />

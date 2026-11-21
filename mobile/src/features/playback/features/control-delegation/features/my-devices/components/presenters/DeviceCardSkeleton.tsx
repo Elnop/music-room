@@ -1,35 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import { SkeletonBlock } from '@/shared/theme/components/Skeleton';
-
-export function DeviceCardSkeleton() {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-	return (
-		<View style={styles.skeletonCard}>
-			<View style={styles.deviceHeader}>
-				<SkeletonBlock width={40} height={40} radius={20} style={styles.skeletonIcon} />
-				<View style={styles.textContainer}>
-					<SkeletonBlock width="55%" height={16} />
-					<SkeletonBlock width="40%" height={12} style={styles.skeletonLine} />
-				</View>
-			</View>
-			<View style={styles.divider} />
-			{[0, 1].map(index => (
-				<View key={index} style={styles.friendRow}>
-					<SkeletonBlock width={32} height={32} radius={16} />
-					<View style={styles.textContainer}>
-						<SkeletonBlock width="45%" height={14} />
-					</View>
-					<SkeletonBlock width={51} height={31} radius={16} />
-				</View>
-			))}
-		</View>
-	);
-}
+import { DeviceCardSkeletonHeader } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceCardSkeletonHeader';
+import { DeviceCardSkeletonRow } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceCardSkeletonRow';
 
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
@@ -40,32 +14,25 @@ function createStyles(theme: Theme) {
 			paddingBottom: theme.spacing.xs,
 			marginBottom: theme.spacing.lg,
 		},
-		deviceHeader: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingVertical: theme.spacing.sm,
-		},
-		skeletonIcon: {
-			marginRight: theme.spacing.md,
-		},
-		skeletonLine: {
-			marginTop: 6,
-		},
-		textContainer: {
-			flex: 1,
-			marginRight: theme.spacing.sm,
-		},
 		divider: {
-			height: 1,
+			height: theme.borders.hairline,
 			backgroundColor: theme.colors.border,
 			marginVertical: theme.spacing.xs,
 		},
-		friendRow: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingVertical: theme.spacing.sm,
-			gap: theme.spacing.md,
-		},
 	});
 	return styles;
+}
+
+export function DeviceCardSkeleton() {
+	const { styles } = useThemedStyles(createStyles);
+
+	return (
+		<View style={styles.skeletonCard}>
+			<DeviceCardSkeletonHeader />
+			<View style={styles.divider} />
+			{[0, 1].map(index => (
+				<DeviceCardSkeletonRow key={index} />
+			))}
+		</View>
+	);
 }

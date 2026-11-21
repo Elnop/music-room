@@ -1,22 +1,14 @@
 import { usePlaybackControls } from '@/features/playback/shared/player/hooks/usePlaybackControls';
-import { SEEK_STEP_S } from '@/features/playback/shared/player/lib/constants';
+import { SEEK_STEP_S } from '@/features/playback/shared/player/configs/playerConfig';
 import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcutTypes';
 
-export function usePlayerShortcuts(): KeyboardShortcut[] {
-	const controls = usePlaybackControls();
+type PlaybackControls = ReturnType<typeof usePlaybackControls>;
+
+function seekShortcuts(controls: PlaybackControls): KeyboardShortcut[] {
 	function seek(action: 'increment' | 'decrement') {
 		if (!controls.sliderDisabled) controls.handleSliderAction(action);
 	}
-
 	return [
-		{
-			key: ' ',
-			keys: 'Espace',
-			description: 'Lecture / pause',
-			run: () => {
-				if (!controls.playDisabled) controls.handlePlayPause();
-			},
-		},
 		{
 			key: 'ArrowLeft',
 			shift: false,
@@ -31,6 +23,11 @@ export function usePlayerShortcuts(): KeyboardShortcut[] {
 			description: `Avancer de ${SEEK_STEP_S} secondes`,
 			run: () => seek('increment'),
 		},
+	];
+}
+
+function trackShortcuts(controls: PlaybackControls): KeyboardShortcut[] {
+	return [
 		{
 			key: 'ArrowLeft',
 			shift: true,
@@ -45,5 +42,21 @@ export function usePlayerShortcuts(): KeyboardShortcut[] {
 			description: 'Titre suivant',
 			run: controls.handleNext,
 		},
+	];
+}
+
+export function usePlayerShortcuts(): KeyboardShortcut[] {
+	const controls = usePlaybackControls();
+	return [
+		{
+			key: ' ',
+			keys: 'Espace',
+			description: 'Lecture / pause',
+			run: () => {
+				if (!controls.playDisabled) controls.handlePlayPause();
+			},
+		},
+		...seekShortcuts(controls),
+		...trackShortcuts(controls),
 	];
 }

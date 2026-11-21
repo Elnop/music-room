@@ -1,11 +1,11 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayerBarContainer } from '@/features/playback/features/player-bar/components/PlayerBarContainer';
-import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { useVolumeStore } from '@/features/playback/shared/volume/volumeStore';
-import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
-import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
-import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { nowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
+import { volumeStore } from '@/features/playback/shared/volume/volumeStore';
+import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/playerSheetsTypes';
+import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 import { Text } from '@/shared/theme/components/Text';
 
 const mockSeekTo = jest.fn();
@@ -26,7 +26,7 @@ jest.mock('@/shared/theme/hooks/useTheme', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/features/playback/shared/player/lib/PlayerContext', () => ({
+jest.mock('@/features/playback/shared/player/hooks/usePlayer', () => ({
 	usePlayer: () => ({ player: { volume: 1 }, seekTo: mockSeekTo, loading: false, error: null }),
 }));
 
@@ -77,9 +77,9 @@ describe('PlayerBarContainer', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		mockNowPlaying = playing();
-		usePlayerStore.setState({ isModalOpen: false });
-		useNowPlayingPanelStore.setState({ isOpen: false });
-		useVolumeStore.setState({ volume: 1, muted: false });
+		playerStore.setState({ isModalOpen: false });
+		nowPlayingPanelStore.setState({ isOpen: false });
+		volumeStore.setState({ volume: 1, muted: false });
 	});
 
 	it('shows the track with the elapsed time and the length', () => {
@@ -94,9 +94,9 @@ describe('PlayerBarContainer', () => {
 		fireEvent.press(screen.getByLabelText('Piste précédente'));
 		fireEvent.press(screen.getByLabelText('Pause'));
 		fireEvent.press(screen.getByLabelText('Piste suivante'));
-		expect(mockPrevious).toHaveBeenCalled();
-		expect(mockToggle).toHaveBeenCalled();
-		expect(mockNext).toHaveBeenCalled();
+		expect(mockPrevious).toHaveBeenCalledWith();
+		expect(mockToggle).toHaveBeenCalledWith();
+		expect(mockNext).toHaveBeenCalledWith();
 	});
 
 	it('seeks where the progress bar is clicked', () => {
@@ -118,7 +118,7 @@ describe('PlayerBarContainer', () => {
 	it('sets, mutes and restores the volume', () => {
 		render(<PlayerBarContainer {...sheets} />);
 		act(() => volumeSlider().props.onValueChange(0.4));
-		expect(useVolumeStore.getState().volume).toBe(0.4);
+		expect(volumeStore.getState().volume).toBe(0.4);
 
 		fireEvent.press(screen.getByLabelText('Couper le son'));
 		expect(volumeSlider().props.value).toBe(0);
@@ -137,11 +137,11 @@ describe('PlayerBarContainer', () => {
 	it('shows and hides the now playing panel from the track and from its button', () => {
 		render(<PlayerBarContainer {...sheets} />);
 		fireEvent.press(screen.getByLabelText(/^Afficher « En cours de lecture », Goofy Goober Rock/u));
-		expect(useNowPlayingPanelStore.getState().isOpen).toBe(true);
-		expect(usePlayerStore.getState().isModalOpen).toBe(false);
+		expect(nowPlayingPanelStore.getState().isOpen).toBe(true);
+		expect(playerStore.getState().isModalOpen).toBe(false);
 		expect(screen.getByLabelText('Masquer « En cours de lecture »')).toBeSelected();
 		fireEvent.press(screen.getByLabelText('Masquer « En cours de lecture »'));
-		expect(useNowPlayingPanelStore.getState().isOpen).toBe(false);
+		expect(nowPlayingPanelStore.getState().isOpen).toBe(false);
 	});
 
 	it('offers nothing to play without a track', () => {

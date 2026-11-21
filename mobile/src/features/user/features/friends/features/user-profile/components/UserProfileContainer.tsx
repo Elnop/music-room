@@ -8,7 +8,7 @@ import { useUserProfileScreen } from '@/features/user/features/friends/features/
 import { UserProfileView } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileView';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
 import { Text } from '@/shared/theme/components/Text';
-import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
 
 type UserProfileOrchestratorProps = Partial<
 	NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>

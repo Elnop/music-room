@@ -1,11 +1,11 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { NowPlayingPanelContainer } from '@/features/playback/features/now-playing-panel/components/NowPlayingPanelContainer';
-import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
-import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
+import { nowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
+import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/playerSheetsTypes';
 import type { TrackActionsSheetProps } from '@/shared/playback/types/trackActionsSheetTypes';
 import { THIS_DEVICE_LABEL } from '@/shared/platform/platformConfig';
-import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
+import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 import type { OwnerQueue, QueueItem } from '@/shared/playback/types/playbackTypes';
 import { Text } from '@/shared/theme/components/Text';
 
@@ -46,9 +46,12 @@ function item(id: string, title: string): QueueItem {
 let mockQueue: OwnerQueue;
 const mockPlayItem = jest.fn(async () => 'played' as const);
 
-jest.mock('@/features/playback/shared/player/stores/queueStore', () => ({
+jest.mock('@/features/playback/shared/player/hooks/useActiveQueue', () => ({
 	useActiveQueue: () => mockQueue,
-	useQueueStore: { getState: () => ({ playItem: mockPlayItem }) },
+}));
+
+jest.mock('@/features/playback/shared/player/stores/queueStore', () => ({
+	queueStore: { getState: () => ({ playItem: mockPlayItem }) },
 }));
 
 const sheets: PlayerSheets = {
@@ -92,7 +95,7 @@ describe('NowPlayingPanelContainer', () => {
 			],
 			version: 1,
 		};
-		useNowPlayingPanelStore.setState({ isOpen: true });
+		nowPlayingPanelStore.setState({ isOpen: true });
 	});
 
 	it('shows the track, the device and what comes next, without the transport of the bar', () => {
@@ -138,7 +141,7 @@ describe('NowPlayingPanelContainer', () => {
 	it('closes with its button', () => {
 		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		fireEvent.press(screen.getByLabelText('Fermer le panneau'));
-		expect(useNowPlayingPanelStore.getState().isOpen).toBe(false);
+		expect(nowPlayingPanelStore.getState().isOpen).toBe(false);
 	});
 
 	it('invites to pick a track when nothing plays', () => {

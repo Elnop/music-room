@@ -1,11 +1,5 @@
 import type { QueueItem } from '@/shared/playback/types/playbackTypes';
 
-export const RESTART_THRESHOLD_S = 3;
-
-export function previousAction(currentTime: number, hasPrevious: boolean): 'restart' | 'previous' {
-	return currentTime > RESTART_THRESHOLD_S || !hasPrevious ? 'restart' : 'previous';
-}
-
 type QueueItemsView = {
 	currentItemId: string | null;
 	items: QueueItem[];
