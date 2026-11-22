@@ -7,7 +7,7 @@ import { connectStore } from '@/features/playback/shared/player/stores/connectSt
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { showError } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
 import type { DevicePickerOwner } from '@/features/playback/features/control-delegation/shared/delegation/types/deviceTypes';

@@ -1,5 +1,5 @@
 import * as authApi from '@/features/user/features/auth/shared/sign-in/lib/authApi';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { logger } from '@/shared/logging/logger';
 import type { SessionAccess } from '@/features/user/features/auth/shared/sign-in/types/authStateTypes';
 

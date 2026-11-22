@@ -44,19 +44,23 @@ rules:
     languages: [typescript]
     severity: ERROR
     message: >-
-      HTTP calls go through mobile/src/shared/backend/lib/api.ts, which sends the
-      X-Platform, X-Device-Model and X-App-Version headers. See
+      fetch is called only in an xClient.ts file. Backend calls go through
+      apiRequest (mobile/src/shared/backend/lib/apiRequest.ts), whose client
+      sends the X-Platform, X-Device-Model and X-App-Version headers. See
       .agents/rules/guardrails.md#no-fetch-outside-api-client
     pattern-either:
       - pattern: fetch(...)
       - pattern: globalThis.fetch(...)
       - pattern: window.fetch(...)
+    metadata:
+      allowed-paths:
+        - "*Client.ts"
     paths:
       include:
         - /mobile/src/
         - /mobile/App.tsx
       exclude:
-        - /mobile/src/shared/backend/lib/api.ts
+        - "*Client.ts"
         - "*.test.ts"
         - "*.test.tsx"
 

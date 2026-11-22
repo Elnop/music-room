@@ -10,7 +10,7 @@ How it fits with the rest of the system: [doc/architecture/overview.md](../doc/a
 - **Language**: TypeScript (strict mode)
 - **Navigation**: React Navigation v7
 - **State**: TanStack Query v5 (server data, cache, invalidation) and Zustand v5 (local client state: session, preferences, UI, player)
-- **HTTP client**: shared API client (`src/shared/backend/lib/api.ts`) on top of `fetch`, which adds the telemetry headers (`X-Platform`, `X-Device-Model`, `X-App-Version`) and refreshes the token transparently
+- **HTTP client**: shared API client (`src/shared/backend/lib/apiRequest.ts`) on top of `fetch`, which adds the telemetry headers (`X-Platform`, `X-Device-Model`, `X-App-Version`) and refreshes the token transparently
 - **Auth**: the backend API (`/api/auth/*`); the app ships no Supabase client
 - **Real time**: socket.io-client v4.8
 - **Validation**: Zod v4
@@ -42,7 +42,7 @@ From the repository root, `make install` installs both projects.
 
 `make dev-docker` and `make dev-local` force `EXPO_PUBLIC_API_URL=http://<local IP>:3000` and `EXPO_PUBLIC_WS_URL=ws://<local IP>:3000` (variables `DEV_API_URL` and `DEV_WS_URL` in `make/config.mk`), whatever the value in `.env`. `make dev-tunnel` uses the ngrok tunnel URL. The values in `.env` are only used by an `npx expo start` run by hand. A tester can also change the backend address inside the app, without rebuilding (`BackendUrlField`, `shared/backend/lib/backendUrl.ts`).
 
-The app never talks to Supabase: sign-in, sign-up, email verification, password reset, refresh and logout all go through the backend API (calls in `src/features/user/features/auth/shared/sign-in/lib/`, through the `src/shared/backend/lib/api.ts` client), which logs them. The session (backend tokens) lives in `src/features/user/features/auth/shared/sign-in/authStore.ts`, persisted in AsyncStorage by `features/user/features/auth/shared/sign-in/lib/sessionStorage.ts`; it is refreshed through `/api/auth/refresh` (before a request when the token expires soon, at startup, and after a 401), and a refused refresh (401) clears the storage and goes back to the sign-in screen.
+The app never talks to Supabase: sign-in, sign-up, email verification, password reset, refresh and logout all go through the backend API (calls in `src/features/user/features/auth/shared/sign-in/lib/`, through the `src/shared/backend/lib/apiRequest.ts` client), which logs them. The session (backend tokens) lives in `src/features/user/features/auth/shared/sign-in/authStore.ts`, persisted in AsyncStorage by `features/user/features/auth/shared/sign-in/lib/sessionStorage.ts`; it is refreshed through `/api/auth/refresh` (before a request when the token expires soon, at startup, and after a 401), and a refused refresh (401) clears the storage and goes back to the sign-in screen.
 
 ```env
 # Backend API (ignored by make dev-docker, dev-local and dev-tunnel)
@@ -185,7 +185,7 @@ mobile/src/
 │   ├── search/ · legal/
 │   └── shell/                  # AppProvidersContainer, AppFrameLayout, TabBarLayout, NavigationRootLayout, startup, linking,
 │                               # alert host, keyboard shortcuts help
-└── shared/                     # theme (design system), backend (api.ts, session, socketStore, queryClient), query-keys,
+└── shared/                     # theme (design system), backend (apiRequest.ts, apiClient.ts, session, socketStore, queryClient), query-keys,
                                 # playback, tracks, users, alerts, logging, formatting, platform, share-links…
 ```
 
@@ -201,7 +201,7 @@ mobile/src/
 
 ## State, real time and playback
 
-- **HTTP calls**: always through `shared/backend/lib/api.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
+- **HTTP calls**: always through `shared/backend/lib/apiRequest.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
 - **Server data**: TanStack Query (`AppProvidersContainer` provides the client). A query key is built with `queryKeys` (`shared/query-keys/queryKeys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/configs/staleQueryConfig.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/hooks/useSocketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
 - **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/backend/lib/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
 - **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`lib/playlistSocketRules.ts` next to it); `features/playback/features/control-delegation/hooks/` handles friends' listening and delegated control commands.

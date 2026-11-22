@@ -15,7 +15,7 @@ import { deferred } from '@test-utils/deferred';
 import { queueItem, queueItemBody, queueState } from '@test-utils/queueFixtures';
 import type { UserProfile } from '@/shared/users/userTypes';
 import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { hapticSuccess } from '@/shared/theme/lib/haptics';
 import type { QueueState, QueueStepResult } from '@/shared/playback/types/queueTypes';

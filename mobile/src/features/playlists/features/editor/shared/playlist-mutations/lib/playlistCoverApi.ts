@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { jpegFormData } from '@/shared/backend/lib/jpegFormData';
 import type { CoverResponse } from '@/features/playlists/shared/playlist/playlistTypes';
 

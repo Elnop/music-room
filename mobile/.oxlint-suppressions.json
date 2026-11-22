@@ -4,20 +4,6 @@
       "count": 1
     }
   },
-  "src/shared/backend/lib/api.ts": {
-    "eslint(max-lines-per-function)": {
-      "count": 2
-    },
-    "eslint(max-params)": {
-      "count": 1
-    },
-    "fetch-placement(no-restricted-syntax)": {
-      "count": 2
-    },
-    "function-size(max-variables)": {
-      "count": 2
-    }
-  },
   "src/shared/backend/lib/socketCache.ts": {
     "query-conventions(query-key-factory)": {
       "count": 3

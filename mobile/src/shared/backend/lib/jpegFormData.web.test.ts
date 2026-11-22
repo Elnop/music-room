@@ -1,7 +1,7 @@
-import { readLocalBlob } from '@/shared/backend/lib/api';
+import { readLocalBlob } from '@/shared/backend/lib/apiClient';
 import { jpegFormData } from '@/shared/backend/lib/jpegFormData.web';
 
-jest.mock('@/shared/backend/lib/api', () => ({ readLocalBlob: jest.fn() }));
+jest.mock('@/shared/backend/lib/apiClient', () => ({ readLocalBlob: jest.fn() }));
 
 describe('jpegFormData (web)', () => {
 	it('appends the local image as a Blob, the only file part a browser FormData takes', async () => {

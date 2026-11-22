@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
 

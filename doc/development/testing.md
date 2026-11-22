@@ -42,7 +42,7 @@ Unit tests are the default. Write an integration test only for behavior that liv
 | Mail (`features/mail/services/mail.service.ts`) | Mock the service and assert the call (recipient, template). | Mocked as well; no email is ever sent. |
 | Google / Facebook sign-in | Mock the token verification (`google-auth-library`, Graph API call). | Mocked as well. |
 
-Mobile tests never reach the network. `mobile/src/shared/backend/lib/api.ts`, the socket store and Expo modules are mocked; the jest-expo preset covers the native ones. The helpers several tests share (fixtures, fake `fetch` responses, `renderWithQuery`) live in `mobile/test-utils/` and are imported through `@test-utils/`; production code never imports them.
+Mobile tests never reach the network. `mobile/src/shared/backend/lib/apiRequest.ts`, the socket store and Expo modules are mocked; the jest-expo preset covers the native ones. The helpers several tests share (fixtures, fake `fetch` responses, `renderWithQuery`) live in `mobile/test-utils/` and are imported through `@test-utils/`; production code never imports them.
 
 ## Integration database: local Supabase stack
 

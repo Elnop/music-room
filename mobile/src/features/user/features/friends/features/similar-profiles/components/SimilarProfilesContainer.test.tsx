@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react-native';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 import type { RecommendedProfile } from '@/features/user/features/friends/friendsTypes';
 import { renderWithClient } from '@test-utils/renderWithClient';

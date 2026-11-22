@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 
 const MAX_RETRIES = 2;
 

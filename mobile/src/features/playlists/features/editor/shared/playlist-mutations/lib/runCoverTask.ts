@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { patchPlaylist } from '@/features/playlists/features/editor/shared/playlist-mutations/lib/playlistCacheEdits';

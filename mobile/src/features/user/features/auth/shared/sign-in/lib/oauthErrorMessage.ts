@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import type { OAuthProvider } from '@/features/user/features/auth/authTypes';
 import { isScriptLoadError } from '@/features/user/features/auth/shared/sign-in/lib/loadScript';

@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import { act, renderHook } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCoverActions } from '@/features/playlists/features/editor/shared/playlist-mutations/hooks/useCoverActions';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import * as playlistCoverApi from '@/features/playlists/features/editor/shared/playlist-mutations/lib/playlistCoverApi';
 import { patchPlaylist } from '@/features/playlists/features/editor/shared/playlist-mutations/lib/playlistCacheEdits';

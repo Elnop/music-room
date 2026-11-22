@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import type { StreamUrlResponse } from '@/shared/tracks/types/soundcloudTypes';
 import type { StreamFetchResult } from '@/features/playback/shared/player/types/playerTypes';
 

@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import type { Playlist } from '@/features/playlists/shared/playlist/playlistTypes';
 import type { PlaylistInput } from '@/features/playlists/features/editor/shared/playlist-mutations/types/playlistFormTypes';
 

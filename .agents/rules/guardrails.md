@@ -32,7 +32,7 @@ The rules block from day one; the violations that existed when a rule arrived ar
 | dependency-cruiser | `backend/.dependency-cruiser-known-violations.json` | a violation |
 | oxlint | `mobile/.oxlint-suppressions.json` (same format as ESLint's) | a (file, rule) pair, with its count |
 | jscpd | the `ignore` globs of `<project>/.jscpd.json` | a glob (the first globs, tests and generated files, are permanent) |
-| semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (`api.ts` and the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
+| semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
 | gitleaks | the `[[allowlists]]` of `.gitleaks.toml` | an allowed value or path, public by design |
 
 An exception list only shrinks. `check:exceptions` counts the entries of each list per rule and fails when a count is higher than at the fork point from `origin/develop` or than at `HEAD`. A story that cleans files then shrinks the list:
@@ -84,7 +84,7 @@ semgrep, mobile: a `useEffect` callback is never `async`. React expects it to re
 
 ## no-fetch-outside-api-client
 
-semgrep, mobile: `fetch(` appears only in `src/shared/backend/lib/api.ts`. The API client adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6). Call the backend through it.
+semgrep, mobile: `fetch(` appears only in a file named `<thing>Client.ts`, the same convention as brutalway's `fetch-placement` (oxlint): the rule allows that name through `metadata.allowed-paths` (see [exception-lists](#exception-lists)). The backend has one client, `src/shared/backend/lib/apiClient.ts`, which adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6) and a default timeout. Call the backend through `apiRequest` (`src/shared/backend/lib/apiRequest.ts`), which adds the session token on top of it; never write a second client for the backend.
 
 ## no-asyncstorage-outside-storage
 

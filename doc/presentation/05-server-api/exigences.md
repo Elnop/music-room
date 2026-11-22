@@ -18,7 +18,7 @@
 - **API REST et JSON documentée par Swagger UI** (`/api-docs`). Pour chaque route, on y trouve la méthode, les paramètres, le corps, les réponses et les erreurs.
 - **Une documentation qui ne peut pas diverger du code** : elle est générée à partir des schémas Zod qui valident les requêtes. Un test (`openapi-coverage.test.ts`) échoue dès qu'une route montée n'est pas documentée.
 - **Erreurs uniformes** : un seul format d'erreur, `{ success: false, error: { message, code, why, fix } }`, et toute entrée invalide reçoit `400 VALIDATION_ERROR`.
-- **L'app est une télécommande** : chaque appel HTTP passe par `shared/backend/lib/api.ts`, et les événements Socket.io mettent à jour son cache. Elle ne garde aucune donnée métier en propre.
+- **L'app est une télécommande** : chaque appel HTTP passe par `shared/backend/lib/apiRequest.ts`, et les événements Socket.io mettent à jour son cache. Elle ne garde aucune donnée métier en propre.
 - **Adresse du backend modifiable dans l'app**, sans rebuild : le champ **Serveur** des Paramètres, ou l'écran d'accueil avant la connexion.
 - **Google et Facebook** dans l'app : voir [02-user/scenario-social-login.md](../02-user/scenario-social-login.md).
 
@@ -42,7 +42,7 @@ L'argumentaire complet est dans [decisions.md §1.6](../../decisions.md#16-proto
 ## Où regarder
 
 - `backend/src/app/routes.ts`, `backend/src/app/openapi.ts`, `backend/src/features/*/<name>.openapi.ts`
-- `mobile/src/shared/backend/lib/api.ts`, `mobile/src/shared/backend/lib/backendUrl.ts`
+- `mobile/src/shared/backend/lib/apiRequest.ts`, `mobile/src/shared/backend/lib/backendUrl.ts`
 - Détail : [mobile-api.md](../../features/mobile-api.md)
 
 ## Scénarios

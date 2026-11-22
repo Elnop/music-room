@@ -1,6 +1,6 @@
 import { showAlert } from '@/shared/alerts/showAlert';
 import { useSession } from '@/shared/backend/hooks/useSession';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { useEvent } from '@/features/events/shared/events/hooks/useEventQueries';
 import { useEventDeletion } from '@/features/events/features/detail/hooks/useEventDeletion';
 import type {

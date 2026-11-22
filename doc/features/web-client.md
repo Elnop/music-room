@@ -6,7 +6,7 @@ Code: the same `mobile/` app, built for the web by Expo (`react-native-web`). Ev
 
 ## Approach
 
-The browser runs the Android app's code: the same screens, Zustand stores, TanStack Query cache, Socket.io client and API client (`shared/backend/lib/api.ts`, so the IV.6 headers are sent: `X-Platform: web`, and `X-Device-Model` read from the user agent, e.g. `Chrome on Linux`). It stays a remote control of the backend (IV.5), and the guardrails of `npm run check` cover it with no second project.
+The browser runs the Android app's code: the same screens, Zustand stores, TanStack Query cache, Socket.io client and API client (`shared/backend/lib/apiRequest.ts`, so the IV.6 headers are sent: `X-Platform: web`, and `X-Device-Model` read from the user agent, e.g. `Chrome on Linux`). It stays a remote control of the backend (IV.5), and the guardrails of `npm run check` cover it with no second project.
 
 Each native module was already isolated in one service or hook. That file gets a `.web.ts` variant next to it, which Metro picks for the web bundle; nothing imports a variant by name (knip treats `src/**/*.web.{ts,tsx}` as entry points). No native library reaches the web bundle, and hls.js reaches only the web one; the Google and Facebook SDKs are scripts loaded at run time.
 
