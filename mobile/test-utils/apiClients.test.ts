@@ -43,33 +43,6 @@ const CLIENT_HEADERS = {
 	'X-App-Version': '1.2.3',
 };
 
-test.each([
-	['friendsApi', () => friendsApi.getFriends('caller-token'), [], 'caller-token'],
-	['profileApi', () => profileApi.getOwnProfile('caller-token'), { id: 'u1' }, 'caller-token'],
-	[
-		'privacyApi',
-		() => privacyApi.getPrivacySettings('caller-token'),
-		{ email_visibility: 'private' },
-		'caller-token',
-	],
-	[
-		'musicControlApi',
-		() => musicControlApi.getMyPermissions('caller-token'),
-		{ allowedUserIds: [] },
-		'caller-token',
-	],
-])('%s sends the client headers and the token', async (_name, call, data, token) => {
-	fetchMock.mockResolvedValue(jsonResponse({ success: true, data }));
-
-	await call();
-
-	const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-	expect(init.headers).toMatchObject({
-		...CLIENT_HEADERS,
-		Authorization: `Bearer ${token}`,
-	});
-});
-
 describe('with a signed-in session', () => {
 	let sessionToken = 'session-token';
 	const refreshAccessToken = jest.fn(async () => {
@@ -94,6 +67,23 @@ describe('with a signed-in session', () => {
 		});
 	});
 
+	it.each([
+		['friendsApi', () => friendsApi.getFriends(), []],
+		['profileApi', () => profileApi.getOwnProfile(), { id: 'u1' }],
+		['privacyApi', () => privacyApi.getPrivacySettings(), { email_visibility: 'private' }],
+		['musicControlApi', () => musicControlApi.getMyPermissions(), { allowedUserIds: [] }],
+	])('%s sends the client headers and the session token', async (_name, call, data) => {
+		fetchMock.mockResolvedValue(jsonResponse({ success: true, data }));
+
+		await call();
+
+		const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(init.headers).toMatchObject({
+			...CLIENT_HEADERS,
+			Authorization: 'Bearer session-token',
+		});
+	});
+
 	it('sends the session token, refreshes it on a 401 and retries', async () => {
 		fetchMock
 			.mockResolvedValueOnce(
@@ -101,7 +91,7 @@ describe('with a signed-in session', () => {
 			)
 			.mockResolvedValueOnce(jsonResponse({ success: true, data: [] }));
 
-		await expect(friendsApi.getFriends('stale-caller-token')).resolves.toStrictEqual([]);
+		await expect(friendsApi.getFriends()).resolves.toStrictEqual([]);
 
 		expect(refreshAccessToken).toHaveBeenCalledTimes(1);
 		const [[, first], [, retry]] = fetchMock.mock.calls as [string, RequestInit][];

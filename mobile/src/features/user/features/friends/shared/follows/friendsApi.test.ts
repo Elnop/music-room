@@ -1,10 +1,9 @@
-import { apiRequest, authRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import type { FollowStatus } from '@/features/user/features/friends/friendsTypes';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({
 	apiRequest: jest.fn(),
-	authRequest: jest.fn(),
 }));
 
 const mockStatus: FollowStatus = {
@@ -20,27 +19,10 @@ describe('friendsApi', () => {
 		jest.clearAllMocks();
 	});
 
-	it('getFriends calls apiRequest without token, or authRequest with token', async () => {
+	it('getFriends calls apiRequest', async () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce([]);
 		await friendsApi.getFriends();
 		expect(apiRequest).toHaveBeenCalledWith('/api/friends');
-
-		jest.mocked(authRequest).mockResolvedValueOnce([]);
-		await friendsApi.getFriends('my-token');
-		expect(authRequest).toHaveBeenCalledWith('/api/friends', 'my-token');
-	});
-
-	it('getMyStats calls apiRequest without token, or authRequest with token', async () => {
-		const stats = { followersCount: 1, followingCount: 2 };
-		jest.mocked(apiRequest).mockResolvedValueOnce(stats);
-		const res1 = await friendsApi.getMyStats();
-		expect(apiRequest).toHaveBeenCalledWith('/api/friends/stats/me');
-		expect(res1).toStrictEqual(stats);
-
-		jest.mocked(authRequest).mockResolvedValueOnce(stats);
-		const res2 = await friendsApi.getMyStats('tok');
-		expect(authRequest).toHaveBeenCalledWith('/api/friends/stats/me', 'tok');
-		expect(res2).toStrictEqual(stats);
 	});
 
 	it('getFollowStatus calls /api/friends/status/:userId', async () => {

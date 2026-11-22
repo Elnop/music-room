@@ -6,11 +6,10 @@ import { LOAD_ERROR } from '@/features/playback/features/control-delegation/feat
 import type { MyDevicesData } from '@/features/playback/features/control-delegation/features/my-devices/myDevicesTypes';
 
 export async function fetchMyDevices(): Promise<MyDevicesData> {
-	const accessToken = getSession().accessToken;
-	if (!accessToken) throw new Error(LOAD_ERROR);
+	if (!getSession().accessToken) throw new Error(LOAD_ERROR);
 	const [myDevices, myFriends, allowedIds, deviceInfo] = await Promise.all([
 		musicControlApi.getMyDevices(),
-		musicControlApi.getFriends(accessToken),
+		musicControlApi.getFriends(),
 		musicControlApi.getMyPermissions(),
 		deviceService.getDeviceInfo().catch(() => null),
 	]);

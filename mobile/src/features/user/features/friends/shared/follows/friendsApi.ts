@@ -1,27 +1,16 @@
-import { apiRequest, authRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import type {
 	FollowStatus,
 	FriendPlaylistSummary,
 	FriendProfile,
-	MyStats,
 	ProfileRecommendations,
 	UserProfile,
 	FilteredProfile,
 } from '@/features/user/features/friends/friendsTypes';
 
 export const friendsApi = {
-	getFriends(accessToken?: string): Promise<FriendProfile[]> {
-		if (accessToken) {
-			return authRequest<FriendProfile[]>('/api/friends', accessToken);
-		}
+	getFriends(): Promise<FriendProfile[]> {
 		return apiRequest<FriendProfile[]>('/api/friends');
-	},
-
-	getMyStats(accessToken?: string): Promise<MyStats> {
-		if (accessToken) {
-			return authRequest<MyStats>('/api/friends/stats/me', accessToken);
-		}
-		return apiRequest<MyStats>('/api/friends/stats/me');
 	},
 
 	getFollowStatus(userId: string): Promise<FollowStatus> {

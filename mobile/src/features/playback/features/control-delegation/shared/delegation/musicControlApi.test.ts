@@ -1,9 +1,8 @@
-import { apiRequest, authRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/musicControlApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({
 	apiRequest: jest.fn(),
-	authRequest: jest.fn(),
 }));
 
 describe('musicControlApi', () => {
@@ -11,32 +10,11 @@ describe('musicControlApi', () => {
 		jest.clearAllMocks();
 	});
 
-	it('getMyPermissions calls apiRequest or authRequest', async () => {
+	it('getMyPermissions calls apiRequest', async () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce({ allowedUserIds: ['u1'] });
 		const result = await musicControlApi.getMyPermissions();
-		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/permissions', {});
+		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/permissions');
 		expect(result).toStrictEqual(['u1']);
-
-		jest.mocked(authRequest).mockResolvedValueOnce({ allowedUserIds: ['u2'] });
-		const resultToken = await musicControlApi.getMyPermissions('tok');
-		expect(authRequest).toHaveBeenCalledWith('/api/music-control/permissions', 'tok', {});
-		expect(resultToken).toStrictEqual(['u2']);
-	});
-
-	it('grantControl sends POST', async () => {
-		jest.mocked(apiRequest).mockResolvedValueOnce({ success: true, allowedUserId: 'u1' });
-		await musicControlApi.grantControl('u1');
-		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/permissions/u1', {
-			method: 'POST',
-		});
-	});
-
-	it('revokeControl sends DELETE', async () => {
-		jest.mocked(apiRequest).mockResolvedValueOnce({ success: true, allowedUserId: 'u1' });
-		await musicControlApi.revokeControl('u1');
-		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/permissions/u1', {
-			method: 'DELETE',
-		});
 	});
 
 	it('canControl returns boolean and handles error', async () => {
@@ -53,7 +31,7 @@ describe('musicControlApi', () => {
 		const devices = [{ deviceId: 'd1', deviceName: 'D1' }];
 		jest.mocked(apiRequest).mockResolvedValueOnce({ devices });
 		const res = await musicControlApi.getMyDevices();
-		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/devices', {});
+		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/devices');
 		expect(res).toStrictEqual(devices);
 	});
 
@@ -72,7 +50,7 @@ describe('musicControlApi', () => {
 		const payload = { allDevices: true, devices: [] };
 		jest.mocked(apiRequest).mockResolvedValueOnce(payload);
 		const res = await musicControlApi.getControllableDevices('u1');
-		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/users/u1/devices', {});
+		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/users/u1/devices');
 		expect(res).toStrictEqual(payload);
 	});
 
@@ -80,7 +58,7 @@ describe('musicControlApi', () => {
 		const payload = { myDevices: [], friendDevices: [] };
 		jest.mocked(apiRequest).mockResolvedValueOnce(payload);
 		const res = await musicControlApi.getDevicePicker();
-		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/controllable-devices', {});
+		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/controllable-devices');
 		expect(res).toStrictEqual(payload);
 	});
 

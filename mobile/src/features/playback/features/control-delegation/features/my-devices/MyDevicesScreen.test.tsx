@@ -163,7 +163,7 @@ describe('MyDevicesScreen', () => {
 
 		expect(requests()[0]).toMatchObject({ method: 'GET', authorization: 'Bearer access' });
 		expect(requests()[0].url).toMatch(/\/api\/music-control\/devices$/u);
-		expect(getFriends).toHaveBeenCalledWith('access');
+		expect(getFriends).toHaveBeenCalledTimes(1);
 
 		expect(screen.getByTestId('device-device-1')).toHaveTextContent(/Cet appareil/u);
 		expect(screen.getByTestId('device-device-2')).not.toHaveTextContent(/Cet appareil/u);

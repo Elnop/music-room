@@ -30,8 +30,8 @@ const mockUploadAvatar = jest.fn();
 const mockRemoveAvatar = jest.fn();
 jest.mock('@/features/user/features/profile/shared/profile/lib/profileApi', () => ({
 	profileApi: {
-		uploadAvatar: (uri: string, token: string) => mockUploadAvatar(token, uri),
-		removeAvatar: (token: string) => mockRemoveAvatar(token),
+		uploadAvatar: (uri: string) => mockUploadAvatar(uri),
+		removeAvatar: () => mockRemoveAvatar(),
 	},
 }));
 
@@ -82,7 +82,7 @@ describe('useAvatarPicker', () => {
 			expect.objectContaining({ allowsEditing: true, aspect: [1, 1], mediaTypes: ['images'] })
 		);
 		expect(mockPrepareAvatar).toHaveBeenCalledWith(ASSET);
-		expect(mockUploadAvatar).toHaveBeenCalledWith('token', 'file:///cache/avatar-512.jpg');
+		expect(mockUploadAvatar).toHaveBeenCalledWith('file:///cache/avatar-512.jpg');
 		expect(mockSetAvatarUrl).toHaveBeenCalledWith(NEW_URL);
 		expect(mockShowSuccess).toHaveBeenCalledWith('Photo de profil mise à jour');
 		expect(result.current.isUploading).toBe(false);
@@ -96,7 +96,7 @@ describe('useAvatarPicker', () => {
 			expect.objectContaining({ mediaTypes: ['images'] })
 		);
 		expect(mockPicker.launchImageLibraryAsync).not.toHaveBeenCalled();
-		expect(mockUploadAvatar).toHaveBeenCalledWith('token', 'file:///cache/avatar-512.jpg');
+		expect(mockUploadAvatar).toHaveBeenCalledWith('file:///cache/avatar-512.jpg');
 	});
 
 	it('sends nothing when the picker is cancelled', async () => {
@@ -135,7 +135,7 @@ describe('useAvatarPicker', () => {
 	it('removes the photo and clears it in the store', async () => {
 		await run(hook => hook.remove());
 
-		expect(mockRemoveAvatar).toHaveBeenCalledWith('token');
+		expect(mockRemoveAvatar).toHaveBeenCalledTimes(1);
 		expect(mockSetAvatarUrl).toHaveBeenCalledWith(null);
 	});
 });
