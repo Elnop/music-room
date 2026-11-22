@@ -16,7 +16,9 @@ permissions:
 jobs:
   lint:
     name: lint
-    runs-on: ubuntu-slim # 1 vCPU container runner, no Docker; 15 min cap
+    # Backend: ubuntu-slim (1 vCPU container runner, no Docker; 15 min cap).
+    # Mobile: a full VM, oxlint cannot reserve the memory of its JS plugins in the slim container.
+    runs-on: ${{ matrix.package == 'mobile' && 'ubuntu-24.04' || 'ubuntu-slim' }}
     timeout-minutes: 10
     strategy:
       fail-fast: false
