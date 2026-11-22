@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { useAudioPlayerStatus } from '@/features/playback/shared/player/lib/audioPlayer';
+import { useAudioPlayerStatus } from '@/features/playback/lib/audioPlayer';
 import { followNativePlaying, isSettled } from '@/features/playback/lib/nativeInterruption';
-import { isLocalTarget } from '@/features/playback/shared/player/lib/connectTarget';
+import { isLocalTarget } from '@/features/playback/lib/isLocalTarget';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useAudioInterruption(player: AudioPlayer): void {

@@ -8,7 +8,7 @@ import { connectStore } from '@/features/playback/shared/player/stores/connectSt
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { createStore } from 'zustand';
-import { streamPrefetch } from '@/features/playback/shared/player/lib/streamPrefetch';
+import { streamPrefetch } from '@/features/playback/lib/streamPrefetch';
 import { apiRequest } from '@/shared/backend/lib/api';
 import { trackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import type { SoundCloudTrack, StreamUrlResponse } from '@/shared/tracks/types/soundcloudTypes';

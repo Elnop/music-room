@@ -1,5 +1,5 @@
 import { showAlert } from '@/shared/alerts/showAlert';
-import { autoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
+import { autoplayStore } from '@/features/playback/autoplayStore';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 
 export function showAutoplayPrompt(play: () => void): void {

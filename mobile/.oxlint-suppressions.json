@@ -4,28 +4,8 @@
       "count": 1
     }
   },
-  "src/features/playback/components/PlaylistPlaybackContainer.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/control-delegation/FriendListeningContainer.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/control-delegation/hooks/useMusicControlEmitter.ts": {
     "react(exhaustive-effect-dependencies)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/media-session/hooks/useMediaSession.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/now-playing-panel/hooks/usePanelFocus.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   },
@@ -44,39 +24,19 @@
       "count": 1
     }
   },
-  "src/features/playback/lib/configureAudioMode.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/player/lib/attachStream.ts": {
+  "src/features/playback/lib/attachStream.ts": {
     "import(no-named-as-default-member)": {
       "count": 1
     }
   },
-  "src/features/playback/shared/player/lib/audioPlayer.ts": {
+  "src/features/playback/lib/audioPlayer.ts": {
     "hook-naming(no-restricted-syntax)": {
       "count": 2
     }
   },
-  "src/features/playback/shared/player/lib/audioPlayer.web.ts": {
+  "src/features/playback/lib/audioPlayer.web.ts": {
     "hook-naming(no-restricted-syntax)": {
       "count": 2
-    }
-  },
-  "src/features/playlists/features/editor/features/card-menu/PlaylistCardMenuContainer.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/shell/hooks/useFocusRing.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/features/shell/hooks/useKeyboardShortcuts.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
     }
   },
   "src/features/shell/lib/navigationFonts.ts": {
@@ -87,24 +47,9 @@
       "count": 1
     }
   },
-  "src/features/subscription/PlanContainer.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/subscription/lib/subscription.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/shared/alerts/showAlert.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
     }
   },
   "src/shared/backend/deviceService.ts": {
@@ -126,11 +71,6 @@
       "count": 2
     }
   },
-  "src/shared/backend/lib/jpegFormData.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
   "src/shared/backend/lib/socketCache.ts": {
     "query-conventions(query-key-factory)": {
       "count": 3
@@ -143,21 +83,6 @@
   },
   "src/shared/query-keys/queryKeys.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/screen-title/useScreenTitle.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/AvatarPhoto.web.tsx": {
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useIconTooltip.web.ts": {
-    "file-named-after-export(file-named-after-export)": {
       "count": 1
     }
   }

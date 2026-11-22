@@ -1,6 +1,6 @@
 import HlsClient, { Events } from 'hls.js';
 import type { StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
-import type { MediaElement } from '@/features/playback/shared/player/types/mediaElementTypes';
+import type { MediaElement } from '@/features/playback/types/mediaElementTypes';
 
 const HLS_MIME = 'application/vnd.apple.mpegurl';
 

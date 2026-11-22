@@ -7,7 +7,6 @@ import { PlayerModalContainer } from '@/features/playback/features/player-modal/
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { queueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { activeOwnerId } from '@/features/playback/shared/player/lib/connectTarget';
 import type { OwnerQueue } from '@/features/playback/shared/player/types/queueTypes';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
@@ -115,8 +114,13 @@ registerAuthSession({
 let mockNext = jest.fn(async () => 'played' as const);
 const mockPrevious = jest.fn(async () => 'played' as const);
 
+function activeOwner(): string {
+	const { target } = connectStore.getState();
+	return target.kind === 'remote' ? target.ownerId : 'me';
+}
+
 function setTestQueue(queue: OwnerQueue) {
-	queueStore.setState({ queues: { [activeOwnerId() ?? 'me']: queue } });
+	queueStore.setState({ queues: { [activeOwner()]: queue } });
 }
 
 queueStore.setState({ next: () => mockNext(), previous: () => mockPrevious() });

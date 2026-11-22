@@ -1,5 +1,5 @@
-import { isLocalTarget } from '@/features/playback/shared/player/lib/connectTarget';
-import { isStreamStale } from '@/features/playback/shared/player/lib/streamPrefetch';
+import { isLocalTarget } from '@/features/playback/lib/isLocalTarget';
+import { isStreamStale } from '@/features/playback/lib/streamPrefetch';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 

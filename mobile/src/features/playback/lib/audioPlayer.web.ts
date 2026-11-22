@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { autoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
-import { HtmlAudioPlayer } from '@/features/playback/shared/player/lib/HtmlAudioPlayer';
+import { autoplayStore } from '@/features/playback/autoplayStore';
+import { HtmlAudioPlayer } from '@/features/playback/lib/HtmlAudioPlayer';
 import type {
 	AudioPlayer,
 	AudioPlayerStatus,

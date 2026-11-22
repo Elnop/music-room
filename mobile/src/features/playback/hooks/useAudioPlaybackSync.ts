@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
-import { useStreamStart } from '@/features/playback/shared/player/hooks/useStreamStart';
-import { syncPlayback } from '@/features/playback/shared/player/lib/syncPlayback';
+import { useStreamStart } from '@/features/playback/hooks/useStreamStart';
+import { syncPlayback } from '@/features/playback/lib/syncPlayback';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useAudioPlaybackSync(player: AudioPlayer): void {

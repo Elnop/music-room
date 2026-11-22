@@ -3,9 +3,9 @@ import type { ReactNode } from 'react';
 import { useChangePlan, usePlan } from '@/features/subscription/usePlan';
 import type { PlanState } from '@/features/subscription/lib/subscription';
 
-interface PlanContainerProps {
+type PlanContainerProps = {
 	children: (plan: PlanState) => ReactNode;
-}
+};
 
 export function PlanContainer({ children }: PlanContainerProps) {
 	const query = usePlan();

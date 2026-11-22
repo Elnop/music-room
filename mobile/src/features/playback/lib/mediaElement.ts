@@ -1,4 +1,4 @@
-import type { MediaElement } from '@/features/playback/shared/player/types/mediaElementTypes';
+import type { MediaElement } from '@/features/playback/types/mediaElementTypes';
 
 type BrowserDocument = {
 	createElement: (tag: 'audio') => MediaElement;

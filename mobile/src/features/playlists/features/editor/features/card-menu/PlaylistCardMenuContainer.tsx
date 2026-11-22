@@ -9,11 +9,11 @@ import { PlaylistActionsSheet } from '@/features/playlists/features/editor/share
 import { useMenuAnchor } from '@/features/playlists/features/editor/shared/menu-anchor/hooks/useMenuAnchor';
 import type { PlanState } from '@/features/subscription/lib/subscription';
 
-interface PlaylistCardMenuContainerProps {
+type PlaylistCardMenuContainerProps = {
 	navigation: CardMenuNavigation;
 	premium: Pick<PlanState, 'isPremium' | 'refetch'>;
 	children: (actionsFor: PlaylistCardMenu['actionsFor']) => ReactNode;
-}
+};
 
 export function PlaylistCardMenuContainer({
 	navigation,

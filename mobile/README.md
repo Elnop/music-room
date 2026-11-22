@@ -97,7 +97,7 @@ From the root: `make dev-phone` (USB phone, any network), `make dev-docker` (Doc
 
 `make dev-web` (backend in Docker) or `make dev-web-local` (no Docker) serves the app in a browser on `http://localhost:8081`, the web origin in the backend's `ALLOWED_ORIGINS`; it calls the backend on `http://localhost:3000` and has no backend address to pick. A service that wraps a native module has a `.web.ts` variant next to it, which Metro picks for the web bundle (`googleSignIn.web.ts`, `beaconScanner.web.ts`, `useImageColors.web.ts`, …); what the browser cannot do is hidden (`shared/platform/platform.ts`).
 
-The player hooks reach the audio through `features/playback/shared/player/lib/audioPlayer.ts` (expo-audio). Its browser variant `audioPlayer.web.ts` plays the SoundCloud HLS stream in one `<audio>` element for the page: natively when the browser reads HLS (Safari), through `hls.js` otherwise, which only feeds the element; the queue, auto-advance, prefetch and the expired-URL watchdog stay the shared hooks. `useMediaSession.web.ts` drives the media keys and the browser's media notification through the Media Session API. A playback the browser refuses before any click on the page (a friend's remote command, typically) leaves the player paused, so the controller never sees it playing, and asks "Cliquer pour activer le son" (`hooks/useAutoplayPrompt.ts`).
+The player hooks reach the audio through `features/playback/lib/audioPlayer.ts` (expo-audio). Its browser variant `audioPlayer.web.ts` plays the SoundCloud HLS stream in one `<audio>` element for the page: natively when the browser reads HLS (Safari), through `hls.js` otherwise, which only feeds the element; the queue, auto-advance, prefetch and the expired-URL watchdog stay the shared hooks. `useMediaSession.web.ts` drives the media keys and the browser's media notification through the Media Session API. A playback the browser refuses before any click on the page (a friend's remote command, typically) leaves the player paused, so the controller never sees it playing, and asks "Cliquer pour activer le son" (`hooks/useAutoplayPrompt.ts`).
 
 To test the responsive layout, resize the browser window (or use the browser's device toolbar) across the breakpoints of `shared/theme/configs/layoutConfig.ts`: under 768 px the phone layout, which is Android's; from 768 px a left icon rail; from 1024 px the desktop side bar. The layout follows the window live, no reload. `npx expo export -p web --clear` builds the static site into `dist/` (`--clear`: the Metro cache can hold another checkout's paths); the backend address is the `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL` of the build. Everything the web client changes or lacks, and the demo scenario: [web-client.md](../doc/features/web-client.md).
 
@@ -156,7 +156,7 @@ The web client is published at `https://elnop.github.io/music-room/` by `.github
 
 ## Architecture
 
-The code follows the layers of [brutalway](https://brutalway.elnop.dev/) (epic #616): `src/app/` composes the features, `src/features/` holds one folder per domain of the subject, and `src/shared/` holds leaf slices. A feature has kind folders for its own files, its sub-features in `features/` and the slices they share in `shared/`; two features never import each other, and what one passes to another goes through `app/` as props. dependency-cruiser, check-tree, oxlint and ESLint check these rules. More in [code-layout.md](../doc/architecture/code-layout.md).
+The code follows the layers of [brutalway](https://brutalway.elnop.dev/) (epic #616): `src/app/` composes the features, `src/features/` holds one folder per domain of the subject, and `src/shared/` holds leaf shared features. A feature has kind folders for its own files, its sub-features in `features/` and the shared features they share in `shared/`; two features never import each other, and what one passes to another goes through `app/` as props. dependency-cruiser, check-tree, oxlint and ESLint check these rules. More in [code-layout.md](../doc/architecture/code-layout.md).
 
 ```
 mobile/src/
@@ -250,7 +250,7 @@ Expo supports hot reload: change any file and the app updates within 1-2 seconds
 
 Types, validators and versions match the backend:
 
-- **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their slice, such as `src/shared/tracks/types/trackTypes.ts`) match the backend's schemas.
+- **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their shared feature, such as `src/shared/tracks/types/trackTypes.ts`) match the backend's schemas.
 - **Zod validators** (`src/features/playlists/features/editor/shared/playlist-mutations/playlistSchemas.ts`, `src/features/user/features/auth/shared/sign-in/authSchemas.ts`) use the same rules.
 - **Versions**: Socket.io and Zod are the same as the backend's.
 

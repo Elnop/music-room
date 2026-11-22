@@ -1,7 +1,7 @@
 import { FETCH_TIMEOUT_MS } from '@/features/playback/shared/player/configs/playerConfig';
-import { fetchStreamUrl } from '@/features/playback/shared/player/lib/fetchStreamUrl';
-import { streamFailureMessage } from '@/features/playback/shared/player/lib/streamFailureMessage';
-import { streamPrefetch } from '@/features/playback/shared/player/lib/streamPrefetch';
+import { fetchStreamUrl } from '@/features/playback/lib/fetchStreamUrl';
+import { streamFailureMessage } from '@/features/playback/lib/streamFailureMessage';
+import { streamPrefetch } from '@/features/playback/lib/streamPrefetch';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import type { StreamFetchResult } from '@/features/playback/shared/player/types/playerTypes';

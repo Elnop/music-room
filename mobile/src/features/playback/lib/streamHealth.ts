@@ -1,7 +1,7 @@
 import { RENEWAL_HEALTHY_MS } from '@/features/playback/shared/player/configs/playerConfig';
-import { isLocalTarget } from '@/features/playback/shared/player/lib/connectTarget';
+import { isLocalTarget } from '@/features/playback/lib/isLocalTarget';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
-import type { StreamWatch } from '@/features/playback/playbackEngineTypes';
+import type { StreamWatch } from '@/features/playback/types/playbackEngineTypes';
 
 type HealthySample = {
 	statusId: number;

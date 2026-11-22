@@ -3,10 +3,10 @@ import type { ReactNode } from 'react';
 import { useFriendListening } from '@/features/playback/features/control-delegation/hooks/useFriendListening';
 import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/types/delegationTypes';
 
-interface FriendListeningContainerProps {
+type FriendListeningContainerProps = {
 	userId: string;
 	children: (listening: FriendListeningResult) => ReactNode;
-}
+};
 
 export function FriendListeningContainer({ userId, children }: FriendListeningContainerProps) {
 	const listening = useFriendListening(userId);

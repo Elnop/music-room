@@ -4,7 +4,7 @@ import {
 	clearLoadTimers,
 	resetOnTrackChange,
 	watchStreamLoad,
-} from '@/features/playback/shared/player/lib/streamLoadWatch';
+} from '@/features/playback/lib/streamLoadWatch';
 import type {
 	AudioPlayer,
 	StreamLoadWatch,

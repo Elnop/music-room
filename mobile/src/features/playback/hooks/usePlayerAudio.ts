@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react';
-import { useAudioPlayer } from '@/features/playback/shared/player/lib/audioPlayer';
-import { useAudioPlaybackSync } from '@/features/playback/shared/player/hooks/useAudioPlaybackSync';
+import { useAudioPlayer } from '@/features/playback/lib/audioPlayer';
+import { useAudioPlaybackSync } from '@/features/playback/hooks/useAudioPlaybackSync';
 import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
-import { useStreamLoader } from '@/features/playback/shared/player/hooks/useStreamLoader';
+import { useStreamLoader } from '@/features/playback/hooks/useStreamLoader';
 import { setPositionReader } from '@/features/playback/shared/player/lib/positionReader';
-import { playerPositionMs, seekPlayer } from '@/features/playback/shared/player/lib/seekPlayer';
+import { playerPositionMs, seekPlayer } from '@/features/playback/lib/seekPlayer';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 
 type PlayerAudio = {
