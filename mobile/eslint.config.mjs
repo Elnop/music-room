@@ -8,21 +8,6 @@ import prettierConfig from 'eslint-config-prettier';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import componentsPlugin from './eslint/plugin-components.mjs';
 
-// Removed aliases, still banned so they cannot come back: @/ is the only one left
-// (babel.config.js, tsconfig.json).
-const LEGACY_ALIASES = [
-  '@api',
-  '@components',
-  '@contexts',
-  '@screens',
-  '@services',
-  '@store',
-  '@hooks',
-  '@utils',
-  '@themes',
-  '@constants',
-];
-
 // CSS named colours (CSS Color Module Level 4), 'transparent' excepted.
 const NAMED_COLORS = [
   'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black',
@@ -154,64 +139,6 @@ export default [
       // and the `set-state-in-effect` cases are realtime hooks to refactor with device testing.
       'react-hooks/immutability': 'warn',
       'react-hooks/set-state-in-effect': 'warn',
-
-      // No console.* at all. Not the core `no-console`: its message cannot
-      // point to the rule's doc.
-      'no-restricted-globals': [
-        'error',
-        {
-          name: 'console',
-          message:
-            'No direct console.* call; use the project logger. See .agents/rules/logging.md#no-console',
-        },
-      ],
-
-      // Imports that leave the current folder go through @/.
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['../*'],
-              message:
-                'Use the @/ alias instead of a relative parent import (../). See .agents/rules/architecture.md#no-parent-imports',
-            },
-            {
-              group: LEGACY_ALIASES.flatMap(alias => [alias, `${alias}/*`]),
-              message:
-                'Only the @/ alias is allowed (@/components/..., not @components/...). See .agents/rules/architecture.md#no-legacy-aliases',
-            },
-          ],
-        },
-      ],
-    },
-  },
-
-  // Only the logger writes to the console; the ErrorBoundary test mutes React's log of the caught error.
-  // See .agents/rules/logging.md#no-console
-  {
-    files: [
-      'src/shared/logging/logger.ts',
-      'src/shared/logging/logger.test.ts',
-      'src/features/shell/components/presenters/ErrorBoundary.test.tsx',
-    ],
-    rules: {
-      'no-restricted-globals': 'off',
-    },
-  },
-
-  // No index.ts: import the source file.
-  {
-    files: ['src/**/index.{ts,tsx}'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: 'Program',
-          message:
-            'Files named index.ts are forbidden; name the file after what it holds and import it directly. See .agents/rules/structure.md#no-index-files',
-        },
-      ],
     },
   },
 
@@ -293,7 +220,6 @@ export default [
         },
       ],
       'components/screen-orchestrator-only': 'error',
-      'components/hook-no-jsx': 'error',
       'components/one-component-per-file': 'error',
       'components/orchestrator-no-fetch': 'error',
     },

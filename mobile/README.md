@@ -238,7 +238,7 @@ Component roles are checked automatically, without exception (#386, documentatio
 
 - **`components/screen-orchestrator-only`**: a navigation screen only imports orchestrators from `features/`, never presenters.
 - **Roles by name** (dependency-cruiser, `@brutalway/dependency-cruiser-config`): an orchestrator is named `XContainer`; any other component is a presenter, which reaches no Zustand store and no TanStack query through any chain of imports, and renders no orchestrator.
-- **`components/hook-no-jsx`**: a hook contains no JSX element or fragment (logic only).
+- **Hooks without JSX** (oxlint `hook-files`, brutalway preset): a `useX.ts` file contains no JSX element or fragment.
 - **`components/one-component-per-file`**: at most one React component per source file.
 - **`components/orchestrator-no-fetch`**: an orchestrator leaves network calls to TanStack Query or service hooks, with no direct `fetch`.
 

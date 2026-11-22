@@ -22,7 +22,7 @@ Screens and navigation stacks/navigators in `src/app/**` or screen component fil
 
 ## hook-no-jsx
 
-Hooks in `*/hooks/**` or files named `use*.ts` / `use*.tsx` must contain logic only and no JSX elements or fragments.
+A hook lives in its own `useX.ts` file and contains logic only, no JSX element or fragment (oxlint `hook-files` and `hook-naming`, brutalway preset).
 
 - **Forbidden**: Returning or embedding `<View>`, `<Text>`, `<Component />`, or fragments `<>...</>`.
 - **Allowed**: Returning state values, callbacks, mutation triggers, refs, and query results.
