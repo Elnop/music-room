@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useIsLocalTarget } from '@/features/playback/hooks/useIsLocalTarget';
 import { useNextQueueItem } from '@/features/playback/hooks/useNextQueueItem';
 import { usePrefetchRequest } from '@/features/playback/hooks/usePrefetchRequest';
@@ -12,15 +12,10 @@ export function useNextTrackPrefetch(player: AudioPlayer): void {
 	const isLocal = useIsLocalTarget();
 	const next = useNextQueueItem();
 	const inWindow = usePrefetchWindow(player);
-	const requestedKeyRef = useRef<string | null>(null);
-
-	useEffect(() => {
-		requestedKeyRef.current = null;
-	}, [next.playingItemId]);
 
 	useEffect(() => {
 		dropStalePrefetch(isLocal, next.key, next.currentId);
 	}, [isLocal, next.key, next.currentId]);
 
-	usePrefetchRequest(next, isLocal && isPlaying && inWindow && !next.stepping, requestedKeyRef);
+	usePrefetchRequest(next, isLocal && isPlaying && inWindow && !next.stepping);
 }

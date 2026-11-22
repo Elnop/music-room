@@ -1,24 +1,4 @@
 {
-  "src/features/playback/features/control-delegation/hooks/useMusicControlEmitter.ts": {
-    "react(exhaustive-effect-dependencies)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/player-modal/hooks/useArtworkCarousel.ts": {
-    "react(exhaustive-effect-dependencies)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/hooks/useLastTrackPersistence.ts": {
-    "react(exhaustive-effect-dependencies)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/hooks/useNextTrackPrefetch.ts": {
-    "react(exhaustive-effect-dependencies)": {
-      "count": 1
-    }
-  },
   "src/features/playback/lib/attachStream.ts": {
     "import(no-named-as-default-member)": {
       "count": 1
