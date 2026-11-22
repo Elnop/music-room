@@ -18,7 +18,8 @@
 //   entry in the reference, may land with up to the recorded number of
 //   entries (guardrails.md#exception-lists). Any other rule only shrinks.
 //
-// Usage: node tools/guardrails/check-exceptions.mjs [backend] [mobile]
+// Usage: node tools/guardrails/check-exceptions.mjs [backend]
+// The mobile runs @brutalway/check-exceptions instead (guardrails.md#exception-lists).
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -27,11 +28,11 @@ import { followRenames, parseRenames } from './renames.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '../../..');
 const args = process.argv.slice(2);
-const projects = args.length > 0 ? args : ['backend', 'mobile'];
+const projects = args.length > 0 ? args : ['backend'];
 
 for (const project of projects) {
-  if (!['backend', 'mobile'].includes(project)) {
-    console.error('usage: check-exceptions.mjs [backend] [mobile]');
+  if (project !== 'backend') {
+    console.error('usage: check-exceptions.mjs [backend]');
     process.exit(2);
   }
 }
@@ -39,17 +40,6 @@ for (const project of projects) {
 // --- readers: file content -> { counts?: { key: number }, entries?: Set } ---
 // `counts` may not grow per key. Every string of `entries` must already exist
 // in the reference, so an entry can be neither added nor widened.
-
-function readEslint(text) {
-  const counts = {};
-  for (const rules of Object.values(JSON.parse(text))) {
-    for (const [rule, { count }] of Object.entries(rules)) {
-      counts[`${rule} (files)`] = (counts[`${rule} (files)`] ?? 0) + 1;
-      counts[`${rule} (occurrences)`] = (counts[`${rule} (occurrences)`] ?? 0) + count;
-    }
-  }
-  return { counts };
-}
 
 function readDepcruise(text) {
   const counts = {};
@@ -160,9 +150,7 @@ function readGitleaks(text) {
 const lists = [
   ...projects.flatMap((project) => [
     { project, path: `${project}/.jscpd.json`, read: readJscpd },
-    ...(project === 'backend'
-      ? [{ project, path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise }]
-      : [{ project, path: `${project}/.oxlint-suppressions.json`, read: readEslint, newRule: 'oxlint' }]),
+    { project, path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise },
   ]),
   { path: 'tools/semgrep/rules.yml', read: readSemgrep },
   { path: '.gitleaks.toml', read: readGitleaks },
@@ -227,15 +215,7 @@ const newRuleBaselines = JSON.parse(
 const newRules = new Set();
 
 const growths = [];
-const REMOVED_BASELINES = projects.flatMap((project) =>
-  project === 'backend'
-    ? [`${project}/eslint-suppressions.json`]
-    : [
-        `${project}/eslint-suppressions.json`,
-        `${project}/.dependency-cruiser-known-violations.json`,
-        `${project}/.check-tree-known-violations.json`,
-      ]
-);
+const REMOVED_BASELINES = projects.map((project) => `${project}/eslint-suppressions.json`);
 for (const path of REMOVED_BASELINES.filter((p) => existsSync(join(root, p)))) {
   growths.push(`${path}: this baseline was removed once empty; fix the violations instead of recording them`);
 }

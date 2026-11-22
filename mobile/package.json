@@ -15,7 +15,7 @@
 		"lint:fix": "eslint . --fix",
 		"check": "node ../tools/guardrails/run-checks.mjs type-check check:lint check:oxlint check:dead-code check:deps check:tree check:duplication check:semgrep check:ast-grep check:secrets test check:exceptions",
 		"check:lint": "eslint . --quiet",
-		"check:oxlint": "node ../tools/guardrails/check-oxlint.mjs",
+		"check:oxlint": "oxlint -c oxlint.config.mjs src test-utils main.ts",
 		"check:dead-code": "knip",
 		"check:deps": "depcruise src main.ts --config .dependency-cruiser.cjs --output-type err-long",
 		"check:tree": "check-tree src",
@@ -23,7 +23,7 @@
 		"check:semgrep": "node ../tools/guardrails/docker-scan.mjs semgrep mobile",
 		"check:ast-grep": "ast-grep scan",
 		"check:secrets": "node ../tools/guardrails/docker-scan.mjs secrets mobile",
-		"check:exceptions": "node ../tools/guardrails/check-exceptions.mjs mobile",
+		"check:exceptions": "check-exceptions --base origin/develop",
 		"format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
 		"type-check": "tsc --noEmit",
 		"test": "node --test eslint/plugin-components.test.mjs ../tools/guardrails/*.test.mjs && jest",
@@ -97,6 +97,7 @@
 	},
 	"devDependencies": {
 		"@ast-grep/cli": "^0.51.0",
+		"@brutalway/check-exceptions": "^0.2.0",
 		"@brutalway/check-tree": "0.14.1",
 		"@brutalway/dependency-cruiser-config": "0.12.2",
 		"@brutalway/oxlint-config-react-hook-form": "0.2.0",
@@ -150,6 +151,12 @@
 			"!src/**/*.test.{ts,tsx}",
 			"!src/**/*.d.ts"
 		]
+	},
+	"check-exceptions": {
+		"newRules": {
+			"oxlint-suppressions import/no-named-as-default-member": 1,
+			"oxlint-suppressions query-conventions/query-key-factory": 3
+		}
 	},
 	"private": true
 }

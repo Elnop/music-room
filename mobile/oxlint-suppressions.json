@@ -1,11 +1,11 @@
 {
   "src/features/playback/lib/attachStream.ts": {
-    "import(no-named-as-default-member)": {
+    "import/no-named-as-default-member": {
       "count": 1
     }
   },
   "src/shared/backend/lib/socketCache.ts": {
-    "query-conventions(query-key-factory)": {
+    "query-conventions/query-key-factory": {
       "count": 3
     }
   }

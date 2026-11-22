@@ -7,7 +7,7 @@ Read before creating a file or a folder. Every rule here is checked by `npm run 
 Where a file goes is set by the target layout in `doc/architecture/code-layout.md` and summarized in `AGENTS.md`:
 
 - Backend: `src/features/<name>/` holds `<name>.routes.ts`, `<name>.controller.ts`, `<name>.validators.ts`, `<name>.types.ts`, `<name>.openapi.ts`, logic in `services/`, authorization in `permissions/`, helpers in `utils/`. Cross-cutting code (config, middleware, security, types) goes in `src/shared/`; the Socket.io server in `src/realtime/` (`socket-server.ts`, `handlers/`, `emitters/`); the composition root (routes registry, OpenAPI document) in `src/app/`.
-- Mobile: three layers, `src/app/`, `src/features/` and `src/shared/` ([mobile-layers](architecture.md#mobile-layers)). `src/app/` composes the features into the navigation and imports only features; `src/app/App.tsx`, registered by `index.ts`, mounts `AppProvidersContainer` from `features/shell` and `RootNavigator`. A feature is a domain of the subject (`user` for IV.1, `playlists` with its `editor` for IV.2.3, `playback` with its `control-delegation` for IV.2.2, `events`, `subscription`, `search`, `legal`, `shell`). It holds kind folders for its own files, its sub-features in `features/` and the shared features they share in `shared/`, and the same shape repeats one level down. A component's role is read from its name ([components.md](components.md#roles-by-name)), and tests sit next to their file:
+- Mobile: three layers, `src/app/`, `src/features/` and `src/shared/` ([mobile-layers](architecture.md#mobile-layers)). `src/app/` composes the features into the navigation and imports only features; `src/app/App.tsx`, registered by `main.ts`, mounts `AppProvidersContainer` from `features/shell` and `RootNavigator`. A feature is a domain of the subject (`user` for IV.1, `playlists` with its `editor` for IV.2.3, `playback` with its `control-delegation` for IV.2.2, `events`, `subscription`, `search`, `legal`, `shell`). It holds kind folders for its own files, its sub-features in `features/` and the shared features they share in `shared/`, and the same shape repeats one level down. A component's role is read from its name ([components.md](components.md#roles-by-name)), and tests sit next to their file:
 
   ```
   features/<feature>/
@@ -33,7 +33,7 @@ Where a file goes is set by the target layout in `doc/architecture/code-layout.m
 
 No file named `index.ts` (or `index.tsx`) under `src/` (backend: ESLint `no-restricted-syntax`; mobile: oxlint `check-file/no-index` from the brutalway preset). An index file is either a barrel that re-exports, which hides where code lives and creates cycles, or a module with a name that says nothing. Name the file after what it holds and import that file directly.
 
-The app entry points outside `src/` (`mobile/index.ts`, required by Expo) are not concerned.
+The app entry points outside `src/` (`mobile/main.ts`, the Expo entry) are not concerned.
 
 ## backend-feature
 

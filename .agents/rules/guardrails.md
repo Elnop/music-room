@@ -10,7 +10,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | --- | --- | --- | --- |
 | type-check | tsc | `tsconfig.json` | a type error |
 | lint | ESLint (`eslint . --quiet`) | `eslint.config.*` | an ESLint error (warnings do not fail) |
-| oxlint | oxlint (mobile), `tools/guardrails/check-oxlint.mjs` | `oxlint.config.mjs`, `.oxlint-suppressions.json` | a violation of the brutalway oxlint presets beyond the suppressions ([oxlint](#oxlint)) |
+| oxlint | oxlint (mobile) | `oxlint.config.mjs`, `oxlint-suppressions.json` | a violation of the brutalway oxlint presets beyond the suppressions ([oxlint](#oxlint)) |
 | dead-code | knip | `knip.json` | an unused file, export, type or dependency |
 | deps | dependency-cruiser | `.dependency-cruiser.cjs` (mobile: preset `@brutalway/dependency-cruiser-config/layers`), backend: `.dependency-cruiser-known-violations.json` | a layer violation, a cross-feature import or a cycle ([architecture.md](architecture.md), mobile: [mobile-layers](architecture.md#mobile-layers)) |
 | tree | check-tree (mobile) | | a folder outside the layout, an empty folder, a kind folder with a single child ([structure.md](structure.md#check-tree)) |
@@ -19,7 +19,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | ast-grep | ast-grep | `sgconfig.yml`, `ast-grep/rules/` | a pattern rule below |
 | secrets | gitleaks (Docker) | `.gitleaks.toml` | a secret in a file git would commit ([no-secrets](#no-secrets)) |
 | test | Vitest / jest-expo | | a failing unit test |
-| exceptions | `tools/guardrails/check-exceptions.mjs` | | an exception list that grew ([exception-lists](#exception-lists)) |
+| exceptions | `tools/guardrails/check-exceptions.mjs` (backend), `@brutalway/check-exceptions` (mobile) | | an exception list that grew ([exception-lists](#exception-lists)) |
 
 Every tool is a devDependency installed by `make install`, except semgrep and gitleaks, which run from Docker images pinned by digest in `tools/guardrails/docker-scan.mjs`: Docker must be running (it already is for `make dev-docker`). semgrep lists its files with git, so in a git worktree the script also mounts the main checkout's `.git`; a scan that reaches no file fails instead of passing. The CI job `check` runs the same command for both projects on every PR.
 
@@ -30,22 +30,24 @@ The rules block from day one; the violations that existed when a rule arrived ar
 | Tool | Exception list | Entry |
 | --- | --- | --- |
 | dependency-cruiser | `backend/.dependency-cruiser-known-violations.json` | a violation |
-| oxlint | `mobile/.oxlint-suppressions.json` (same format as ESLint's) | a (file, rule) pair, with its count |
+| oxlint | `mobile/oxlint-suppressions.json`, written by oxlint | a (file, rule) pair, with its count |
 | jscpd | the `ignore` globs of `<project>/.jscpd.json` | a glob (the first globs, tests and generated files, are permanent) |
 | semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
 | gitleaks | the `[[allowlists]]` of `.gitleaks.toml` | an allowed value or path, public by design |
 
-An exception list only shrinks. `check:exceptions` counts the entries of each list per rule and fails when a count is higher than at the fork point from `origin/develop` or than at `HEAD`. A story that cleans files then shrinks the list:
+An exception list only shrinks. `check:exceptions` counts the entries of each list per rule and fails when a count is higher than at the fork point from `origin/develop` (the backend script also compares with `HEAD`). A story that cleans files then shrinks the list:
 
 - dependency-cruiser: `npx depcruise src --config .dependency-cruiser.cjs --output-type baseline --output-to .dependency-cruiser-known-violations.json` from `backend/`.
-- oxlint: `npm run check:oxlint -- --prune` from `mobile/` (`check:oxlint` fails while a suppression allows more than what is left).
+- oxlint: `npm run check:oxlint -- --prune-suppressions` from `mobile/` (`check:oxlint` fails while a suppression allows more than what is left).
 - jscpd, semgrep, gitleaks: delete the entries by hand.
 
 For jscpd `ignore`, semgrep `exclude` and every string of the `.gitleaks.toml` allowlist and `[extend]` sections, the comparison is by value: every entry must already exist on `develop`, so an entry can be neither added nor widened (such as `**/src/store/authStore.ts` turned into `**/src/**`).
 
 A semgrep rule whose scope is a naming convention declares it in `metadata.allowed-paths` and repeats each glob in `paths.exclude`, since semgrep reads only `paths`. `check:exceptions` does not count an exclude entry that the same rule declares there, under these constraints: `allowed-paths` is read only directly under the rule's `metadata:`; only a suffix glob `*<Suffix>.<ext>` qualifies, Suffix being a capitalised word of 4 letters or more (`*Storage.ts`; not `*.ts`, not a file name), and any other value leaves its exclude entry counted as an exception; and each rule's `allowed-paths` is compared with the reference like an exception list, so a new glob fails unless it is recorded for that rule under `allowedPaths` in `tools/guardrails/new-rule-baselines.json`. Such a glob allows every file whose name ends that way, existing or future. Adding one changes the rule and takes a dedicated ticket ([append-only-rules](#append-only-rules)).
 
-Two changes are not growth. A file moved with git (a rename) keeps its entries and inline escapes under its new path: update the path in the list, nothing else. A new rule lands with exceptions only through the versioned allowlist `tools/guardrails/new-rule-baselines.json` (`{ "<project>": { "<rule id>": <max entries> } }`): a rule listed there, with no entry in the reference list, may record up to that many entries (oxlint: occurrences; dependency-cruiser: violations), and `check:exceptions` prints `new rule, baseline accepted`. Adding the rule to the allowlist, with today's count, is part of the ticket that creates the rule. A baseline only counts while it is absent from `develop`'s copy of the allowlist: once on `develop`, the rule only shrinks like any other, even after its last entry is gone, and `check:exceptions` fails until the next ticket removes the stale baseline. A rule not in the allowlist (a renamed one included) starts at 0. The rename logic is in `tools/guardrails/renames.mjs`; the tests of `tools/guardrails/` (`*.test.mjs`) run in the mobile's `npm test`.
+The next two paragraphs describe the backend script, `tools/guardrails/check-exceptions.mjs`, which also watches the two lists both projects share (`tools/semgrep/rules.yml` and `.gitleaks.toml`). The mobile runs `@brutalway/check-exceptions --base origin/develop`: it reads `oxlint-suppressions.json`, `knip.json`, `.jscpd.json` and the inline escapes of `mobile/` (`oxlint-disable`, `eslint-disable`, `@ts-expect-error`, `@ts-ignore`, `@ts-nocheck`, `jscpd:ignore-start`, `gitleaks:allow`), and counts per rule over the whole project, so a moved file changes nothing. A rule absent at the fork point starts at 0; the ticket that adds it writes its count under `check-exceptions.newRules` in `mobile/package.json`, and the next ticket deletes that entry.
+
+Two changes are not growth. A file moved with git (a rename) keeps its entries and inline escapes under its new path: update the path in the list, nothing else. A new rule lands with exceptions only through the versioned allowlist `tools/guardrails/new-rule-baselines.json` (`{ "<project>": { "<rule id>": <max entries> } }`): a rule listed there, with no entry in the reference list, may record up to that many entries (dependency-cruiser: violations), and `check:exceptions` prints `new rule, baseline accepted`. Adding the rule to the allowlist, with today's count, is part of the ticket that creates the rule. A baseline only counts while it is absent from `develop`'s copy of the allowlist: once on `develop`, the rule only shrinks like any other, even after its last entry is gone, and `check:exceptions` fails until the next ticket removes the stale baseline. A rule not in the allowlist (a renamed one included) starts at 0. The rename logic is in `tools/guardrails/renames.mjs`; the tests of `tools/guardrails/` (`*.test.mjs`) run in the mobile's `npm test`.
 
 Inline escapes count too: `check:exceptions` counts `eslint-disable`, `oxlint-disable`, `nosemgrep`, `ast-grep-ignore` and `jscpd:ignore-start` per file under the project's `src/`, and fails when a file has more than on `develop` (a new file starts at 0).
 
@@ -53,7 +55,7 @@ Never add an entry or an inline escape to make new code pass: fix the code. A js
 
 ## oxlint
 
-Mobile only. `npm run check:oxlint` runs oxlint with `oxlint.config.mjs`, which extends three presets of [brutalway](https://brutalway.elnop.dev/): `@brutalway/oxlint-config-react-native` (itself built on `@brutalway/oxlint-config-react`, `-typescript` and `-zustand`), `@brutalway/oxlint-config-tanstack-query` and `@brutalway/oxlint-config-react-hook-form`. It runs next to ESLint, which keeps the project's own rules. Each rule, what it rejects and how to fix it is described in the README of its preset, in `node_modules/@brutalway/oxlint-config-*/README.md`; the main ones:
+Mobile only. `npm run check:oxlint` runs oxlint with `oxlint.config.mjs`, which extends three presets of [brutalway](https://brutalway.elnop.dev/): `@brutalway/oxlint-config-react-native` (itself built on `@brutalway/oxlint-config-react`, `-typescript` and `-zustand`), `@brutalway/oxlint-config-tanstack-query` and `@brutalway/oxlint-config-react-hook-form`. It lints `src/`, `test-utils/` and `main.ts`, next to ESLint, which keeps the project's own rules. Each rule, what it rejects and how to fix it is described in the README of its preset, in `node_modules/@brutalway/oxlint-config-*/README.md`; the main ones:
 
 - styles: no literal color, size, spacing, font or shadow in `StyleSheet.create`, no object written in a `style` prop, no unused style, no raw text outside `<Text>` (`theme-styles`, `react-native/*`);
 - code shape: no comment, function declarations, small functions, types where they belong, exports at the end, no relative import (`no-comments`, `func-style`, `function-size`, `type-definitions`, `export-placement`, `no-restricted-imports`);
@@ -61,7 +63,7 @@ Mobile only. `npm run check:oxlint` runs oxlint with `oxlint.config.mjs`, which 
 - TanStack Query: keys from a key factory, complete `queryKey` dependencies (`query-conventions`, `tanstack-query/*`);
 - tests: `it` inside `describe`, `toStrictEqual`, `toHaveBeenCalledWith` (`jest/*`).
 
-`tools/guardrails/check-oxlint.mjs` counts the violations per file and rule and compares them with `.oxlint-suppressions.json`, which recorded the 5205 violations left when oxlint arrived (#629). A count above its suppression fails and prints the violations; a suppression that allows more than what is left fails too, until `npm run check:oxlint -- --prune` lowers it. The list only shrinks ([exception-lists](#exception-lists)); `--write` rewrites it from scratch and is for the ticket that adds a rule. The script is tested by `node --test tools/guardrails/check-oxlint.test.mjs`, which `npm test` runs.
+oxlint reads `oxlint-suppressions.json` itself: the file recorded the 5205 violations left when oxlint arrived (#629) and holds 4 today. A count above its suppression fails and prints the violations; a suppression that allows more than what is left fails too, until `npm run check:oxlint -- --prune-suppressions` lowers it. The list only shrinks ([exception-lists](#exception-lists)); `--suppress-all` rewrites it from scratch and is for the ticket that adds a rule, with its `newRules` entry.
 
 ## pre-commit
 

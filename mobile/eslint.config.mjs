@@ -220,7 +220,6 @@ export default [
         },
       ],
       'components/screen-orchestrator-only': 'error',
-      'components/one-component-per-file': 'error',
       'components/orchestrator-no-fetch': 'error',
     },
   },

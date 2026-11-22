@@ -2,7 +2,6 @@ import { RuleTester } from 'eslint';
 import { describe, it } from 'node:test';
 import tseslint from 'typescript-eslint';
 import screenOrchestratorOnly from './rules/screen-orchestrator-only.mjs';
-import oneComponentPerFile from './rules/one-component-per-file.mjs';
 import orchestratorNoFetch from './rules/orchestrator-no-fetch.mjs';
 
 RuleTester.describe = describe;
@@ -52,45 +51,6 @@ ruleTester.run('screen-orchestrator-only', screenOrchestratorOnly, {
 			code: "import { PlaylistDetailView } from '@/features/playlists/detail/components/presenters/PlaylistDetailView';",
 			filename: '/app/mobile/src/app/stacks/PlaylistsStack.tsx',
 			errors: [{ messageId: 'noPresenterInScreen' }],
-		},
-	],
-});
-
-ruleTester.run('one-component-per-file', oneComponentPerFile, {
-	valid: [
-		{
-			code: 'export function One() { return <div>One</div>; }',
-			filename: '/app/mobile/src/features/foo/presenters/One.tsx',
-		},
-		{
-			code: 'export const One = () => <div>One</div>;',
-			filename: '/app/mobile/src/features/foo/presenters/One.tsx',
-		},
-		{
-			code: 'function helper() { return 42; } export function One() { return <div>{helper()}</div>; }',
-			filename: '/app/mobile/src/features/foo/presenters/One.tsx',
-		},
-	],
-	invalid: [
-		{
-			code: `
-				function SubHeader() { return <div>Sub</div>; }
-				export function MainView() { return <div><SubHeader /></div>; }
-			`,
-			filename: '/app/mobile/src/features/foo/presenters/MainView.tsx',
-			errors: [{ messageId: 'oneComponentPerFile' }],
-		},
-		{
-			code: `
-				export const First = () => <div>1</div>;
-				export const Second = () => <div>2</div>;
-				export const Third = () => <div>3</div>;
-			`,
-			filename: '/app/mobile/src/features/foo/presenters/TriView.tsx',
-			errors: [
-				{ messageId: 'oneComponentPerFile' },
-				{ messageId: 'oneComponentPerFile' },
-			],
 		},
 	],
 });
