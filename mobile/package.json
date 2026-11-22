@@ -97,7 +97,7 @@
 	},
 	"devDependencies": {
 		"@ast-grep/cli": "^0.51.0",
-		"@brutalway/check-tree": "0.14.0",
+		"@brutalway/check-tree": "0.14.1",
 		"@brutalway/dependency-cruiser-config": "0.12.2",
 		"@brutalway/oxlint-config-react-hook-form": "0.2.0",
 		"@brutalway/oxlint-config-react-native": "0.3.1",

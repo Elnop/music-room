@@ -56,4 +56,4 @@ export const queryKeys = {
 		all: ['search'] as const,
 		tracks: (query: string) => [...queryKeys.search.all, 'tracks', query] as const,
 	},
-} as const;
+};
