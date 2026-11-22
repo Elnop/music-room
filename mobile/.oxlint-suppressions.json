@@ -42,15 +42,5 @@
     "query-conventions(query-key-factory)": {
       "count": 3
     }
-  },
-  "src/shared/logging/logger.ts": {
-    "eslint(no-console)": {
-      "count": 3
-    }
-  },
-  "src/shared/query-keys/queryKeys.ts": {
-    "export-placement(no-restricted-syntax)": {
-      "count": 1
-    }
   }
 }
