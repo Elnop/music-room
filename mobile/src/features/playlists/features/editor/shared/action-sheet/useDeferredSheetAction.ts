@@ -10,7 +10,7 @@ export function useDeferredSheetAction(onClose: () => void): DeferredSheetAction
 	const pendingRef = useRef<(() => void) | null>(null);
 
 	return {
-		run: action => () => {
+		run: (action) => () => {
 			if (Platform.OS === 'ios') {
 				pendingRef.current = action;
 				onClose();

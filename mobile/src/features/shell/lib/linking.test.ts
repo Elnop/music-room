@@ -58,7 +58,7 @@ describe('stateFromLinkPath outside a browser', () => {
 		'login',
 		'profile/settings',
 		`playlist/${ID}/edit`,
-	])('ignores %j', path => {
+	])('ignores %j', (path) => {
 		expect(stateFromLinkPath(path)).toBeUndefined();
 	});
 });
@@ -141,21 +141,23 @@ describe('createLinking in a browser', () => {
 
 	it.each(['/login', '/welcome', '/nowhere', `/playlist/${ID}/extra`])(
 		'opens the home for %s when signed in',
-		path => {
+		(path) => {
 			const linking = createLinking(() => true);
 			expect(linking.getStateFromPath!(path, linking.config as Options)).toBeUndefined();
 			expect(takePendingLink()).toBeNull();
-		}
+		},
 	);
 
 	it('opens /privacy in both sessions', () => {
 		const signedOut = createLinking(() => false);
 		expect(
-			signedOut.getStateFromPath!('/privacy', signedOut.config as Options)?.routes.map(r => r.name)
+			signedOut.getStateFromPath!('/privacy', signedOut.config as Options)?.routes.map(
+				(r) => r.name,
+			),
 		).toStrictEqual(['Welcome', 'PrivacyPolicy']);
 		const signedIn = createLinking(() => true);
 		expect(signedIn.getStateFromPath!('/privacy', signedIn.config as Options)?.routes[0].name).toBe(
-			'ProfileTab'
+			'ProfileTab',
 		);
 		expect(takePendingLink()).toBeNull();
 	});
@@ -163,20 +165,20 @@ describe('createLinking in a browser', () => {
 	it('opens the welcome screen at the root when signed out', () => {
 		const linking = createLinking(() => false);
 		const state = linking.getStateFromPath!('/', linking.config as Options);
-		expect(state?.routes.map(route => route.name)).toStrictEqual(['Welcome']);
+		expect(state?.routes.map((route) => route.name)).toStrictEqual(['Welcome']);
 		expect(linking.getPathFromState!({ routes: [{ name: 'Welcome' }] }, linking.config)).toBe('/');
 	});
 
 	it('opens a signed-out screen when signed out', () => {
 		const linking = createLinking(() => false);
 		const state = linking.getStateFromPath!('/register', linking.config as Options);
-		expect(state?.routes.map(route => route.name)).toStrictEqual(['Welcome', 'Register']);
+		expect(state?.routes.map((route) => route.name)).toStrictEqual(['Welcome', 'Register']);
 	});
 
 	it('keeps an app screen opened signed out, but not the home', () => {
 		const linking = createLinking(() => false);
 		expect(
-			linking.getStateFromPath!('/profile/devices', linking.config as Options)
+			linking.getStateFromPath!('/profile/devices', linking.config as Options),
 		).toBeUndefined();
 		expect(takePendingLink()).toBe('/profile/devices');
 		linking.getStateFromPath!('/', linking.config as Options);
@@ -201,7 +203,7 @@ describe('createLinking in a browser under a base path', () => {
 		]);
 	});
 
-	it.each(['playlist', 'user'])('opens a direct /music-room/%s/<id> address', kind => {
+	it.each(['playlist', 'user'])('opens a direct /music-room/%s/<id> address', (kind) => {
 		const linking = createLinking(() => true);
 		const state = linking.getStateFromPath!(`/music-room/${kind}/${ID}`, linking.config as Options);
 		expect(state?.routes[0].name).toBe(kind === 'playlist' ? 'PlaylistsTab' : 'FriendsTab');
@@ -218,10 +220,10 @@ describe('createLinking in a browser under a base path', () => {
 		const state = stateFromLinkPath(`user/${ID}`)!;
 		expect(linking.getPathFromState!(state, linking.config)).toBe(`/music-room/user/${ID}`);
 		expect(linking.getPathFromState!({ routes: [{ name: 'Login' }] }, linking.config)).toBe(
-			'/music-room/login'
+			'/music-room/login',
 		);
 		expect(linking.getPathFromState!({ routes: [{ name: 'Welcome' }] }, linking.config)).toBe(
-			'/music-room/'
+			'/music-room/',
 		);
 	});
 });
@@ -248,7 +250,7 @@ describe('openPendingLink', () => {
 						}),
 					}),
 				}),
-			})
+			}),
 		);
 		expect(openPendingLink(ref)).toBe(false);
 		expect(ref.dispatch).toHaveBeenCalledTimes(1);

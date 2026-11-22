@@ -20,7 +20,7 @@ function licensePath(deviceId: string, userId: string): string {
 export const musicControlApi = {
 	async getMyPermissions(): Promise<string[]> {
 		const data = await apiRequest<MusicControlPermissionsResponse>(
-			'/api/music-control/permissions'
+			'/api/music-control/permissions',
 		);
 		return data.allowedUserIds;
 	},
@@ -45,14 +45,14 @@ export const musicControlApi = {
 			{
 				method: 'PATCH',
 				body: JSON.stringify({ name }),
-			}
+			},
 		);
 		return data.device;
 	},
 
 	async getControllableDevices(userId: string): Promise<ControllableDevicesResponse> {
 		return apiRequest<ControllableDevicesResponse>(
-			`/api/music-control/users/${encodeURIComponent(userId)}/devices`
+			`/api/music-control/users/${encodeURIComponent(userId)}/devices`,
 		);
 	},
 
@@ -72,7 +72,7 @@ export const musicControlApi = {
 
 	async revokeDeviceLicense(
 		deviceId: string,
-		userId: string
+		userId: string,
 	): Promise<RevokeDeviceLicenseResponse> {
 		return apiRequest<RevokeDeviceLicenseResponse>(licensePath(deviceId, userId), {
 			method: 'DELETE',

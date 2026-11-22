@@ -36,14 +36,14 @@ function renderTab(onToggleControl = jest.fn()) {
 				onRefresh: jest.fn(),
 			}}
 			control={{
-				canControl: id => id === 's',
+				canControl: (id) => id === 's',
 				togglingUserId: null,
 				onToggleControl,
 			}}
 			onSelectUser={jest.fn()}
 			onGoToSearch={jest.fn()}
 			bottomPadding={0}
-		/>
+		/>,
 	);
 	return onToggleControl;
 }
@@ -66,7 +66,7 @@ describe('FriendsListTab', () => {
 		fireEvent(
 			screen.getByLabelText('sandy peut contrôler ma musique sur tous mes appareils'),
 			'valueChange',
-			false
+			false,
 		);
 		expect(onToggleControl).toHaveBeenCalledWith('s', true);
 	});

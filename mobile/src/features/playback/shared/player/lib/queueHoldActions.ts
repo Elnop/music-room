@@ -23,7 +23,7 @@ function applyQueueState(set: QueueSet, get: QueueGet, state: QueueState): void 
 	if (!isHeldOwner(state.ownerId)) return;
 	const held = get().queues[state.ownerId];
 	if (held && state.version <= held.version) return;
-	set(current => ({
+	set((current) => ({
 		queues: {
 			...current.queues,
 			[state.ownerId]: {
@@ -38,7 +38,7 @@ function applyQueueState(set: QueueSet, get: QueueGet, state: QueueState): void 
 
 export function queueHoldActions(set: QueueSet, get: QueueGet): QueueHoldActions {
 	return {
-		load: async ownerId => {
+		load: async (ownerId) => {
 			const me = getSession().user?.id;
 			try {
 				get().applyState(await queueApi.getQueue(ownerId && ownerId !== me ? { ownerId } : {}));
@@ -46,7 +46,7 @@ export function queueHoldActions(set: QueueSet, get: QueueGet): QueueHoldActions
 				logger.error('[queueStore] Load failed:', error);
 			}
 		},
-		applyState: state => applyQueueState(set, get, state),
+		applyState: (state) => applyQueueState(set, get, state),
 	};
 }
 
@@ -55,14 +55,14 @@ export function queueOwnerActions(set: QueueSet, get: QueueGet): QueueOwnerActio
 		setCurrentItem: (ownerId, itemId, version) => {
 			const held = get().queues[ownerId];
 			if (!held || held.version >= version || held.currentItemId === itemId) return;
-			if (!held.items.some(item => item.id === itemId)) return;
-			set(current => ({
+			if (!held.items.some((item) => item.id === itemId)) return;
+			set((current) => ({
 				queues: { ...current.queues, [ownerId]: { ...held, currentItemId: itemId } },
 			}));
 		},
-		forget: ownerId => {
+		forget: (ownerId) => {
 			if (!(ownerId in get().queues)) return;
-			set(current => {
+			set((current) => {
 				const queues = { ...current.queues };
 				delete queues[ownerId];
 				return { queues };

@@ -118,16 +118,16 @@ describe('playerStore state machine', () => {
 
 	it.each<PlaybackState>(['idle', 'ready', 'playing', 'paused'])(
 		'setPlaybackReady is a no-op from %s',
-		from => {
+		(from) => {
 			withState(from);
 			playerStore.getState().setPlaybackReady();
 			expect(playerStore.getState().playbackState).toBe(from);
-		}
+		},
 	);
 
 	it.each<PlaybackState>(['loading', 'ready', 'paused'])(
 		'setPlaybackPlaying moves %s to playing',
-		from => {
+		(from) => {
 			playerStore.setState({ playbackState: from, loading: true, pendingTrackId: 9 });
 
 			playerStore.getState().setPlaybackPlaying();
@@ -137,7 +137,7 @@ describe('playerStore state machine', () => {
 			expect(state.isPlaying).toBe(true);
 			expect(state.loading).toBe(false);
 			expect(state.pendingTrackId).toBeNull();
-		}
+		},
 	);
 
 	it('setPlaybackPlaying is a no-op from idle', () => {
@@ -146,14 +146,14 @@ describe('playerStore state machine', () => {
 		expect(playerStore.getState().isPlaying).toBe(false);
 	});
 
-	it.each<PlaybackState>(['ready', 'paused'])('play moves %s to playing', from => {
+	it.each<PlaybackState>(['ready', 'paused'])('play moves %s to playing', (from) => {
 		withState(from);
 		playerStore.getState().play();
 		expect(playerStore.getState().playbackState).toBe('playing');
 		expect(playerStore.getState().isPlaying).toBe(true);
 	});
 
-	it.each<PlaybackState>(['idle', 'loading', 'playing'])('play is a no-op from %s', from => {
+	it.each<PlaybackState>(['idle', 'loading', 'playing'])('play is a no-op from %s', (from) => {
 		withState(from);
 		playerStore.getState().play();
 		expect(playerStore.getState().playbackState).toBe(from);
@@ -168,11 +168,11 @@ describe('playerStore state machine', () => {
 
 	it.each<PlaybackState>(['idle', 'loading', 'ready', 'paused'])(
 		'pause is a no-op from %s',
-		from => {
+		(from) => {
 			withState(from);
 			playerStore.getState().pause();
 			expect(playerStore.getState().playbackState).toBe(from);
-		}
+		},
 	);
 
 	it('resume moves paused to playing', () => {
@@ -184,11 +184,11 @@ describe('playerStore state machine', () => {
 
 	it.each<PlaybackState>(['idle', 'loading', 'ready', 'playing'])(
 		'resume is a no-op from %s',
-		from => {
+		(from) => {
 			withState(from);
 			playerStore.getState().resume();
 			expect(playerStore.getState().playbackState).toBe(from);
-		}
+		},
 	);
 });
 
@@ -369,12 +369,12 @@ describe('pause by the system (#310)', () => {
 
 	it.each<PlaybackState>(['idle', 'loading', 'ready', 'paused'])(
 		'pauseBySystem is a no-op from %s',
-		from => {
+		(from) => {
 			withState(from);
 			playerStore.getState().pauseBySystem();
 			expect(playerStore.getState().playbackState).toBe(from);
 			expect(playerStore.getState().pausedBySystem).toBe(false);
-		}
+		},
 	);
 
 	it('a user pause during the interruption clears the mark and stays paused', () => {
@@ -447,7 +447,7 @@ describe('restored track (#312)', () => {
 
 	it.each(['play', 'resume'] as const)(
 		'%s loads the stream at the saved position, keeping the modal',
-		action => {
+		(action) => {
 			restore();
 			playerStore.setState({ isModalOpen: true });
 
@@ -460,7 +460,7 @@ describe('restored track (#312)', () => {
 			expect(state.queueItemId).toBe('q9');
 			expect(state.needsStreamLoad).toBe(false);
 			expect(state.isModalOpen).toBe(true);
-		}
+		},
 	);
 
 	it('moves the start position on a seek before play', () => {

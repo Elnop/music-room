@@ -15,7 +15,7 @@ describe('SocialSignInButtons', () => {
 			<SocialSignInButtons
 				social={{ onGoogle, onFacebook: jest.fn(), isPending: false }}
 				disabled={false}
-			/>
+			/>,
 		);
 
 		fireEvent.press(screen.getByLabelText('Continuer avec Google'));
@@ -31,7 +31,7 @@ describe('SocialSignInButtons', () => {
 			<SocialSignInButtons
 				social={{ onGoogle: jest.fn(), onFacebook, googleButton, isPending: false }}
 				disabled={false}
-			/>
+			/>,
 		);
 
 		fireEvent.press(screen.getByLabelText('Continuer avec Facebook'));
@@ -52,11 +52,11 @@ describe('SocialSignInButtons', () => {
 					isPending: false,
 				}}
 				disabled={false}
-			/>
+			/>,
 		);
 
 		expect(
-			StyleSheet.flatten(screen.getByLabelText('Continuer avec Facebook').props.style)
+			StyleSheet.flatten(screen.getByLabelText('Continuer avec Facebook').props.style),
 		).toMatchObject({ height: 40, maxWidth: 400, borderRadius: 4 });
 	});
 });

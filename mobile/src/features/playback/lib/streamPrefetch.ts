@@ -19,7 +19,7 @@ export const streamPrefetch = {
 	take(
 		queueItemId: string | null,
 		permalink: string,
-		now: number = Date.now()
+		now: number = Date.now(),
 	): PrefetchedStream | null {
 		const entry = held;
 		if (!entry || queueItemId === null) return null;

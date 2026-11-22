@@ -44,21 +44,21 @@ jest.mock('react-native-reorderable-list', () => {
 
 const data = ['a', 'b', 'c'];
 function rows() {
-	return screen.getAllByTestId('row').map(row => row.props.children);
+	return screen.getAllByTestId('row').map((row) => row.props.children);
 }
 
 function renderList(onReorder: (from: number, to: number) => Promise<unknown>) {
 	return render(
 		<ReorderableList
 			data={data}
-			keyExtractor={item => item}
+			keyExtractor={(item) => item}
 			onReorder={onReorder}
 			renderItem={({ item }) => (
 				<Text key={item} testID="row">
 					{item}
 				</Text>
 			)}
-		/>
+		/>,
 	);
 }
 
@@ -105,14 +105,14 @@ describe('ReorderableList', () => {
 		rerender(
 			<ReorderableList
 				data={['c', 'a', 'b']}
-				keyExtractor={item => item}
+				keyExtractor={(item) => item}
 				onReorder={() => new Promise(() => {})}
 				renderItem={({ item }) => (
 					<Text key={item} testID="row">
 						{item}
 					</Text>
 				)}
-			/>
+			/>,
 		);
 		expect(rows()).toStrictEqual(['c', 'a', 'b']);
 	});

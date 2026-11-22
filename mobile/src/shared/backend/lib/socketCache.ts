@@ -9,7 +9,7 @@ import type {
 export function applySocketEvent<Payload, Data>(
 	client: QueryClient,
 	rule: SocketCacheRule<Payload, Data>,
-	payload: Payload
+	payload: Payload,
 ): SocketCacheResult {
 	const queryKey = rule.queryKey(payload);
 	if (!queryKey) return 'ignored';
@@ -25,7 +25,7 @@ export function applySocketEvent<Payload, Data>(
 }
 
 export function socketCacheRule<Payload, Data>(
-	rule: SocketCacheRule<Payload, Data>
+	rule: SocketCacheRule<Payload, Data>,
 ): SocketCacheBinding {
 	return {
 		event: rule.event,
@@ -36,9 +36,9 @@ export function socketCacheRule<Payload, Data>(
 export function bindSocketCache(
 	socket: Socket,
 	client: QueryClient,
-	bindings: readonly SocketCacheBinding[]
+	bindings: readonly SocketCacheBinding[],
 ): () => void {
-	const listeners = bindings.map(binding => {
+	const listeners = bindings.map((binding) => {
 		function listener(payload: unknown) {
 			binding.apply(client, payload);
 		}

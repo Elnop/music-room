@@ -18,19 +18,19 @@ export function useLicenseToggle(updateLicensed: (update: PairUpdate) => void) {
 	const onToggle = useCallback(
 		async (device: UserDeviceWithLicenses, friend: FriendUserSummary, grant: boolean) => {
 			const key = pairKey(device.deviceId, friend.id);
-			setPending(current => setPair(current, key, true));
-			updateLicensed(current => setPair(current, key, grant));
+			setPending((current) => setPair(current, key, true));
+			updateLicensed((current) => setPair(current, key, grant));
 			try {
 				await requestLicense(device, friend, grant);
 			} catch (error) {
-				updateLicensed(current => setPair(current, key, !grant));
+				updateLicensed((current) => setPair(current, key, !grant));
 				const fallback = grant ? "Impossible d'accorder l'accès" : "Impossible de retirer l'accès";
 				showError(apiErrorMessage(error, fallback));
 			} finally {
-				setPending(current => setPair(current, key, false));
+				setPending((current) => setPair(current, key, false));
 			}
 		},
-		[updateLicensed]
+		[updateLicensed],
 	);
 
 	return { pending, onToggle };

@@ -9,7 +9,7 @@ export function startLoadedPlayer(player: AudioPlayer): void {
 		player
 			.seekTo(state.startPositionMs / 1000)
 			.then(() => state.markSeek())
-			.catch(err => {
+			.catch((err) => {
 				logger.warn('[PlayerAudioSync] Start position seek failed:', err);
 			});
 	}

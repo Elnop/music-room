@@ -44,7 +44,7 @@ describe('useProviderButtons (web)', () => {
 		const latest = jest.fn();
 		const { result, rerender } = renderHook(
 			({ onCredential }: { onCredential: () => void }) => useProviderButtons(onCredential, 'row'),
-			{ initialProps: { onCredential: first } }
+			{ initialProps: { onCredential: first } },
 		);
 
 		const detach = attach(result.current);
@@ -62,7 +62,7 @@ describe('useProviderButtons (web)', () => {
 	it('releases a button that renders after the slot is gone', async () => {
 		const release = jest.fn();
 		let finish: (done: () => void) => void = noop;
-		render.mockReturnValue(new Promise(resolve => (finish = resolve)));
+		render.mockReturnValue(new Promise((resolve) => (finish = resolve)));
 		const { result } = renderHook(() => useProviderButtons(jest.fn(), 'form'));
 
 		const detach = attach(result.current);

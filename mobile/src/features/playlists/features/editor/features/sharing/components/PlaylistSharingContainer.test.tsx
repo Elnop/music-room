@@ -18,7 +18,7 @@ import { playlistWithTracks } from '@test-utils/playlistFixtures';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
@@ -50,7 +50,7 @@ jest.mock(
 				</Text>
 			),
 		};
-	}
+	},
 );
 
 type Props = NativeStackScreenProps<PlaylistStackParamList, 'PlaylistSharing'>;
@@ -77,7 +77,7 @@ async function renderScreen() {
 		<PlaylistSharingContainer
 			route={{ key: 'k', name: 'PlaylistSharing', params: { playlistId: 'p1' } } as Props['route']}
 			navigation={{} as Props['navigation']}
-		/>
+		/>,
 	);
 	clear = () => view.client.clear();
 	await act(async () => {});
@@ -129,7 +129,7 @@ describe('PlaylistSharingContainer', () => {
 		routes.routes[PLAYLIST] = fail(403, 'PLAYLIST_ACCESS_DENIED');
 		await renderScreen();
 		await waitFor(() =>
-			expect(showError).toHaveBeenCalledWith('Vous ne pouvez pas modifier cette playlist')
+			expect(showError).toHaveBeenCalledWith('Vous ne pouvez pas modifier cette playlist'),
 		);
 	});
 

@@ -6,17 +6,17 @@ import { useRemoteQueue } from '@/features/playback/hooks/useRemoteQueue';
 import { bindControl, bindListening } from '@/features/playback/lib/remoteListening';
 
 export function useRemoteTarget(): void {
-	const socket = useSocketState(state => state.socket);
-	const isConnected = useSocketState(state => state.isConnected);
-	const ownerId = useConnectState(state =>
-		state.target.kind === 'remote' ? state.target.ownerId : null
+	const socket = useSocketState((state) => state.socket);
+	const isConnected = useSocketState((state) => state.isConnected);
+	const ownerId = useConnectState((state) =>
+		state.target.kind === 'remote' ? state.target.ownerId : null,
 	);
-	const deviceId = useConnectState(state =>
-		state.target.kind === 'remote' ? state.target.deviceId : null
+	const deviceId = useConnectState((state) =>
+		state.target.kind === 'remote' ? state.target.deviceId : null,
 	);
 	useRemoteQueue(
 		ownerId,
-		useSession(state => state?.user?.id ?? null)
+		useSession((state) => state?.user?.id ?? null),
 	);
 
 	useEffect(() => {

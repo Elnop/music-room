@@ -29,7 +29,7 @@ function showsListening({ follow, listening }: ViewedProfile): boolean {
 		listening.canControlMusic &&
 		isFriend &&
 		!listening.isLoading &&
-		listening.devices.some(d => Boolean(d.track))
+		listening.devices.some((d) => Boolean(d.track))
 	);
 }
 

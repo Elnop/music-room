@@ -11,7 +11,7 @@ export function forgotPassword(email: string): Promise<MessageResponse> {
 export function resetPassword(
 	email: string,
 	code: string,
-	newPassword: string
+	newPassword: string,
 ): Promise<MessageResponse> {
 	return apiRequest('/api/auth/reset-password', {
 		method: 'POST',

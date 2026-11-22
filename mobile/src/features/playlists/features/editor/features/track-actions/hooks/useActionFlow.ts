@@ -8,7 +8,7 @@ import type {
 
 export function useActionFlow(
 	track: AddQueueItemBody | null,
-	start: TrackActionsStart
+	start: TrackActionsStart,
 ): ActionFlow {
 	const [shown, setShown] = useState(track);
 	const [step, setStep] = useState<TrackActionsStep>(start);

@@ -14,7 +14,7 @@ export function usePanelArtwork(track: NowPlayingTrack | null): PanelArtwork {
 			dominantColor
 				? [hexToRgba(dominantColor, 0.22), 'transparent']
 				: ['transparent', 'transparent'],
-		[dominantColor]
+		[dominantColor],
 	);
 	return { artworkUrl, gradient };
 }

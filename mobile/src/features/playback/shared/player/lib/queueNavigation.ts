@@ -8,11 +8,11 @@ type QueueItemsView = {
 function currentIndex(state: QueueItemsView): number {
 	return state.currentItemId === null
 		? -1
-		: state.items.findIndex(item => item.id === state.currentItemId);
+		: state.items.findIndex((item) => item.id === state.currentItemId);
 }
 
 export function currentItem(state: QueueItemsView): QueueItem | undefined {
-	return state.items.find(item => item.id === state.currentItemId);
+	return state.items.find((item) => item.id === state.currentItemId);
 }
 
 export function nextItem(state: QueueItemsView): QueueItem | undefined {

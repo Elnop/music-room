@@ -21,7 +21,7 @@ export function SearchTracksResults({ screen, bottomPadding }: SearchTracksResul
 	return (
 		<FlatList
 			data={screen.results}
-			keyExtractor={item => item.id.toString()}
+			keyExtractor={(item) => item.id.toString()}
 			renderItem={({ item }) => (
 				<MemoizedTrackRow
 					track={item}

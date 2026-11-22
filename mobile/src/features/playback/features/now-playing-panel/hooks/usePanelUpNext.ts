@@ -7,7 +7,7 @@ import type { PanelUpNext } from '@/features/playback/features/now-playing-panel
 
 export function usePanelUpNext(isRemote: boolean): PanelUpNext {
 	const queue = useActiveQueue();
-	const localTrack = usePlayerState(state => state.currentTrack);
+	const localTrack = usePlayerState((state) => state.currentTrack);
 	const next = useMemo(() => upNext(queue, UP_NEXT_COUNT), [queue]);
 	const source = next.current?.track ?? (isRemote ? null : localTrack);
 	return { items: next.items, total: next.total, source };

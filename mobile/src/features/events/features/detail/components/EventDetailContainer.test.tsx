@@ -21,7 +21,7 @@ import { beaconActions, beaconStore } from '@/features/events/features/detail/be
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('@/shared/theme/hooks/useTheme', () => {
@@ -45,7 +45,7 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 }));
 
 function pressDestructive(_title: string, _message?: string, buttons?: AlertButton[]) {
-	buttons?.find(button => button.style === 'destructive')?.onPress?.();
+	buttons?.find((button) => button.style === 'destructive')?.onPress?.();
 }
 
 type Props = NativeStackScreenProps<EventStackParamList, 'EventDetail'>;
@@ -59,7 +59,7 @@ async function renderDetail(waitForTitle = true) {
 		<EventDetailContainer
 			route={{ key: 'k', name: 'EventDetail', params: { id: 'e1' } } as Props['route']}
 			navigation={navigation as unknown as Props['navigation']}
-		/>
+		/>,
 	);
 	clear = () => view.client.clear();
 	if (waitForTitle) await screen.findByText('Rooftop');

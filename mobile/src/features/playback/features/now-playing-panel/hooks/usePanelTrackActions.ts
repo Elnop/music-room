@@ -20,8 +20,8 @@ export function usePanelTrackActions(source: PanelTrackSource | null): PanelTrac
 	return {
 		actions,
 		shareUrl: source ? toTrackInput(source).trackUri : null,
-		onAddToPlaylist: anchor => openActions(anchor, 'playlists'),
-		onMoreActions: anchor => openActions(anchor, 'actions'),
+		onAddToPlaylist: (anchor) => openActions(anchor, 'playlists'),
+		onMoreActions: (anchor) => openActions(anchor, 'actions'),
 		onCloseActions: () => setActions(null),
 	};
 }

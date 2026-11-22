@@ -14,10 +14,10 @@ import type { MemberList } from '@/features/playlists/features/editor/features/s
 
 export function useMembersQuery(id: string): MemberList {
 	const client = useQueryClient();
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	const query = useQuery({
 		queryKey: queryKeys.playlists.members(id),
-		queryFn: context => loadMembers(context.client, id),
+		queryFn: (context) => loadMembers(context.client, id),
 		enabled: signedIn,
 		staleTime: STALE.none,
 		gcTime: STALE.none,
@@ -35,6 +35,6 @@ export function useMembersQuery(id: string): MemberList {
 		members: query.data ?? [],
 		isLoading: query.isLoading,
 		refetch: useCallback(() => void refetch(), [refetch]),
-		setMembers: update => updateMembers(client, id, update),
+		setMembers: (update) => updateMembers(client, id, update),
 	};
 }

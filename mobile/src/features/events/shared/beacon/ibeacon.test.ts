@@ -21,8 +21,8 @@ describe('buildIBeaconPayload', () => {
 		expect(
 			payload
 				.slice(2, 18)
-				.map(b => b.toString(16).padStart(2, '0'))
-				.join('')
+				.map((b) => b.toString(16).padStart(2, '0'))
+				.join(''),
 		).toBe(ZUMIK_BEACON_UUID.replaceAll('-', ''));
 		expect(payload.slice(20, 22)).toStrictEqual([0, 42]);
 		expect(payload[22]).toBe(MEASURED_POWER & 0xff);
@@ -31,7 +31,7 @@ describe('buildIBeaconPayload', () => {
 	it('refuses a minor out of range and a malformed UUID', () => {
 		expect(() => buildIBeaconPayload(eventBeaconFrame(70_000))).toThrow('Invalid minor');
 		expect(() => buildIBeaconPayload({ ...eventBeaconFrame(1), uuid: 'nope' })).toThrow(
-			'Invalid UUID'
+			'Invalid UUID',
 		);
 	});
 });

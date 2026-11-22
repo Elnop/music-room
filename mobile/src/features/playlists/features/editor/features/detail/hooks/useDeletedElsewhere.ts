@@ -9,7 +9,7 @@ import type { DetailNavigation } from '@/features/playlists/features/editor/feat
 export function useDeletedElsewhere(
 	navigation: DetailNavigation,
 	id: string,
-	deletingRef: RefObject<boolean>
+	deletingRef: RefObject<boolean>,
 ): boolean {
 	const client = useQueryClient();
 	const { deleted } = usePlaylistRoom(id);

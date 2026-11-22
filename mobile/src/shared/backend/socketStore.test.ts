@@ -80,7 +80,7 @@ const mockAuthState = {
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 registerAuthSession({
@@ -109,11 +109,11 @@ function lastAuthOption(): AuthCallback {
 }
 
 function readHandshake(): Promise<object> {
-	return new Promise(resolve => lastAuthOption()(resolve));
+	return new Promise((resolve) => lastAuthOption()(resolve));
 }
 
 function flush() {
-	return new Promise<void>(resolve => setImmediate(resolve));
+	return new Promise<void>((resolve) => setImmediate(resolve));
 }
 const backendError = jest.fn();
 onBackendError(backendError);
@@ -187,13 +187,13 @@ describe('socketStore connect_error', () => {
 		expect(backendError).toHaveBeenCalledWith(
 			'error',
 			'[Socket] Handshake refused, staying disconnected:',
-			'INVALID_TOKEN'
+			'INVALID_TOKEN',
 		);
 	});
 
 	it.each(['NO_TOKEN', 'INVALID_HANDSHAKE', 'TOO_MANY_ATTEMPTS'])(
 		'disconnects without refresh on %s',
-		async code => {
+		async (code) => {
 			socket.trigger('connect_error', new Error(code));
 			await flush();
 
@@ -204,9 +204,9 @@ describe('socketStore connect_error', () => {
 			expect(backendError).toHaveBeenCalledWith(
 				'error',
 				'[Socket] Handshake refused, staying disconnected:',
-				code
+				code,
 			);
-		}
+		},
 	);
 });
 
@@ -250,7 +250,7 @@ describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
 		expect(backendError).toHaveBeenCalledWith(
 			'error',
 			'[Socket] Handshake refused, staying disconnected:',
-			'DEVICE_REGISTRATION_FAILED'
+			'DEVICE_REGISTRATION_FAILED',
 		);
 	});
 

@@ -3,7 +3,7 @@ import { useAvatarPicker } from '@/features/user/features/profile/features/edit-
 import { ApiError } from '@/shared/backend/lib/ApiError';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
@@ -76,10 +76,10 @@ async function run(action: (hook: ReturnType<typeof useAvatarPicker>) => Promise
 
 describe('useAvatarPicker', () => {
 	it('picks a square photo, resizes it, uploads it and updates the store', async () => {
-		const result = await run(hook => hook.pickAndUpload('library'));
+		const result = await run((hook) => hook.pickAndUpload('library'));
 
 		expect(mockPicker.launchImageLibraryAsync).toHaveBeenCalledWith(
-			expect.objectContaining({ allowsEditing: true, aspect: [1, 1], mediaTypes: ['images'] })
+			expect.objectContaining({ allowsEditing: true, aspect: [1, 1], mediaTypes: ['images'] }),
 		);
 		expect(mockPrepareAvatar).toHaveBeenCalledWith(ASSET);
 		expect(mockUploadAvatar).toHaveBeenCalledWith('file:///cache/avatar-512.jpg');
@@ -89,11 +89,11 @@ describe('useAvatarPicker', () => {
 	});
 
 	it('uses the camera when asked', async () => {
-		await run(hook => hook.pickAndUpload('camera'));
+		await run((hook) => hook.pickAndUpload('camera'));
 
 		expect(mockPicker.requestCameraPermissionsAsync).toHaveBeenCalledWith();
 		expect(mockPicker.launchCameraAsync).toHaveBeenCalledWith(
-			expect.objectContaining({ mediaTypes: ['images'] })
+			expect.objectContaining({ mediaTypes: ['images'] }),
 		);
 		expect(mockPicker.launchImageLibraryAsync).not.toHaveBeenCalled();
 		expect(mockUploadAvatar).toHaveBeenCalledWith('file:///cache/avatar-512.jpg');
@@ -102,7 +102,7 @@ describe('useAvatarPicker', () => {
 	it('sends nothing when the picker is cancelled', async () => {
 		mockPicker.launchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: null });
 
-		await run(hook => hook.pickAndUpload('library'));
+		await run((hook) => hook.pickAndUpload('library'));
 
 		expect(mockUploadAvatar).not.toHaveBeenCalled();
 		expect(mockShowError).not.toHaveBeenCalled();
@@ -111,7 +111,7 @@ describe('useAvatarPicker', () => {
 	it('shows a French message and sends nothing when the permission is refused', async () => {
 		mockPicker.requestCameraPermissionsAsync.mockResolvedValue({ granted: false });
 
-		await run(hook => hook.pickAndUpload('camera'));
+		await run((hook) => hook.pickAndUpload('camera'));
 
 		expect(mockPicker.launchCameraAsync).not.toHaveBeenCalled();
 		expect(mockUploadAvatar).not.toHaveBeenCalled();
@@ -125,7 +125,7 @@ describe('useAvatarPicker', () => {
 	])('shows a French toast on %s and keeps the old avatar', async (code, status, message) => {
 		mockUploadAvatar.mockRejectedValue(new ApiError('x', code, undefined, status));
 
-		const result = await run(hook => hook.pickAndUpload('library'));
+		const result = await run((hook) => hook.pickAndUpload('library'));
 
 		expect(mockShowError).toHaveBeenCalledWith(message);
 		expect(mockSetAvatarUrl).not.toHaveBeenCalled();
@@ -133,7 +133,7 @@ describe('useAvatarPicker', () => {
 	});
 
 	it('removes the photo and clears it in the store', async () => {
-		await run(hook => hook.remove());
+		await run((hook) => hook.remove());
 
 		expect(mockRemoveAvatar).toHaveBeenCalledTimes(1);
 		expect(mockSetAvatarUrl).toHaveBeenCalledWith(null);

@@ -11,8 +11,8 @@ export function useSettingsScreen(subscription: PlanState) {
 	const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
 
 	function handleTogglePremium(premium: boolean) {
-		subscription.changePlan(premium ? 'premium' : 'free', error =>
-			showError(apiErrorMessage(error, "Impossible de changer d'offre"))
+		subscription.changePlan(premium ? 'premium' : 'free', (error) =>
+			showError(apiErrorMessage(error, "Impossible de changer d'offre")),
 		);
 	}
 

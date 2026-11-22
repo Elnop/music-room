@@ -13,7 +13,7 @@ import { EmailVerificationContainer } from '@/features/user/features/auth/featur
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
 	signInWithGoogle: jest.fn(),
@@ -114,7 +114,7 @@ describe('EmailVerificationContainer', () => {
 		fireEvent.press(screen.getByLabelText('Renvoyer le code'));
 
 		expect(
-			await screen.findByText('Patientez un instant avant de redemander un code.')
+			await screen.findByText('Patientez un instant avant de redemander un code.'),
 		).toBeTruthy();
 		expect(screen.getByText('Renvoyer le code')).toBeTruthy();
 	});

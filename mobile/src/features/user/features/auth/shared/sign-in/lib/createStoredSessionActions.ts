@@ -25,13 +25,13 @@ export function createStoredSessionActions({
 }: SessionAccess): StoredSessionActions {
 	return {
 		loadFromStorage: () => loadStoredSession(set),
-		setAvatarUrl: async avatarUrl => {
+		setAvatarUrl: async (avatarUrl) => {
 			const { user } = get();
 			if (!user) return;
 			set({ user: { ...user, avatarUrl: avatarUrl ?? undefined } });
 			await writer.persist();
 		},
-		setUser: async user => {
+		setUser: async (user) => {
 			set({ user });
 			await writer.persist();
 		},

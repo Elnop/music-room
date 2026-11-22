@@ -6,18 +6,18 @@ import type { ControllableIds } from '@/features/playback/features/control-deleg
 export function fetchControllable(
 	targetUserId: string,
 	generation: RefObject<number>,
-	setControllable: Dispatch<SetStateAction<ControllableIds | null>>
+	setControllable: Dispatch<SetStateAction<ControllableIds | null>>,
 ): void {
 	generation.current += 1;
 	const request = generation.current;
 	musicControlApi
 		.getControllableDevices(targetUserId)
-		.then(res => {
+		.then((res) => {
 			if (generation.current !== request) return;
-			const ids = res.devices.map(d => d.deviceId);
+			const ids = res.devices.map((d) => d.deviceId);
 			setControllable({ userId: targetUserId, allDevices: res.allDevices, ids });
 		})
-		.catch(err => {
+		.catch((err) => {
 			logger.error('[MusicControl] Load controllable devices failed:', err);
 			if (generation.current !== request) return;
 			setControllable({ userId: targetUserId, allDevices: false, ids: [] });

@@ -14,7 +14,7 @@ type BoundFieldsProps<K extends string> = {
 export function BoundFields<K extends string>({ fields, bindings, onEnter }: BoundFieldsProps<K>) {
 	return (
 		<>
-			{fields.map(field => (
+			{fields.map((field) => (
 				<Input
 					key={field.name}
 					label={field.label}

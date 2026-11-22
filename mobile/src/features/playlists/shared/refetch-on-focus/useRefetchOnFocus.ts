@@ -10,6 +10,6 @@ export function useRefetchOnFocus(refetch: () => unknown): void {
 				return;
 			}
 			refetch();
-		}, [refetch])
+		}, [refetch]),
 	);
 }

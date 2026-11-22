@@ -18,7 +18,7 @@ export function usePickTransfer(onClose: () => void) {
 				setPendingKey(null);
 			}
 		},
-		[onClose]
+		[onClose],
 	);
 
 	return { pendingKey, onPick };

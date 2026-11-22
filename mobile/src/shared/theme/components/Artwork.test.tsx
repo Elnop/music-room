@@ -17,7 +17,7 @@ describe('Artwork', () => {
 		expect(screen.queryByTestId('artwork-placeholder')).toBeNull();
 	});
 
-	it.each([null, undefined, ''])('draws a local placeholder for %p, with no image', async uri => {
+	it.each([null, undefined, ''])('draws a local placeholder for %p, with no image', async (uri) => {
 		render(<Artwork uri={uri} size={48} />);
 		expect(screen.getByTestId('artwork-placeholder')).toBeTruthy();
 		expect(screen.UNSAFE_queryAllByType(Image)).toHaveLength(0);

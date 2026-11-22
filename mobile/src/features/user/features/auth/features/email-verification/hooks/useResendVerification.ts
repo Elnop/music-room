@@ -30,9 +30,9 @@ export function useResendVerification({
 					cooldown.start(RESEND_COOLDOWN_S);
 					showSuccess('Code renvoyé. Vérifiez votre email.');
 				},
-				onError: failure =>
+				onError: (failure) =>
 					reportError(apiErrorMessage(failure, "Impossible d'envoyer un nouveau code")),
-			}
+			},
 		);
 	}
 

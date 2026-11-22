@@ -7,21 +7,21 @@ import type { MyDevicesState } from '@/features/playback/features/control-delega
 
 export async function loadMyDevices(
 	setScreen: Dispatch<SetStateAction<MyDevicesState>>,
-	isRefresh: boolean
+	isRefresh: boolean,
 ): Promise<void> {
 	try {
 		const data = await fetchMyDevices();
-		setScreen(screen => ({ ...screen, data, loadFailed: false }));
+		setScreen((screen) => ({ ...screen, data, loadFailed: false }));
 	} catch (error) {
-		if (!isRefresh) setScreen(screen => ({ ...screen, loadFailed: true }));
+		if (!isRefresh) setScreen((screen) => ({ ...screen, loadFailed: true }));
 		showError(apiErrorMessage(error, LOAD_ERROR));
 	}
 }
 
 export async function refreshMyDevices(
-	setScreen: Dispatch<SetStateAction<MyDevicesState>>
+	setScreen: Dispatch<SetStateAction<MyDevicesState>>,
 ): Promise<void> {
-	setScreen(screen => ({ ...screen, isRefreshing: true }));
+	setScreen((screen) => ({ ...screen, isRefreshing: true }));
 	await loadMyDevices(setScreen, true);
-	setScreen(screen => ({ ...screen, isRefreshing: false }));
+	setScreen((screen) => ({ ...screen, isRefreshing: false }));
 }

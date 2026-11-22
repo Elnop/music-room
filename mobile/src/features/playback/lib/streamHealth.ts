@@ -22,7 +22,7 @@ export function noteHealthyPosition(watch: StreamWatch, sample: HealthySample): 
 export function recoverFailedStream(
 	watch: StreamWatch,
 	statusId: number,
-	isPlaying: boolean
+	isPlaying: boolean,
 ): void {
 	if (!isPlaying || watch.loadedId !== statusId) return;
 	if (watch.handledId === statusId || !isLocalTarget()) return;

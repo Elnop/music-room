@@ -22,7 +22,7 @@ export function LinkedAccountsList({ linkedProviders, actions }: LinkedAccountsL
 					{index > 0 && <View style={styles.divider} />}
 					<LinkedAccountRow
 						method={method}
-						linked={linkedProviders.find(provider => provider.type === method.type)}
+						linked={linkedProviders.find((provider) => provider.type === method.type)}
 						actions={actions}
 					/>
 				</View>

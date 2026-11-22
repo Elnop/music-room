@@ -25,13 +25,13 @@ function handlesKeyItself(target: ShortcutTarget | null, key: string): boolean {
 
 export function matchShortcut(
 	event: ShortcutKeyEvent,
-	shortcuts: readonly KeyboardShortcut[]
+	shortcuts: readonly KeyboardShortcut[],
 ): KeyboardShortcut | undefined {
 	if (event.ctrlKey || event.altKey || event.metaKey) return undefined;
 	if (isTypingTarget(event.target) || handlesKeyItself(event.target, event.key)) return undefined;
 	return shortcuts.find(
-		shortcut =>
+		(shortcut) =>
 			shortcut.key === event.key &&
-			(shortcut.shift === undefined || shortcut.shift === event.shiftKey)
+			(shortcut.shift === undefined || shortcut.shift === event.shiftKey),
 	);
 }

@@ -24,12 +24,12 @@ export function usePlaylistSharing(id: string): PlaylistSharing {
 		members,
 		settings,
 		userSearch,
-		addUser: user => {
+		addUser: (user) => {
 			if (members.busy) return;
 			userSearch.search.clear();
 			members.add(user, mode.isPrivate, !mode.isEditRestricted);
 		},
-		removeUser: userId => members.remove(userId, mode.isPrivate),
+		removeUser: (userId) => members.remove(userId, mode.isPrivate),
 		bottomPadding: useBottomPadding(),
 	};
 }

@@ -7,6 +7,6 @@ export function confirmPlaylistDelete(name: string, onConfirm: () => void): void
 		[
 			{ text: 'Annuler', style: 'cancel' },
 			{ text: 'Supprimer', style: 'destructive', onPress: onConfirm },
-		]
+		],
 	);
 }

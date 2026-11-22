@@ -3,7 +3,7 @@ import type { DomDocument, DomElement } from '@/features/events/features/event-f
 export function element<T extends DomElement>(
 	doc: DomDocument,
 	tag: string,
-	attributes: Record<string, string> = {}
+	attributes: Record<string, string> = {},
 ): T {
 	const node = doc.createElement(tag);
 	for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
@@ -13,7 +13,7 @@ export function element<T extends DomElement>(
 export function button(
 	doc: DomDocument,
 	label: string,
-	attributes: Record<string, string>
+	attributes: Record<string, string>,
 ): DomElement {
 	const node = element(doc, 'button', attributes);
 	node.textContent = label;

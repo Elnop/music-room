@@ -62,7 +62,7 @@ function renderRow(props: Partial<TrackItemProps> = {}) {
 			onShowActions={jest.fn()}
 			onDragStart={jest.fn()}
 			{...props}
-		/>
+		/>,
 	);
 }
 

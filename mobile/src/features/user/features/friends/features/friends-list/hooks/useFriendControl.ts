@@ -10,7 +10,7 @@ export function useFriendControl() {
 	const toggling = useToggleControl();
 	const permissionSet = useMemo(
 		() => new Set(permissions.data ?? NO_PERMISSIONS),
-		[permissions.data]
+		[permissions.data],
 	);
 	const canControl = useCallback((id: string) => permissionSet.has(id), [permissionSet]);
 	const control: FriendControl = { canControl, ...toggling };

@@ -17,7 +17,7 @@ export function useProfileData() {
 	useFocusEffect(
 		useCallback(() => {
 			void refetchData();
-		}, [refetchData])
+		}, [refetchData]),
 	);
 
 	const refresh = useRefreshing(refetchData);

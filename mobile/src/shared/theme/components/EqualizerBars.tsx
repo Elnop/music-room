@@ -14,7 +14,7 @@ function barLevels(bar: number) {
 function steppedRange(levels: number[]) {
 	const count = levels.length;
 	const inputRange = levels.flatMap((_, step) => [step / count, (step + HOLD_END) / count]);
-	const outputRange = levels.flatMap(level => [level, level]);
+	const outputRange = levels.flatMap((level) => [level, level]);
 	return { inputRange: [...inputRange, 1], outputRange: [...outputRange, levels[0]] };
 }
 
@@ -30,7 +30,7 @@ function rowStyle({ height, barWidth }: BarShape): ViewStyle {
 
 function barStyle(
 	{ color, height, barWidth }: BarShape,
-	scaleY: Animated.AnimatedInterpolation<number>
+	scaleY: Animated.AnimatedInterpolation<number>,
 ) {
 	return { width: barWidth, height, backgroundColor: color, transform: [{ scaleY }] };
 }

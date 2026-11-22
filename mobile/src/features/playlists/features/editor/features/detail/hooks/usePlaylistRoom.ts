@@ -10,7 +10,7 @@ type PlaylistRoom = {
 };
 
 export function usePlaylistRoom(playlistId: string): PlaylistRoom {
-	const socket = useSocketState(state => (state.isConnected ? state.socket : null));
+	const socket = useSocketState((state) => (state.isConnected ? state.socket : null));
 	const client = useQueryClient();
 	const [deletedId, setDeletedId] = useState<string | null>(null);
 	const joinedRef = useRef<string | null>(null);

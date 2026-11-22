@@ -17,7 +17,7 @@ const PICKER_OPTIONS: ImagePicker.ImagePickerOptions = {
 
 export async function pickImage(
 	source: ImageSource,
-	onDenied: () => void
+	onDenied: () => void,
 ): Promise<PickedImage | null> {
 	const { granted } =
 		source === 'camera'

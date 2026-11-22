@@ -16,7 +16,7 @@ export function GenreGrid({ selection, isMaxReached }: GenreGridProps) {
 
 	return (
 		<View style={styles.genresGrid}>
-			{MUSIC_GENRES.map(genre => {
+			{MUSIC_GENRES.map((genre) => {
 				const isSelected = selection.selectedGenres.includes(genre);
 
 				return (

@@ -22,7 +22,7 @@ describe('SkeletonList', () => {
 		render(<SkeletonList count={4} row={TrackRowSkeleton} />);
 		await act(async () => {});
 		expect(screen.getAllByTestId('skeleton-block', { includeHiddenElements: true })).toHaveLength(
-			12
+			12,
 		);
 	});
 

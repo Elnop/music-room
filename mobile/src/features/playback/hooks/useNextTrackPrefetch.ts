@@ -8,7 +8,7 @@ import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlaye
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useNextTrackPrefetch(player: AudioPlayer): void {
-	const isPlaying = usePlayerState(state => state.playbackState === 'playing');
+	const isPlaying = usePlayerState((state) => state.playbackState === 'playing');
 	const isLocal = useIsLocalTarget();
 	const next = useNextQueueItem();
 	const inWindow = usePrefetchWindow(player);

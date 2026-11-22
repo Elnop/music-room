@@ -9,7 +9,7 @@ import { SettingsContainer } from '@/features/user/features/settings/components/
 import { PlanContainer } from '@/features/subscription/PlanContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/theme/hooks/useTheme', () => {
@@ -49,9 +49,9 @@ function renderSettings() {
 	render(
 		<QueryClientProvider client={client}>
 			<PlanContainer>
-				{plan => <SettingsContainer subscription={plan} backendUrlField={null} />}
+				{(plan) => <SettingsContainer subscription={plan} backendUrlField={null} />}
 			</PlanContainer>
-		</QueryClientProvider>
+		</QueryClientProvider>,
 	);
 }
 
@@ -98,8 +98,8 @@ describe('SettingsContainer', () => {
 
 		await waitFor(() =>
 			expect(
-				jest.requireMock<{ showError: jest.Mock }>('@/shared/theme/lib/toast').showError
-			).toHaveBeenCalledWith("Impossible de changer d'offre")
+				jest.requireMock<{ showError: jest.Mock }>('@/shared/theme/lib/toast').showError,
+			).toHaveBeenCalledWith("Impossible de changer d'offre"),
 		);
 		expect(screen.getByText('Offre actuelle : Gratuite')).toBeTruthy();
 		expect(screen.getByLabelText('Premium').props.value).toBe(false);
@@ -108,7 +108,7 @@ describe('SettingsContainer', () => {
 	it('leaves breathing room under its last section', () => {
 		renderSettings();
 		expect(
-			StyleSheet.flatten(screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle)
+			StyleSheet.flatten(screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle),
 		).toStrictEqual({ paddingBottom: testTheme.spacing.xl });
 	});
 

@@ -60,7 +60,7 @@ describe('facebookSignIn (web)', () => {
 		await expect(signInWithFacebook()).resolves.toBe('fb-access-token');
 		expect(mockLoadScript).toHaveBeenCalledWith('https://connect.facebook.net/en_US/sdk.js');
 		expect(init).toHaveBeenCalledWith(
-			expect.objectContaining({ appId: 'fb-app-id', version: 'v21.0' })
+			expect.objectContaining({ appId: 'fb-app-id', version: 'v21.0' }),
 		);
 		expect(login).toHaveBeenCalledWith(expect.any(Function), { scope: 'public_profile,email' });
 	});
@@ -89,7 +89,7 @@ describe('facebookSignIn (web)', () => {
 	it('rejects when the script does not load', async () => {
 		const { signInWithFacebook } = load();
 		mockLoadScript.mockRejectedValue(
-			new Error('Could not load https://connect.facebook.net/en_US/sdk.js')
+			new Error('Could not load https://connect.facebook.net/en_US/sdk.js'),
 		);
 
 		await expect(signInWithFacebook()).rejects.toThrow('Could not load');
@@ -118,7 +118,7 @@ describe('facebookSignIn (web)', () => {
 
 		preloadFacebookSdk();
 
-		await new Promise<void>(resolve => setImmediate(resolve));
+		await new Promise<void>((resolve) => setImmediate(resolve));
 		expect(warn).toHaveBeenCalledWith('[OAuth] Facebook SDK not loaded:', {
 			errorMessage: 'Could not load sdk.js',
 		});

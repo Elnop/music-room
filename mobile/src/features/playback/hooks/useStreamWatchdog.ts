@@ -5,7 +5,7 @@ import type { AudioPlayer } from '@/features/playback/shared/player/types/player
 
 export function useStreamWatchdog(player: AudioPlayer): void {
 	const status = useAudioPlayerStatus(player);
-	const isPlaying = usePlayerState(state => state.playbackState === 'playing');
+	const isPlaying = usePlayerState((state) => state.playbackState === 'playing');
 	useStreamHealth(player, isPlaying, {
 		id: status?.id,
 		playbackState: status?.playbackState,

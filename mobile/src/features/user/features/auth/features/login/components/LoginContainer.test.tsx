@@ -16,7 +16,7 @@ import { fail, ok } from '@test-utils/fetchResponses';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
 	signInWithGoogle: jest.fn(),
@@ -50,7 +50,7 @@ function renderLogin() {
 		view.rerender(
 			<QueryClientProvider client={view.client}>
 				<LoginContainer {...props} />
-			</QueryClientProvider>
+			</QueryClientProvider>,
 		);
 	}
 	return { ...view, setFocused };
@@ -123,7 +123,7 @@ describe('LoginContainer', () => {
 
 		fillAndSubmit('a@example.com', 'Secret1!');
 		await waitFor(() =>
-			expect(showWarning).toHaveBeenCalledWith('Email non vérifié. Redirection...')
+			expect(showWarning).toHaveBeenCalledWith('Email non vérifié. Redirection...'),
 		);
 		expect(navigate).not.toHaveBeenCalled();
 
@@ -174,7 +174,7 @@ describe('LoginContainer', () => {
 		fireEvent.press(screen.getByLabelText('Continuer avec Facebook'));
 
 		await waitFor(() =>
-			expect(showError).toHaveBeenCalledWith("La connexion avec Facebook n'est pas configurée.")
+			expect(showError).toHaveBeenCalledWith("La connexion avec Facebook n'est pas configurée."),
 		);
 	});
 
@@ -187,10 +187,10 @@ describe('LoginContainer', () => {
 		await waitFor(() =>
 			expect(fetchMock).toHaveBeenCalledWith(
 				expect.stringMatching(/\/api\/auth\/login$/u),
-				expect.anything()
-			)
+				expect.anything(),
+			),
 		);
-		await new Promise<void>(resolve => setTimeout(resolve, 50));
+		await new Promise<void>((resolve) => setTimeout(resolve, 50));
 		expect(showError).not.toHaveBeenCalled();
 
 		view.setFocused(true);
@@ -200,19 +200,19 @@ describe('LoginContainer', () => {
 
 	it('shows no error toast once the screen has unmounted', async () => {
 		let answer: (response: Response) => void = noop;
-		fetchMock.mockReturnValue(new Promise<Response>(resolve => (answer = resolve)));
+		fetchMock.mockReturnValue(new Promise<Response>((resolve) => (answer = resolve)));
 		const view = renderLogin();
 
 		fillAndSubmit('a@example.com', 'wrong');
 		await waitFor(() =>
 			expect(fetchMock).toHaveBeenCalledWith(
 				expect.stringMatching(/\/api\/auth\/login$/u),
-				expect.anything()
-			)
+				expect.anything(),
+			),
 		);
 		view.unmount();
 		answer(fail(401, 'INVALID_CREDENTIALS'));
-		await new Promise<void>(resolve => setTimeout(resolve, 50));
+		await new Promise<void>((resolve) => setTimeout(resolve, 50));
 
 		expect(showError).not.toHaveBeenCalled();
 	});

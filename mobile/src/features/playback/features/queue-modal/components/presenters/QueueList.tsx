@@ -23,7 +23,7 @@ export function QueueList({ list, rowActions }: QueueListProps) {
 	return (
 		<ReorderableList<QueueItem>
 			data={list.upcoming}
-			keyExtractor={item => item.id}
+			keyExtractor={(item) => item.id}
 			onReorder={list.onReorder}
 			dragEnabled={!isMoving}
 			ListHeaderComponent={header}

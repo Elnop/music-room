@@ -27,7 +27,7 @@ function pickPole(backgrounds: Rgb[]): Rgb {
 }
 
 export function readableSurface(dominant: Rgb, base: Rgb): ReadableSurface {
-	const backgrounds = gradientSamples().map(a => compositeOver(dominant, a, base));
+	const backgrounds = gradientSamples().map((a) => compositeOver(dominant, a, base));
 	const pole = pickPole(backgrounds);
 	if (worstContrast(pole, backgrounds) >= MIN_TEXT_CONTRAST) {
 		return { alphas: GRADIENT_ALPHAS, backgrounds, pole };
@@ -44,7 +44,7 @@ export function secondaryAlpha({ backgrounds, pole }: ReadableSurface): number {
 		const rounded = Math.round(a * 100) / 100;
 		if (
 			backgrounds.every(
-				bg => contrastRatio(compositeOver(pole, rounded, bg), bg) >= MIN_TEXT_CONTRAST
+				(bg) => contrastRatio(compositeOver(pole, rounded, bg), bg) >= MIN_TEXT_CONTRAST,
 			)
 		) {
 			return rounded;

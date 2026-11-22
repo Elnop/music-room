@@ -4,7 +4,7 @@ import type { FieldBinding } from '@/features/user/features/auth/shared/field-bi
 
 export function useFieldBinding<T extends FieldValues>(
 	control: Control<T>,
-	name: Path<T>
+	name: Path<T>,
 ): FieldBinding {
 	const { field, fieldState } = useController({ control, name });
 	return {

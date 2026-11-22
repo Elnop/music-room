@@ -7,7 +7,7 @@ import type { CodeInputState } from '@/features/user/features/auth/shared/code-i
 const EMPTY_CODE = CODE_BOX_KEYS.map(() => '');
 
 function isFilled(digits: readonly string[]): boolean {
-	return digits.every(digit => digit !== '');
+	return digits.every((digit) => digit !== '');
 }
 
 export function useCodeInput(): CodeInputState {

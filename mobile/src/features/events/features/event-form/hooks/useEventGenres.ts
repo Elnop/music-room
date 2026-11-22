@@ -9,8 +9,8 @@ export function useEventGenres(initial: MusicGenre[]): EventGenres {
 
 	function toggleGenre(genre: MusicGenre) {
 		setGenresError(undefined);
-		setGenres(current => {
-			if (current.includes(genre)) return current.filter(g => g !== genre);
+		setGenres((current) => {
+			if (current.includes(genre)) return current.filter((g) => g !== genre);
 			return current.length < EVENT_LIMITS.GENRES_MAX ? [...current, genre] : current;
 		});
 	}

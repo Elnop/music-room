@@ -13,7 +13,7 @@ import { ForgotPasswordContainer } from '@/features/user/features/auth/features/
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
 	signInWithGoogle: jest.fn(),
@@ -71,7 +71,7 @@ describe('ForgotPasswordContainer', () => {
 		fireEvent.press(screen.getByLabelText('Envoyer le code'));
 
 		await waitFor(() =>
-			expect(navigate).toHaveBeenCalledWith('ResetPassword', { email: 'a@example.com' })
+			expect(navigate).toHaveBeenCalledWith('ResetPassword', { email: 'a@example.com' }),
 		);
 		expect(request().url).toMatch(/\/api\/auth\/forgot-password$/u);
 		expect(request().body).toStrictEqual({ email: 'a@example.com' });
@@ -94,7 +94,7 @@ describe('ForgotPasswordContainer', () => {
 		fireEvent.press(screen.getByLabelText('Envoyer le code'));
 
 		expect(
-			await screen.findByText('Le serveur a rencontré un problème. Réessayez plus tard.')
+			await screen.findByText('Le serveur a rencontré un problème. Réessayez plus tard.'),
 		).toBeTruthy();
 		expect(navigate).not.toHaveBeenCalled();
 	});

@@ -15,7 +15,7 @@ export function PlaylistPickerRows({ actions }: PlaylistPickerRowsProps) {
 
 	return (
 		<ScrollView style={styles.list}>
-			{actions.editable.map(playlist => (
+			{actions.editable.map((playlist) => (
 				<ActionSheetRow
 					key={playlist.id}
 					icon={MusicSolid}

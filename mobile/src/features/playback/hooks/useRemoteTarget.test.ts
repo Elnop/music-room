@@ -32,7 +32,7 @@ jest.mock('@/features/playback/shared/player/stores/queueStore', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -70,7 +70,7 @@ function deviceStatus(deviceId: string): ListeningStatus {
 }
 
 function handler<T>(event: string) {
-	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
+	const calls = mockSocket.on.mock.calls.filter((call) => call[0] === event);
 	return calls[calls.length - 1]?.[1] as (data: T) => void;
 }
 
@@ -141,7 +141,7 @@ describe('useRemoteTarget', () => {
 			handler<UserListeningStatus>('listening:status')({
 				ownerId: 'friend',
 				devices: [deviceStatus('phone')],
-			})
+			}),
 		);
 		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(showInfo).toHaveBeenCalledWith('Appareil hors ligne');
@@ -183,7 +183,7 @@ describe('useRemoteTarget', () => {
 			handler<{ targetUserId: string; targetDeviceId: string }>('control:success')({
 				targetUserId: 'friend',
 				targetDeviceId: 'tablet',
-			})
+			}),
 		);
 		expect(connect().controlPending).toBe(false);
 	});
@@ -195,7 +195,7 @@ describe('useRemoteTarget', () => {
 			handler<{ code: string; message: string }>('listening:error')({
 				code: 'NOT_AUTHORIZED',
 				message: 'no',
-			})
+			}),
 		);
 		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(showInfo).toHaveBeenCalledWith('Accès refusé à cet appareil');
@@ -203,7 +203,7 @@ describe('useRemoteTarget', () => {
 
 	it('shares the listening room with another holder', () => {
 		const { acquireListening, releaseListening } = jest.requireActual(
-			'@/features/playback/shared/listening-rooms/listeningRooms'
+			'@/features/playback/shared/listening-rooms/listeningRooms',
 		);
 		acquireListening(mockSocket, 'friend');
 		mockSocket.emit.mockClear();

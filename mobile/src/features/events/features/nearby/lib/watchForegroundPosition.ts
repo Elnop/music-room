@@ -40,18 +40,18 @@ async function readyToWatch(setState: SetPosition): Promise<boolean> {
 function startWebTimeout(session: WatchSession, setState: SetPosition): void {
 	if (Platform.OS !== 'web') return;
 	session.timeout = setTimeout(() => {
-		setState(current => (current.status === 'located' ? current : { status: 'timed-out' }));
+		setState((current) => (current.status === 'located' ? current : { status: 'timed-out' }));
 	}, WEB_POSITION_TIMEOUT_MS);
 }
 
 async function watch(
 	session: WatchSession,
 	setState: SetPosition,
-	pendingRequest: Promise<boolean> | null
+	pendingRequest: Promise<boolean> | null,
 ): Promise<void> {
 	if (pendingRequest) await pendingRequest;
 	if (!(await readyToWatch(setState))) return;
-	setState(current => (current.status === 'located' ? current : { status: 'waiting' }));
+	setState((current) => (current.status === 'located' ? current : { status: 'waiting' }));
 	startWebTimeout(session, setState);
 	session.subscription = await Location.watchPositionAsync(WATCH_OPTIONS, ({ coords }) => {
 		if (!session.cancelled) {
@@ -66,10 +66,10 @@ async function watch(
 
 export function watchForegroundPosition(
 	setState: SetPosition,
-	pendingRequest: Promise<boolean> | null
+	pendingRequest: Promise<boolean> | null,
 ): () => void {
 	const session: WatchSession = { cancelled: false };
-	watch(session, setState, pendingRequest).catch(error => {
+	watch(session, setState, pendingRequest).catch((error) => {
 		logger.warn('[NearbyEvents] Position unavailable:', error);
 		if (!session.cancelled) setState({ status: 'disabled' });
 	});

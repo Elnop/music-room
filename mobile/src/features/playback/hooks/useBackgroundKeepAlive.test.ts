@@ -8,7 +8,7 @@ jest.mock('@/features/playback/lib/jsKeepAlive', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 describe('useBackgroundKeepAlive', () => {

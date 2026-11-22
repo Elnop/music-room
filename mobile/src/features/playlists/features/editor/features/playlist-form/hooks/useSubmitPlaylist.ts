@@ -17,13 +17,13 @@ import type {
 export function useSubmitPlaylist(
 	navigation: PlaylistFormNavigation,
 	editedId: string | undefined,
-	settings: Pick<PlaylistSettings, 'isPrivate' | 'isEditRestricted'>
+	settings: Pick<PlaylistSettings, 'isPrivate' | 'isEditRestricted'>,
 ): (data: PlaylistFormInput) => Promise<void> {
-	const signedIn = useSession(session => session.user !== null);
+	const signedIn = useSession((session) => session.user !== null);
 	const create = useCreatePlaylist();
 	const update = useUpdatePlaylist();
 
-	return async data => {
+	return async (data) => {
 		if (editedId !== undefined) {
 			await saveEdits({ id: editedId, navigation, save: update.mutateAsync }, data);
 			return;

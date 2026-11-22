@@ -13,7 +13,7 @@ export function useDeletedPlaylist(navigation: DetailNavigation, id: string): De
 
 	return {
 		active: !deleted && !leaving.gone,
-		markDeleting: deleting => {
+		markDeleting: (deleting) => {
 			deletingRef.current = deleting;
 		},
 		leaveDeleted: leaving.leave,

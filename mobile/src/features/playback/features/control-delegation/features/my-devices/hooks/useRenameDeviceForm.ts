@@ -32,17 +32,17 @@ export function useRenameDeviceForm({
 	function onSave() {
 		const trimmed = form.name.trim();
 		const error = deviceNameError(trimmed);
-		if (error) setForm(current => ({ ...current, error }));
+		if (error) setForm((current) => ({ ...current, error }));
 		else onSubmit(trimmed);
 	}
 
 	return {
 		name: form.name,
 		error: form.error,
-		onChangeName: text => setForm(current => ({ ...current, name: text, error: undefined })),
+		onChangeName: (text) => setForm((current) => ({ ...current, name: text, error: undefined })),
 		onSave,
 		onReset: () => {
-			setForm(current => ({ ...current, error: undefined }));
+			setForm((current) => ({ ...current, error: undefined }));
 			onSubmit(null);
 		},
 	};

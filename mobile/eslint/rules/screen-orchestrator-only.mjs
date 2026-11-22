@@ -23,7 +23,8 @@ export default {
 		if (isHook) return {};
 
 		const isNavigation = filename.includes('/src/app/') || filename.startsWith('src/app/');
-		const isScreenComponent = /[A-Z]\w*Screen\.[jt]sx?$/.test(filename) && !filename.includes('.test.');
+		const isScreenComponent =
+			/[A-Z]\w*Screen\.[jt]sx?$/.test(filename) && !filename.includes('.test.');
 
 		if (!isNavigation && !isScreenComponent) {
 			return {};
@@ -50,13 +51,14 @@ export default {
 				// For screen component files, any component imported from features must come from orchestrators
 				if (isScreenComponent) {
 					const hasNonTypeSpecifier = node.specifiers?.some(
-						s => s.type === 'ImportSpecifier' && s.importKind !== 'type'
+						(s) => s.type === 'ImportSpecifier' && s.importKind !== 'type',
 					);
 					if (hasNonTypeSpecifier) {
 						const isOrchestrator =
 							source.includes('/orchestrators/') ||
-							node.specifiers.some(s => /(Container|Layout|Page)$/.test(s.imported?.name ?? ''));
-						const isAllowed = isOrchestrator || source.endsWith('/types') || source.includes('/types/');
+							node.specifiers.some((s) => /(Container|Layout|Page)$/.test(s.imported?.name ?? ''));
+						const isAllowed =
+							isOrchestrator || source.endsWith('/types') || source.includes('/types/');
 						if (!isAllowed) {
 							context.report({
 								node,

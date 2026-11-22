@@ -6,7 +6,7 @@ import type { PanelNavigation } from '@/features/playback/features/now-playing-p
 type Sheet = 'queue' | 'devices';
 
 export function usePanelNavigation(): PanelNavigation {
-	const setOpen = useNowPlayingPanelState(state => state.setOpen);
+	const setOpen = useNowPlayingPanelState((state) => state.setOpen);
 	const [sheet, setSheet] = useState<Sheet | null>(null);
 	const close = useCallback(() => setOpen(false), [setOpen]);
 	usePanelFocus(close);

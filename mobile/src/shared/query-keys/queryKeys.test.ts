@@ -35,7 +35,7 @@ describe('queryKeys', () => {
 	});
 
 	it('gives each domain its own root', () => {
-		const roots = Object.values(queryKeys).map(domain => domain.all[0]);
+		const roots = Object.values(queryKeys).map((domain) => domain.all[0]);
 		expect(new Set(roots).size).toBe(roots.length);
 	});
 

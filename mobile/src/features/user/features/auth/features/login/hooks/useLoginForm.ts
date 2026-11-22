@@ -31,7 +31,7 @@ function unverifiedEmail(error: unknown): EmailVerificationParams | null {
 function handleLoginError(
 	error: unknown,
 	navigation: LoginNavigation,
-	reportError: (message: string) => void
+	reportError: (message: string) => void,
 ): void {
 	logger.error('[LoginScreen] Login error:', error);
 	const params = unverifiedEmail(error);
@@ -54,8 +54,8 @@ export function useLoginForm(navigation: LoginNavigation): LoginForm {
 	return {
 		email: useFieldBinding(form.control, 'email'),
 		password: useFieldBinding(form.control, 'password'),
-		submit: form.handleSubmit(input =>
-			login.mutate(input, { onError: error => handleLoginError(error, navigation, reportError) })
+		submit: form.handleSubmit((input) =>
+			login.mutate(input, { onError: (error) => handleLoginError(error, navigation, reportError) }),
 		),
 		isSubmitting: login.isPending,
 		reportError,

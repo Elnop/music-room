@@ -3,14 +3,14 @@ import { distanceMeters, formatDistance } from '@/features/events/features/nearb
 describe('distanceMeters', () => {
 	it('is zero for the same point', () => {
 		expect(
-			distanceMeters({ latitude: 48.9, longitude: 2.3 }, { latitude: 48.9, longitude: 2.3 })
+			distanceMeters({ latitude: 48.9, longitude: 2.3 }, { latitude: 48.9, longitude: 2.3 }),
 		).toBe(0);
 	});
 
 	it('gives about 111 m per thousandth of a degree of latitude', () => {
 		const d = distanceMeters(
 			{ latitude: 48.9, longitude: 2.3 },
-			{ latitude: 48.901, longitude: 2.3 }
+			{ latitude: 48.901, longitude: 2.3 },
 		);
 		expect(d).toBeGreaterThan(110);
 		expect(d).toBeLessThan(112);

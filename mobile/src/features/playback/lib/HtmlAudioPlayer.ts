@@ -4,10 +4,7 @@ import type {
 	PlaybackEvents,
 } from '@/features/playback/shared/player/types/playerTypes';
 import type { StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
-import {
-	mediaElement,
-	setMediaEventHandler,
-} from '@/features/playback/lib/mediaElement';
+import { mediaElement, setMediaEventHandler } from '@/features/playback/lib/mediaElement';
 import type { MediaElement } from '@/features/playback/types/mediaElementTypes';
 import { attachStream } from '@/features/playback/lib/attachStream';
 
@@ -34,7 +31,7 @@ export class HtmlAudioPlayer implements AudioPlayer {
 	constructor(
 		private readonly source: string,
 		private readonly protocol: StreamProtocol,
-		private readonly events: PlaybackEvents
+		private readonly events: PlaybackEvents,
 	) {
 		this.status = this.readStatus();
 	}
@@ -44,7 +41,7 @@ export class HtmlAudioPlayer implements AudioPlayer {
 		detachOwner?.();
 		ownerId = this.id;
 		detachOwner = () => this.detach();
-		setMediaEventHandler(type => this.handleMediaEvent(type));
+		setMediaEventHandler((type) => this.handleMediaEvent(type));
 		this.failed = false;
 		if (this.source) {
 			this.releaseStream = attachStream(mediaElement(), this.source, this.protocol, this.onFatal);
@@ -93,7 +90,7 @@ export class HtmlAudioPlayer implements AudioPlayer {
 	play(): void {
 		this.media()
 			?.play()
-			.catch(error => {
+			.catch((error) => {
 				if (isAutoplayRefusal(error)) this.events.onPlayBlocked();
 			});
 	}

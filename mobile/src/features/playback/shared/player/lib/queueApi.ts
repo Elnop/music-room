@@ -21,7 +21,7 @@ function deviceBody({ deviceId }: QueueCallTarget = {}): { body?: string } {
 async function step(
 	path: string,
 	boundary: QueueStepBoundary,
-	target: QueueCallTarget = {}
+	target: QueueCallTarget = {},
 ): Promise<QueueStepResult> {
 	try {
 		const state = await apiRequest<QueueState>(path, { method: 'POST', ...deviceBody(target) });
@@ -57,7 +57,7 @@ export const queueApi = {
 	moveItem(
 		itemId: string,
 		afterItemId: string | null,
-		target: QueueCallTarget = {}
+		target: QueueCallTarget = {},
 	): Promise<QueueState> {
 		return apiRequest<QueueState>(`${base(target)}/items/${encodeURIComponent(itemId)}/move`, {
 			method: 'POST',
@@ -81,7 +81,7 @@ export const queueApi = {
 	playPlaylist(
 		playlistId: string,
 		target: QueueCallTarget = {},
-		startTrackId?: string
+		startTrackId?: string,
 	): Promise<QueueState> {
 		const body = {
 			...(target.deviceId ? { deviceId: target.deviceId } : {}),
@@ -89,7 +89,7 @@ export const queueApi = {
 		};
 		return apiRequest<QueueState>(
 			`${base(target)}/playlists/${encodeURIComponent(playlistId)}/play`,
-			{ method: 'POST', ...(Object.keys(body).length ? { body: JSON.stringify(body) } : {}) }
+			{ method: 'POST', ...(Object.keys(body).length ? { body: JSON.stringify(body) } : {}) },
 		);
 	},
 

@@ -6,7 +6,7 @@ const MARKER = 'expoMediaControlMedia3Version';
 
 /** One Media3 version for both modules, so they share the same MediaSession classes. */
 function withMedia3Version(config) {
-	return withProjectBuildGradle(config, config => {
+	return withProjectBuildGradle(config, (config) => {
 		if (config.modResults.language !== 'groovy') return config;
 		const contents = config.modResults.contents;
 		if (!contents.includes(MARKER)) {

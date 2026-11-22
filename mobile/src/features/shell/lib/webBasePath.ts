@@ -26,7 +26,7 @@ const browser = globalThis as { location?: BrowserLocation; history?: BrowserHis
 export function restoreRedirectedPath(
 	location = browser.location,
 	history = browser.history,
-	base = webBasePath()
+	base = webBasePath(),
 ): void {
 	if (!location || !history) return;
 	const encoded = REDIRECT_PARAM.exec(location.search)?.[1];

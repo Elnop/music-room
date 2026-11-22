@@ -9,7 +9,7 @@ import type { NewPlaylistContext } from '@/features/playlists/features/editor/fe
 export async function addToPlaylist(
 	addTrack: NewPlaylistContext['addTrack'],
 	playlist: Playlist,
-	track: AddQueueItemBody
+	track: AddQueueItemBody,
 ): Promise<void> {
 	try {
 		await addTrack({ playlistId: playlist.id, track });

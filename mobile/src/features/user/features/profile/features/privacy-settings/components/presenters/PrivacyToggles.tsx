@@ -17,13 +17,13 @@ export function PrivacyToggles({ privacy, onVisibilityChange }: PrivacyTogglesPr
 
 	return (
 		<View style={styles.settings}>
-			{PRIVACY_TOGGLES.map(toggle => (
+			{PRIVACY_TOGGLES.map((toggle) => (
 				<VisibilityToggle
 					key={toggle.field}
 					label={toggle.label}
 					description={toggle.description}
 					value={privacy[toggle.field]}
-					onChange={value => onVisibilityChange(toggle.field, value)}
+					onChange={(value) => onVisibilityChange(toggle.field, value)}
 				/>
 			))}
 		</View>

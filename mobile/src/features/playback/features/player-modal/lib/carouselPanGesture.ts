@@ -32,7 +32,7 @@ function finishSwipe(
 	motion: CarouselMotion,
 	bounds: CarouselBounds,
 	event: PanEnd,
-	onStep: SwipeStep
+	onStep: SwipeStep,
 ) {
 	'worklet';
 	const { center } = motion;
@@ -42,7 +42,7 @@ function finishSwipe(
 	if ((direction === 'next' && hasNext) || (direction === 'previous' && hasPrevious)) {
 		center.value = withSequence(
 			withTiming(anchor + (direction === 'next' ? 1 : -1), { duration: SWIPE_MS }),
-			withDelay(SETTLE_TIMEOUT_MS, withSpring(anchor))
+			withDelay(SETTLE_TIMEOUT_MS, withSpring(anchor)),
 		);
 		runOnJS(onStep)(direction);
 	} else {
@@ -53,7 +53,7 @@ function finishSwipe(
 export function carouselPanGesture(
 	motion: CarouselMotion,
 	bounds: CarouselBounds,
-	onStep: SwipeStep
+	onStep: SwipeStep,
 ): PanGesture {
 	const { drag } = motion;
 	const { hasPrevious, hasNext } = bounds;
@@ -61,10 +61,10 @@ export function carouselPanGesture(
 		.withTestId('player-artwork-pan')
 		.activeOffsetX([-15, 15])
 		.failOffsetY([-10, 10])
-		.onUpdate(event => {
+		.onUpdate((event) => {
 			const blocked =
 				(event.translationX < 0 && !hasNext) || (event.translationX > 0 && !hasPrevious);
 			drag.value = blocked ? event.translationX * EDGE_RESISTANCE : event.translationX;
 		})
-		.onEnd(event => finishSwipe(motion, bounds, event, onStep));
+		.onEnd((event) => finishSwipe(motion, bounds, event, onStep));
 }

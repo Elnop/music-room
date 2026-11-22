@@ -18,12 +18,12 @@ function accessToken(): string {
 }
 
 function useSignedInUserId(): string {
-	return useAuthState(state => state.user?.id ?? '');
+	return useAuthState((state) => state.user?.id ?? '');
 }
 
 export function useLinkedProviders() {
 	const userId = useSignedInUserId();
-	const signedIn = useAuthState(state => state.accessToken !== null);
+	const signedIn = useAuthState((state) => state.accessToken !== null);
 	return useQuery({
 		queryKey: queryKeys.auth.providers(userId),
 		queryFn: () => providersApi.getLinkedProviders(accessToken()),
@@ -43,7 +43,7 @@ export function useLinkProvider() {
 			const token = provider === 'google' ? await signInWithGoogle() : await signInWithFacebook();
 			return providersApi.linkProvider(accessToken(), provider, token);
 		},
-		onSuccess: response => queryClient.setQueryData(queryKeys.auth.providers(userId), response),
+		onSuccess: (response) => queryClient.setQueryData(queryKeys.auth.providers(userId), response),
 	});
 }
 
@@ -55,7 +55,7 @@ export function useUnlinkProvider() {
 			await providersApi.unlinkProvider(accessToken(), provider);
 			await queryClient.refetchQueries(
 				{ queryKey: queryKeys.auth.providers(userId), type: 'active' },
-				{ throwOnError: true }
+				{ throwOnError: true },
 			);
 		},
 	});

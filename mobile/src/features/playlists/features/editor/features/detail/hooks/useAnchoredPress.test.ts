@@ -34,7 +34,7 @@ describe('useAnchoredPress', () => {
 				y: 6,
 				width: 32,
 				height: 32,
-			})
+			}),
 		);
 		const { result } = renderHook(() => useAnchoredPress(buttonAt(5, 6), onPress));
 		result.current();

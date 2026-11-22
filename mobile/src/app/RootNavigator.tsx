@@ -24,7 +24,7 @@ async function loadSession(): Promise<void> {
 }
 
 export function RootNavigator() {
-	const isAuthenticated = useAuthState(state => state.isAuthenticated);
+	const isAuthenticated = useAuthState((state) => state.isAuthenticated);
 	const navigationRef = useNavigationContainerRef<AppTabsParamList>();
 	const linking = useMemo(() => createLinking(isSignedIn), []);
 	const ready = useAppStartup(loadSession);

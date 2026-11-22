@@ -9,7 +9,7 @@ import type {
 export function useSharingSettings(
 	id: string,
 	mode: SharingMode,
-	loaded: boolean
+	loaded: boolean,
 ): SharingSettings {
 	const { isUpdating, apply } = useSharingUpdate(id);
 	const { isPrivate, isEditRestricted } = mode;
@@ -26,7 +26,7 @@ export function useSharingSettings(
 			if (isEditRestricted) showWarning(openEditWarning(isPrivate));
 			void apply(
 				{ editMode: isEditRestricted ? 'open' : 'restricted' },
-				'Failed to update edit mode'
+				'Failed to update edit mode',
 			);
 		},
 	};

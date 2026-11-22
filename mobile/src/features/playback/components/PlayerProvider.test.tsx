@@ -94,7 +94,7 @@ jest.mock('expo-audio', () => ({
 jest.mock('@/shared/backend/lib/apiRequest', () => ({ apiRequest: jest.fn() }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -118,7 +118,7 @@ const track: SoundCloudTrack = {
 let seekRef: ((seconds: number) => void) | null = null;
 const seekProbe = (
 	<SeekProbe
-		onSeekTo={seekTo => {
+		onSeekTo={(seekTo) => {
 			seekRef = seekTo;
 		}}
 	/>
@@ -269,7 +269,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 			expect(u2.play).toHaveBeenCalledTimes(playing ? 1 : 0);
 			expect(playerStore.getState().playbackState).toBe(expected);
 			expect(playerStore.getState().error).toBeNull();
-		}
+		},
 	);
 
 	it('renews once at the last known position when the player fails mid-track', async () => {
@@ -305,7 +305,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		const u1 = mockPlayerFor('u1');
 		answerStreams(
 			{ streamUrl: 'u2', expiresAt: inMinutes(30) },
-			{ streamUrl: 'u3', expiresAt: inMinutes(30) }
+			{ streamUrl: 'u3', expiresAt: inMinutes(30) },
 		);
 
 		setStatus(u1, { playbackState: 'ready', isLoaded: true, currentTime: 30 });
@@ -351,7 +351,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		act(() => playerStore.getState().pause());
 		mockPlayerFor('u1').currentTime = 42;
 		let answer: (data: { streamUrl: string; expiresAt: string }) => void = noop;
-		mockApiRequest.mockReturnValueOnce(new Promise(resolve => (answer = resolve)));
+		mockApiRequest.mockReturnValueOnce(new Promise((resolve) => (answer = resolve)));
 
 		await act(async () => playerStore.getState().resume());
 
@@ -381,7 +381,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		await startPlaying(inMinutes(1));
 		act(() => playerStore.getState().pause());
 		mockApiRequest.mockRejectedValueOnce(
-			new ApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
+			new ApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404),
 		);
 
 		await act(async () => playerStore.getState().resume());
@@ -423,7 +423,7 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		view: ReturnType<typeof render>,
 		player: MockPlayer,
 		playing: boolean,
-		extra: Partial<MockStatus> = {}
+		extra: Partial<MockStatus> = {},
 	) {
 		player.playing = playing;
 		setStatus(player, { playing, ...extra });
@@ -495,7 +495,7 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 	it.each(['failed', 'idle'])(
 		'does not mirror a stop when the player is %s',
-		async playbackState => {
+		async (playbackState) => {
 			const view = await startPlaying(inMinutes(30));
 			const u1 = mockPlayerFor('u1');
 			setStatus(u1, { playing: true, isLoaded: false });
@@ -505,7 +505,7 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 			expect(playerStore.getState().playbackState).toBe('playing');
 			expect(playerStore.getState().pausedBySystem).toBe(false);
-		}
+		},
 	);
 
 	it('ignores a late event that no longer matches the player', async () => {
@@ -589,7 +589,7 @@ describe('PlayerProvider restored track (#312)', () => {
 	it('shows the existing error on play when the track is gone', async () => {
 		await renderRestored();
 		mockApiRequest.mockRejectedValueOnce(
-			new ApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
+			new ApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404),
 		);
 
 		await act(async () => playerStore.getState().resume());
@@ -655,7 +655,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 
 	function streamCallFor(item: QueueItem) {
 		return mockApiRequest.mock.calls.filter(([endpoint]) =>
-			String(endpoint).includes(encodeURIComponent(item.track.trackUri))
+			String(endpoint).includes(encodeURIComponent(item.track.trackUri)),
 		).length;
 	}
 
@@ -739,7 +739,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 	it('ignores a prefetch answered after the next item changed', async () => {
 		const { view, player } = await playQueueItem(A, [A, B, C]);
 		let answer: (data: { streamUrl: string; expiresAt: string }) => void = noop;
-		mockApiRequest.mockReturnValueOnce(new Promise(resolve => (answer = resolve)));
+		mockApiRequest.mockReturnValueOnce(new Promise((resolve) => (answer = resolve)));
 		await reach(view, player, 185);
 
 		mockApiRequest.mockReturnValueOnce(new Promise(() => undefined));

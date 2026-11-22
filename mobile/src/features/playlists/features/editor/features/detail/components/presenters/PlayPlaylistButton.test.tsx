@@ -61,7 +61,7 @@ describe('PlayPlaylistButton (#277)', () => {
 
 	it('ignores a second tap while the request runs, then says another action runs', async () => {
 		let resolve!: (value: string) => void;
-		playPlaylist.mockReturnValue(new Promise(r => (resolve = r)));
+		playPlaylist.mockReturnValue(new Promise((r) => (resolve = r)));
 		await renderButton();
 		const button = screen.getByLabelText('Lire la playlist');
 		fireEvent.press(button);

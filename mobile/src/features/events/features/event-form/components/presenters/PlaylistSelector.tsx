@@ -24,7 +24,7 @@ export function PlaylistSelector({ playlists, selectedId, onSelect }: PlaylistSe
 				<Text style={styles.hint}>Seules vos playlists publiques peuvent être liées.</Text>
 			)}
 			<View style={styles.list}>
-				{options.map(option => (
+				{options.map((option) => (
 					<PlaylistOption
 						key={option.id ?? 'none'}
 						name={option.name}

@@ -6,7 +6,7 @@ import { canEditPlaylist } from '@/features/playlists/features/editor/shared/per
 import type { EditablePlaylists } from '@/features/playlists/features/editor/features/track-actions/trackActionsTypes';
 
 export function useEditablePlaylists(enabled: boolean): EditablePlaylists {
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	const list = usePlaylists(enabled);
 
 	useEffect(() => {
@@ -16,8 +16,8 @@ export function useEditablePlaylists(enabled: boolean): EditablePlaylists {
 	}, [list.error]);
 
 	const editable = useMemo(
-		() => (list.data ?? []).filter(playlist => canEditPlaylist(userId, playlist)),
-		[list.data, userId]
+		() => (list.data ?? []).filter((playlist) => canEditPlaylist(userId, playlist)),
+		[list.data, userId],
 	);
 
 	return { editable, loadingPlaylists: list.isFetching && editable.length === 0 };

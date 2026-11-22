@@ -7,7 +7,7 @@ import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { useAudioPlaybackSync } from '@/features/playback/hooks/useAudioPlaybackSync';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 const track = {

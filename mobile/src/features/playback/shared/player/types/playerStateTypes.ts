@@ -33,7 +33,7 @@ export type PlayerState = {
 	playTrack: (
 		track: SoundCloudTrack,
 		queueItemId?: string | null,
-		startPositionMs?: number | null
+		startPositionMs?: number | null,
 	) => void;
 	renewStream: (positionMs: number, keepPlaying: boolean, afterFailure?: boolean) => void;
 	restoreTrack: (track: SoundCloudTrack, queueItemId: string | null, positionMs: number) => void;

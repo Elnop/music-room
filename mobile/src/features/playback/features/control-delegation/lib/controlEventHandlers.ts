@@ -6,13 +6,13 @@ import type { ControlEventHandlers } from '@/features/playback/features/control-
 export function controlEventHandlers(
 	targetUserId: string,
 	reload: () => void,
-	setControlError: Dispatch<SetStateAction<ControlError | null>>
+	setControlError: Dispatch<SetStateAction<ControlError | null>>,
 ): ControlEventHandlers {
 	return {
-		handlePermissionChanged: data => {
+		handlePermissionChanged: (data) => {
 			if (data.ownerId === targetUserId) reload();
 		},
-		handleControlError: err => {
+		handleControlError: (err) => {
 			logger.error('[MusicControl] Control error:', err);
 			setControlError({ code: err.code, message: err.message });
 			if (err.code === 'NOT_AUTHORIZED') reload();

@@ -8,7 +8,7 @@ type SidebarAccountContainerProps = {
 };
 
 export function SidebarAccountContainer({ active, onPress }: SidebarAccountContainerProps) {
-	const user = useSession(s => s.user);
+	const user = useSession((s) => s.user);
 	if (!user) return null;
 
 	return (

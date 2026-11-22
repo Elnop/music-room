@@ -9,15 +9,15 @@ export const connectStore = createStore<ConnectState>((set, get) => ({
 	target: LOCAL_TARGET,
 	remoteStatus: null,
 	controlPending: false,
-	setRemote: remote => selectRemote(set, get, remote),
-	setLocal: message => {
+	setRemote: (remote) => selectRemote(set, get, remote),
+	setLocal: (message) => {
 		set({ target: LOCAL_TARGET, remoteStatus: null, controlPending: false });
 		if (message) showInfo(message);
 	},
-	setRemoteStatus: status => {
+	setRemoteStatus: (status) => {
 		set({ remoteStatus: status });
 	},
-	setControlPending: pending => {
+	setControlPending: (pending) => {
 		set({ controlPending: pending });
 	},
 }));

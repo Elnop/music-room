@@ -11,19 +11,19 @@ export function useSearchQuery() {
 	const onSearchChange = useCallback(
 		(text: string) => {
 			if (text.trim()) {
-				setQuery(current => ({ ...current, text, pending: true }));
+				setQuery((current) => ({ ...current, text, pending: true }));
 				debouncedSetQuery(text.trim());
 			} else {
 				debouncedSetQuery.cancel();
 				setQuery({ text, debounced: '', pending: false });
 			}
 		},
-		[debouncedSetQuery]
+		[debouncedSetQuery],
 	);
 
 	const settle = useCallback(() => {
 		debouncedSetQuery.cancel();
-		setQuery(current => ({ ...current, pending: false }));
+		setQuery((current) => ({ ...current, pending: false }));
 	}, [debouncedSetQuery]);
 
 	return { query, onSearchChange, settle };

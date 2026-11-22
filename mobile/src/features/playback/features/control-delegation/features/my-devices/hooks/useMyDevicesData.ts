@@ -30,7 +30,7 @@ export function useMyDevicesData() {
 		let isMounted = true;
 		void Promise.resolve().then(async () => {
 			await load(false);
-			if (isMounted) setScreen(current => ({ ...current, isLoading: false }));
+			if (isMounted) setScreen((current) => ({ ...current, isLoading: false }));
 		});
 		return () => {
 			isMounted = false;
@@ -40,7 +40,7 @@ export function useMyDevicesData() {
 	const onRefresh = useCallback(() => refreshMyDevices(setScreen), []);
 
 	const updateLicensed = useCallback((update: PairUpdate) => {
-		setScreen(current => ({
+		setScreen((current) => ({
 			...current,
 			data: { ...current.data, licensed: update(current.data.licensed) },
 		}));

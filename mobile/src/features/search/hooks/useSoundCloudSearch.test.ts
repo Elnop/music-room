@@ -6,7 +6,7 @@ import { searchApi } from '@/features/search/searchApi';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({

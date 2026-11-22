@@ -26,7 +26,7 @@ export function DeviceCardList({ devices, currentDeviceId, access, actions }: De
 	}
 	return (
 		<>
-			{devices.map(device => (
+			{devices.map((device) => (
 				<DeviceCard
 					key={device.deviceId}
 					device={device}

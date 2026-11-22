@@ -5,7 +5,7 @@ import type {
 
 export function useProviderButtons(
 	_onGoogleCredential: () => void,
-	_variant: GoogleButtonVariant
+	_variant: GoogleButtonVariant,
 ): GoogleButtonSlot | undefined {
 	return undefined;
 }

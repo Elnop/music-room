@@ -8,7 +8,7 @@ export function useDragDecisionGesture(): DragDecision {
 	const touchStart = useSharedValue({ x: 0, y: 0 });
 	const panGesture = useMemo(
 		() => dragDecisionGesture(dragRequested, touchStart),
-		[dragRequested, touchStart]
+		[dragRequested, touchStart],
 	);
 	return { dragRequested, panGesture };
 }

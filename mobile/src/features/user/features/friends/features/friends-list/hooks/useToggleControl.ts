@@ -20,7 +20,7 @@ export function useToggleControl() {
 				setTogglingUserId(null);
 			}
 		},
-		[toggleMutation]
+		[toggleMutation],
 	);
 
 	return { togglingUserId, onToggleControl };

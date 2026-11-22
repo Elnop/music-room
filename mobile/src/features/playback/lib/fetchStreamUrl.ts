@@ -4,7 +4,7 @@ import type { StreamFetchResult } from '@/features/playback/shared/player/types/
 
 export async function fetchStreamUrl(
 	permalink: string,
-	signal: AbortSignal
+	signal: AbortSignal,
 ): Promise<StreamFetchResult> {
 	const streamEndpoint = `/api/soundcloud/stream?url=${encodeURIComponent(permalink)}`;
 	const data = await apiRequest<Partial<StreamUrlResponse>>(streamEndpoint, { signal });

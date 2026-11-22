@@ -30,7 +30,7 @@ export function DeviceCardSkeleton() {
 		<View style={styles.skeletonCard}>
 			<DeviceCardSkeletonHeader />
 			<View style={styles.divider} />
-			{[0, 1].map(index => (
+			{[0, 1].map((index) => (
 				<DeviceCardSkeletonRow key={index} />
 			))}
 		</View>

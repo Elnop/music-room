@@ -70,7 +70,7 @@ jest.mock('@/shared/backend/deviceService', () => ({
 				deviceName: 'Pixel',
 				platform: 'android',
 				model: 'Pixel 8',
-			})
+			}),
 		),
 	},
 }));
@@ -79,7 +79,7 @@ jest.mock(
 	'@/features/playback/features/control-delegation/shared/delegation/musicControlApi',
 	() => ({
 		musicControlApi: { getControllableDevices: jest.fn() },
-	})
+	}),
 );
 
 const mockGetControllable = musicControlApi.getControllableDevices as jest.Mock;
@@ -105,7 +105,7 @@ describe('useMusicControlEmitter', () => {
 			jest.advanceTimersByTime(500);
 		});
 
-		const events = mockSocket.emit.mock.calls.map(call => call[0]);
+		const events = mockSocket.emit.mock.calls.map((call) => call[0]);
 		expect(events).not.toContain('auth:register');
 		expect(mockSocket.emit).toHaveBeenCalledWith('listening:update', {
 			track: null,
@@ -203,7 +203,7 @@ describe('useMusicControlEmitter control:command', () => {
 		await act(async () => {
 			await Promise.resolve();
 		});
-		const calls = mockSocket.on.mock.calls.filter(call => call[0] === 'control:command');
+		const calls = mockSocket.on.mock.calls.filter((call) => call[0] === 'control:command');
 		return { ...rendered, handle: calls[calls.length - 1][1] as (data: unknown) => void };
 	}
 
@@ -222,7 +222,7 @@ describe('useMusicControlEmitter control:command', () => {
 		expect(mockPlayTrack).toHaveBeenCalledWith(
 			expect.objectContaining({ title: 'Song', permalink_url: queueTrack.trackUri }),
 			'item-1',
-			42_000
+			42_000,
 		);
 		expect(mockSetCurrentItem).toHaveBeenCalledWith('user-1', 'item-1', 7);
 		expect(mockSetLocal).toHaveBeenCalledWith();
@@ -236,7 +236,7 @@ describe('useMusicControlEmitter control:command', () => {
 		expect(mockPlayTrack).toHaveBeenCalledWith(
 			expect.objectContaining({ title: 'Song' }),
 			undefined,
-			5000
+			5000,
 		);
 		expect(mockSetCurrentItem).not.toHaveBeenCalled();
 		expect(mockSetLocal).toHaveBeenCalledWith();
@@ -270,7 +270,7 @@ function status(deviceId: string) {
 function controllable(ids: string[], allDevices = false) {
 	return {
 		allDevices,
-		devices: ids.map(deviceId => ({
+		devices: ids.map((deviceId) => ({
 			deviceId,
 			deviceName: deviceId,
 			platform: 'android',
@@ -282,7 +282,7 @@ function controllable(ids: string[], allDevices = false) {
 }
 
 function emitted(event: string) {
-	return mockSocket.emit.mock.calls.filter(call => call[0] === event);
+	return mockSocket.emit.mock.calls.filter((call) => call[0] === event);
 }
 
 async function renderFriend() {
@@ -297,7 +297,7 @@ async function renderFriend() {
 }
 
 async function receive(event: string, data: unknown) {
-	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
+	const calls = mockSocket.on.mock.calls.filter((call) => call[0] === event);
 	const handle = calls[calls.length - 1]?.[1] as (data: unknown) => void;
 	await act(async () => {
 		handle(data);
@@ -315,7 +315,7 @@ describe('useFriendListening', () => {
 		await receive('listening:status', { ownerId: FRIEND, devices: [status('A'), status('B')] });
 
 		expect(result.current.canControl).toBe(true);
-		expect(result.current.devices.map(d => [d.device.deviceId, d.controllable])).toStrictEqual([
+		expect(result.current.devices.map((d) => [d.device.deviceId, d.controllable])).toStrictEqual([
 			['A', true],
 			['B', false],
 		]);
@@ -340,7 +340,7 @@ describe('useFriendListening', () => {
 
 		await receive('listening:status', { ownerId: FRIEND, devices: [status('A'), status('B')] });
 
-		expect(result.current.devices.every(d => d.controllable)).toBe(true);
+		expect(result.current.devices.every((d) => d.controllable)).toBe(true);
 		unmount();
 	});
 
@@ -350,7 +350,9 @@ describe('useFriendListening', () => {
 
 		await receive('listening:status', { ownerId: FRIEND, devices: [status('A'), status('NEW')] });
 
-		expect(result.current.devices.find(d => d.device.deviceId === 'NEW')?.controllable).toBe(true);
+		expect(result.current.devices.find((d) => d.device.deviceId === 'NEW')?.controllable).toBe(
+			true,
+		);
 
 		act(() => result.current.remotePause('NEW'));
 		expect(mockSocket.emit).toHaveBeenCalledWith('control:action', {
@@ -388,7 +390,7 @@ describe('useFriendListening', () => {
 		expect(result.current.canControl).toBe(false);
 		expect(logger.error).toHaveBeenCalledWith(
 			'[MusicControl] Load controllable devices failed:',
-			expect.any(Error)
+			expect.any(Error),
 		);
 		unmount();
 	});
@@ -451,13 +453,13 @@ describe('useFriendListening', () => {
 describe('controlErrorMessage', () => {
 	it('maps server codes to French toast texts', () => {
 		expect(controlErrorMessage({ code: 'NOT_AUTHORIZED', message: 'x' })).toBe(
-			'Vous ne pouvez pas contrôler cet appareil'
+			'Vous ne pouvez pas contrôler cet appareil',
 		);
 		expect(controlErrorMessage({ code: 'DEVICE_OFFLINE', message: 'x' })).toBe(
-			"Cet appareil n'est plus en ligne"
+			"Cet appareil n'est plus en ligne",
 		);
 		expect(controlErrorMessage({ code: 'OTHER', message: 'Server says no' })).toBe(
-			'La commande a échoué, réessayez'
+			'La commande a échoué, réessayez',
 		);
 	});
 });

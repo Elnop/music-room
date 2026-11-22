@@ -3,7 +3,7 @@ import { lastTrackStorage } from '@/shared/playback/lastTrackStorage';
 import type { LastTrackEntry } from '@/shared/playback/types/playbackTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 const entry: LastTrackEntry = {

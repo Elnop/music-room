@@ -10,7 +10,7 @@ export function PrivacyPolicyContainer() {
 	return (
 		<PrivacyPolicyView
 			bottomPadding={bottomPadding}
-			onOpenLink={url => openExternalUrl(url, showError)}
+			onOpenLink={(url) => openExternalUrl(url, showError)}
 		/>
 	);
 }

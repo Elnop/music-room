@@ -12,7 +12,7 @@ type FriendPlaylistListProps = {
 export function FriendPlaylistList({ playlists, ownerName, cardStyle }: FriendPlaylistListProps) {
 	return (
 		<>
-			{playlists.items.map(playlist => (
+			{playlists.items.map((playlist) => (
 				<FriendPlaylistCard
 					key={playlist.id}
 					playlist={playlist}

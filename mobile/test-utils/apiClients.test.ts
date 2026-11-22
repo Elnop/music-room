@@ -8,7 +8,7 @@ import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -87,7 +87,7 @@ describe('with a signed-in session', () => {
 	it('sends the session token, refreshes it on a 401 and retries', async () => {
 		fetchMock
 			.mockResolvedValueOnce(
-				jsonResponse({ success: false, error: { code: 'INVALID_TOKEN' } }, 401)
+				jsonResponse({ success: false, error: { code: 'INVALID_TOKEN' } }, 401),
 			)
 			.mockResolvedValueOnce(jsonResponse({ success: true, data: [] }));
 

@@ -20,23 +20,23 @@ type PlaylistPatch = Partial<
 >;
 
 export function patchPlaylist(client: QueryClient, id: string, patch: PlaylistPatch): void {
-	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
-		list?.map(playlist => (playlist.id === id ? { ...playlist, ...patch } : playlist))
+	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), (list) =>
+		list?.map((playlist) => (playlist.id === id ? { ...playlist, ...patch } : playlist)),
 	);
-	client.setQueryData<PlaylistWithTracks>(queryKeys.playlists.detail(id), playlist =>
-		playlist ? { ...playlist, ...patch } : playlist
+	client.setQueryData<PlaylistWithTracks>(queryKeys.playlists.detail(id), (playlist) =>
+		playlist ? { ...playlist, ...patch } : playlist,
 	);
 }
 
 export function prependPlaylist(client: QueryClient, playlist: Playlist): void {
-	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
-		list ? [playlist, ...list] : list
+	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), (list) =>
+		list ? [playlist, ...list] : list,
 	);
 }
 
 export function dropFromList(client: QueryClient, id: string): void {
-	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
-		list?.filter(playlist => playlist.id !== id)
+	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), (list) =>
+		list?.filter((playlist) => playlist.id !== id),
 	);
 }
 

@@ -5,7 +5,7 @@ import { usePhotoMenu } from '@/features/user/features/profile/features/edit-pro
 
 export function useEditProfile() {
 	const bottomPadding = useBottomPadding();
-	const user = useSession(s => s.user);
+	const user = useSession((s) => s.user);
 	const photoMenu = usePhotoMenu(Boolean(user?.avatarUrl));
 	const form = useEditProfileForm(user);
 

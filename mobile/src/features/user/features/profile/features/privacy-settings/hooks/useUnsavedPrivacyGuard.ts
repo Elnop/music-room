@@ -21,7 +21,7 @@ export function useUnsavedPrivacyGuard(hasChanges: boolean) {
 					style: 'destructive',
 					onPress: () => navigation.dispatch(navData.action),
 				},
-			]
+			],
 		);
 	});
 

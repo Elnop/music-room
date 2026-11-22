@@ -4,7 +4,7 @@ import type { Playlist } from '@/features/playlists/shared/playlist/playlistType
 import type { CardMenuSelection } from '@/features/playlists/features/editor/features/card-menu/cardMenuTypes';
 
 export function useCardMenuSelection(): CardMenuSelection {
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	const [selection, setSelection] = useState<{ playlist: Playlist | null; visible: boolean }>({
 		playlist: null,
 		visible: false,
@@ -12,10 +12,10 @@ export function useCardMenuSelection(): CardMenuSelection {
 
 	return {
 		...selection,
-		actionsFor: target =>
+		actionsFor: (target) =>
 			Boolean(userId) && target.ownerId === userId
 				? () => setSelection({ playlist: target, visible: true })
 				: undefined,
-		close: () => setSelection(current => ({ ...current, visible: false })),
+		close: () => setSelection((current) => ({ ...current, visible: false })),
 	};
 }

@@ -9,7 +9,7 @@ import { settleTrackEvent } from '@/features/playlists/features/editor/shared/tr
 export async function addTrack(
 	client: QueryClient,
 	playlistId: string,
-	track: AddQueueItemBody
+	track: AddQueueItemBody,
 ): Promise<void> {
 	const result = await tracksApi.addTrack(playlistId, track);
 	await settleTrackEvent(client, {
@@ -24,10 +24,10 @@ export async function addTrack(
 export async function removeTrack(
 	client: QueryClient,
 	playlistId: string,
-	trackId: string
+	trackId: string,
 ): Promise<void> {
-	client.setQueryData<PlaylistWithTracks>(queryKeys.playlists.detail(playlistId), playlist =>
-		playlist ? { ...playlist, tracks: playlist.tracks.filter(t => t.id !== trackId) } : playlist
+	client.setQueryData<PlaylistWithTracks>(queryKeys.playlists.detail(playlistId), (playlist) =>
+		playlist ? { ...playlist, tracks: playlist.tracks.filter((t) => t.id !== trackId) } : playlist,
 	);
 	try {
 		const result = await tracksApi.removeTrack(playlistId, trackId);

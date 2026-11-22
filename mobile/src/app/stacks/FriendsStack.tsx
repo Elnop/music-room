@@ -30,10 +30,10 @@ export function FriendsNavigator() {
 				options={{ title: '', headerTitle: '' }}
 			/>
 			<FriendsStack.Screen name="PlaylistDetail" options={{ headerShown: false }}>
-				{props => <PlaylistDetailScreen {...props} />}
+				{(props) => <PlaylistDetailScreen {...props} />}
 			</FriendsStack.Screen>
 			<FriendsStack.Screen name="SearchTracks" options={{ title: 'Ajouter des musiques' }}>
-				{props => <SearchTracksScreen {...props} playback={playbackActions} />}
+				{(props) => <SearchTracksScreen {...props} playback={playbackActions} />}
 			</FriendsStack.Screen>
 		</FriendsStack.Navigator>
 	);

@@ -8,7 +8,7 @@ import { showError } from '@/shared/theme/lib/toast';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
@@ -71,7 +71,7 @@ function renderLoaded(): Promise<void> {
 	render(
 		<QueryClientProvider client={client}>
 			<PrivacySettingsContainer />
-		</QueryClientProvider>
+		</QueryClientProvider>,
 	);
 	return screen.findByText('Choisissez qui peut voir vos informations').then(() => undefined);
 }
@@ -115,10 +115,10 @@ describe('PrivacySettingsScreen leave guard', () => {
 		expect(mockDispatch).not.toHaveBeenCalled();
 
 		const buttons = (Alert.alert as jest.Mock).mock.calls[0][2] as AlertButtons;
-		buttons.find(b => b.text === 'Annuler')?.onPress?.();
+		buttons.find((b) => b.text === 'Annuler')?.onPress?.();
 		expect(mockDispatch).not.toHaveBeenCalled();
 
-		buttons.find(b => b.text === 'Quitter sans enregistrer')?.onPress?.();
+		buttons.find((b) => b.text === 'Quitter sans enregistrer')?.onPress?.();
 		expect(mockDispatch).toHaveBeenCalledWith(BACK);
 	});
 
@@ -130,7 +130,7 @@ describe('PrivacySettingsScreen leave guard', () => {
 
 		await waitFor(() => expect(mockGoBack).toHaveBeenCalledWith());
 		expect(privacyApi.updatePrivacySettings).toHaveBeenCalledWith(
-			expect.objectContaining({ avatarVisibility: 'private' })
+			expect.objectContaining({ avatarVisibility: 'private' }),
 		);
 		expect(Alert.alert).not.toHaveBeenCalled();
 		expect(mockDispatch).toHaveBeenCalledWith(BACK);
@@ -141,7 +141,7 @@ describe('PrivacySettingsScreen leave guard', () => {
 		jest.mocked(privacyApi.updatePrivacySettings).mockReturnValue(
 			new Promise((_resolve, reject) => {
 				failSave = reject;
-			})
+			}),
 		);
 		await renderLoaded();
 		fireEvent.press(screen.getAllByText('Privé')[0]);
@@ -154,7 +154,7 @@ describe('PrivacySettingsScreen leave guard', () => {
 			failSave(new Error('network'));
 		});
 		expect(showError).toHaveBeenCalledWith(
-			"Impossible d'enregistrer les paramètres de confidentialité"
+			"Impossible d'enregistrer les paramètres de confidentialité",
 		);
 
 		pressBack();

@@ -9,14 +9,14 @@ export function useCodeBoxes(): CodeBoxes {
 		(index: number) => (input: TextInput | null) => {
 			boxes.current[index] = input;
 		},
-		[]
+		[],
 	);
 
 	const focusFirst = useCallback(() => boxes.current[0]?.focus(), []);
 
 	return {
 		setBoxRef,
-		focus: index => boxes.current[index]?.focus(),
+		focus: (index) => boxes.current[index]?.focus(),
 		focusFirst,
 	};
 }

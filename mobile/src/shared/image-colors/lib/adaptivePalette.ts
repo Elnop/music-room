@@ -20,7 +20,7 @@ function paletteOn(surface: ReadableSurface, dominantColor: string): AdaptivePal
 		accent: text,
 		accentBg: `rgba(${channel},${isWhite ? 0.3 : 0.2})`,
 		onAccent: isWhite ? '#000000' : '#FFFFFF',
-		gradient: surface.alphas.map(a => hexToRgba(dominantColor, a)) as AdaptivePalette['gradient'],
+		gradient: surface.alphas.map((a) => hexToRgba(dominantColor, a)) as AdaptivePalette['gradient'],
 	};
 }
 

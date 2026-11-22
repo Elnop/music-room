@@ -10,7 +10,7 @@ jest.mock('expo-haptics', () => ({
 }));
 
 function flush() {
-	return new Promise<void>(resolve => setImmediate(() => resolve()));
+	return new Promise<void>((resolve) => setImmediate(() => resolve()));
 }
 
 describe('haptics', () => {
@@ -31,19 +31,19 @@ describe('haptics', () => {
 		hapticSuccess();
 		expect(Haptics.notificationAsync).toHaveBeenCalledTimes(1);
 		expect(Haptics.notificationAsync).toHaveBeenCalledWith(
-			Haptics.NotificationFeedbackType.Success
+			Haptics.NotificationFeedbackType.Success,
 		);
 	});
 
 	it('swallows a rejection from a device without a vibrator', async () => {
 		(Haptics.impactAsync as jest.Mock).mockReturnValueOnce(
-			Promise.reject(new Error('no vibrator'))
+			Promise.reject(new Error('no vibrator')),
 		);
 		(Haptics.selectionAsync as jest.Mock).mockReturnValueOnce(
-			Promise.reject(new Error('no vibrator'))
+			Promise.reject(new Error('no vibrator')),
 		);
 		(Haptics.notificationAsync as jest.Mock).mockReturnValueOnce(
-			Promise.reject(new Error('no vibrator'))
+			Promise.reject(new Error('no vibrator')),
 		);
 		expect(() => {
 			hapticTap();

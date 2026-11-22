@@ -7,9 +7,9 @@ export function useDebouncedQuery(setQuery: Dispatch<SetStateAction<SearchQueryS
 	const debouncedSetQuery = useMemo(
 		() =>
 			debounce((text: string) => {
-				setQuery(current => ({ ...current, pending: false, debounced: text }));
+				setQuery((current) => ({ ...current, pending: false, debounced: text }));
 			}, 500),
-		[setQuery]
+		[setQuery],
 	);
 
 	useEffect(() => () => debouncedSetQuery.cancel(), [debouncedSetQuery]);

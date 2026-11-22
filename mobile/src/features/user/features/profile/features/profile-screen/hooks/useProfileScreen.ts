@@ -7,7 +7,7 @@ import { useProfileNavigation } from '@/features/user/features/profile/features/
 
 export function useProfileScreen() {
 	const bottomPadding = useBottomPadding();
-	const user = useSession(s => s.user);
+	const user = useSession((s) => s.user);
 	const profileNavigation = useProfileNavigation();
 	const data = useProfileData();
 	const logoutState = useConfirmLogout();

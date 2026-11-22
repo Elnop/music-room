@@ -13,7 +13,7 @@ export function usePhotoMenu(hasAvatar: boolean) {
 		showAlert(
 			'Photo de profil',
 			'Choisissez une nouvelle photo.',
-			photoMenuButtons({ pickAndUpload, remove }, hasAvatar)
+			photoMenuButtons({ pickAndUpload, remove }, hasAvatar),
 		);
 	}, [pickAndUpload, remove, hasAvatar]);
 
@@ -22,7 +22,7 @@ export function usePhotoMenu(hasAvatar: boolean) {
 
 function photoMenuButtons(
 	picker: Pick<AvatarPicker, 'pickAndUpload' | 'remove'>,
-	hasAvatar: boolean
+	hasAvatar: boolean,
 ): AlertButton[] {
 	const buttons: AlertButton[] = [
 		{ text: 'Galerie', onPress: () => void picker.pickAndUpload('library') },

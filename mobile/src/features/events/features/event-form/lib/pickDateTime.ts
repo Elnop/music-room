@@ -1,7 +1,7 @@
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 function pick(mode: 'date' | 'time', value: Date): Promise<Date | null> {
-	return new Promise(resolve => {
+	return new Promise((resolve) => {
 		DateTimePickerAndroid.open({
 			value,
 			mode,

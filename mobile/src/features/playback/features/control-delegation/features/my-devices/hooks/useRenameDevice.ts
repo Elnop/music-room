@@ -9,22 +9,22 @@ export function useRenameDevice(load: (isRefresh: boolean) => Promise<void>) {
 	const onSubmitRename = useCallback(
 		async (name: string | null) => {
 			if (!rename.device) return;
-			setRename(current => ({ ...current, saving: true }));
+			setRename((current) => ({ ...current, saving: true }));
 			if (await saveDeviceName(rename.device.deviceId, name)) {
-				setRename(current => ({ ...current, device: null }));
+				setRename((current) => ({ ...current, device: null }));
 				await load(true);
 			}
-			setRename(current => ({ ...current, saving: false }));
+			setRename((current) => ({ ...current, saving: false }));
 		},
-		[rename.device, load]
+		[rename.device, load],
 	);
 
 	return {
 		rename,
 		onOpenRename: (device: UserDeviceWithLicenses) =>
-			setRename(current => ({ ...current, device })),
+			setRename((current) => ({ ...current, device })),
 		onCloseRename: () => {
-			if (!rename.saving) setRename(current => ({ ...current, device: null }));
+			if (!rename.saving) setRename((current) => ({ ...current, device: null }));
 		},
 		onSubmitRename,
 	};

@@ -7,7 +7,7 @@ import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
 
 export function useSaveMusicPreferences(
-	selection: ReturnType<typeof useGenreSelection>
+	selection: ReturnType<typeof useGenreSelection>,
 ): PreferencesSave {
 	const navigation = useNavigation();
 	const updateMutation = useUpdateMusicPreferencesMutation();

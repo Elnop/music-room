@@ -22,7 +22,7 @@ export async function signInWithFacebook(): Promise<string> {
 	try {
 		if (!FACEBOOK_APP_ID) {
 			throw new Error(
-				'Facebook App ID not configured. Please set EXPO_PUBLIC_FACEBOOK_APP_ID in your .env file.'
+				'Facebook App ID not configured. Please set EXPO_PUBLIC_FACEBOOK_APP_ID in your .env file.',
 			);
 		}
 

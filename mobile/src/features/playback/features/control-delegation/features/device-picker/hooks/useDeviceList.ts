@@ -28,7 +28,7 @@ export function useDeviceList(visible: boolean): DeviceList {
 	}, [visible]);
 
 	const retry = useCallback(() => {
-		setList(current => ({ ...current, loading: true, loadError: false }));
+		setList((current) => ({ ...current, loading: true, loadError: false }));
 		loadDevices(generation, setList);
 	}, []);
 

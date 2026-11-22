@@ -48,7 +48,7 @@ function setWidth(width: number) {
 }
 
 function texts() {
-	return screen.UNSAFE_getAllByType(Text).map(node => node.props.children);
+	return screen.UNSAFE_getAllByType(Text).map((node) => node.props.children);
 }
 
 describe('TabBarLayout', () => {

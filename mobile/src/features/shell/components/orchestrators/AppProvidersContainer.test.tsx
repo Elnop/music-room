@@ -9,7 +9,7 @@ import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
 import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('react-native-gesture-handler', () => ({
 	...jest.requireActual('react-native-gesture-handler'),
@@ -34,7 +34,7 @@ describe('AppProvidersContainer', () => {
 		render(
 			<AppProvidersContainer queryClient={client}>
 				<Probe onClient={onClient} />
-			</AppProvidersContainer>
+			</AppProvidersContainer>,
 		);
 
 		expect(onClient).toHaveBeenCalledWith(client);
@@ -48,7 +48,7 @@ describe('AppProvidersContainer', () => {
 		render(
 			<AppProvidersContainer>
 				<Probe onClient={onClient} />
-			</AppProvidersContainer>
+			</AppProvidersContainer>,
 		);
 
 		expect(onClient.mock.calls[0][0]).toBeDefined();
@@ -60,7 +60,7 @@ describe('AppProvidersContainer', () => {
 		const { unmount } = render(
 			<AppProvidersContainer queryClient={client}>
 				<Text>app</Text>
-			</AppProvidersContainer>
+			</AppProvidersContainer>,
 		);
 
 		notifySessionEnd();

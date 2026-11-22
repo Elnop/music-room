@@ -4,7 +4,7 @@ import type { PlayerState } from '@/features/playback/shared/player/types/player
 
 export function watchPlayerState(
 	pick: (state: PlayerState) => readonly unknown[],
-	onChange: (state: PlayerState) => void
+	onChange: (state: PlayerState) => void,
 ): () => void {
 	onChange(playerStore.getState());
 	return playerStore.subscribe((state, previous) => {

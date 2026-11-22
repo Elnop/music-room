@@ -11,7 +11,7 @@ export function useCreatePlaylist() {
 	const client = useQueryClient();
 	return useMutation({
 		mutationFn: (input: PlaylistInput) => playlistEditsApi.createPlaylist(input),
-		onSuccess: playlist => prependPlaylist(client, playlist),
+		onSuccess: (playlist) => prependPlaylist(client, playlist),
 	});
 }
 
@@ -24,7 +24,7 @@ export function useUpdatePlaylist() {
 	const client = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, changes }: UpdateVariables) => playlistEditsApi.updatePlaylist(id, changes),
-		onSuccess: updated =>
+		onSuccess: (updated) =>
 			patchPlaylist(client, updated.id, {
 				name: updated.name,
 				description: updated.description,

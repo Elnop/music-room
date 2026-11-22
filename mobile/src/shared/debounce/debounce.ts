@@ -5,7 +5,7 @@ type Debounced<A extends unknown[]> = {
 
 export function debounce<A extends unknown[]>(
 	fn: (...args: A) => void,
-	waitMs: number
+	waitMs: number,
 ): Debounced<A> {
 	let timer: ReturnType<typeof setTimeout> | undefined;
 

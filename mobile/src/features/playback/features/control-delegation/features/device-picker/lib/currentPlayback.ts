@@ -37,12 +37,12 @@ function localPlayback(): TransferPlayback | null {
 
 function remotePlayback(
 	{ ownerId, deviceId }: RemoteTarget,
-	me: string | null
+	me: string | null,
 ): TransferPlayback | null | 'untransferable' {
 	const { remoteStatus } = connectStore.getState();
 	if (!remoteStatus?.track) return null;
 	const queue = selectQueue(queueStore.getState(), ownerId);
-	const item = queue.items.find(entry => entry.id === queue.currentItemId);
+	const item = queue.items.find((entry) => entry.id === queue.currentItemId);
 	if (!item || hashStringToNumber(item.track.trackUri) !== remoteStatus.track.id) {
 		return 'untransferable';
 	}
@@ -55,7 +55,7 @@ function remotePlayback(
 
 export function currentPlayback(
 	target: ConnectTarget,
-	me: string | null
+	me: string | null,
 ): TransferPlayback | null | 'untransferable' {
 	return target.kind === 'remote' ? remotePlayback(target, me) : localPlayback();
 }

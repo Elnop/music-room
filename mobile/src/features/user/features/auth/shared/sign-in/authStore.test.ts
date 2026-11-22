@@ -10,7 +10,7 @@ import { login } from '@/features/user/features/auth/shared/sign-in/lib/signIn';
 import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock(
@@ -18,7 +18,7 @@ jest.mock(
 	() => {
 		throw new Error('supabase must not load');
 	},
-	{ virtual: true }
+	{ virtual: true },
 );
 
 jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
@@ -93,7 +93,7 @@ describe('refreshAccessToken', () => {
 		socketDisconnect.mockReset();
 		withOpenSocket();
 		fetchMock.mockResolvedValue(
-			fail(401, 'INVALID_REFRESH_TOKEN', 'Invalid or expired refresh token')
+			fail(401, 'INVALID_REFRESH_TOKEN', 'Invalid or expired refresh token'),
 		);
 
 		await expect(authStore.getState().refreshAccessToken()).resolves.toBe(false);
@@ -110,13 +110,13 @@ describe('refreshAccessToken', () => {
 		expect(await AsyncStorage.getItem('@zumik/is_authenticated')).toBeNull();
 		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/u);
-		expect(calledUrls().some(url => url.endsWith('/api/auth/logout'))).toBe(false);
+		expect(calledUrls().some((url) => url.endsWith('/api/auth/logout'))).toBe(false);
 		expect(socketDisconnect).toHaveBeenCalledTimes(1);
 	});
 
 	it('keeps the session when the auth service is unavailable (503)', async () => {
 		fetchMock.mockResolvedValue(
-			fail(503, 'AUTH_UNAVAILABLE', 'Authentication service is unavailable')
+			fail(503, 'AUTH_UNAVAILABLE', 'Authentication service is unavailable'),
 		);
 
 		await expect(authStore.getState().refreshAccessToken()).resolves.toBe(false);
@@ -168,7 +168,7 @@ describe('refreshAccessToken', () => {
 					expiresIn: 3600,
 					expiresAt,
 				},
-			})
+			}),
 		);
 
 		await expect(authStore.getState().refreshAccessToken()).resolves.toBe(true);
@@ -274,7 +274,7 @@ function storedSessionValues(): Promise<readonly (readonly [string, string | nul
 	return AsyncStorage.multiGet(Object.values(KEYS));
 }
 
-const NOTHING_STORED = Object.values(KEYS).map(key => [key, null]);
+const NOTHING_STORED = Object.values(KEYS).map((key) => [key, null]);
 
 describe('refresh during use', () => {
 	it('shares one backend refresh between concurrent callers', async () => {
@@ -294,7 +294,7 @@ describe('refresh during use', () => {
 
 	it('gives every concurrent caller false and clears the session when the refresh is refused', async () => {
 		fetchMock.mockResolvedValue(
-			fail(401, 'INVALID_REFRESH_TOKEN', 'Invalid or expired refresh token')
+			fail(401, 'INVALID_REFRESH_TOKEN', 'Invalid or expired refresh token'),
 		);
 
 		const results = await Promise.all([
@@ -403,7 +403,7 @@ describe('session persistence', () => {
 		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
 		expect(logger.error).toHaveBeenCalledWith(
 			'Failed to load auth state from storage:',
-			expect.anything()
+			expect.anything(),
 		);
 	});
 

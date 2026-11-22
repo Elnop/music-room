@@ -6,7 +6,7 @@ import { privacyApi } from '@/features/user/features/profile/shared/profile/lib/
 import type { MusicGenre } from '@/shared/users/userTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
@@ -39,7 +39,7 @@ function renderLoaded(): Promise<void> {
 	render(
 		<QueryClientProvider client={client}>
 			<MusicPreferencesContainer />
-		</QueryClientProvider>
+		</QueryClientProvider>,
 	);
 	return screen.findByText(/Quels genres aimez-vous/u).then(() => undefined);
 }

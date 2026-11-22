@@ -20,7 +20,7 @@ export function PolicySectionItem({ section, onOpenLink }: PolicySectionItemProp
 			<Text style={styles.title} accessibilityRole="header">
 				{section.title}
 			</Text>
-			{section.blocks.map(block => (
+			{section.blocks.map((block) => (
 				<PolicyBlockItem key={policyKey(block)} block={block} onOpenLink={onOpenLink} />
 			))}
 		</View>

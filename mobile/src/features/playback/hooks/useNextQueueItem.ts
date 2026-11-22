@@ -6,7 +6,7 @@ import type { NextQueueItem } from '@/features/playback/types/playbackEngineType
 
 export function useNextQueueItem(): NextQueueItem {
 	const queue = useActiveQueue();
-	const playingItemId = usePlayerState(state => state.queueItemId);
+	const playingItemId = usePlayerState((state) => state.queueItemId);
 	const next = nextItem(queue);
 	const permalink = next ? trackToSoundCloud(next).permalink_url : null;
 

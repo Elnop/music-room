@@ -6,8 +6,8 @@ import { AlertDialog } from '@/features/shell/components/presenters/AlertDialog'
 const OK_BUTTON: AlertButton = { text: 'OK' };
 
 export function AlertHostContainer() {
-	const alert = useAlertState(state => state.queue[0]);
-	const dismiss = useAlertState(state => state.dismiss);
+	const alert = useAlertState((state) => state.queue[0]);
+	const dismiss = useAlertState((state) => state.dismiss);
 
 	if (!alert) return null;
 
@@ -17,7 +17,7 @@ export function AlertHostContainer() {
 		button?.onPress?.();
 	}
 	function cancel() {
-		return choose(buttons.find(button => button.style === 'cancel'));
+		return choose(buttons.find((button) => button.style === 'cancel'));
 	}
 
 	return (

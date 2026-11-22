@@ -20,7 +20,7 @@ import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures'
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
@@ -69,7 +69,7 @@ jest.mock('@/shared/theme/components/ReorderableList', () => {
 					{props.ListHeaderComponent}
 					{props.data.length === 0
 						? props.ListEmptyComponent
-						: props.data.map(item => (
+						: props.data.map((item) => (
 								<View key={item.id}>
 									{props.renderItem({ item, drag: jest.fn(), isActive: false })}
 								</View>
@@ -98,7 +98,7 @@ jest.mock(
 				</>
 			),
 		};
-	}
+	},
 );
 
 type Props = NativeStackScreenProps<PlaylistStackParamList, 'PlaylistDetail'>;
@@ -277,7 +277,7 @@ describe('PlaylistDetailContainer tracks (#307)', () => {
 
 	it('plays the playlist from the tapped track, with feedback on the row while it starts', async () => {
 		let settle: (outcome: string) => void = noop;
-		testPlayback.playPlaylist.mockReturnValueOnce(new Promise(resolve => (settle = resolve)));
+		testPlayback.playPlaylist.mockReturnValueOnce(new Promise((resolve) => (settle = resolve)));
 		await renderScreen({ tracks });
 
 		fireEvent.press(screen.getByText('Other'));
@@ -321,20 +321,20 @@ describe('PlaylistDetailContainer tracks (#307)', () => {
 		await renderScreen({ tracks });
 		await act(() => mockList.onReorder(2, 0));
 		expect(routes.fetchMock.mock.calls.at(-1)?.[1]?.body).toBe(
-			JSON.stringify({ afterRank: null, expectedVersion: 1 })
+			JSON.stringify({ afterRank: null, expectedVersion: 1 }),
 		);
-		expect(mockList.data.map(t => t.id)).toStrictEqual(['Again', 'Song', 'Other']);
+		expect(mockList.data.map((t) => t.id)).toStrictEqual(['Again', 'Song', 'Other']);
 	});
 
 	it('reloads and tells the user when someone else moved the track', async () => {
 		routes.routes[`POST /api/playlists/${ID}/tracks/Again/move`] = fail(
 			409,
-			'TRACK_MOVED_CONCURRENTLY'
+			'TRACK_MOVED_CONCURRENTLY',
 		);
 		await renderScreen({ tracks });
 		await act(() => expect(mockList.onReorder(2, 0)).rejects.toMatchObject({ status: 409 }));
 		expect(showError).toHaveBeenCalledWith("Ce titre a été modifié par quelqu'un d'autre");
-		expect(routes.calls().filter(c => c === `GET /api/playlists/${ID}`)).toHaveLength(2);
+		expect(routes.calls().filter((c) => c === `GET /api/playlists/${ID}`)).toHaveLength(2);
 	});
 
 	it('toasts a failed pull to refresh and keeps the tracks', async () => {
@@ -367,7 +367,7 @@ describe('PlaylistDetailContainer owner actions (#342)', () => {
 			text: string;
 			onPress?: () => void;
 		}[];
-		return buttons.find(b => b.text === text);
+		return buttons.find((b) => b.text === text);
 	}
 
 	it('opens the edit form and « Visibilité et droits »', async () => {
@@ -446,7 +446,7 @@ describe('PlaylistDetailContainer deleted while viewing (#342)', () => {
 				rebalanced: false,
 				event: 'track_added',
 				track: playlistTrack('New', 'z'),
-			})
+			}),
 		);
 		expect(await screen.findByText('New')).toBeTruthy();
 	});

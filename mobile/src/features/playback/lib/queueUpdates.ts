@@ -19,7 +19,7 @@ export function reloadQueues(load: QueueStoreState['load'], userId: string | und
 export function watchQueueUpdates(
 	socket: Socket,
 	applyState: QueueStoreState['applyState'],
-	currentUserId: () => string | undefined
+	currentUserId: () => string | undefined,
 ): () => void {
 	function handleQueueUpdated(state: QueueState) {
 		if (state.ownerId !== currentUserId() && state.ownerId !== remoteOwnerId()) return;

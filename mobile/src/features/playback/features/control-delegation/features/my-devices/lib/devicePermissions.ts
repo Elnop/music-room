@@ -34,7 +34,7 @@ export function licensedPairs(devices: UserDeviceWithLicenses[]): Set<string> {
 }
 
 export function friendLicenses(device: UserDevice, access: DeviceAccess): FriendLicense[] {
-	return access.friends.map(friend => {
+	return access.friends.map((friend) => {
 		const key = pairKey(device.deviceId, friend.id);
 		const allDevices = access.allDevicesFriendIds.has(friend.id);
 		const isPending = access.pending.has(key);

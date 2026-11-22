@@ -6,7 +6,7 @@ import { privacyApi } from '@/features/user/features/profile/shared/profile/lib/
 import { profileApi } from '@/features/user/features/profile/shared/profile/lib/profileApi';
 
 export function useProfilePrivacy() {
-	const authenticated = useSession(s => s.isAuthenticated);
+	const authenticated = useSession((s) => s.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.profile.privacy(),
 		queryFn: () => privacyApi.getPrivacySettings(),
@@ -18,7 +18,7 @@ export function useProfilePrivacy() {
 }
 
 export function useUserMusicPreferences(options?: { refetchOnMount?: boolean | 'always' }) {
-	const authenticated = useSession(s => s.isAuthenticated);
+	const authenticated = useSession((s) => s.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.profile.musicPreferences(),
 		queryFn: () => privacyApi.getMusicPreferences(),
@@ -30,7 +30,7 @@ export function useUserMusicPreferences(options?: { refetchOnMount?: boolean | '
 }
 
 export function useUserStats() {
-	const authenticated = useSession(s => s.isAuthenticated);
+	const authenticated = useSession((s) => s.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.friends.stats(),
 		queryFn: () => profileApi.getMyStats(),

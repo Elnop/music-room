@@ -16,7 +16,7 @@ export function VisibilityOptions({ value, onChange }: VisibilityOptionsProps) {
 
 	return (
 		<View style={styles.options}>
-			{VISIBILITY_OPTIONS.map(option => (
+			{VISIBILITY_OPTIONS.map((option) => (
 				<VisibilityOption
 					key={option}
 					option={option}

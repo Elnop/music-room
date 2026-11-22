@@ -81,7 +81,7 @@ describe('deviceService', () => {
 
 		it('keeps the re-run suffix of the release tag', () => {
 			expect(formatBuildLabel('1.0.0', '42.2', 'a1b2c3d')).toBe(
-				'Zumik 1.0.0 (build 42.2 · a1b2c3d)'
+				'Zumik 1.0.0 (build 42.2 · a1b2c3d)',
 			);
 		});
 

@@ -34,7 +34,7 @@ describe('authSession', () => {
 				user: { id: 'me' } as UserProfile,
 				accessToken: 'token',
 				isAuthenticated: true,
-			})
+			}),
 		);
 
 		expect(result.current).toBe('me');

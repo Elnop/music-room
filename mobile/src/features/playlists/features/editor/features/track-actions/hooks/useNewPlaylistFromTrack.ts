@@ -7,7 +7,7 @@ import type { NewPlaylistDraft } from '@/features/playlists/features/editor/feat
 
 export function useNewPlaylistFromTrack(
 	track: AddQueueItemBody | null,
-	onClose: () => void
+	onClose: () => void,
 ): NewPlaylistDraft {
 	const draft = useDraftState();
 	const context = useNewPlaylistContext(draft, onClose);

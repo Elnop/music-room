@@ -14,10 +14,10 @@ import {
 } from '@test-utils/fakeMediaElement';
 
 jest.mock('@/features/playback/hooks/useAudioPlayer', () =>
-	jest.requireActual('@/features/playback/hooks/useAudioPlayer.web')
+	jest.requireActual('@/features/playback/hooks/useAudioPlayer.web'),
 );
 jest.mock('@/features/playback/hooks/useAudioPlayerStatus', () =>
-	jest.requireActual('@/features/playback/hooks/useAudioPlayerStatus.web')
+	jest.requireActual('@/features/playback/hooks/useAudioPlayerStatus.web'),
 );
 jest.mock('hls.js', () => ({ __esModule: true, default: { isSupported: () => false } }));
 jest.mock('@/features/playback/lib/fetchStreamUrl', () => ({
@@ -26,7 +26,7 @@ jest.mock('@/features/playback/lib/fetchStreamUrl', () => ({
 }));
 jest.mock('@/shared/alerts/showAlert', () => ({ showAlert: jest.fn() }));
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 const mockSocket = { connected: true, on: jest.fn(), off: jest.fn(), emit: jest.fn() };
@@ -151,7 +151,7 @@ describe('the browser as a delegated device', () => {
 
 		expect(media.play).toHaveBeenCalledWith();
 		expect(playerStore.getState().playbackState).toBe('paused');
-		expect(sentStatuses().some(status => status.isPlaying)).toBe(false);
+		expect(sentStatuses().some((status) => status.isPlaying)).toBe(false);
 		expect(sentStatuses().at(-1)).toMatchObject({ track: { title: 'Song' }, isPlaying: false });
 		const [title, , buttons] = (showAlert as jest.Mock).mock.calls[0] as [
 			string,
@@ -161,7 +161,7 @@ describe('the browser as a delegated device', () => {
 		expect(title).toBe('Cliquer pour activer le son');
 
 		media.playResult = () => Promise.resolve();
-		const activateSound = buttons.find(button => button.text === 'Activer le son');
+		const activateSound = buttons.find((button) => button.text === 'Activer le son');
 		await act(async () => activateSound?.onPress?.());
 		await settle();
 

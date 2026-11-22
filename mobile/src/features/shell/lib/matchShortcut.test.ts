@@ -50,7 +50,7 @@ describe('matchShortcut', () => {
 		expect(matchShortcut(press('?', { shiftKey: true }), SHORTCUTS)).toBe(HELP);
 	});
 
-	it.each(['INPUT', 'TEXTAREA', 'SELECT'])('ignores a key typed in a %s', tagName => {
+	it.each(['INPUT', 'TEXTAREA', 'SELECT'])('ignores a key typed in a %s', (tagName) => {
 		expect(matchShortcut(press(' ', { target: element(tagName) }), SHORTCUTS)).toBeUndefined();
 	});
 
@@ -61,17 +61,20 @@ describe('matchShortcut', () => {
 
 	it('leaves Space to a focused button and the arrows to a focused slider', () => {
 		expect(
-			matchShortcut(press(' ', { target: element('DIV', 'button') }), SHORTCUTS)
+			matchShortcut(press(' ', { target: element('DIV', 'button') }), SHORTCUTS),
 		).toBeUndefined();
 		expect(
-			matchShortcut(press('ArrowRight', { target: element('DIV', 'slider') }), SHORTCUTS)
+			matchShortcut(press('ArrowRight', { target: element('DIV', 'slider') }), SHORTCUTS),
 		).toBeUndefined();
 		expect(
-			matchShortcut(press('ArrowRight', { target: element('DIV', 'button') }), SHORTCUTS)
+			matchShortcut(press('ArrowRight', { target: element('DIV', 'button') }), SHORTCUTS),
 		).toBe(SEEK);
 	});
 
-	it.each(['ctrlKey', 'altKey', 'metaKey'] as const)('leaves a key with %s to the browser', key => {
-		expect(matchShortcut(press('ArrowRight', { [key]: true }), SHORTCUTS)).toBeUndefined();
-	});
+	it.each(['ctrlKey', 'altKey', 'metaKey'] as const)(
+		'leaves a key with %s to the browser',
+		(key) => {
+			expect(matchShortcut(press('ArrowRight', { [key]: true }), SHORTCUTS)).toBeUndefined();
+		},
+	);
 });

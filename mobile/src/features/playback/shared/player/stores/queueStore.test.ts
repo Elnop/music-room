@@ -23,7 +23,7 @@ import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -156,7 +156,7 @@ describe('queueStore load and events', () => {
 		api.getQueue.mockResolvedValue(queueState('a'));
 		await store().load();
 		expect(mine().currentItemId).toBe('a');
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b', 'c']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'b', 'c']);
 		expect(store().loaded).toBe(true);
 	});
 
@@ -173,7 +173,7 @@ describe('queueStore load and events', () => {
 		const before = mockPlayer.loadCounter;
 		store().applyState(queueState('c', ['a', 'c']));
 		expect(mine().currentItemId).toBe('c');
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'c']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'c']);
 		expect(mockPlayer.loadCounter).toBe(before);
 		expect(mockPlayer.currentTrack).toBe(listTrack);
 	});
@@ -233,7 +233,7 @@ describe('queueStore next', () => {
 
 	it('does not override a track tapped while the request ran', async () => {
 		let resolve!: (value: { ok: true; state: QueueState }) => void;
-		api.next.mockReturnValue(new Promise(r => (resolve = r)));
+		api.next.mockReturnValue(new Promise((r) => (resolve = r)));
 
 		const pending = store().next();
 		mockPlayer.playTrack(listTrack);
@@ -249,7 +249,7 @@ describe('queueStore next', () => {
 describe('queueStore concurrent steps', () => {
 	it('ignores a step while another is pending', async () => {
 		let resolve!: (value: { ok: true; state: QueueState }) => void;
-		api.next.mockReturnValue(new Promise(r => (resolve = r)));
+		api.next.mockReturnValue(new Promise((r) => (resolve = r)));
 
 		const first = store().next();
 		const second = store().next();
@@ -354,7 +354,7 @@ describe('queueStore addItem', () => {
 		await expect(store().addItem(body)).resolves.toBe(true);
 
 		expect(api.addItem).toHaveBeenCalledWith(body, {});
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'n']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'n']);
 		expect(mine().currentItemId).toBe('a');
 		expect(showSuccess).toHaveBeenCalledWith("Ajouté à la file d'attente");
 		expect(hapticSuccess).toHaveBeenCalledTimes(1);
@@ -369,7 +369,7 @@ describe('queueStore addItem', () => {
 
 		await expect(store().addItem(body)).resolves.toBe(false);
 
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a']);
 		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter à la file d'attente");
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(hapticSuccess).not.toHaveBeenCalled();
@@ -391,7 +391,7 @@ describe('queueStore playNext', () => {
 		await expect(store().playNext(body)).resolves.toBe(true);
 
 		expect(api.addItem).toHaveBeenCalledWith({ ...body, next: true }, {});
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'n', 'b']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'n', 'b']);
 		expect(mine().currentItemId).toBe('a');
 		expect(showSuccess).toHaveBeenCalledWith('Lira ensuite');
 		expect(hapticSuccess).toHaveBeenCalledTimes(1);
@@ -403,7 +403,7 @@ describe('queueStore playNext', () => {
 
 		await expect(store().playNext(body)).resolves.toBe(false);
 
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a']);
 		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter ce titre");
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(hapticSuccess).not.toHaveBeenCalled();
@@ -437,7 +437,7 @@ describe('queueStore playItem', () => {
 
 	it('shares the step guard with next', async () => {
 		let resolve!: (value: QueueState) => void;
-		api.playItem.mockReturnValue(new Promise(r => (resolve = r)));
+		api.playItem.mockReturnValue(new Promise((r) => (resolve = r)));
 
 		const pending = store().playItem('b');
 		await expect(store().next()).resolves.toBe('ignored');
@@ -457,7 +457,7 @@ describe('queueStore removeItem', () => {
 		await expect(store().removeItem('b')).resolves.toBe(true);
 
 		expect(api.removeItem).toHaveBeenCalledWith('b', {});
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'c']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'c']);
 		expect(mockPlayer.loadCounter).toBe(before);
 	});
 
@@ -505,7 +505,7 @@ describe('queueStore removeItem', () => {
 		api.playItem.mockResolvedValue(queueState('a'));
 		await store().playItem('a');
 		let resolve!: (value: { ok: true; state: QueueState }) => void;
-		api.next.mockReturnValue(new Promise(r => (resolve = r)));
+		api.next.mockReturnValue(new Promise((r) => (resolve = r)));
 
 		const pending = store().next();
 		await expect(store().removeItem('a')).resolves.toBe(false);
@@ -523,7 +523,7 @@ describe('queueStore removeItem', () => {
 		await expect(store().removeItem('a')).resolves.toBe(false);
 
 		expect(showError).toHaveBeenCalledTimes(2);
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b', 'c']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'b', 'c']);
 	});
 });
 
@@ -535,7 +535,7 @@ describe('queueStore moveItem', () => {
 		await expect(store().moveItem('c', null)).resolves.toBe(true);
 
 		expect(api.moveItem).toHaveBeenCalledWith('c', null, {});
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'c', 'b']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'c', 'b']);
 	});
 
 	it('shows an error and keeps the store order on a conflict', async () => {
@@ -545,7 +545,7 @@ describe('queueStore moveItem', () => {
 		await expect(store().moveItem('c', null)).resolves.toBe(false);
 
 		expect(showError).toHaveBeenCalledWith('Impossible de déplacer ce titre');
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b', 'c']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'b', 'c']);
 	});
 });
 
@@ -555,7 +555,7 @@ describe('queueStore playPlaylist', () => {
 			...queueState(currentItemId, []),
 			items: [
 				queueItem('x'),
-				...ids.map(id => ({ ...queueItem(id), sourcePlaylistId: 'p1', blockId: 'blk' })),
+				...ids.map((id) => ({ ...queueItem(id), sourcePlaylistId: 'p1', blockId: 'blk' })),
 			],
 		};
 	}
@@ -605,7 +605,7 @@ describe('queueStore playPlaylist', () => {
 
 	it('is ignored while another step is pending', async () => {
 		let resolve!: (value: QueueState) => void;
-		api.playPlaylist.mockReturnValue(new Promise(r => (resolve = r)));
+		api.playPlaylist.mockReturnValue(new Promise((r) => (resolve = r)));
 
 		const first = store().playPlaylist('p1');
 		await expect(store().playPlaylist('p1')).resolves.toBe('ignored');
@@ -675,7 +675,7 @@ describe('queueStore versions (#285)', () => {
 		await addB;
 		first.resolve(withA);
 		await addA;
-		expect(mine().items.map(i => i.id)).toStrictEqual(['a', 'b']);
+		expect(mine().items.map((i) => i.id)).toStrictEqual(['a', 'b']);
 	});
 
 	it('plays the item of a stale step answer but keeps the newer state', async () => {
@@ -868,7 +868,7 @@ describe('queueStore owners (#297)', () => {
 			transfer.mockRejectedValue(new ApiError('down', 'NETWORK_ERROR'));
 			await store().playListTrack(listTrack);
 			expect(showError).toHaveBeenCalledWith(
-				'Impossible de joindre le serveur. Vérifiez votre connexion.'
+				'Impossible de joindre le serveur. Vérifiez votre connexion.',
 			);
 			expect(connectStore.getState().target.kind).toBe('remote');
 		});

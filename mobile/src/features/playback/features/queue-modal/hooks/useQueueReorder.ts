@@ -4,7 +4,7 @@ import { afterItemIdForDrop } from '@/shared/tracks/lib/moveTarget';
 import type { QueueItem } from '@/features/playback/shared/player/types/queueTypes';
 
 export function useQueueReorder(upcoming: QueueItem[]) {
-	const moveItem = useQueueState(state => state.moveItem);
+	const moveItem = useQueueState((state) => state.moveItem);
 	const [isMoving, setIsMoving] = useState(false);
 
 	const onReorder = useCallback(
@@ -18,7 +18,7 @@ export function useQueueReorder(upcoming: QueueItem[]) {
 				setIsMoving(false);
 			}
 		},
-		[upcoming, moveItem]
+		[upcoming, moveItem],
 	);
 
 	return { isMoving, onReorder };

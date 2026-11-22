@@ -25,7 +25,7 @@ async function requestAdvertisePermission(): Promise<boolean> {
 			message:
 				"Zumik utilise le Bluetooth pour annoncer votre événement aux téléphones proches. Il n'envoie aucune donnée personnelle.",
 			buttonPositive: 'Continuer',
-		}
+		},
 	);
 	return result === PermissionsAndroid.RESULTS.GRANTED;
 }

@@ -11,7 +11,7 @@ type SimilarProfilesCarouselProps = {
 export function SimilarProfilesCarousel({ section }: SimilarProfilesCarouselProps) {
 	return (
 		<SnapCarousel itemWidth={SIMILAR_CARD_WIDTH}>
-			{section.profiles.map(profile => (
+			{section.profiles.map((profile) => (
 				<SimilarProfileCard key={profile.id} profile={profile} onOpen={section.openProfile} />
 			))}
 		</SnapCarousel>

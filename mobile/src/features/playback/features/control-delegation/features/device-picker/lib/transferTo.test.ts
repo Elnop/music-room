@@ -19,7 +19,7 @@ import { hashStringToNumber } from '@/features/playback/shared/player/lib/trackT
 import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -109,7 +109,7 @@ function remoteStatus(
 	ownerId: string,
 	deviceId: string,
 	positionMs: number,
-	itemId: string
+	itemId: string,
 ): ListeningStatus {
 	return {
 		ownerId,

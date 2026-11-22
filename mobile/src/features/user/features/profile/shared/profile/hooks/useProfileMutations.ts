@@ -13,7 +13,7 @@ export function useUpdateProfileMutation() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: UpdateProfileData) => profileApi.updateProfile(data),
-		onSuccess: async updatedUser => {
+		onSuccess: async (updatedUser) => {
 			await setUser(updatedUser);
 			queryClient.setQueryData(queryKeys.profile.me(), updatedUser);
 		},
@@ -24,7 +24,7 @@ export function useUpdatePrivacyMutation() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: UpdatePrivacyData) => privacyApi.updatePrivacySettings(data),
-		onSuccess: data => {
+		onSuccess: (data) => {
 			queryClient.setQueryData(queryKeys.profile.privacy(), data);
 		},
 	});
@@ -34,7 +34,7 @@ export function useUpdateMusicPreferencesMutation() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: UpdateMusicPreferencesData) => privacyApi.updateMusicPreferences(data),
-		onSuccess: data => {
+		onSuccess: (data) => {
 			queryClient.setQueryData(queryKeys.profile.musicPreferences(), data);
 		},
 	});

@@ -4,7 +4,7 @@ import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { resetBackendUrl, setBackendUrl } from '@/shared/backend/lib/backendUrl';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -63,7 +63,7 @@ describe('apiRequest backend address', () => {
 			jsonResponse(404, {
 				success: false,
 				error: { message: 'Track stream not available', code: 'STREAM_NOT_FOUND' },
-			})
+			}),
 		);
 
 		const error = await apiRequest('/api/soundcloud/stream?url=x').catch((e: unknown) => e);
@@ -84,7 +84,7 @@ describe('apiRequest backend address', () => {
 					fix: 'Wait for retryAfter',
 				},
 				meta: { timestamp: '2026-01-01T00:00:00.000Z' },
-			})
+			}),
 		);
 
 		const error = await apiRequest('/api/auth/login').catch((e: unknown) => e);
@@ -101,7 +101,7 @@ describe('apiRequest backend address', () => {
 
 	it('keeps the HTTP status when a 2xx body reports a failure', async () => {
 		fetchMock.mockResolvedValue(
-			jsonResponse(200, { success: false, error: { message: 'Nope', code: 'SOME_CODE' } })
+			jsonResponse(200, { success: false, error: { message: 'Nope', code: 'SOME_CODE' } }),
 		);
 
 		const error = await apiRequest('/api/playlists').catch((e: unknown) => e);
@@ -153,7 +153,7 @@ describe('readLocalBlob', () => {
 
 	it('refuses a network URL without fetching it', async () => {
 		await expect(readLocalBlob('http://example.com/a.jpg')).rejects.toThrow(
-			'only reads blob: and data: URIs, got "http:"'
+			'only reads blob: and data: URIs, got "http:"',
 		);
 		expect(fetchMock).not.toHaveBeenCalled();
 	});

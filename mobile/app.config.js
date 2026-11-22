@@ -108,10 +108,7 @@ module.exports = {
 			'./plugins/withMedia3Version.js',
 			'./plugins/withPodsDeploymentTarget.js',
 			['expo-media-control', { enableBackgroundAudio: true, audioSessionCategory: 'playback' }],
-			[
-				'@react-native-google-signin/google-signin',
-				{ iosUrlScheme: GOOGLE_IOS_URL_SCHEME },
-			],
+			['@react-native-google-signin/google-signin', { iosUrlScheme: GOOGLE_IOS_URL_SCHEME }],
 			[
 				'react-native-fbsdk-next',
 				{

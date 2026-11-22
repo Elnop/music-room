@@ -18,7 +18,7 @@ import { testPlayback } from '@test-utils/testPlaybackConfig';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
@@ -55,7 +55,7 @@ async function renderScreen() {
 	const client = createQueryClient();
 	client.setQueryData(
 		queryKeys.playlists.detail('p1'),
-		playlistWithTracks({ tracks: [playlistTrack('k', 'a', known.permalink_url)] })
+		playlistWithTracks({ tracks: [playlistTrack('k', 'a', known.permalink_url)] }),
 	);
 	renderWithClient(
 		<SearchTracksContainer
@@ -64,7 +64,7 @@ async function renderScreen() {
 			TrackActionsSheet={({ track }) => (track ? <Text>{`actions ${track.title}`}</Text> : null)}
 			playback={testPlayback}
 		/>,
-		client
+		client,
 	);
 	clear = () => client.clear();
 	await act(async () => {});
@@ -91,7 +91,7 @@ describe('SearchTracksContainer (#307)', () => {
 	it('invites to search before anything is typed', async () => {
 		await renderScreen();
 		expect(
-			screen.getByText('Recherchez des titres sur SoundCloud pour les ajouter à votre playlist')
+			screen.getByText('Recherchez des titres sur SoundCloud pour les ajouter à votre playlist'),
 		).toBeTruthy();
 	});
 
@@ -131,9 +131,9 @@ describe('SearchTracksContainer (#307)', () => {
 		fireEvent.press(screen.getByText('Song'));
 		expect(screen.getByTestId('added-42')).toBeTruthy();
 		await act(async () =>
-			answer.resolve(ok({ track: playlistTrack('t', 'z'), tracksVersion: 2, rebalanced: false }))
+			answer.resolve(ok({ track: playlistTrack('t', 'z'), tracksVersion: 2, rebalanced: false })),
 		);
-		expect(routes.calls().filter(c => c === ADD)).toHaveLength(1);
+		expect(routes.calls().filter((c) => c === ADD)).toHaveLength(1);
 		expect(screen.getByTestId('added-42')).toBeTruthy();
 	});
 
@@ -143,7 +143,7 @@ describe('SearchTracksContainer (#307)', () => {
 		await search();
 		await act(async () => fireEvent.press(screen.getByText('Song')));
 		expect(showError).toHaveBeenCalledWith(
-			'Le serveur a rencontré un problème. Réessayez plus tard.'
+			'Le serveur a rencontré un problème. Réessayez plus tard.',
 		);
 		expect(screen.getByTestId('add-42')).toBeTruthy();
 	});

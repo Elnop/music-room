@@ -21,14 +21,14 @@ export function WelcomeContainer({ navigation, backendUrlField }: WelcomeOrchest
 			buildLabel={getBuildLabel()}
 			server={{
 				shown: showServer,
-				onToggle: () => setShowServer(value => !value),
+				onToggle: () => setShowServer((value) => !value),
 				field: backendUrlField,
 			}}
 			actions={{
 				onStart: () => navigation.navigate('Register'),
 				onLogin: () => navigation.navigate('Login'),
 				onOpenPrivacyPolicy: () => navigation.navigate('PrivacyPolicy'),
-				onOpenLink: url => openExternalUrl(url, showError),
+				onOpenLink: (url) => openExternalUrl(url, showError),
 			}}
 		/>
 	);

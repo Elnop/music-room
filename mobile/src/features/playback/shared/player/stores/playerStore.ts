@@ -11,9 +11,9 @@ export const playerStore = createStore<PlayerState>((set, get) => ({
 	...playerStreamActions(set, get),
 	...playerTrackActions(set, get),
 	...playerTransportActions(set, get),
-	toggleModal: () => set(state => ({ isModalOpen: !state.isModalOpen })),
-	setModalOpen: isOpen => set({ isModalOpen: isOpen }),
-	markSeek: () => set(state => ({ seekCount: state.seekCount + 1 })),
+	toggleModal: () => set((state) => ({ isModalOpen: !state.isModalOpen })),
+	setModalOpen: (isOpen) => set({ isModalOpen: isOpen }),
+	markSeek: () => set((state) => ({ seekCount: state.seekCount + 1 })),
 }));
 
 onSessionEnd(() => {

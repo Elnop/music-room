@@ -13,7 +13,7 @@ import { RegisterContainer } from '@/features/user/features/auth/features/regist
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
 	signInWithGoogle: jest.fn(),
@@ -73,7 +73,7 @@ function fillAndSubmit() {
 	fireEvent.changeText(screen.getByPlaceholderText('votre_pseudo'), 'newbie');
 	fireEvent.changeText(
 		screen.getByPlaceholderText('Choisissez un mot de passe robuste'),
-		'Secret1!'
+		'Secret1!',
 	);
 	fireEvent.press(screen.getByLabelText('Créer un compte'));
 }
@@ -81,7 +81,7 @@ function fillAndSubmit() {
 describe('RegisterContainer', () => {
 	it('opens the code screen when the email must be verified', async () => {
 		fetchMock.mockResolvedValue(
-			ok({ user: { ...user, id: 'user-new' }, requiresVerification: true })
+			ok({ user: { ...user, id: 'user-new' }, requiresVerification: true }),
 		);
 		renderScreen();
 
@@ -91,7 +91,7 @@ describe('RegisterContainer', () => {
 			expect(navigate).toHaveBeenCalledWith('EmailVerification', {
 				userId: 'user-new',
 				email: 'new@example.com',
-			})
+			}),
 		);
 		expect(request().url).toMatch(/\/api\/auth\/register$/u);
 		expect(request().body).toStrictEqual({
@@ -127,7 +127,7 @@ describe('RegisterContainer', () => {
 		fireEvent.press(screen.getByLabelText('Créer un compte'));
 
 		expect(
-			await screen.findByText('Le mot de passe doit contenir au moins 8 caractères')
+			await screen.findByText('Le mot de passe doit contenir au moins 8 caractères'),
 		).toBeTruthy();
 		expect(fetchMock).not.toHaveBeenCalled();
 	});

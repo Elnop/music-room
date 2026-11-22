@@ -15,7 +15,7 @@ export function getLinkedProviders(accessToken: string): Promise<LinkedProviders
 
 export function unlinkProvider(
 	accessToken: string,
-	provider: OAuthProvider
+	provider: OAuthProvider,
 ): Promise<MessageResponse> {
 	return apiRequest(`/api/auth/providers/${provider}`, {
 		method: 'DELETE',
@@ -26,7 +26,7 @@ export function unlinkProvider(
 export function linkProvider(
 	accessToken: string,
 	provider: OAuthProvider,
-	token: string
+	token: string,
 ): Promise<LinkedProvidersResponse> {
 	const body = provider === 'google' ? { idToken: token } : { accessToken: token };
 	return apiRequest(`/api/auth/providers/${provider}/link`, {

@@ -4,8 +4,8 @@ import type { NowPlaying } from '@/features/playback/shared/player/types/playerT
 import type { PlayerBarPanel } from '@/features/playback/features/player-bar/playerBarTypes';
 
 export function usePlayerBarPanel(nowPlaying: NowPlaying): PlayerBarPanel {
-	const isOpen = useNowPlayingPanelState(state => state.isOpen);
-	const onToggle = useNowPlayingPanelState(state => state.toggle);
+	const isOpen = useNowPlayingPanelState((state) => state.isOpen);
+	const onToggle = useNowPlayingPanelState((state) => state.toggle);
 	const label = isOpen ? 'Masquer « En cours de lecture »' : 'Afficher « En cours de lecture »';
 	const summary = trackSummary(nowPlaying.track, nowPlaying.deviceLabel);
 	return { isOpen, label, trackLabel: [label, ...summary].join(', '), onToggle };

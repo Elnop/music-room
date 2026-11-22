@@ -4,8 +4,8 @@ import { subscribeListening } from '@/features/playback/features/control-delegat
 import type { ListeningState } from '@/features/playback/features/control-delegation/controlDelegationTypes';
 
 export function useListeningStatuses(targetUserId: string | null, canControl: boolean) {
-	const socket = useSocketState(state => state.socket);
-	const isConnected = useSocketState(state => state.isConnected);
+	const socket = useSocketState((state) => state.socket);
+	const isConnected = useSocketState((state) => state.isConnected);
 	const [listening, setListening] = useState<ListeningState>({
 		statuses: [],
 		isLoading: false,

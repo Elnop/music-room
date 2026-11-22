@@ -7,7 +7,7 @@ export function configureAudioMode(): void {
 		shouldPlayInBackground: true,
 		interruptionMode: 'doNotMix',
 		interruptionModeAndroid: 'duckOthers',
-	}).catch(err => {
+	}).catch((err) => {
 		logger.warn('[PlayerAudioMode] Failed to set audio mode:', err);
 	});
 }

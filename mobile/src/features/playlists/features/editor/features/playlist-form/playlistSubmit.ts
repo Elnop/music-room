@@ -23,7 +23,7 @@ export async function saveEdits(edit: PlaylistEdit, data: PlaylistFormInput): Pr
 
 export async function createAndOpen(
 	creation: PlaylistCreation,
-	data: PlaylistFormInput
+	data: PlaylistFormInput,
 ): Promise<void> {
 	try {
 		const created = await creation.create({

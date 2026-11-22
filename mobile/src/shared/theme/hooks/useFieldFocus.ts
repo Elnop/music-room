@@ -8,16 +8,16 @@ export function useFieldFocus({ onFocus, onBlur }: FocusHandlers = {}) {
 	const [focused, setFocused] = useState(false);
 	const focusProps = useMemo<FocusHandlers>(
 		() => ({
-			onFocus: event => {
+			onFocus: (event) => {
 				setFocused(true);
 				onFocus?.(event);
 			},
-			onBlur: event => {
+			onBlur: (event) => {
 				setFocused(false);
 				onBlur?.(event);
 			},
 		}),
-		[onFocus, onBlur]
+		[onFocus, onBlur],
 	);
 	return { focused: Platform.OS === 'web' && focused, focusProps };
 }

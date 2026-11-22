@@ -10,7 +10,7 @@ const signal = new AbortController().signal;
 describe('fetchStreamUrl', () => {
 	it.each(['hls', 'progressive'] as const)(
 		'keeps the %s protocol of the answer',
-		async protocol => {
+		async (protocol) => {
 			mockApiRequest.mockResolvedValueOnce({ streamUrl: 'u', protocol, expiresAt: EXPIRES_AT });
 
 			expect(await fetchStreamUrl('https://soundcloud.com/a/b', signal)).toStrictEqual({
@@ -18,7 +18,7 @@ describe('fetchStreamUrl', () => {
 				protocol,
 				expiresAt: Date.parse(EXPIRES_AT),
 			});
-		}
+		},
 	);
 
 	it('reads an answer with no protocol, from an older server, as HLS', async () => {

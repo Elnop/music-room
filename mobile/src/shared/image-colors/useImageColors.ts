@@ -12,7 +12,7 @@ type ColorTarget = {
 async function loadDominantColor(
 	imageUrl: string | null | undefined,
 	fallbackColor: string,
-	target: ColorTarget
+	target: ColorTarget,
 ): Promise<void> {
 	if (!imageUrl) {
 		target.setColor(null);

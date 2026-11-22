@@ -4,7 +4,7 @@ import { menuAnchorActions } from '@/shared/theme/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 export function useMenuAnchor(visible: boolean): MenuAnchor | null {
-	const recorded = useMenuAnchorState(state => state.anchor);
+	const recorded = useMenuAnchorState((state) => state.anchor);
 	const [anchor, setAnchor] = useState<MenuAnchor | null>(visible ? recorded : null);
 	const [wasVisible, setWasVisible] = useState(visible);
 	if (visible !== wasVisible) {

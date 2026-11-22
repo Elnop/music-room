@@ -25,11 +25,11 @@ export function DetailTrackList({ page, playlist, frame }: DetailTrackListProps)
 	return (
 		<ReorderableList
 			data={playlist.tracks}
-			keyExtractor={item => item.id}
+			keyExtractor={(item) => item.id}
 			onReorder={page.tracks.reorder}
 			dragEnabled={page.tracks.canEdit && !page.tracks.isMoving}
 			extraData={page.tracks.currentUri}
-			renderItem={info => <DetailTrackItem page={page} info={info} />}
+			renderItem={(info) => <DetailTrackItem page={page} info={info} />}
 			ListHeaderComponent={frame.header}
 			contentContainerStyle={frame.contentStyle}
 			ListEmptyComponent={EMPTY}

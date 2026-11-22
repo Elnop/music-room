@@ -15,7 +15,7 @@ jest.mock('@/shared/theme/lib/haptics', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -64,7 +64,7 @@ function swipe(translationX: number, translationY = 0, velocityX = 0) {
 			{ state: State.ACTIVE, translationX: translationX / 2, translationY: translationY / 2 },
 			{ state: State.ACTIVE, translationX, translationY },
 			{ state: State.END, translationX, translationY, velocityX },
-		])
+		]),
 	);
 }
 

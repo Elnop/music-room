@@ -13,7 +13,7 @@ function formWidth(target: GoogleButtonTarget): number {
 export function googleButtonConfiguration(
 	target: GoogleButtonTarget,
 	variant: GoogleButtonVariant,
-	onClick: () => void
+	onClick: () => void,
 ): GoogleButtonConfiguration {
 	const form = variant === 'form';
 	return {

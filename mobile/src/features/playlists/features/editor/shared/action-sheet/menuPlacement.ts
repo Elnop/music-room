@@ -21,7 +21,7 @@ function menuLeft(anchor: MenuAnchor, windowWidth: number, menuWidth: number): n
 export function menuPlacement(
 	anchor: MenuAnchor,
 	window: { width: number; height: number },
-	menuWidth: number
+	menuWidth: number,
 ): MenuPlacement {
 	const left = menuLeft(anchor, window.width, menuWidth);
 	const buttonBottom = anchor.y + anchor.height;

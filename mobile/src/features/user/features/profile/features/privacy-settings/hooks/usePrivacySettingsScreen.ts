@@ -17,8 +17,8 @@ export function usePrivacySettingsScreen() {
 			showError(
 				apiErrorMessage(
 					privacyQuery.error,
-					'Impossible de charger les paramètres de confidentialité'
-				)
+					'Impossible de charger les paramètres de confidentialité',
+				),
 			);
 		}
 	}, [privacyQuery.isError, privacyQuery.error]);

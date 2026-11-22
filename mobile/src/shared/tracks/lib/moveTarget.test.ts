@@ -30,7 +30,7 @@ describe('afterRankForDrop', () => {
 	});
 });
 
-const upcoming = ['u1', 'u2', 'u3', 'u4'].map(id => ({ id }) as QueueItem);
+const upcoming = ['u1', 'u2', 'u3', 'u4'].map((id) => ({ id }) as QueueItem);
 
 describe('afterItemIdForDrop', () => {
 	it('drags down by dropping after the target item', () => {

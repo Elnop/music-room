@@ -11,7 +11,7 @@ function sendFailure(error: Error | null): string | null {
 
 export function useForgotPassword(
 	initialEmail: string,
-	navigation: NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>
+	navigation: NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>,
 ): ForgotPassword {
 	const field = useEmailField(initialEmail);
 	const mutation = useForgotPasswordMutation();

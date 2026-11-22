@@ -89,7 +89,7 @@ describe('useMediaSession (web)', () => {
 				title: 'Song',
 				artist: 'Artist',
 				artwork: [{ src: 'https://i1.sndcdn.com/artworks-abc-t500x500.jpg' }],
-			})
+			}),
 		);
 		expect(session.playbackState).toBe('playing');
 		expect(session.setPositionState).toHaveBeenCalledWith({

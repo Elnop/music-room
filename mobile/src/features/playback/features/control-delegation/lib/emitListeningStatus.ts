@@ -10,7 +10,7 @@ function currentPositionMs(): number {
 export function emitListeningStatus(
 	socket: Socket,
 	currentTrack: SoundCloudTrack | null,
-	isPlaying: boolean
+	isPlaying: boolean,
 ): void {
 	const status = {
 		track: currentTrack

@@ -9,10 +9,10 @@ import { reloadIfOnScreen } from '@/features/playlists/shared/playlist/lib/playl
 
 function applyTrackEvent(
 	client: QueryClient,
-	event: PlaylistUpdatedEvent
+	event: PlaylistUpdatedEvent,
 ): 'applied' | 'ignored' | 'reload' {
 	const current = client.getQueryData<PlaylistWithTracks>(
-		queryKeys.playlists.detail(event.playlistId)
+		queryKeys.playlists.detail(event.playlistId),
 	);
 	if (!current) return 'ignored';
 	const next = applyPlaylistEvent(current, event);
@@ -24,7 +24,7 @@ function applyTrackEvent(
 
 export async function settleTrackEvent(
 	client: QueryClient,
-	event: PlaylistUpdatedEvent
+	event: PlaylistUpdatedEvent,
 ): Promise<void> {
 	if (applyTrackEvent(client, event) === 'reload') await reloadIfOnScreen(client, event.playlistId);
 }

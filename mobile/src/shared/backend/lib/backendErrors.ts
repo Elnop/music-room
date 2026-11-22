@@ -11,6 +11,10 @@ export function onBackendError(listener: BackendErrorListener): () => void {
 	};
 }
 
-export function reportBackendError(level: BackendErrorLevel, message: string, context?: unknown): void {
+export function reportBackendError(
+	level: BackendErrorLevel,
+	message: string,
+	context?: unknown,
+): void {
 	for (const listener of listeners) listener(level, message, context);
 }

@@ -65,7 +65,7 @@ describe('googleSignIn (web)', () => {
 		expect(mockLoadScript).toHaveBeenCalledWith('https://accounts.google.com/gsi/client');
 		expect(initialize).toHaveBeenCalledTimes(1);
 		expect(initialize).toHaveBeenCalledWith(
-			expect.objectContaining({ client_id: 'web-client-id', ux_mode: 'popup' })
+			expect.objectContaining({ client_id: 'web-client-id', ux_mode: 'popup' }),
 		);
 		expect(buttonConfig(0)).toMatchObject({ size: 'large', width: 400, theme: 'filled_black' });
 		expect(buttonConfig(1)).toMatchObject({ size: 'medium', theme: 'outline' });
@@ -118,7 +118,7 @@ describe('googleSignIn (web)', () => {
 	it('rejects when the script does not load', async () => {
 		const { renderGoogleButton, signInWithGoogle } = load();
 		mockLoadScript.mockRejectedValue(
-			new Error('Could not load https://accounts.google.com/gsi/client')
+			new Error('Could not load https://accounts.google.com/gsi/client'),
 		);
 
 		await expect(renderGoogleButton(target, 'form', jest.fn())).rejects.toThrow('Could not load');

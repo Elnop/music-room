@@ -12,9 +12,9 @@ type ProviderSignIn = {
 export function useProviderSignIn(onFailure: (message: string) => void): ProviderSignIn {
 	const mutation = useMutation({ mutationFn: signInWithProvider });
 	return {
-		signIn: provider =>
+		signIn: (provider) =>
 			mutation.mutate(provider, {
-				onError: error => {
+				onError: (error) => {
 					if (!isSignInCancelled(error)) onFailure(oauthErrorMessage(provider, error));
 				},
 			}),

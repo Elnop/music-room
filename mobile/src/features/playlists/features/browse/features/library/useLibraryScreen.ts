@@ -15,13 +15,13 @@ type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Playlists'>
 
 function splitByOwner(playlists: Playlist[], userId: string | undefined) {
 	return {
-		owned: playlists.filter(playlist => playlist.ownerId === userId),
-		shared: playlists.filter(playlist => playlist.ownerId !== userId),
+		owned: playlists.filter((playlist) => playlist.ownerId === userId),
+		shared: playlists.filter((playlist) => playlist.ownerId !== userId),
 	};
 }
 
 export function useLibraryScreen(navigation: Navigation): LibraryScreen {
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	const bottomPadding = useBottomPadding();
 	const mine = usePlaylists();
 	const refresher = useManualRefresh(mine.refetch, 'LibraryScreen');
@@ -34,7 +34,7 @@ export function useLibraryScreen(navigation: Navigation): LibraryScreen {
 		...splitByOwner(mine.data ?? [], userId),
 		isRefreshing: refresher.isRefreshing,
 		refresh: refresher.refresh,
-		openPlaylist: id => navigation.navigate('PlaylistDetail', { id }),
+		openPlaylist: (id) => navigation.navigate('PlaylistDetail', { id }),
 		createPlaylist,
 		bottomPadding,
 	};

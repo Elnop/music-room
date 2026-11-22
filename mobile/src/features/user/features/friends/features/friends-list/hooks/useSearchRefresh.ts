@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 export function useSearchRefresh(
 	searchQuery: string,
-	performSearch: (query: string, isRefresh: boolean) => Promise<void>
+	performSearch: (query: string, isRefresh: boolean) => Promise<void>,
 ) {
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const onRefresh = useCallback(async () => {

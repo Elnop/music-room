@@ -32,7 +32,7 @@ export function CodeDigitBox({ index, code, onChangeDigit, options }: CodeDigitB
 			]}
 			focusedStyle={focusedFieldStyle(theme.colors.primary)}
 			value={digit}
-			onChangeText={text => onChangeDigit(index, text)}
+			onChangeText={(text) => onChangeDigit(index, text)}
 			onKeyPress={({ nativeEvent: { key } }) => code.pressKey(index, key)}
 			keyboardType="number-pad"
 			maxLength={CODE_INPUT_MAX_LENGTH}

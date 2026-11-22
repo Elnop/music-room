@@ -6,11 +6,11 @@ export function listeningHandlers(targetUserId: string, setListening: SetListeni
 	return {
 		handleStatus: (status: UserListeningStatus) => {
 			if (status.ownerId !== targetUserId) return;
-			setListening(current => ({ ...current, statuses: status.devices, isLoading: false }));
+			setListening((current) => ({ ...current, statuses: status.devices, isLoading: false }));
 		},
 		handleError: (err: { message: string; code: string }) => {
 			logger.error('[MusicControl] Error:', err);
-			setListening(current => ({ ...current, error: err.message, isLoading: false }));
+			setListening((current) => ({ ...current, error: err.message, isLoading: false }));
 		},
 	};
 }

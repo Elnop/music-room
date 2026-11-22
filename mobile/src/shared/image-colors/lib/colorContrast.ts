@@ -33,5 +33,5 @@ export function compositeOver(color: Rgb, alpha: number, base: Rgb): Rgb {
 }
 
 export function worstContrast(fg: Rgb, backgrounds: Rgb[]): number {
-	return Math.min(...backgrounds.map(bg => contrastRatio(fg, bg)));
+	return Math.min(...backgrounds.map((bg) => contrastRatio(fg, bg)));
 }

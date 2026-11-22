@@ -3,7 +3,7 @@ import type { AdvertiseFailure } from '@/features/events/features/detail/eventDe
 export class AdvertiseError extends Error {
 	constructor(
 		readonly reason: AdvertiseFailure,
-		cause?: unknown
+		cause?: unknown,
 	) {
 		super(`Beacon advertising failed: ${reason}`, { cause });
 	}

@@ -27,7 +27,7 @@ function sidebarBarStyle(isTablet: boolean, theme: Theme): ViewStyle {
 
 export function sidebarTabOptions(
 	breakpoint: Breakpoint,
-	theme: Theme
+	theme: Theme,
 ): BottomTabNavigationOptions | null {
 	if (breakpoint === 'phone') return null;
 	const isTablet = breakpoint === 'tablet';

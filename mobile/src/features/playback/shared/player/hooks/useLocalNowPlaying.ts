@@ -7,7 +7,7 @@ import { toNowPlayingTrack } from '@/features/playback/shared/player/lib/toNowPl
 import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useLocalNowPlaying(): NowPlaying {
-	const currentTrack = usePlayerState(state => state.currentTrack);
+	const currentTrack = usePlayerState((state) => state.currentTrack);
 	const status = usePlaybackStatus(currentTrack);
 	const timing = useLocalTiming(currentTrack);
 	const transport = useLocalTransport(timing.positionMs);

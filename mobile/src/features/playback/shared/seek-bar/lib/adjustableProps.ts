@@ -4,7 +4,7 @@ import { formatTime } from '@/features/playback/shared/seek-bar/lib/formatTime';
 export function adjustableProps(
 	times: { position: number; total: number },
 	disabled: boolean,
-	onAction: (actionName: string) => void
+	onAction: (actionName: string) => void,
 ): ViewProps {
 	return {
 		accessible: true,

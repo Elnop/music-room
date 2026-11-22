@@ -14,8 +14,8 @@ export function usePlayerSheets(isModalOpen: boolean): PlayerSheetsState {
 
 	return {
 		isQueueOpen: open.queue,
-		setQueueOpen: queue => setOpen(current => ({ ...current, queue })),
+		setQueueOpen: (queue) => setOpen((current) => ({ ...current, queue })),
 		isDevicesOpen: open.devices,
-		setDevicesOpen: devices => setOpen(current => ({ ...current, devices })),
+		setDevicesOpen: (devices) => setOpen((current) => ({ ...current, devices })),
 	};
 }

@@ -9,7 +9,7 @@ import type {
 export async function requestLicense(
 	device: UserDeviceWithLicenses,
 	friend: FriendUserSummary,
-	grant: boolean
+	grant: boolean,
 ): Promise<void> {
 	if (grant) {
 		await musicControlApi.grantDeviceLicense(device.deviceId, friend.id);

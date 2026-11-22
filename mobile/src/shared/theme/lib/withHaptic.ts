@@ -12,10 +12,10 @@ const HAPTICS: Record<Haptic, () => void> = {
 
 export function withHaptic(
 	onPress: PressHandler | null | undefined,
-	haptic: Haptic | undefined
+	haptic: Haptic | undefined,
 ): PressHandler | undefined {
 	if (!onPress) return undefined;
-	return event => {
+	return (event) => {
 		if (haptic) HAPTICS[haptic]();
 		onPress(event);
 	};

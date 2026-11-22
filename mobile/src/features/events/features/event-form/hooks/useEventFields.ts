@@ -17,8 +17,8 @@ export function useEventFields(edited: MusicEvent | undefined) {
 			accessInfo: edited?.accessInfo ?? '',
 		},
 	});
-	const place = useEventPlace(edited, address =>
-		form.setValue('address', address, { shouldValidate: true })
+	const place = useEventPlace(edited, (address) =>
+		form.setValue('address', address, { shouldValidate: true }),
 	);
 	const fields = {
 		name: useCappedField(form.control, 'name', EVENT_LIMITS.NAME_MAX),

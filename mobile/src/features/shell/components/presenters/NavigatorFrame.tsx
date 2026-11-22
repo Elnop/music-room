@@ -14,7 +14,7 @@ type NavigatorFrameProps = {
 export function NavigatorFrame({ insets, underBanner, panelOpen, children }: NavigatorFrameProps) {
 	const navigatorInsets = useMemo(
 		() => (underBanner ? { ...insets, top: 0 } : insets),
-		[underBanner, insets]
+		[underBanner, insets],
 	);
 
 	return (

@@ -22,7 +22,7 @@ export function useNowPlayingPanel(): NowPlayingPanelData {
 		isRemote: nowPlaying.isRemote,
 		upNext: next.items,
 		upNextTotal: next.total,
-		onPlayItem: itemId => {
+		onPlayItem: (itemId) => {
 			void queueStore.getState().playItem(itemId);
 		},
 	};

@@ -24,7 +24,7 @@ export function SearchUsersTab({ search, onSelectUser, bottomPadding }: SearchUs
 			data={search.searchResults}
 			refresh={search}
 			bottomPadding={bottomPadding}
-			keyExtractor={item => item.id}
+			keyExtractor={(item) => item.id}
 			renderItem={({ item }) => <UserRow user={item} onPress={onSelectUser} />}
 			ListEmptyComponent={<SearchUsersEmpty search={search} />}
 		/>

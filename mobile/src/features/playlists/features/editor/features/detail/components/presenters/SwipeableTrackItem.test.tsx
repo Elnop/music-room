@@ -66,7 +66,7 @@ describe('SwipeableTrackItem', () => {
 		render(<TrackItem track={track} onDelete={onDelete} onShowActions={jest.fn()} />);
 		await act(async () => {});
 		expect(screen.getByLabelText('Song, Artist').props.accessibilityHint).toBe(
-			'Appui long pour les actions du titre'
+			'Appui long pour les actions du titre',
 		);
 	});
 
@@ -77,7 +77,7 @@ describe('SwipeableTrackItem', () => {
 				onDelete={onDelete}
 				onShowActions={jest.fn()}
 				onDragStart={jest.fn()}
-			/>
+			/>,
 		);
 		await act(async () => {});
 		const row = within(screen.getByLabelText('Song, Artist'));
@@ -163,7 +163,7 @@ describe('SwipeableTrackItem', () => {
 				onPress={onPress}
 				onShowActions={onShowActions}
 				onDragStart={jest.fn()}
-			/>
+			/>,
 		);
 		await act(async () => {});
 		fireEvent.press(screen.getByText('Song'));
@@ -190,7 +190,7 @@ describe('SwipeableTrackItem', () => {
 				onShowActions={onShowActions}
 				onPress={onPress}
 				unavailable
-			/>
+			/>,
 		);
 		await act(async () => {});
 		expect(screen.getByText('Indisponible · Artist')).toBeTruthy();

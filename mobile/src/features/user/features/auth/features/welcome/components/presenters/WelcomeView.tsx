@@ -26,7 +26,7 @@ export function WelcomeView({ icons, buildLabel, server, actions }: WelcomeViewP
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{icons.map(icon => (
+			{icons.map((icon) => (
 				<FloatingIcon key={icon.spec.id} motion={icon} />
 			))}
 			<KeyboardAvoidingView

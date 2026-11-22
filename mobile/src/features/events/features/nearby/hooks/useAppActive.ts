@@ -10,7 +10,7 @@ export function useAppActive(): boolean {
 	const [active, setActive] = useState(() => isActive(AppState.currentState));
 
 	useEffect(() => {
-		const subscription = AppState.addEventListener('change', state => setActive(isActive(state)));
+		const subscription = AppState.addEventListener('change', (state) => setActive(isActive(state)));
 		return () => subscription.remove();
 	}, []);
 

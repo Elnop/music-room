@@ -16,7 +16,7 @@ const HIDDEN_ON_DESKTOP: BottomTabNavigationOptions = { tabBarItemStyle: { displ
 function tabScreenOptions(
 	theme: Theme,
 	tabBar: ViewStyle,
-	sidebar: BottomTabNavigationOptions | null
+	sidebar: BottomTabNavigationOptions | null,
 ) {
 	return ({ route }: { route: { name: string } }): BottomTabNavigationOptions => ({
 		tabBarActiveTintColor: theme.colors.primary,
@@ -39,7 +39,7 @@ export function useTabOptions() {
 	const styles = useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
 	const screenOptions = useMemo(
 		() => tabScreenOptions(theme, styles.tabBar, sidebarTabOptions(breakpoint, theme)),
-		[theme, styles, breakpoint]
+		[theme, styles, breakpoint],
 	);
 	return { screenOptions, hiddenOnDesktop: breakpoint === 'desktop' ? HIDDEN_ON_DESKTOP : null };
 }

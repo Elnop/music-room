@@ -31,7 +31,7 @@ function currentSlots(track: NowPlayingTrack | null, artworkUrl: string | null):
 
 export function carouselView(
 	queue: Pick<OwnerQueue, 'items' | 'currentItemId'>,
-	current: { track: NowPlayingTrack | null; artworkUrl: string | null }
+	current: { track: NowPlayingTrack | null; artworkUrl: string | null },
 ): CarouselView {
 	const { items } = queue;
 	const shown = displayedQueueIndex(items, queue.currentItemId, current.track?.id ?? null);

@@ -32,7 +32,7 @@ function renderWelcome() {
 		<WelcomeContainer
 			{...({ navigation: { navigate }, route: {} } as unknown as Props)}
 			backendUrlField={<Text>backend-url-field</Text>}
-		/>
+		/>,
 	);
 }
 

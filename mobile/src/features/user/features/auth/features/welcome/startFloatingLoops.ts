@@ -23,7 +23,7 @@ function pulse(scale: Animated.Value, toValue: number, duration: number) {
 export function startFloatingLoops({ spec, float, spin, scale }: FloatingIconValues): void {
 	const { duration, delay } = spec;
 	Animated.loop(
-		Animated.sequence([timing(float, 1, duration, delay), timing(float, 0, duration)])
+		Animated.sequence([timing(float, 1, duration, delay), timing(float, 0, duration)]),
 	).start();
 	Animated.loop(
 		Animated.timing(spin, {
@@ -31,9 +31,9 @@ export function startFloatingLoops({ spec, float, spin, scale }: FloatingIconVal
 			duration: duration * 2.5,
 			easing: Easing.linear,
 			useNativeDriver: true,
-		})
+		}),
 	).start();
 	Animated.loop(
-		Animated.sequence([pulse(scale, 1.15, duration), pulse(scale, 1, duration)])
+		Animated.sequence([pulse(scale, 1.15, duration), pulse(scale, 1, duration)]),
 	).start();
 }

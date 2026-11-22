@@ -9,7 +9,7 @@ type UserProfileScreenProps = NativeStackScreenProps<FriendsStackParamList, 'Use
 export function UserProfileScreen(props: UserProfileScreenProps) {
 	return (
 		<FriendListeningContainer userId={props.route.params.userId}>
-			{listening => <UserProfileContainer {...props} listening={listening} />}
+			{(listening) => <UserProfileContainer {...props} listening={listening} />}
 		</FriendListeningContainer>
 	);
 }

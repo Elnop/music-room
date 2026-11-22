@@ -13,8 +13,8 @@ type AlertState = {
 	dismiss: () => void;
 };
 
-export const alertStore = createStore<AlertState>(set => ({
+export const alertStore = createStore<AlertState>((set) => ({
 	queue: [],
-	push: alert => set(state => ({ queue: [...state.queue, alert] })),
-	dismiss: () => set(state => ({ queue: state.queue.slice(1) })),
+	push: (alert) => set((state) => ({ queue: [...state.queue, alert] })),
+	dismiss: () => set((state) => ({ queue: state.queue.slice(1) })),
 }));

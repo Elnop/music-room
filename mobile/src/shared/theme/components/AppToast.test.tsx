@@ -13,7 +13,7 @@ jest.mock('@/shared/theme/hooks/useTheme', () => {
 describe('AppToast', () => {
 	it.each(['success', 'error', 'info', 'warning'] as const)(
 		'renders a %s toast with its message in the theme colours',
-		async type => {
+		async (type) => {
 			render(<AppToast />);
 
 			await act(async () => {
@@ -27,6 +27,6 @@ describe('AppToast', () => {
 			expect(style.backgroundColor).toBe(originalTheme.colors.surface);
 			const text = StyleSheet.flatten(screen.getByText(`Message ${type}`).props.style);
 			expect(text.color).toBe(originalTheme.colors.text);
-		}
+		},
 	);
 });

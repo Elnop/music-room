@@ -36,7 +36,7 @@ describe('Input', () => {
 				placeholder="Password"
 				secureTextEntry
 				testID="password-input"
-			/>
+			/>,
 		);
 
 		const input = screen.getByTestId('password-input');
@@ -53,7 +53,7 @@ describe('Input', () => {
 				onChangeText={jest.fn()}
 				secureTextEntry
 				testID="password-input"
-			/>
+			/>,
 		);
 
 		fireEvent.press(screen.getByLabelText('Afficher le mot de passe'));
@@ -85,7 +85,7 @@ describe('Input', () => {
 					placeholder="Name"
 					onEnter={submit}
 					{...props}
-				/>
+				/>,
 			);
 			fireEvent(screen.getByPlaceholderText('Name'), 'submitEditing');
 			return submit;

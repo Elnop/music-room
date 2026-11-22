@@ -16,7 +16,7 @@ export function PlaylistGrid({ playlists, onOpen, onPlaylistActions }: PlaylistG
 
 	return (
 		<View style={styles.grid}>
-			{playlists.map(playlist => (
+			{playlists.map((playlist) => (
 				<PlaylistGridCard
 					key={playlist.id}
 					playlist={playlist}

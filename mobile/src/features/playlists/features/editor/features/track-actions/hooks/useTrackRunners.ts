@@ -10,7 +10,7 @@ import type { TrackRunners } from '@/features/playlists/features/editor/features
 export function useTrackRunners(
 	shown: AddQueueItemBody | null,
 	onClose: () => void,
-	playback: PlaybackActions
+	playback: PlaybackActions,
 ): TrackRunners {
 	const addTrack = useAddTrack();
 
@@ -21,9 +21,9 @@ export function useTrackRunners(
 	}
 
 	return {
-		playNext: () => run(body => playback.playNext(body)),
-		addToQueue: () => run(body => playback.addToQueue(body)),
-		addToPlaylist: playlist => run(body => addToPlaylist(addTrack.mutateAsync, playlist, body)),
+		playNext: () => run((body) => playback.playNext(body)),
+		addToQueue: () => run((body) => playback.addToQueue(body)),
+		addToPlaylist: (playlist) => run((body) => addToPlaylist(addTrack.mutateAsync, playlist, body)),
 		share: () => run(shareTrack),
 	};
 }

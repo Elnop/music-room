@@ -28,7 +28,7 @@ jest.mock('@/features/playback/shared/player/hooks/usePlayerProgress', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -203,7 +203,7 @@ describe('useNowPlaying remote', () => {
 
 	it("shows the device's track, estimated progress and the queue item's duration", () => {
 		const { hashStringToNumber } = jest.requireActual(
-			'@/features/playback/shared/player/lib/trackToSoundCloud'
+			'@/features/playback/shared/player/lib/trackToSoundCloud',
 		);
 		goRemote('friend', 'Léa');
 		queueStore.setState({

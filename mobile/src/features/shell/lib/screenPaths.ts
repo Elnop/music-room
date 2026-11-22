@@ -19,7 +19,7 @@ const TAB_SCREENS: Record<AppTab, string> = {
 	ProfileTab: 'Profile',
 };
 
-const MATCHERS = SCREEN_PATHS.map(entry => ({
+const MATCHERS = SCREEN_PATHS.map((entry) => ({
 	entry,
 	regex: new RegExp(`^${entry.path.replace(':id', `(${UUID})`)}$`, 'iu'),
 }));
@@ -31,7 +31,7 @@ export function matchScreenPath(path: string, signedIn?: boolean): ScreenPathMat
 		return found ? [{ entry, id: found[1] ?? '' }] : [];
 	});
 	return (
-		matches.find(match => signedIn === undefined || Boolean(match.entry.tab) === signedIn) ??
+		matches.find((match) => signedIn === undefined || Boolean(match.entry.tab) === signedIn) ??
 		matches[0]
 	);
 }
@@ -55,10 +55,11 @@ function focusedRoute(state: StateNode): RouteNode | undefined {
 }
 
 function screenPathFor(name: string, params: Record<string, unknown>): ScreenPath | undefined {
-	const candidates = SCREEN_PATHS.filter(candidate => candidate.screen === name);
+	const candidates = SCREEN_PATHS.filter((candidate) => candidate.screen === name);
 	return (
-		candidates.find(candidate => candidate.param && typeof params[candidate.param] === 'string') ??
-		candidates.find(candidate => !candidate.param)
+		candidates.find(
+			(candidate) => candidate.param && typeof params[candidate.param] === 'string',
+		) ?? candidates.find((candidate) => !candidate.param)
 	);
 }
 

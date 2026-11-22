@@ -20,7 +20,7 @@ import { playlistWithTracks } from '@test-utils/playlistFixtures';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
@@ -47,7 +47,7 @@ function renderScreen(params?: { playlistId?: string }) {
 	const client = createQueryClient();
 	client.setQueryData(
 		queryKeys.playlists.detail('p1'),
-		playlistWithTracks({ id: 'p1', name: 'Mix', description: 'Old description' })
+		playlistWithTracks({ id: 'p1', name: 'Mix', description: 'Old description' }),
 	);
 	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), [{ id: 'old' } as Playlist]);
 	const view = renderWithClient(
@@ -55,7 +55,7 @@ function renderScreen(params?: { playlistId?: string }) {
 			route={{ key: 'k', name: 'CreatePlaylist', params } as Props['route']}
 			navigation={mockNavigation as unknown as Props['navigation']}
 		/>,
-		client
+		client,
 	);
 	clear = () => client.clear();
 	return view;
@@ -68,11 +68,11 @@ beforeEach(async () => {
 	signIn('me');
 	sentBody = undefined;
 	routes = mockFetchRoutes({
-		'POST /api/playlists': body => {
+		'POST /api/playlists': (body) => {
 			sentBody = body;
 			return ok({ playlist: created });
 		},
-		'PATCH /api/playlists/p1': body => {
+		'PATCH /api/playlists/p1': (body) => {
 			sentBody = body;
 			return ok({ playlist: { id: 'p1', name: 'Renamed', description: '' } });
 		},
@@ -90,12 +90,12 @@ describe('PlaylistFormContainer create mode', () => {
 
 		fireEvent.changeText(
 			screen.getByPlaceholderText('Ma super playlist'),
-			'Les tubes du Crabe Croustillant'
+			'Les tubes du Crabe Croustillant',
 		);
 		fireEvent.press(screen.getByText('Créer la playlist'));
 
 		await waitFor(() =>
-			expect(mockNavigation.replace).toHaveBeenCalledWith('PlaylistDetail', { id: 'new-id' })
+			expect(mockNavigation.replace).toHaveBeenCalledWith('PlaylistDetail', { id: 'new-id' }),
 		);
 		expect(sentBody).toStrictEqual({
 			name: 'Les tubes du Crabe Croustillant',
@@ -151,8 +151,8 @@ describe('PlaylistFormContainer edit mode (#342)', () => {
 
 		await waitFor(() =>
 			expect(showError).toHaveBeenCalledWith(
-				'Le serveur a rencontré un problème. Réessayez plus tard.'
-			)
+				'Le serveur a rencontré un problème. Réessayez plus tard.',
+			),
 		);
 		expect(mockNavigation.goBack).not.toHaveBeenCalled();
 		expect(screen.getByDisplayValue('Renamed')).toBeTruthy();
@@ -179,11 +179,11 @@ describe('PlaylistFormContainer caches', () => {
 		expect(screen.getByText('Visible uniquement par les invités')).toBeTruthy();
 		fireEvent.press(screen.getByText('Créer la playlist'));
 		await waitFor(() =>
-			expect(mockNavigation.replace).toHaveBeenCalledWith('PlaylistDetail', { id: 'new-id' })
+			expect(mockNavigation.replace).toHaveBeenCalledWith('PlaylistDetail', { id: 'new-id' }),
 		);
 		expect(sentBody).toMatchObject({ visibility: 'private', editMode: 'restricted' });
 		const list = view.client.getQueryData<Playlist[]>(queryKeys.playlists.list());
-		expect(list?.map(p => p.id)).toStrictEqual(['new-id', 'old']);
+		expect(list?.map((p) => p.id)).toStrictEqual(['new-id', 'old']);
 	});
 
 	it('toasts a failed creation and stays on the form', async () => {
@@ -193,8 +193,8 @@ describe('PlaylistFormContainer caches', () => {
 		fireEvent.press(screen.getByText('Créer la playlist'));
 		await waitFor(() =>
 			expect(showError).toHaveBeenCalledWith(
-				'Le serveur a rencontré un problème. Réessayez plus tard.'
-			)
+				'Le serveur a rencontré un problème. Réessayez plus tard.',
+			),
 		);
 		expect(mockNavigation.replace).not.toHaveBeenCalled();
 	});

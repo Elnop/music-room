@@ -5,5 +5,5 @@ import type { OwnerQueue } from '@/features/playback/shared/player/types/queueTy
 
 export function useActiveQueue(): OwnerQueue {
 	const ownerId = useActiveOwnerId();
-	return useQueueState(state => selectQueue(state, ownerId));
+	return useQueueState((state) => selectQueue(state, ownerId));
 }

@@ -12,7 +12,7 @@ type ProfileMenuItemsProps = {
 export function ProfileMenuItems({ wide = false, actions }: ProfileMenuItemsProps) {
 	return (
 		<>
-			{PROFILE_MENU_ENTRIES.map(entry => (
+			{PROFILE_MENU_ENTRIES.map((entry) => (
 				<ProfileNavigationItem
 					key={entry.action}
 					title={entry.title}

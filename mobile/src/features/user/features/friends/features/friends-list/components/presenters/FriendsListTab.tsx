@@ -34,7 +34,7 @@ export function FriendsListTab(props: FriendsListTabProps) {
 			data={friendsList.friends}
 			refresh={friendsList}
 			bottomPadding={props.bottomPadding}
-			keyExtractor={item => item.id}
+			keyExtractor={(item) => item.id}
 			renderItem={({ item }) => (
 				<FriendListItem friend={item} cell={{ columns, control, onSelectUser }} />
 			)}

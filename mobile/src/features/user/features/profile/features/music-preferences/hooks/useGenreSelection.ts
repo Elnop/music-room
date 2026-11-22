@@ -13,7 +13,7 @@ export function useGenreSelection(genres: MusicGenre[] | undefined) {
 			const toggled = toggledGenres(selectedGenres, genre);
 			if (toggled) setCustomGenres(toggled);
 		},
-		[selectedGenres]
+		[selectedGenres],
 	);
 
 	const reset = useCallback(() => setCustomGenres(null), []);
@@ -27,7 +27,7 @@ export function useGenreSelection(genres: MusicGenre[] | undefined) {
 }
 
 function toggledGenres(selectedGenres: MusicGenre[], genre: MusicGenre): MusicGenre[] | null {
-	if (selectedGenres.includes(genre)) return selectedGenres.filter(g => g !== genre);
+	if (selectedGenres.includes(genre)) return selectedGenres.filter((g) => g !== genre);
 	if (selectedGenres.length < MAX_GENRES) return [...selectedGenres, genre];
 	return null;
 }

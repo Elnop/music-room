@@ -27,7 +27,7 @@ describe('ShareLinkButton', () => {
 		fireEvent.press(screen.getByRole('button', { name: 'Partager' }));
 
 		await waitFor(() =>
-			expect(share).toHaveBeenCalledWith({ message: `Chill\n${LINK}`, title: 'Chill' })
+			expect(share).toHaveBeenCalledWith({ message: `Chill\n${LINK}`, title: 'Chill' }),
 		);
 		expect(showSuccess).not.toHaveBeenCalled();
 	});
@@ -39,7 +39,7 @@ describe('ShareLinkButton', () => {
 		fireEvent.press(screen.getByText('Partager'));
 
 		await waitFor(() =>
-			expect(share).toHaveBeenCalledWith(expect.objectContaining({ message: LINK }))
+			expect(share).toHaveBeenCalledWith(expect.objectContaining({ message: LINK })),
 		);
 	});
 

@@ -10,9 +10,9 @@ type LibraryScreenProps = NativeStackScreenProps<PlaylistStackParamList, 'Playli
 export function LibraryScreen(props: LibraryScreenProps) {
 	return (
 		<PlanContainer>
-			{plan => (
+			{(plan) => (
 				<PlaylistCardMenuContainer navigation={props.navigation} premium={plan}>
-					{actionsFor => <LibraryContainer {...props} onPlaylistActions={actionsFor} />}
+					{(actionsFor) => <LibraryContainer {...props} onPlaylistActions={actionsFor} />}
 				</PlaylistCardMenuContainer>
 			)}
 		</PlanContainer>

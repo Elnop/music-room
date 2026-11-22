@@ -3,7 +3,7 @@ import { playlistFormSchema } from '@/features/playlists/features/editor/shared/
 describe('playlistFormSchema (#342)', () => {
 	it('accepts a name of 50 characters, such as a long French title', () => {
 		expect(playlistFormSchema.safeParse({ name: 'Les tubes du Crabe Croustillant' }).success).toBe(
-			true
+			true,
 		);
 		expect(playlistFormSchema.safeParse({ name: 'a'.repeat(50) }).success).toBe(true);
 	});
@@ -20,12 +20,12 @@ describe('playlistFormSchema (#342)', () => {
 
 	it('accepts a description of 500 characters, the backend limit, and refuses 501', () => {
 		expect(
-			playlistFormSchema.safeParse({ name: 'Mix', description: 'a'.repeat(500) }).success
+			playlistFormSchema.safeParse({ name: 'Mix', description: 'a'.repeat(500) }).success,
 		).toBe(true);
 		const result = playlistFormSchema.safeParse({ name: 'Mix', description: 'a'.repeat(501) });
 		expect(result.success).toBe(false);
 		expect(result.error?.issues[0].message).toBe(
-			'La description doit faire 500 caractères maximum'
+			'La description doit faire 500 caractères maximum',
 		);
 	});
 });

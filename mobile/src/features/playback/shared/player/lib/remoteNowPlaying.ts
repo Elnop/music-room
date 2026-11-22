@@ -24,7 +24,7 @@ type RemoteView = {
 
 function remoteDurationMs(queue: OwnerQueue, trackId: number | undefined): number | null {
 	if (trackId === undefined) return null;
-	const current = queue.items.find(item => item.id === queue.currentItemId);
+	const current = queue.items.find((item) => item.id === queue.currentItemId);
 	return current && hashStringToNumber(current.track.trackUri) === trackId
 		? current.track.durationMs
 		: null;

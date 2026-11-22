@@ -7,8 +7,8 @@ import { queueStore } from '@/features/playback/shared/player/stores/queueStore'
 
 export function useQueueAutoAdvance(player: AudioPlayer): void {
 	const { didJustFinish } = useAudioPlayerStatus(player);
-	const loadCounter = usePlayerState(state => state.loadCounter);
-	const isPlaying = usePlayerState(state => state.playbackState === 'playing');
+	const loadCounter = usePlayerState((state) => state.loadCounter);
+	const isPlaying = usePlayerState((state) => state.playbackState === 'playing');
 	const wasFinishedRef = useRef(false);
 	const finishedLoadRef = useRef<number | null>(null);
 

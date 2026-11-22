@@ -44,7 +44,7 @@ export const friendsApi = {
 
 	getUserPublicPlaylists(userId: string): Promise<FriendPlaylistSummary[]> {
 		return apiRequest<{ playlists: FriendPlaylistSummary[] }>(`/api/playlists/user/${userId}`).then(
-			res => res.playlists
+			(res) => res.playlists,
 		);
 	},
 

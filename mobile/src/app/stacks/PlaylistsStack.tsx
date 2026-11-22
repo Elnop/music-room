@@ -39,7 +39,7 @@ function editorScreens() {
 				})}
 			/>
 			<PlaylistStack.Screen name="SearchTracks" options={{ title: 'Ajouter des titres' }}>
-				{props => <SearchTracksScreen {...props} playback={playbackActions} />}
+				{(props) => <SearchTracksScreen {...props} playback={playbackActions} />}
 			</PlaylistStack.Screen>
 			<PlaylistStack.Screen
 				name="PlaylistSharing"
@@ -85,7 +85,7 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 				options={{ title: 'Playlists' }}
 			/>
 			<PlaylistStack.Screen name="PlaylistDetail" options={PLAYLIST_DETAIL_OPTIONS}>
-				{props => <PlaylistDetailScreen {...props} />}
+				{(props) => <PlaylistDetailScreen {...props} />}
 			</PlaylistStack.Screen>
 			{editorScreens()}
 			{eventScreens()}

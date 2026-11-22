@@ -25,7 +25,7 @@ const REMOVE_MESSAGES = {
 };
 
 export function useAvatarPicker() {
-	const accessToken = useSession(s => s.accessToken);
+	const accessToken = useSession((s) => s.accessToken);
 	const [isUploading, setIsUploading] = useState(false);
 
 	async function pickAndUpload(source: ImageSource): Promise<void> {
@@ -57,7 +57,7 @@ async function removeAvatar(): Promise<void> {
 async function changeAvatar(
 	change: () => Promise<void>,
 	messages: typeof UPLOAD_MESSAGES,
-	setIsUploading: (isUploading: boolean) => void
+	setIsUploading: (isUploading: boolean) => void,
 ): Promise<void> {
 	setIsUploading(true);
 	try {

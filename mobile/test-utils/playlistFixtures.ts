@@ -18,7 +18,7 @@ export function playlistTrack(id: string, rank: string, trackUri = id): TrackInP
 }
 
 export function playlistWithTracks(
-	overrides: Partial<PlaylistWithTracks> = {}
+	overrides: Partial<PlaylistWithTracks> = {},
 ): PlaylistWithTracks {
 	return {
 		id: 'p1',

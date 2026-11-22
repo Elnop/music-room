@@ -21,7 +21,7 @@ export function browserMediaSession(): BrowserMediaSession | undefined {
 
 export function browserMetadata(
 	title: string | undefined,
-	init: Omit<MetadataInit, 'title'>
+	init: Omit<MetadataInit, 'title'>,
 ): unknown {
 	const Metadata = browser.MediaMetadata;
 	return title !== undefined && Metadata ? new Metadata({ title, ...init }) : null;
@@ -37,7 +37,7 @@ function setHandler(session: BrowserMediaSession, action: MediaAction, handler: 
 
 export function setMediaHandlers(
 	session: BrowserMediaSession,
-	handlers: MediaHandlers | null
+	handlers: MediaHandlers | null,
 ): void {
 	for (const action of MEDIA_ACTIONS) {
 		setHandler(session, action, handlers ? handlers[action] : null);

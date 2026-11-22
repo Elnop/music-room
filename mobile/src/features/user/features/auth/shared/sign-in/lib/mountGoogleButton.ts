@@ -9,12 +9,12 @@ import type {
 export function mountGoogleButton(
 	target: GoogleButtonTarget,
 	variant: GoogleButtonVariant,
-	{ onCredential, onFailure }: GoogleButtonCallbacks
+	{ onCredential, onFailure }: GoogleButtonCallbacks,
 ): () => void {
 	let mounted = true;
 	let release: (() => void) | undefined;
 	renderGoogleButton(target, variant, onCredential).then(
-		done => {
+		(done) => {
 			if (mounted) release = done;
 			else done();
 		},
@@ -23,7 +23,7 @@ export function mountGoogleButton(
 				errorMessage: error instanceof Error ? error.message : String(error),
 			});
 			if (mounted) onFailure();
-		}
+		},
 	);
 	return () => {
 		mounted = false;

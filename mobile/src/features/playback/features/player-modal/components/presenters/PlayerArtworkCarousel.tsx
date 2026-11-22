@@ -27,7 +27,7 @@ export function PlayerArtworkCarousel({ carousel, colors }: PlayerArtworkCarouse
 	return (
 		<View style={styles.artworkWrapper}>
 			<View style={boxSize(frameSize, frameSize + CAROUSEL_TEXT_HEIGHT)}>
-				{carousel.slots.map(slot => (
+				{carousel.slots.map((slot) => (
 					<PlayerCarouselSlot
 						key={slot.key}
 						slot={slot}

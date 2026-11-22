@@ -36,7 +36,7 @@ export function playTrackPatch(state: PlayerState, start: TrackStart): Partial<P
 export function renewStreamPatch(
 	state: PlayerState,
 	positionMs: number,
-	options: { keepPlaying: boolean; afterFailure: boolean }
+	options: { keepPlaying: boolean; afterFailure: boolean },
 ): Partial<PlayerState> {
 	return {
 		startPositionMs: validPos(positionMs),

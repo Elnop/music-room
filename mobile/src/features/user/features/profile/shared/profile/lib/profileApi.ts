@@ -1,10 +1,6 @@
 import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { jpegFormData } from '@/shared/backend/lib/jpegFormData';
-import type {
-	AvatarResponse,
-	UpdateProfileData,
-	UserProfile,
-} from '@/shared/users/userTypes';
+import type { AvatarResponse, UpdateProfileData, UserProfile } from '@/shared/users/userTypes';
 
 export const profileApi = {
 	updateProfile(data: UpdateProfileData): Promise<UserProfile> {

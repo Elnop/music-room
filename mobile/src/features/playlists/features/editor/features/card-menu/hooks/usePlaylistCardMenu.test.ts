@@ -6,7 +6,7 @@ import type { Playlist } from '@/features/playlists/shared/playlist/playlistType
 import { usePlaylistCardMenu } from '@/features/playlists/features/editor/features/card-menu/hooks/usePlaylistCardMenu';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
@@ -21,20 +21,20 @@ jest.mock(
 	'@/features/playlists/features/editor/shared/playlist-mutations/hooks/useCoverActions',
 	() => ({
 		useCoverActions: () => ({ isPremium: false, change: jest.fn(), remove: jest.fn() }),
-	})
+	}),
 );
 const mockDelete = jest.fn();
 jest.mock(
 	'@/features/playlists/features/editor/shared/playlist-mutations/hooks/usePlaylistMutations',
 	() => ({
 		useDeletePlaylist: () => ({ mutateAsync: mockDelete }),
-	})
+	}),
 );
 jest.mock(
 	'@/features/playlists/features/editor/shared/playlist-mutations/lib/playlistCacheEdits',
 	() => ({
 		forgetPlaylist: jest.fn(),
-	})
+	}),
 );
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
 
@@ -80,7 +80,7 @@ describe('usePlaylistCardMenu', () => {
 			text: string;
 			onPress?: () => void;
 		}[];
-		const confirm = buttons.find(button => button.text === 'Supprimer');
+		const confirm = buttons.find((button) => button.text === 'Supprimer');
 		await act(async () => confirm?.onPress?.());
 		expect(mockDelete).toHaveBeenCalledWith('p1');
 		expect(showSuccess).toHaveBeenCalledWith('Playlist supprimée');

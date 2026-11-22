@@ -21,7 +21,7 @@ export function createLogout({ set, get, writer }: SessionAccess): () => Promise
 		if (user) {
 			await lastTrackStorage
 				.clear(user.id)
-				.catch(error => logger.warn('[lastTrackStorage] Clear failed', error));
+				.catch((error) => logger.warn('[lastTrackStorage] Clear failed', error));
 		}
 	};
 }

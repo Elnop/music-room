@@ -11,12 +11,12 @@ export function useLastTrackRestore(userId: string | null): string | null {
 		let cancelled = false;
 		void lastTrackStorage
 			.load(userId)
-			.then(entry => {
+			.then((entry) => {
 				if (cancelled) return;
 				restoreLastTrack(entry);
 				setRestoredFor(userId);
 			})
-			.catch(error => {
+			.catch((error) => {
 				logger.warn('[lastTrackStorage] Load failed', error);
 				if (!cancelled) setRestoredFor(userId);
 			});

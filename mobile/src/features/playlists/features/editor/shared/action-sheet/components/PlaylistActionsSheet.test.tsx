@@ -35,7 +35,7 @@ function renderSheet(visible = true, cover = { hasCover: false, coverLocked: fal
 				onChangeCover,
 				onRemoveCover,
 			}}
-		/>
+		/>,
 	);
 }
 

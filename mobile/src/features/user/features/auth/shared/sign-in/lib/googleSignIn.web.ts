@@ -39,7 +39,7 @@ function receiveCredential({ credential }: { credential?: string }): void {
 async function loadIdentity(): Promise<GoogleIdentity> {
 	if (!WEB_CLIENT_ID) {
 		throw new Error(
-			'Google Sign-In is not configured. Please set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in your .env file.'
+			'Google Sign-In is not configured. Please set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in your .env file.',
 		);
 	}
 	await loadScript(GIS_SCRIPT);
@@ -63,7 +63,7 @@ export function configureGoogleSignIn(): void {}
 export async function renderGoogleButton(
 	target: GoogleButtonTarget,
 	variant: GoogleButtonVariant,
-	onCredential: () => void
+	onCredential: () => void,
 ): Promise<() => void> {
 	const identity = await loadIdentity();
 	function listener(): void {
@@ -73,7 +73,7 @@ export async function renderGoogleButton(
 		target,
 		googleButtonConfiguration(target, variant, () => {
 			clicked = listener;
-		})
+		}),
 	);
 	rendered.push(listener);
 	return () => {

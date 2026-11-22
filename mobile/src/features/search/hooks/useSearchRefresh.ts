@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 export function useSearchRefresh(
 	debouncedQuery: string,
 	settle: () => void,
-	refetch: () => Promise<unknown>
+	refetch: () => Promise<unknown>,
 ) {
 	const [isRefreshing, setIsRefreshing] = useState(false);
 

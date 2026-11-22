@@ -4,7 +4,7 @@ import type { DetailPage } from '@/features/playlists/features/editor/features/d
 
 export function ownerMenu(
 	playlist: PlaylistWithTracks,
-	{ owner, cover }: Pick<DetailPage, 'owner' | 'cover'>
+	{ owner, cover }: Pick<DetailPage, 'owner' | 'cover'>,
 ): PlaylistActionsMenu {
 	return {
 		playlistName: playlist.name,

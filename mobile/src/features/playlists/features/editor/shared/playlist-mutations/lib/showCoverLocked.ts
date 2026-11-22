@@ -12,6 +12,6 @@ export function showCoverLocked(navigation: CoverNavigation) {
 				onPress: () =>
 					navigation.getParent()?.navigate('ProfileTab', { screen: 'Settings', initial: false }),
 			},
-		]
+		],
 	);
 }

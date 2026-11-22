@@ -17,14 +17,14 @@ function useEditedEvent(eventId: string | undefined): MusicEvent | undefined {
 		eventId === undefined
 			? undefined
 			: (client.getQueryData<MusicEvent>(queryKeys.events.detail(eventId)) ??
-				client.getQueryData<MusicEvent[]>(queryKeys.events.list())?.find(e => e.id === eventId))
+				client.getQueryData<MusicEvent[]>(queryKeys.events.list())?.find((e) => e.id === eventId)),
 	);
 	return edited;
 }
 
 export function useEventForm(
 	navigation: EventFormNavigation,
-	eventId: string | undefined
+	eventId: string | undefined,
 ): EventForm {
 	const edited = useEditedEvent(eventId);
 	const draft = useEventDraft(edited);

@@ -41,7 +41,7 @@ export function useRegisterForm(navigation: RegisterNavigation): RegisterForm {
 		email: useFieldBinding(form.control, 'email'),
 		username: useFieldBinding(form.control, 'username'),
 		password: useFieldBinding(form.control, 'password'),
-		submit: form.handleSubmit(input => register.mutate(input, registerCallbacks(navigation))),
+		submit: form.handleSubmit((input) => register.mutate(input, registerCallbacks(navigation))),
 		isSubmitting: register.isPending,
 		goToLogin: () => navigation.navigate('Login'),
 	};

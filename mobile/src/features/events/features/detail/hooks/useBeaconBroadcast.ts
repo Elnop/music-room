@@ -19,7 +19,7 @@ const FAILURES: Record<AdvertiseFailure, string> = {
 
 export function useBeaconBroadcast(event: MusicEvent | undefined): BeaconBroadcast {
 	const { eventId, status } = useBeaconState(
-		useShallow(state => ({ eventId: state.eventId, status: state.status }))
+		useShallow((state) => ({ eventId: state.eventId, status: state.status })),
 	);
 	const mine = event !== undefined && eventId === event.id;
 
@@ -29,7 +29,7 @@ export function useBeaconBroadcast(event: MusicEvent | undefined): BeaconBroadca
 			beaconActions.stop();
 			return;
 		}
-		void beaconActions.start(event).then(failure => {
+		void beaconActions.start(event).then((failure) => {
 			if (failure) showError(FAILURES[failure]);
 			else showSuccess('Balise diffusée : les téléphones proches voient votre événement');
 		});

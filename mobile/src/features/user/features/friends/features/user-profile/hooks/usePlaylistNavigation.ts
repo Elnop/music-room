@@ -4,7 +4,7 @@ import type { FriendsStackParamList } from '@/features/user/features/friends/fri
 
 export function usePlaylistNavigation(
 	navigation: NativeStackNavigationProp<FriendsStackParamList, 'UserProfile'> | undefined,
-	onNavigateToPlaylist: ((playlistId: string) => void) | undefined
+	onNavigateToPlaylist: ((playlistId: string) => void) | undefined,
 ) {
 	return useCallback(
 		(playlistId: string) => {
@@ -14,6 +14,6 @@ export function usePlaylistNavigation(
 				navigation.navigate('PlaylistDetail', { id: playlistId });
 			}
 		},
-		[navigation, onNavigateToPlaylist]
+		[navigation, onNavigateToPlaylist],
 	);
 }

@@ -5,8 +5,8 @@ import { miniPlayerSummary } from '@/features/playback/features/mini-player/lib/
 import type { MiniPlayerData } from '@/features/playback/features/mini-player/miniPlayerTypes';
 
 export function useMiniPlayer(): MiniPlayerData {
-	const toggleModal = usePlayerState(state => state.toggleModal);
-	const setModalOpen = usePlayerState(state => state.setModalOpen);
+	const toggleModal = usePlayerState((state) => state.toggleModal);
+	const setModalOpen = usePlayerState((state) => state.setModalOpen);
 	const controls = useMiniPlayerControls();
 	const swipe = useMiniPlayerSwipe({
 		canGoNext: controls.canGoNext,

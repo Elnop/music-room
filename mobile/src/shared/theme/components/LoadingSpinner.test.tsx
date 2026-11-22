@@ -22,7 +22,7 @@ describe('LoadingSpinner', () => {
 		expect(screen.UNSAFE_queryAllByType(EqualizerBars)).toHaveLength(0);
 	});
 
-	it.each(['logo', 'spinner'] as const)('shows the message with the %s variant', variant => {
+	it.each(['logo', 'spinner'] as const)('shows the message with the %s variant', (variant) => {
 		render(<LoadingSpinner variant={variant} message="Loading playlists" />);
 		expect(screen.getByText('Loading playlists')).toBeTruthy();
 	});

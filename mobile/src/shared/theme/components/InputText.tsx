@@ -33,7 +33,7 @@ function webSubmit(onEnter: (() => void) | undefined, multiline: boolean | undef
 function textStyle(
 	styles: ReturnType<typeof createStyles>,
 	props: InputFieldProps,
-	withIcon: boolean
+	withIcon: boolean,
 ): StyleProp<TextStyle> {
 	return [
 		styles.input,

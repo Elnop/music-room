@@ -28,7 +28,7 @@ export function DetailTrackItem({ page, info }: DetailTrackItemProps) {
 			handlers={{
 				onDelete: () => tracks.deleteTrack(item.id),
 				onAddToQueue: () => tracks.addToQueue(item),
-				onShowActions: anchor => tracks.showActions(item, anchor),
+				onShowActions: (anchor) => tracks.showActions(item, anchor),
 				onDragStart: canEdit ? info.drag : undefined,
 				onPress: item.unavailable ? tracks.explainUnavailable : () => play.playFrom(item),
 			}}

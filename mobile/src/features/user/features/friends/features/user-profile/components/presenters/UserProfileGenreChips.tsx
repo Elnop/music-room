@@ -16,7 +16,7 @@ export function UserProfileGenreChips({ genres, style }: UserProfileGenreChipsPr
 
 	return (
 		<View style={[styles.genres, style]}>
-			{genres.map(genre => (
+			{genres.map((genre) => (
 				<GenreChip key={genre} genre={genre} selected size="sm" />
 			))}
 		</View>

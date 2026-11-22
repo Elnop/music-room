@@ -29,7 +29,7 @@ export function AddableTrackItem({ track, isAdded, onAdd, onShowActions }: Addab
 		>
 			<Artwork uri={track.artwork_url || track.user.avatar_url} size={52} style={styles.artwork} />
 			<AddableTrackInfo track={track} />
-			<TrackActionsButton onPress={anchor => onShowActions(track, anchor)} />
+			<TrackActionsButton onPress={(anchor) => onShowActions(track, anchor)} />
 			<AddTrackBadge trackId={track.id} isAdded={isAdded} />
 		</Pressable>
 	);

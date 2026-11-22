@@ -64,7 +64,7 @@ export class FakeMediaElement {
 
 export function autoplayRefusal() {
 	return Promise.reject(
-		Object.assign(new Error('play() needs a user gesture'), { name: 'NotAllowedError' })
+		Object.assign(new Error('play() needs a user gesture'), { name: 'NotAllowedError' }),
 	);
 }
 

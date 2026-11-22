@@ -9,7 +9,7 @@ import {
 import type { SocketCacheRule } from '@/shared/backend/types/socketCacheTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
@@ -112,7 +112,7 @@ describe('socketCache', () => {
 			const invalidate = jest.spyOn(client, 'invalidateQueries');
 
 			expect(
-				applySocketEvent(client, renameRule, { playlistId: 'p1', name: 'X', version: 1 })
+				applySocketEvent(client, renameRule, { playlistId: 'p1', name: 'X', version: 1 }),
 			).toBe('invalidated');
 			expect(invalidate).toHaveBeenCalledWith({ queryKey: playlistKeys.detail('p1') });
 		});

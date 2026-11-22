@@ -16,7 +16,5 @@
 		"babel-preset-expo",
 		"expo-updates"
 	],
-	"ignoreBinaries": [
-		"expo-doctor"
-	]
+	"ignoreBinaries": ["expo-doctor"]
 }

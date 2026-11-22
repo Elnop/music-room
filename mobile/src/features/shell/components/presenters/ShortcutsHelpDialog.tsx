@@ -26,7 +26,7 @@ export function ShortcutsHelpDialog({ visible, shortcuts, onClose }: ShortcutsHe
 						Raccourcis clavier
 					</Text>
 					<View style={styles.list}>
-						{shortcuts.map(shortcut => (
+						{shortcuts.map((shortcut) => (
 							<ShortcutRow key={shortcut.keys} shortcut={shortcut} />
 						))}
 					</View>

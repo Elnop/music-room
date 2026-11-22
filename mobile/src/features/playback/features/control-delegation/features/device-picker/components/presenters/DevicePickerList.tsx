@@ -36,11 +36,11 @@ export function DevicePickerList({ sections, onPick }: DevicePickerListProps) {
 			</PickerSection>
 			<PickerSection label="Mes appareils" emptyText="Aucun autre appareil">
 				{myOthers.length > 0 &&
-					myOthers.map(row => <DeviceRow key={row.key} row={row} onPick={onPick} />)}
+					myOthers.map((row) => <DeviceRow key={row.key} row={row} onPick={onPick} />)}
 			</PickerSection>
 			<PickerSection label="Appareils de mes amis" emptyText="Aucun appareil d'ami à contrôler">
 				{friends.length > 0 &&
-					friends.map(group => (
+					friends.map((group) => (
 						<PickerFriendDevices key={group.owner.ownerId} group={group} onPick={onPick} />
 					))}
 			</PickerSection>

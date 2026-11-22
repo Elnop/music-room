@@ -18,7 +18,7 @@ export function PolicyBlockItem({ block, onOpenLink }: PolicyBlockItemProps) {
 	if ('paragraph' in block) return <PolicyText spans={block.paragraph} onOpenLink={onOpenLink} />;
 	return (
 		<View style={styles.list}>
-			{block.list.map(item => (
+			{block.list.map((item) => (
 				<View key={policyKey(item)} style={styles.item}>
 					<Text style={styles.bullet}>•</Text>
 					<PolicyText spans={item} style={styles.itemText} onOpenLink={onOpenLink} />

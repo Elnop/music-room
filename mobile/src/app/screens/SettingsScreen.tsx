@@ -6,7 +6,7 @@ import { BackendUrlFieldContainer } from '@/features/shell/components/orchestrat
 export function SettingsScreen() {
 	return (
 		<PlanContainer>
-			{plan => (
+			{(plan) => (
 				<SettingsContainer subscription={plan} backendUrlField={<BackendUrlFieldContainer />} />
 			)}
 		</PlanContainer>

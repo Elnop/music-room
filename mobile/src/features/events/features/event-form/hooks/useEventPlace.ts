@@ -10,12 +10,12 @@ import type {
 
 export function useEventPlace(
 	edited: Located | undefined,
-	setAddress: (address: string) => void
+	setAddress: (address: string) => void,
 ): EventPlace {
 	const [located, setLocated] = useState<Located | null>(() =>
 		edited
 			? { latitude: edited.latitude, longitude: edited.longitude, address: edited.address }
-			: null
+			: null,
 	);
 	const [isLocating, setIsLocating] = useState(false);
 
@@ -32,6 +32,6 @@ export function useEventPlace(
 	return {
 		isLocating,
 		locateHere: () => void locateHere(),
-		resolve: address => resolveAddress(located, address),
+		resolve: (address) => resolveAddress(located, address),
 	};
 }

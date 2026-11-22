@@ -11,11 +11,11 @@ function reported(state: PlayerState) {
 
 export function watchListeningStatus(socket: Socket): () => void {
 	let timer: ReturnType<typeof setTimeout> | null = null;
-	const stop = watchPlayerState(reported, state => {
+	const stop = watchPlayerState(reported, (state) => {
 		if (timer) clearTimeout(timer);
 		timer = setTimeout(
 			() => emitListeningStatus(socket, state.currentTrack, state.isPlaying),
-			STATUS_DELAY_MS
+			STATUS_DELAY_MS,
 		);
 	});
 	return () => {

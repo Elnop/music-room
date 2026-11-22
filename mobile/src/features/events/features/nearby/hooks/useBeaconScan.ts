@@ -56,12 +56,12 @@ function useSightings(scanning: boolean): ReadonlyMap<number, BeaconSighting> {
 
 	useEffect(() => {
 		if (!scanning) return undefined;
-		const stopScan = scanEventBeacons(frame =>
-			setSightings(current => recordSighting(current, frame.minor, frame, Date.now()))
+		const stopScan = scanEventBeacons((frame) =>
+			setSightings((current) => recordSighting(current, frame.minor, frame, Date.now())),
 		);
 		const pruning = setInterval(
-			() => setSightings(current => pruneSightings(current, Date.now(), BEACON_TIMEOUT_MS)),
-			BEACON_PRUNE_MS
+			() => setSightings((current) => pruneSightings(current, Date.now(), BEACON_TIMEOUT_MS)),
+			BEACON_PRUNE_MS,
 		);
 		return () => {
 			clearInterval(pruning);
@@ -76,7 +76,7 @@ function useSightings(scanning: boolean): ReadonlyMap<number, BeaconSighting> {
 function scanStatus(
 	permitted: boolean | null,
 	bluetooth: ScannerState | null,
-	scanning: boolean
+	scanning: boolean,
 ): BeaconScanStatus {
 	if (permitted === false) return 'needs-permission';
 	if (bluetooth === 'off' || bluetooth === 'unsupported') return bluetooth;

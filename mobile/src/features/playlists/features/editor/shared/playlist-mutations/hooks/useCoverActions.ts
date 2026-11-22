@@ -13,7 +13,7 @@ import type {
 export function useCoverActions(
 	navigation: CoverNavigation,
 	playlistId: string,
-	premium: Pick<PlanState, 'isPremium' | 'refetch'>
+	premium: Pick<PlanState, 'isPremium' | 'refetch'>,
 ): CoverActions {
 	const { isUploading, perform } = useCoverTask({
 		playlistId,

@@ -9,9 +9,9 @@ export function useDraftState(): DraftState {
 		name: field.name,
 		error: field.error,
 		creating,
-		rename: name => setField({ name }),
-		reset: name => setField({ name }),
-		setError: error => setField(current => ({ ...current, error })),
+		rename: (name) => setField({ name }),
+		reset: (name) => setField({ name }),
+		setError: (error) => setField((current) => ({ ...current, error })),
 		setCreating,
 	};
 }

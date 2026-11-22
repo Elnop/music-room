@@ -5,7 +5,7 @@ import { bindSocketCache } from '@/shared/backend/lib/socketCache';
 import type { SocketCacheBinding } from '@/shared/backend/types/socketCacheTypes';
 
 export function useSocketCache(bindings: readonly SocketCacheBinding[]): void {
-	const socket = useSocketState(state => state.socket);
+	const socket = useSocketState((state) => state.socket);
 	const client = useQueryClient();
 
 	useEffect(() => {

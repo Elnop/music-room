@@ -16,7 +16,7 @@ export function recordSighting(
 	sightings: ReadonlyMap<number, BeaconSighting>,
 	minor: number,
 	frame: { rssi: number; measuredPower: number },
-	now: number
+	now: number,
 ): Map<number, BeaconSighting> {
 	const next = new Map(sightings);
 	next.set(minor, {
@@ -30,7 +30,7 @@ export function recordSighting(
 export function pruneSightings(
 	sightings: ReadonlyMap<number, BeaconSighting>,
 	now: number,
-	timeoutMs: number
+	timeoutMs: number,
 ): Map<number, BeaconSighting> {
 	return new Map([...sightings].filter(([, sighting]) => now - sighting.lastSeen <= timeoutMs));
 }

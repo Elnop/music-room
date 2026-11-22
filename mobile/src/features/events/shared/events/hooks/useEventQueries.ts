@@ -7,7 +7,7 @@ import { fetchPlaylistChoices } from '@/features/events/shared/events/lib/fetchP
 import type { MusicEvent } from '@/features/events/eventTypes';
 
 export function useEvents() {
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.events.list(),
 		queryFn: eventsApi.fetchEvents,
@@ -22,14 +22,14 @@ export function useEvent(id: string) {
 		queryKey: queryKeys.events.detail(id),
 		queryFn: () => eventsApi.fetchEvent(id),
 		placeholderData: () =>
-			client.getQueryData<MusicEvent[]>(queryKeys.events.list())?.find(event => event.id === id),
+			client.getQueryData<MusicEvent[]>(queryKeys.events.list())?.find((event) => event.id === id),
 		staleTime: STALE.short,
 		retry: false,
 	});
 }
 
 export function usePlaylistChoices(enabled: boolean) {
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	return useQuery({
 		queryKey: queryKeys.events.playlistChoices(userId ?? ''),
 		queryFn: () => fetchPlaylistChoices(userId ?? ''),

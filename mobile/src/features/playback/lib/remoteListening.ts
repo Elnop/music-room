@@ -14,7 +14,7 @@ import type { RemoteDevice } from '@/features/playback/types/playbackEngineTypes
 
 function applyListeningStatus(device: RemoteDevice, status: UserListeningStatus): void {
 	if (status.ownerId !== device.ownerId) return;
-	const listened = status.devices.find(d => d.device.deviceId === device.deviceId);
+	const listened = status.devices.find((d) => d.device.deviceId === device.deviceId);
 	if (!listened) {
 		connectStore.getState().setLocal('Appareil hors ligne');
 		return;

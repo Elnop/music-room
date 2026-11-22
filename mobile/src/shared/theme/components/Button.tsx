@@ -53,7 +53,7 @@ function buttonLook(props: ButtonProps): ButtonLook {
 function containerStyle(
 	styles: ReturnType<typeof createStyles>,
 	lookStyles: ReturnType<typeof createLookStyles>,
-	look: ButtonLook
+	look: ButtonLook,
 ): StyleProp<ViewStyle> {
 	const variant = {
 		primary: lookStyles.primary,
