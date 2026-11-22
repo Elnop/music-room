@@ -4,7 +4,7 @@ Read before logging anything or answering an error. Every rule here is checked b
 
 ## no-console
 
-No direct `console.*` call, in backend or mobile (ESLint `no-restricted-globals` on `console`; the core `no-console` rule cannot point to this section). Log through the project logger:
+No direct `console.*` call, in backend or mobile (backend: ESLint `no-restricted-globals` on `console`; mobile: oxlint `no-console` from the brutalway preset, off in `logger.ts`). Log through the project logger:
 
 - Backend: `logger` from `@/shared/utils/logger.js`.
 - Mobile: `logger` from `@/shared/logging/logger`, in features and `app/`. A shared feature of `src/shared/` imports no other shared feature, so it does not log: it returns or throws the error and its caller logs it. `backend/`, whose socket has no caller to report to, publishes its errors through `onBackendError` (`shared/backend/lib/backendErrors.ts`), which `features/shell/lib/startApp.ts` sends to the logger.

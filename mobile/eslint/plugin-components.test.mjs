@@ -2,7 +2,6 @@ import { RuleTester } from 'eslint';
 import { describe, it } from 'node:test';
 import tseslint from 'typescript-eslint';
 import screenOrchestratorOnly from './rules/screen-orchestrator-only.mjs';
-import hookNoJsx from './rules/hook-no-jsx.mjs';
 import oneComponentPerFile from './rules/one-component-per-file.mjs';
 import orchestratorNoFetch from './rules/orchestrator-no-fetch.mjs';
 
@@ -53,31 +52,6 @@ ruleTester.run('screen-orchestrator-only', screenOrchestratorOnly, {
 			code: "import { PlaylistDetailView } from '@/features/playlists/detail/components/presenters/PlaylistDetailView';",
 			filename: '/app/mobile/src/app/stacks/PlaylistsStack.tsx',
 			errors: [{ messageId: 'noPresenterInScreen' }],
-		},
-	],
-});
-
-ruleTester.run('hook-no-jsx', hookNoJsx, {
-	valid: [
-		{
-			code: 'export function useCounter() { const [count, setCount] = useState(0); return { count }; }',
-			filename: '/app/mobile/src/features/foo/hooks/useCounter.ts',
-		},
-		{
-			code: 'export function useData() { return { data: [1, 2, 3] }; }',
-			filename: '/app/mobile/src/hooks/useData.ts',
-		},
-	],
-	invalid: [
-		{
-			code: 'export function useBanner() { return <View><Text>Hi</Text></View>; }',
-			filename: '/app/mobile/src/features/foo/hooks/useBanner.tsx',
-			errors: [{ messageId: 'noJsxElement' }, { messageId: 'noJsxElement' }],
-		},
-		{
-			code: 'export function useFrag() { return <>test</>; }',
-			filename: '/app/mobile/src/features/foo/hooks/useFrag.tsx',
-			errors: [{ messageId: 'noJsxFragment' }],
 		},
 	],
 });

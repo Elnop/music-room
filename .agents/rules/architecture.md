@@ -21,11 +21,11 @@ No import cycle, between files or folders (dependency-cruiser rule `no-circular`
 
 ## no-parent-imports
 
-An import that leaves the current folder goes through the `@/` alias (`@/features/...`, `@/shared/...`), never `../` (ESLint `no-restricted-imports`). Imports inside the current folder (`./x`) stay relative. In the backend, keep the `.js` extension.
+An import that leaves the current folder goes through the `@/` alias (`@/features/...`, `@/shared/...`), never `../` (backend: ESLint `no-restricted-imports`; mobile: oxlint `no-restricted-imports` from the brutalway preset, which also refuses `./x`). In the backend, imports inside the current folder (`./x`) stay relative and keep the `.js` extension.
 
 ## no-legacy-aliases
 
-Mobile only: `@/` (to `src/`) and `@test-utils/` (to `test-utils/`, the helpers tests share) are the only aliases, in `tsconfig.json` and `babel.config.js` (`module-resolver`, which jest uses too). Production code never imports `test-utils/` (dependency-cruiser `no-prod-to-tests`). The older aliases (`@api`, `@components`, `@contexts`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@themes`, `@constants`) were removed by #377 and stay banned (ESLint `no-restricted-imports`): write `@/shared/...`, not `@utils/...`.
+Mobile only: `@/` (to `src/`) and `@test-utils/` (to `test-utils/`, the helpers tests share) are the only aliases, in `tsconfig.json` and `babel.config.js` (`module-resolver`, which jest uses too). Production code never imports `test-utils/` (dependency-cruiser `no-prod-to-tests`). The older aliases (`@api`, `@components`, `@contexts`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@themes`, `@constants`) were removed by #377: they resolve to nothing, so type-check and dependency-cruiser (`no-unresolvable`) refuse them. Write `@/shared/...`, not `@utils/...`.
 
 ## mobile-layers
 

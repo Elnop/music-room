@@ -80,11 +80,11 @@ semgrep, backend and mobile: no `eval()` and no `new Function()`. They run arbit
 
 ## no-async-useeffect
 
-semgrep, mobile: a `useEffect` callback is never `async`. React expects it to return nothing or a cleanup function, not a Promise. Declare an async function inside the effect and call it.
+Mobile, oxlint `react-hooks/exhaustive-deps` (brutalway preset): a `useEffect` callback is never `async`. React expects it to return nothing or a cleanup function, not a Promise. Declare an async function inside the effect and call it.
 
 ## no-fetch-outside-api-client
 
-semgrep, mobile: `fetch(` appears only in a file named `<thing>Client.ts`, the same convention as brutalway's `fetch-placement` (oxlint): the rule allows that name through `metadata.allowed-paths` (see [exception-lists](#exception-lists)). The backend has one client, `src/shared/backend/lib/apiClient.ts`, which adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6) and a default timeout. Call the backend through `apiRequest` (`src/shared/backend/lib/apiRequest.ts`), which adds the session token on top of it; never write a second client for the backend.
+Mobile, oxlint `fetch-placement` (brutalway preset): `fetch(` appears only in a file named `<thing>Client.ts`, and never in an effect. The backend has one client, `src/shared/backend/lib/apiClient.ts`, which adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6) and a default timeout. Call the backend through `apiRequest` (`src/shared/backend/lib/apiRequest.ts`), which adds the session token on top of it; never write a second client for the backend.
 
 ## no-asyncstorage-outside-storage
 

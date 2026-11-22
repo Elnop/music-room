@@ -31,7 +31,7 @@ Where a file goes is set by the target layout in `doc/architecture/code-layout.m
 
 ## no-index-files
 
-No file named `index.ts` (or `index.tsx`) under `src/` (ESLint `no-restricted-syntax`). An index file is either a barrel that re-exports, which hides where code lives and creates cycles, or a module with a name that says nothing. Name the file after what it holds and import that file directly.
+No file named `index.ts` (or `index.tsx`) under `src/` (backend: ESLint `no-restricted-syntax`; mobile: oxlint `check-file/no-index` from the brutalway preset). An index file is either a barrel that re-exports, which hides where code lives and creates cycles, or a module with a name that says nothing. Name the file after what it holds and import that file directly.
 
 The app entry points outside `src/` (`mobile/index.ts`, required by Expo) are not concerned.
 
