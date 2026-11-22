@@ -2,7 +2,7 @@ import { useActiveQueue } from '@/features/playback/shared/player/hooks/useActiv
 import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
 import { nextItem } from '@/features/playback/shared/player/lib/queueNavigation';
 import { trackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
-import type { NextQueueItem } from '@/features/playback/playbackEngineTypes';
+import type { NextQueueItem } from '@/features/playback/types/playbackEngineTypes';
 
 export function useNextQueueItem(): NextQueueItem {
 	const queue = useActiveQueue();

@@ -1,13 +1,13 @@
 import React from 'react';
 import { PlayerContext } from '@/features/playback/shared/player/configs/playerContextConfig';
-import { usePlayerAudio } from '@/features/playback/shared/player/hooks/usePlayerAudio';
+import { usePlayerAudio } from '@/features/playback/hooks/usePlayerAudio';
 import { useLastTrackPersistence } from '@/features/playback/hooks/useLastTrackPersistence';
 import { useQueueAutoAdvance } from '@/features/playback/hooks/useQueueAutoAdvance';
 import { useStreamWatchdog } from '@/features/playback/hooks/useStreamWatchdog';
 import { useNextTrackPrefetch } from '@/features/playback/hooks/useNextTrackPrefetch';
 import { useAudioInterruption } from '@/features/playback/hooks/useAudioInterruption';
 import { useBackgroundKeepAlive } from '@/features/playback/hooks/useBackgroundKeepAlive';
-import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
+import { useAutoplayPrompt } from '@/features/playback/hooks/useAutoplayPrompt';
 import { usePlayerVolume } from '@/features/playback/hooks/usePlayerVolume';
 import { configureAudioMode } from '@/features/playback/lib/configureAudioMode';
 import { registerJsKeepAliveTask } from '@/features/playback/lib/jsKeepAlive';

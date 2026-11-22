@@ -19,8 +19,8 @@ One command per project (`backend/`, `mobile/`) runs every guardrail in parallel
 | `type-check` | `tsc --noEmit` | type errors (strict mode, no `any`) |
 | `lint` | ESLint 9 + in-house plugins | component roles, `@/` imports, no `console.*`, UI primitives, theme tokens, Zustand selectors… |
 | `check:dead-code` | knip | unused files, exports, types and dependencies |
-| `check:deps` | dependency-cruiser (mobile: `@brutalway/dependency-cruiser-config`) | layer violations, imports between features or between slices of `shared/`, impure presenters, cycles |
-| `check:tree` | check-tree (mobile only) | folders outside the layout, empty folders, category folders with a single child |
+| `check:deps` | dependency-cruiser (mobile: `@brutalway/dependency-cruiser-config`) | layer violations, imports between features or between shared features of `shared/`, impure presenters, cycles |
+| `check:tree` | check-tree (mobile only) | folders outside the layout, empty folders, kind folders with a single child |
 | `check:duplication` | jscpd | copied code |
 | `check:semgrep`, `check:ast-grep` | semgrep (Docker image), ast-grep | patterns lint misses: `fetch` outside the API client, AsyncStorage outside the storage modules, `eval`, `@ts-ignore`… |
 | `check:secrets` | gitleaks (Docker image) | committed keys and tokens |

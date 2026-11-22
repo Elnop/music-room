@@ -3,7 +3,7 @@ import type { LastTrackEntry } from '@/shared/playback/types/playbackTypes';
 import { toTrackInput } from '@/shared/tracks/lib/toTrackInput';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { logger } from '@/shared/logging/logger';
-import { isLocalTarget } from '@/features/playback/shared/player/lib/connectTarget';
+import { isLocalTarget } from '@/features/playback/lib/isLocalTarget';
 import { readPositionMs } from '@/features/playback/shared/player/lib/positionReader';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import type { PlayerState } from '@/features/playback/shared/player/types/playerStateTypes';

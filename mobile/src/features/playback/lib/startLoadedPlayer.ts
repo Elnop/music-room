@@ -1,5 +1,5 @@
 import { logger } from '@/shared/logging/logger';
-import { isLocalTarget } from '@/features/playback/shared/player/lib/connectTarget';
+import { isLocalTarget } from '@/features/playback/lib/isLocalTarget';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 

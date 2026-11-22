@@ -7,7 +7,7 @@ Read before fetching server data on the mobile, or before adding or reading a Zu
 Two kinds of state, two tools (epic #362):
 
 - **Server data** (playlists, queue, friends, profiles, devices, search results) is read with **TanStack Query**: a query hook calls the feature's service, which goes through the API client (`@/shared/backend/lib/api`). Mutations use `useMutation`, then update or invalidate the affected keys. Errors are the typed `ApiError`; show them with `apiErrorMessage(error, fallback)`.
-- **Client state** (session, player, preferences, UI) lives in **Zustand**: cross-cutting stores in their `src/shared/` slice (`backend/socketStore.ts`, `alerts/alertStore.ts`), a feature's own stores in its `stores/` folder.
+- **Client state** (session, player, preferences, UI) lives in **Zustand**: cross-cutting stores in their shared feature of `src/shared/` (`backend/socketStore.ts`, `alerts/alertStore.ts`), a feature's own stores in its `stores/` folder.
 
 A Zustand store that copies server data and refreshes it by hand moves to TanStack Query when its feature migrates (#378–#385); no new one is written.
 

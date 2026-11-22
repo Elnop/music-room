@@ -2,7 +2,7 @@ import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/playback/shared/player/config
 import {
 	recoverLoadTimeout,
 	startLoadedPlayer,
-} from '@/features/playback/shared/player/lib/startLoadedPlayer';
+} from '@/features/playback/lib/startLoadedPlayer';
 import type {
 	AudioPlayer,
 	StreamLoadWatch,

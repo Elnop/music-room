@@ -1,4 +1,4 @@
-import { useAudioPlayerStatus } from '@/features/playback/shared/player/lib/audioPlayer';
+import { useAudioPlayerStatus } from '@/features/playback/lib/audioPlayer';
 import { useStreamHealth } from '@/features/playback/hooks/useStreamHealth';
 import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';

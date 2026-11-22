@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useAutoplayState } from '@/features/playback/shared/player/hooks/useAutoplayState';
-import { showAutoplayPrompt } from '@/features/playback/shared/player/lib/showAutoplayPrompt';
+import { useAutoplayState } from '@/features/playback/hooks/useAutoplayState';
+import { showAutoplayPrompt } from '@/features/playback/lib/showAutoplayPrompt';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useAutoplayPrompt(player: AudioPlayer): void {

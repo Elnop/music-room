@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import { prefetchStream } from '@/features/playback/lib/nextTrackPrefetch';
-import type { NextQueueItem } from '@/features/playback/playbackEngineTypes';
+import type { NextQueueItem } from '@/features/playback/types/playbackEngineTypes';
 
 export function usePrefetchRequest(
 	next: NextQueueItem,

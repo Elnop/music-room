@@ -4,7 +4,7 @@ import { playerStore } from '@/features/playback/shared/player/stores/playerStor
 import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/playback/shared/player/configs/playerConfig';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
-import { useAudioPlaybackSync } from '@/features/playback/shared/player/hooks/useAudioPlaybackSync';
+import { useAudioPlaybackSync } from '@/features/playback/hooks/useAudioPlaybackSync';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

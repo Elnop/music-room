@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/react-native';
 import type { AlertButton } from 'react-native';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { autoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
+import { autoplayStore } from '@/features/playback/autoplayStore';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { showAlert } from '@/shared/alerts/showAlert';
-import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
+import { useAutoplayPrompt } from '@/features/playback/hooks/useAutoplayPrompt';
 
 jest.mock('@/shared/alerts/showAlert', () => ({ showAlert: jest.fn() }));
 jest.mock('@react-native-async-storage/async-storage', () =>

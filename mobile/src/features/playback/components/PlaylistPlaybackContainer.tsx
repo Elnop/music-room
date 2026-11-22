@@ -9,10 +9,10 @@ import type {
 	PlaylistPlayback,
 } from '@/shared/playback/types/playbackActionsTypes';
 
-interface PlaylistPlaybackContainerProps {
+type PlaylistPlaybackContainerProps = {
 	playlistId: string;
 	children: (playback: PlaybackActions & PlaylistPlayback) => ReactNode;
-}
+};
 
 export function PlaylistPlaybackContainer({
 	playlistId,

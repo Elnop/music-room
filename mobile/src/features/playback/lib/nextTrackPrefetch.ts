@@ -1,7 +1,7 @@
 import { FETCH_TIMEOUT_MS } from '@/features/playback/shared/player/configs/playerConfig';
-import { isLocalTarget } from '@/features/playback/shared/player/lib/connectTarget';
-import { fetchStreamUrl } from '@/features/playback/shared/player/lib/fetchStreamUrl';
-import { streamPrefetch } from '@/features/playback/shared/player/lib/streamPrefetch';
+import { isLocalTarget } from '@/features/playback/lib/isLocalTarget';
+import { fetchStreamUrl } from '@/features/playback/lib/fetchStreamUrl';
+import { streamPrefetch } from '@/features/playback/lib/streamPrefetch';
 
 type PrefetchTarget = {
 	queueItemId: string;

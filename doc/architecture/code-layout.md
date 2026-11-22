@@ -56,11 +56,11 @@ mobile/src/
 │   ├── subscription/         bonus: the plan, PlanContainer
 │   ├── search/ · legal/
 │   └── shell/                the app's frame: providers, layout, tab bar, startup, linking; what app/ needs from shared/
-└── shared/                   leaf slices: theme (design system), backend (API client, session, socket), playback, tracks, users,
+└── shared/                   leaf shared features: theme (design system), backend (API client, session, socket), playback, tracks, users,
                               alerts, logging, formatting, query-keys…
 ```
 
-Inside a feature, the same shape repeats: kind folders (`components/`, `hooks/`, `lib/`, `stores/`) for its own files, its sub-features in `features/`, and the slices they share in `shared/`. A sub-feature never imports a sibling or its feature's root files; two features never import each other. What crosses features goes through `app/` as props: the plan from `PlanContainer`, a friend's listening state from `FriendListeningContainer`, the playback actions, the track actions sheet. These rules are the `layers` preset of [brutalway](https://brutalway.elnop.dev/), checked by dependency-cruiser and check-tree ([architecture.md](../../.agents/rules/architecture.md#mobile-layers), [structure.md](../../.agents/rules/structure.md#check-tree)).
+Inside a feature, the same shape repeats: kind folders (`components/`, `hooks/`, `lib/`, `stores/`) for its own files, its sub-features in `features/`, and what they share in `shared/`. A sub-feature never imports a sibling or its feature's root files; two features never import each other. What crosses features goes through `app/` as props: the plan from `PlanContainer`, a friend's listening state from `FriendListeningContainer`, the playback actions, the track actions sheet. These rules are the `layers` preset of [brutalway](https://brutalway.elnop.dev/), checked by dependency-cruiser and check-tree ([architecture.md](../../.agents/rules/architecture.md#mobile-layers), [structure.md](../../.agents/rules/structure.md#check-tree)).
 
 - **Component roles** are read from the name (`XContainer` is an orchestrator, any other component a presenter) and checked by dependency-cruiser (presenters reach no store or query, render no orchestrator), oxlint and an in-house ESLint plugin (screens import only orchestrators, hooks contain no JSX, one component per file) ([components.md](../../.agents/rules/components.md)).
 - **Server data lives in TanStack Query**; Zustand only keeps client state (session, player, preferences, UI). A Socket.io event updates the cache (`setQueryData`) or invalidates it through the key factory ([state.md](../../.agents/rules/state.md)).

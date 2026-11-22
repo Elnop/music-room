@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { noteHealthyPosition, recoverFailedStream } from '@/features/playback/lib/streamHealth';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
-import type { StreamWatch, WatchedStatus } from '@/features/playback/playbackEngineTypes';
+import type { StreamWatch, WatchedStatus } from '@/features/playback/types/playbackEngineTypes';
 
 export function useStreamHealth(
 	player: AudioPlayer,

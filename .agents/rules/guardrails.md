@@ -13,7 +13,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | oxlint | oxlint (mobile), `tools/guardrails/check-oxlint.mjs` | `oxlint.config.mjs`, `.oxlint-suppressions.json` | a violation of the brutalway oxlint presets beyond the suppressions ([oxlint](#oxlint)) |
 | dead-code | knip | `knip.json` | an unused file, export, type or dependency |
 | deps | dependency-cruiser | `.dependency-cruiser.cjs` (mobile: preset `@brutalway/dependency-cruiser-config/layers`), backend: `.dependency-cruiser-known-violations.json` | a layer violation, a cross-feature import or a cycle ([architecture.md](architecture.md), mobile: [mobile-layers](architecture.md#mobile-layers)) |
-| tree | check-tree (mobile) | | a folder outside the layout, an empty folder, a category folder with a single child ([structure.md](structure.md#check-tree)) |
+| tree | check-tree (mobile) | | a folder outside the layout, an empty folder, a kind folder with a single child ([structure.md](structure.md#check-tree)) |
 | duplication | jscpd | `.jscpd.json` | a clone of 5 lines and 50 tokens or more in `src/` (tests excluded) |
 | semgrep | semgrep (Docker) | `tools/semgrep/rules.yml` | a pattern rule below |
 | ast-grep | ast-grep | `sgconfig.yml`, `ast-grep/rules/` | a pattern rule below |

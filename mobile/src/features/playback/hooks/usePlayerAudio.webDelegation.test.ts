@@ -1,9 +1,9 @@
 import { act, renderHook } from '@testing-library/react-native';
 import type { AlertButton } from 'react-native';
-import { usePlayerAudio } from '@/features/playback/shared/player/hooks/usePlayerAudio';
-import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
+import { usePlayerAudio } from '@/features/playback/hooks/usePlayerAudio';
+import { useAutoplayPrompt } from '@/features/playback/hooks/useAutoplayPrompt';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
-import { autoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
+import { autoplayStore } from '@/features/playback/autoplayStore';
 import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { showAlert } from '@/shared/alerts/showAlert';
 import type { DeviceCommand } from '@/shared/playback/types/queueTypes';
@@ -13,11 +13,11 @@ import {
 	installFakeDocument,
 } from '@test-utils/fakeMediaElement';
 
-jest.mock('@/features/playback/shared/player/lib/audioPlayer', () =>
-	jest.requireActual('@/features/playback/shared/player/lib/audioPlayer.web')
+jest.mock('@/features/playback/lib/audioPlayer', () =>
+	jest.requireActual('@/features/playback/lib/audioPlayer.web')
 );
 jest.mock('hls.js', () => ({ __esModule: true, default: { isSupported: () => false } }));
-jest.mock('@/features/playback/shared/player/lib/fetchStreamUrl', () => ({
+jest.mock('@/features/playback/lib/fetchStreamUrl', () => ({
 	fetchStreamUrl: () =>
 		Promise.resolve({ streamUrl: 'https://cdn/stream.m3u8', expiresAt: Date.now() + 1_800_000 }),
 }));

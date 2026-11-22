@@ -19,7 +19,7 @@ Each native module was already isolated in one service or hook. That file gets a
 | `features/user/features/auth/shared/sign-in/lib/googleSignIn.web.ts` | Native Google Sign-In: Google Identity Services, Google's rendered button in popup mode |
 | `features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.ts` | Facebook Android SDK: Facebook JavaScript SDK, `FB.login` |
 | `features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web.ts` | Loads the two SDK scripts on the sign-in, sign-up and linked-accounts screens only, and mounts Google's button |
-| `features/playback/shared/player/lib/audioPlayer.web.ts` | `expo-audio`: one `<audio>` element for the page, fed natively or by hls.js |
+| `features/playback/lib/audioPlayer.web.ts` | `expo-audio`: one `<audio>` element for the page, fed natively or by hls.js |
 | `features/playback/lib/configureAudioMode.web.ts` | The audio session setup: a tab has none (no-op) |
 | `features/playback/lib/jsKeepAlive.web.ts` | The Android headless task that keeps JavaScript running in the background: a tab keeps its timers (no-op) |
 | `features/playback/features/media-session/hooks/useMediaSession.web.ts` | `expo-media-control`: the browser's Media Session API |

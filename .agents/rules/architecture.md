@@ -33,14 +33,14 @@ The rules of `@brutalway/dependency-cruiser-config/layers` on the mobile (`npm r
 
 | Rule | Rejects | Fix |
 | --- | --- | --- |
-| `no-cross-feature` | a feature importing another feature | move what they share into a slice of `src/shared/`, or pass it from `app/` as a prop |
-| `shared-not-to-features` | a slice of `src/shared/` importing `app/` or `features/` | move the code down into the slice, or up into the feature |
-| `no-cross-shared` | a slice of `src/shared/` importing another slice | merge the two slices, or move the code that links them into a feature |
+| `no-cross-feature` | a feature importing another feature | move what they share into a shared feature of `src/shared/`, or pass it from `app/` as a prop |
+| `shared-not-to-features` | a shared feature of `src/shared/` importing `app/` or `features/` | move the code down into the shared feature, or up into the feature |
+| `no-cross-shared` | a shared feature of `src/shared/` importing another shared feature | merge the two shared features, or move the code that links them into a feature |
 | `app-only-to-features` | `src/app/` importing `src/shared/` | wrap what `app/` needs in a feature (`features/shell`) |
 | `features-not-to-app` | a feature importing `src/app/` | `app/` composes the features, never the other way |
-| `no-cross-sub-feature` | a sub-feature (`features/<y>/` inside a feature or a slice) importing a sibling or the root of its parent | move what they share into a slice of the parent `shared/` |
-| `no-cross-sub-shared` | a slice of the `shared/` of a feature importing another slice, a sub-feature or the root of its parent | merge the slices, or move the code into the root or a sub-feature |
-| `feature-nesting-too-deep` | a feature or a slice nested more than 10 levels deep | move the deepest sub-features up |
+| `no-cross-sub-feature` | a sub-feature (`features/<y>/` inside a feature or a shared feature) importing a sibling or the root of its parent | move what they share into a shared feature of the parent `shared/` |
+| `no-cross-sub-shared` | a shared feature of the `shared/` of a feature importing another shared feature, a sub-feature or the root of its parent | merge the shared features, or move the code into the root or a sub-feature |
+| `feature-nesting-too-deep` | a feature or a shared feature nested more than 10 levels deep | move the deepest sub-features up |
 | `presenters-are-pure` | a presenter (a component not named `XContainer`, `XLayout`, `XPage`, `XContent`, `XConfig` or `XProvider`) reaching a store, an `xClient.ts`, zustand or TanStack Query through any chain of imports | read the state in the orchestrator above and pass it through props |
 | `presenters-render-presenters` | a presenter importing an `XContainer`, `XLayout` or `XPage` | render the orchestrator from the orchestrator above, or rename a presenter that only lays out its children (`AuthFormLayout`) |
 | `stores-hold-no-server-data` | an `xStore.ts` importing an `xClient.ts`, an `xKeys.ts`, a hook or TanStack Query | server data goes through a query hook, a store keeps UI state |

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
-import { loadStream } from '@/features/playback/shared/player/lib/loadStream';
+import { loadStream } from '@/features/playback/lib/loadStream';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 
 export function useStreamLoader(): void {

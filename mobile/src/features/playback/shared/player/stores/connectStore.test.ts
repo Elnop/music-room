@@ -1,7 +1,6 @@
 import { createStore } from 'zustand';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
-import { activeOwnerId } from '@/features/playback/shared/player/lib/connectTarget';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
@@ -64,7 +63,6 @@ afterEach(() => {
 describe('connectStore', () => {
 	it('starts local', () => {
 		expect(connect().target).toStrictEqual({ kind: 'local' });
-		expect(activeOwnerId()).toBe('me');
 	});
 
 	it('setRemote targets the device and stops the phone audio', () => {
@@ -76,7 +74,6 @@ describe('connectStore', () => {
 			deviceId: 'tablet',
 			ownerUsername: 'Léa',
 		});
-		expect(activeOwnerId()).toBe('friend');
 		expect(mockStop).toHaveBeenCalledTimes(1);
 	});
 

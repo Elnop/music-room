@@ -10,7 +10,7 @@ import {
 import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import type { UserListeningStatus } from '@/features/playback/shared/player/types/listeningTypes';
 import type { ControlRevokedPayload } from '@/features/playback/features/control-delegation/shared/delegation/types/deviceTypes';
-import type { RemoteDevice } from '@/features/playback/playbackEngineTypes';
+import type { RemoteDevice } from '@/features/playback/types/playbackEngineTypes';
 
 function applyListeningStatus(device: RemoteDevice, status: UserListeningStatus): void {
 	if (status.ownerId !== device.ownerId) return;

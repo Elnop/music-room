@@ -7,9 +7,9 @@ import type { StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
 import {
 	mediaElement,
 	setMediaEventHandler,
-} from '@/features/playback/shared/player/lib/mediaElement';
-import type { MediaElement } from '@/features/playback/shared/player/types/mediaElementTypes';
-import { attachStream } from '@/features/playback/shared/player/lib/attachStream';
+} from '@/features/playback/lib/mediaElement';
+import type { MediaElement } from '@/features/playback/types/mediaElementTypes';
+import { attachStream } from '@/features/playback/lib/attachStream';
 
 const HAVE_METADATA = 1;
 const HAVE_FUTURE_DATA = 3;
