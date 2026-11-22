@@ -1,14 +1,17 @@
 {
 	"$schema": "https://unpkg.com/knip@5/schema.json",
 	"entry": [
-		"babel.config.js",
-		"metro.config.cjs",
-		"plugins/withDebugKeystore.js",
-		"plugins/withDevVariant.js",
-		"plugins/withMedia3Version.js",
-		"plugins/withPodsDeploymentTarget.js",
-		"src/**/*.web.{ts,tsx}",
-		"oxlint.config.mjs"
+		"babel.config.js!",
+		"metro.config.cjs!",
+		"plugins/withDebugKeystore.js!",
+		"plugins/withDevVariant.js!",
+		"plugins/withMedia3Version.js!",
+		"plugins/withPodsDeploymentTarget.js!",
+		"src/**/*.{web,android,ios,native}.{ts,tsx}!"
+	],
+	"project": [
+		"src/**/*.{ts,tsx}!",
+		"{,test-utils/**/,eslint/**/,plugins/**/}*.{ts,tsx,js,mjs,cjs}"
 	],
 	"ignoreDependencies": [
 		"@expo/ngrok",

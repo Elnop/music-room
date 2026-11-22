@@ -1,15 +1,8 @@
+import { GRID_GAP, GRID_PADDING } from '@/shared/theme/configs/gridConfig';
+import { tileColumns } from '@/shared/theme/lib/tileColumns';
 import type { Breakpoint } from '@/shared/theme/types/layoutTypes';
 
-const GRID_PADDING = 16;
-const GRID_GAP = 16;
 const GRID_SLACK = 8;
-const MIN_TILE_WIDTH = 180;
-
-export function tileColumns(contentWidth: number, breakpoint: Breakpoint): number {
-	if (breakpoint === 'phone') return 2;
-	const usable = contentWidth - 2 * GRID_PADDING + GRID_GAP;
-	return Math.max(2, Math.floor(usable / (MIN_TILE_WIDTH + GRID_GAP)));
-}
 
 export function tileWidth(contentWidth: number, breakpoint: Breakpoint): number {
 	const columns = tileColumns(contentWidth, breakpoint);

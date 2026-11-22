@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react-native';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
-import { createQueryClient } from '@/shared/backend/queryClient';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
 import { useSocketCache } from '@/shared/backend/hooks/useSocketCache';
 import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 import { socketCacheRule } from '@/shared/backend/lib/socketCache';

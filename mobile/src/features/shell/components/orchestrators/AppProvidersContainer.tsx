@@ -9,7 +9,7 @@ import { AppToast } from '@/shared/theme/components/AppToast';
 import { ErrorBoundary } from '@/features/shell/components/presenters/ErrorBoundary';
 import { ThemedSystemUi } from '@/features/shell/components/presenters/ThemedSystemUi';
 import { ThemeProvider } from '@/features/shell/components/presenters/ThemeProvider';
-import { createQueryClient } from '@/shared/backend/queryClient';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
 import { onSessionEnd } from '@/shared/backend/lib/sessionEnd';
 
 type AppProvidersProps = {

@@ -5,20 +5,10 @@ import type { AppTabsParamList } from '@/app/AppNavigator';
 import { logger } from '@/shared/logging/logger';
 import { LINK_PREFIX } from '@/shared/share-links/shareLinksConfig';
 import { stripBasePath, webBasePath } from '@/features/shell/lib/webBasePath';
-import { matchScreenPath, pathFromState, stateFromMatch } from '@/features/shell/lib/screenPaths';
-import type { ScreenPathMatch } from '@/features/shell/types/screenPathTypes';
+import { pathFromState, stateFromMatch } from '@/features/shell/lib/screenPaths';
+import { matchLink } from '@/features/shell/lib/matchLink';
+import { stateFromLinkPath } from '@/features/shell/lib/stateFromLinkPath';
 import { keepPendingLink, takePendingLink } from '@/features/shell/lib/pendingLink';
-
-function matchLink(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
-	const match = matchScreenPath(path, signedIn);
-	if (!match || (Platform.OS !== 'web' && !match.entry.isShareLink)) return undefined;
-	return match;
-}
-
-export function stateFromLinkPath(path: string) {
-	const match = matchLink(path, true);
-	return match && stateFromMatch(match);
-}
 
 function webLinking(): Partial<LinkingOptions<AppTabsParamList>> {
 	const origin = (globalThis as { location?: { origin?: string } }).location?.origin;

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppProvidersContainer } from '@/features/shell/components/orchestrators/AppProvidersContainer';
-import { createQueryClient } from '@/shared/backend/queryClient';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';

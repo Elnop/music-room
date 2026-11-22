@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { randomUUID } from 'expo-crypto';
 import { deviceStorage } from '@/shared/backend/lib/deviceStorage';
 import { getDeviceName, getModelName } from '@/shared/backend/lib/deviceIdentity';
+import { formatBuildLabel } from '@/shared/backend/lib/formatBuildLabel';
 import type { DeviceInfo } from '@/shared/backend/types/deviceTypes';
 
 export function getAppVersion(): string {
@@ -12,13 +13,6 @@ export function getAppVersion(): string {
 		Constants?.manifest2?.extra?.expoClient?.version ||
 		'1.0.0'
 	);
-}
-
-export function formatBuildLabel(version: string, buildNumber?: string, commit?: string): string {
-	if (!buildNumber) return `Zumik ${version} (dev)`;
-	return commit
-		? `Zumik ${version} (build ${buildNumber} · ${commit})`
-		: `Zumik ${version} (build ${buildNumber})`;
 }
 
 export function getBuildLabel(): string {

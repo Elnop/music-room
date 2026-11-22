@@ -79,7 +79,7 @@ npx vitest run -t "canViewPlaylist"                   # tests whose name matches
 
 # mobile/
 npm test                                              # all tests
-npx jest src/shared/formatting/formatters.test.ts                 # one file
+npx jest src/shared/formatting/formatDuration.test.ts                 # one file
 npx jest -t "formatDuration"                          # tests whose name matches
 ```
 

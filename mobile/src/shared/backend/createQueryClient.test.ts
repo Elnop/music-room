@@ -1,6 +1,7 @@
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { ApiError } from '@/shared/backend/lib/ApiError';
-import { createQueryClient, shouldRetry } from '@/shared/backend/queryClient';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { shouldRetry } from '@/shared/backend/lib/shouldRetry';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),

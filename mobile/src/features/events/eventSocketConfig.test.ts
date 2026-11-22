@@ -1,4 +1,4 @@
-import { createQueryClient } from '@/shared/backend/queryClient';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import type { MusicEvent } from '@/features/events/eventTypes';
 import { musicEvent } from '@test-utils/musicEvent';

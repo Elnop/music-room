@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { PreviewBadge } from '@/shared/theme/components/PreviewBadge';
-import { formatDuration } from '@/shared/formatting/formatters';
+import { formatDuration } from '@/shared/formatting/formatDuration';
 import { isPreviewOnly } from '@/shared/tracks/lib/isPreviewOnly';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 import { Text } from '@/shared/theme/components/Text';

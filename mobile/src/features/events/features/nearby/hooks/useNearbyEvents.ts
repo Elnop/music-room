@@ -9,7 +9,7 @@ import { useNow } from '@/features/events/features/nearby/hooks/useNow';
 import { useForegroundPosition } from '@/features/events/features/nearby/hooks/useForegroundPosition';
 import { useBeaconScan } from '@/features/events/features/nearby/hooks/useBeaconScan';
 import { nearbyNotice } from '@/features/events/features/nearby/lib/nearbyNotice';
-import { mergeNearby } from '@/features/events/features/nearby/lib/nearbyEvents';
+import { mergeNearby } from '@/features/events/features/nearby/lib/mergeNearby';
 import type {
 	BeaconSighting,
 	NearbyEvents,

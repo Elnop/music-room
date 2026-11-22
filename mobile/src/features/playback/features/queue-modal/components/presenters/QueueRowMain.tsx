@@ -4,7 +4,7 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { formatDuration } from '@/shared/formatting/formatters';
+import { formatDuration } from '@/shared/formatting/formatDuration';
 import { TrackPlayingIndicator } from '@/shared/theme/components/TrackPlayingIndicator';
 import { TrackRowInfo } from '@/shared/theme/components/TrackRowInfo';
 import type { QueueItem } from '@/features/playback/shared/player/types/queueTypes';

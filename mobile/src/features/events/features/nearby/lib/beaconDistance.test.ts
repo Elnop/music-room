@@ -2,8 +2,8 @@ import {
 	estimateDistance,
 	pruneSightings,
 	recordSighting,
-	smoothRssi,
 } from '@/features/events/features/nearby/lib/beaconDistance';
+import { smoothRssi } from '@/features/events/features/nearby/lib/smoothRssi';
 
 describe('estimateDistance', () => {
 	it('is one metre at the measured power and grows with the attenuation', () => {

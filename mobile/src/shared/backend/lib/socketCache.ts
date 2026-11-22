@@ -6,7 +6,7 @@ import type {
 	SocketCacheRule,
 } from '@/shared/backend/types/socketCacheTypes';
 
-export function applySocketEvent<Payload, Data>(
+function applySocketEvent<Payload, Data>(
 	client: QueryClient,
 	rule: SocketCacheRule<Payload, Data>,
 	payload: Payload,

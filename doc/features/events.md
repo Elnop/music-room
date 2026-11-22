@@ -62,7 +62,7 @@ The other phones scan with `react-native-ble-plx`, which only reports advertisem
 
 ### Fusion
 
-`mergeNearby` (`utils/nearbyEvents.ts`): an ongoing event heard by beacon comes first, as « Tout près », nearest signal first; GPS adds the events in the radius that no beacon announced. An event seen both ways shows once. A beacon is enough on its own: the event shows even when its registered address is far from the phone.
+`mergeNearby` (`utils/mergeNearby.ts`): an ongoing event heard by beacon comes first, as « Tout près », nearest signal first; GPS adds the events in the radius that no beacon announced. An event seen both ways shows once. A beacon is enough on its own: the event shows even when its registered address is far from the phone.
 
 ## Privacy
 
