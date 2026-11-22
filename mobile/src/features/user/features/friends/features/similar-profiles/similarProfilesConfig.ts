@@ -1,4 +1,4 @@
-import { SPACING } from '@/shared/theme/configs/tokensConfig';
+import { SPACING } from '@/shared/theme/configs/tokensThemeConfig';
 
 const AVATAR_SIZE = 128;
 

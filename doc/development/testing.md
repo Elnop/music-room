@@ -87,7 +87,7 @@ Mobile tests run with a 15 s timeout (`testTimeout` in `mobile/package.json`) in
 
 Jest uses half the cores (`maxWorkers: "50%"` in `mobile/package.json`) instead of all but one: each worker holds about 0.5 GB, and with every core busy `npm run check` went past 4 GB and froze a 16 GB WSL2 machine. With half the cores the check peaks at 2.9 GB and runs faster, as it no longer swaps.
 
-`npm run check` in `backend/` or `mobile/` runs the unit tests together with every other guardrail (type-check, lint, knip, dependency-cruiser, check-tree on mobile, jscpd, semgrep, ast-grep, gitleaks, exception lists); the pre-commit hook runs it on the projects a commit touches. What each check does and how to fix a failure: `.agents/rules/guardrails.md`.
+`npm run check` in `backend/` runs the unit tests together with every other guardrail; in `mobile/` it runs the guardrails only, and the unit tests stay in `npm test` and the CI job `test`. The guardrails are type-check, lint, knip, dependency-cruiser, check-tree on mobile, jscpd, semgrep, ast-grep, gitleaks and the exception lists; the pre-commit hook runs the check on the projects a commit touches. What each check does and how to fix a failure: `.agents/rules/guardrails.md`.
 
 ## Coverage
 
@@ -130,7 +130,7 @@ The backend's global auth limiter (20 `/api/auth` requests per 15 minutes per IP
 | `lint` | `npm run lint` | backend, mobile |
 | `type-check` | `npm run type-check` | backend, mobile |
 | `test` | `npm test` | backend, mobile |
-| `check` | `npm run check`: every guardrail, including lint, type-check and test again (`.agents/rules/guardrails.md`). Runs on `ubuntu-24.04` because semgrep and gitleaks are Docker images, and checks out the full history so the exception lists can be compared with `origin/develop`. | backend, mobile |
+| `check` | `npm run check`: every guardrail, including lint and type-check again, and the unit tests on the backend (`.agents/rules/guardrails.md`). Runs on `ubuntu-24.04` because semgrep and gitleaks are Docker images, and checks out the full history so the exception lists can be compared with `origin/develop`. | backend, mobile |
 | `test-int` | `scripts/test-db.sh up` (Supabase stack + Redis), then `npm run test:int`. The stack's Docker images are cached between runs (`actions/cache`, keyed on the Supabase CLI and Postgres versions and the Redis image): ECR Public's anonymous quota is shared by every runner. A PR reuses the cache saved on `develop` (GitHub scopes caches by branch), so a new image set reaches other PRs once it is on `develop`. | backend |
 
 A failing job marks the pull request red. Lint warnings do not fail it; errors do.

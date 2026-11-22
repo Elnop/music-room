@@ -70,7 +70,7 @@ Mobile: no `fontWeight` and no font name (`fontFamily: 'Arial'`) outside the the
 
 ## check-tree
 
-Mobile: the folders of `src/` follow the layout of [brutalway](https://brutalway.elnop.dev/) (epic #616), checked by `@brutalway/check-tree` (`npm run check:tree`). It reports, one line per folder:
+Mobile: the folders of `src/` follow the layout of [brutalway](https://brutalway.elnop.dev/) (epic #616), checked by `@brutalway/check-tree` (`npm run tree`). It reports, one line per folder:
 
 - an empty folder (tests do not count: a folder holding only a test is empty);
 - a kind folder (`components`, `orchestrators`, `presenters`, `hooks`, `stores`, `services`, `lib`…) holding a single child: move the child up one level and delete the folder;

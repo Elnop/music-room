@@ -4,7 +4,7 @@ import type {
 	PIXEL_SHADOWS,
 	PIXEL_TYPOGRAPHY,
 	SPACING,
-} from '@/shared/theme/configs/tokensConfig';
+} from '@/shared/theme/configs/tokensThemeConfig';
 
 export type ThemeName = 'original';
 

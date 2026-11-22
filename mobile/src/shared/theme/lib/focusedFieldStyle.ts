@@ -1,5 +1,5 @@
 import type { ViewStyle } from 'react-native';
-import { PIXEL } from '@/shared/theme/configs/tokensConfig';
+import { PIXEL } from '@/shared/theme/configs/tokensThemeConfig';
 
 export function focusedFieldStyle(color: string): ViewStyle {
 	return {

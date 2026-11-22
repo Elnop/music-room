@@ -29,7 +29,7 @@ Mobile only: `@/` (to `src/`) and `@test-utils/` (to `test-utils/`, the helpers 
 
 ## mobile-layers
 
-The rules of `@brutalway/dependency-cruiser-config/layers` on the mobile (`npm run check:deps`). Each message says what to change; the README of the package has the details.
+The rules of `@brutalway/dependency-cruiser-config/layers` on the mobile (`npm run deps`). Each message says what to change; the README of the package has the details.
 
 | Rule | Rejects | Fix |
 | --- | --- | --- |

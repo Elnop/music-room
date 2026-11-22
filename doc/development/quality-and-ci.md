@@ -12,7 +12,7 @@ Subject IV.8: an agile process, tests on each layer, and continuous integration.
 
 ## `npm run check`
 
-One command per project (`backend/`, `mobile/`) runs every guardrail in parallel:
+One command per project (`backend/`, `mobile/`) runs every guardrail in parallel. The names below are the backend's; the mobile runs the same tools through `brutal-check` under the names `typecheck`, `lint`, `unused`, `deps`, `tree`, `duplicates`, `secrets` and `exceptions`, without the unit tests:
 
 | Check | Tool | Catches |
 |---|---|---|
@@ -23,7 +23,7 @@ One command per project (`backend/`, `mobile/`) runs every guardrail in parallel
 | `check:tree` | check-tree (mobile only) | folders outside the layout, empty folders, kind folders with a single child |
 | `check:duplication` | jscpd | copied code |
 | `check:semgrep`, `check:ast-grep` | semgrep (Docker image), ast-grep | patterns lint misses: `fetch` outside the API client, AsyncStorage outside the storage modules, `eval`, `@ts-ignore`… |
-| `check:secrets` | gitleaks (Docker image) | committed keys and tokens |
+| `check:secrets` | gitleaks (Docker image; `@brutalway/check-secrets` on mobile) | committed keys and tokens |
 | `test` | Vitest (backend), jest-expo (mobile) | unit tests |
 | `check:exceptions` | `tools/guardrails/check-exceptions.mjs` (backend), `@brutalway/check-exceptions` (mobile) | an exception list that grew compared with `develop` |
 

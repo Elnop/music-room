@@ -1,5 +1,5 @@
 import { NOW_PLAYING_PANEL_WIDTH } from '@/shared/theme/configs/layoutConfig';
-import { SPACING } from '@/shared/theme/configs/tokensConfig';
+import { SPACING } from '@/shared/theme/configs/tokensThemeConfig';
 
 export const PANEL_GUTTER = SPACING.md;
 
