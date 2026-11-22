@@ -1,5 +1,5 @@
-jest.mock('uuid', () => ({
-	v4: () => 'generated-uuid-1234',
+jest.mock('expo-crypto', () => ({
+	randomUUID: () => 'generated-uuid-1234',
 }));
 
 const mockConstants: {

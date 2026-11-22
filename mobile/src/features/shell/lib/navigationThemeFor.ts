@@ -1,7 +1,7 @@
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import type { Theme as NavigationTheme } from '@react-navigation/native';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import { NAVIGATION_FONTS } from '@/features/shell/lib/navigationFonts';
+import { NAVIGATION_FONTS } from '@/features/shell/configs/navigationFontsConfig';
 import { isDarkBackground } from '@/features/shell/lib/textContrast';
 
 export function navigationThemeFor(theme: Theme): NavigationTheme {

@@ -1,4 +1,4 @@
-import type { PlanState } from '@/features/subscription/lib/subscription';
+import type { PlanState } from '@/features/subscription/subscriptionTypes';
 import type {
 	PlaybackActions,
 	PlaylistPlayback,

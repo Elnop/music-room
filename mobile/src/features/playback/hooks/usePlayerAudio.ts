@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { useAudioPlayer } from '@/features/playback/lib/audioPlayer';
+import { useAudioPlayer } from '@/features/playback/hooks/useAudioPlayer';
 import { useAudioPlaybackSync } from '@/features/playback/hooks/useAudioPlaybackSync';
 import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';
 import { useStreamLoader } from '@/features/playback/hooks/useStreamLoader';

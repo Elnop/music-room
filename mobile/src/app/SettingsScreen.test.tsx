@@ -3,8 +3,8 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { testTheme } from '@test-utils/testThemeConfig';
-import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
-import type { Subscription } from '@/features/subscription/lib/subscription';
+import { subscriptionApi } from '@/features/subscription/subscriptionApi';
+import type { Subscription } from '@/features/subscription/subscriptionTypes';
 import { SettingsContainer } from '@/features/user/features/settings/components/SettingsContainer';
 import { PlanContainer } from '@/features/subscription/PlanContainer';
 
@@ -28,7 +28,7 @@ jest.mock('@/shared/backend/hooks/useSession', () => ({
 		selector({ isAuthenticated: true }),
 }));
 
-jest.mock('@/features/subscription/lib/subscriptionApi', () => ({
+jest.mock('@/features/subscription/subscriptionApi', () => ({
 	subscriptionApi: { getSubscription: jest.fn(), changePlan: jest.fn() },
 }));
 

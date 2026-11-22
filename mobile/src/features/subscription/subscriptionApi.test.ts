@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/backend/lib/api';
-import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
+import { subscriptionApi } from '@/features/subscription/subscriptionApi';
 
 jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
 

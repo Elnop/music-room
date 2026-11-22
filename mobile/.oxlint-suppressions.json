@@ -1,9 +1,4 @@
 {
-  "index.ts": {
-    "check-file(no-index)": {
-      "count": 1
-    }
-  },
   "src/features/playback/features/control-delegation/hooks/useMusicControlEmitter.ts": {
     "react(exhaustive-effect-dependencies)": {
       "count": 1
@@ -26,34 +21,6 @@
   },
   "src/features/playback/lib/attachStream.ts": {
     "import(no-named-as-default-member)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/lib/audioPlayer.ts": {
-    "hook-naming(no-restricted-syntax)": {
-      "count": 2
-    }
-  },
-  "src/features/playback/lib/audioPlayer.web.ts": {
-    "hook-naming(no-restricted-syntax)": {
-      "count": 2
-    }
-  },
-  "src/features/shell/lib/navigationFonts.ts": {
-    "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/features/subscription/lib/subscription.ts": {
-    "export-placement(no-restricted-syntax)": {
-      "count": 4
-    }
-  },
-  "src/shared/backend/deviceService.ts": {
-    "import(no-unassigned-import)": {
       "count": 1
     }
   },

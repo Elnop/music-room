@@ -13,7 +13,7 @@ import type {
 	PlaylistPlayback,
 } from '@/shared/playback/types/playbackActionsTypes';
 import type { HeaderSheetButton } from '@/features/playlists/features/editor/features/detail/types/detailPageTypes';
-import type { PlanState } from '@/features/subscription/lib/subscription';
+import type { PlanState } from '@/features/subscription/subscriptionTypes';
 
 type PlaylistDetailContainerProps = NativeStackScreenProps<
 	PlaylistStackParamList,

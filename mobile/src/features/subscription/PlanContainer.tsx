@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import { useChangePlan, usePlan } from '@/features/subscription/usePlan';
-import type { PlanState } from '@/features/subscription/lib/subscription';
+import type { PlanState } from '@/features/subscription/subscriptionTypes';
 
 type PlanContainerProps = {
 	children: (plan: PlanState) => ReactNode;

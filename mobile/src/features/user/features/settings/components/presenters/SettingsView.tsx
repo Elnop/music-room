@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { bottomPaddingStyle } from '@/features/user/shared/profile-layout/bottomPaddingStyle';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
-import type { Plan } from '@/features/subscription/lib/subscription';
+import type { Plan } from '@/features/subscription/subscriptionTypes';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { SubscriptionSection } from '@/features/user/features/settings/components/presenters/SubscriptionSection';

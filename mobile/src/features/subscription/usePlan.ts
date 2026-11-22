@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { useSession } from '@/shared/backend/hooks/useSession';
-import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
-import type { Plan, Subscription } from '@/features/subscription/lib/subscription';
+import { subscriptionApi } from '@/features/subscription/subscriptionApi';
+import type { Plan, Subscription } from '@/features/subscription/subscriptionTypes';
 
 export function usePlan({ enabled = true }: { enabled?: boolean } = {}) {
 	const authenticated = useSession(s => s.isAuthenticated);

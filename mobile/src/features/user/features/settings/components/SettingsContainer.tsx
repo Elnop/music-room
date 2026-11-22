@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSettingsScreen } from '@/features/user/features/settings/useSettingsScreen';
 import { SettingsView } from '@/features/user/features/settings/components/presenters/SettingsView';
-import type { PlanState } from '@/features/subscription/lib/subscription';
+import type { PlanState } from '@/features/subscription/subscriptionTypes';
 
 type SettingsContainerProps = {
 	subscription: PlanState;

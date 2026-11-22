@@ -7,10 +7,8 @@ import {
 	autoplayRefusal,
 	installFakeDocument,
 } from '@test-utils/fakeMediaElement';
-import {
-	useAudioPlayer,
-	useAudioPlayerStatus,
-} from '@/features/playback/lib/audioPlayer.web';
+import { useAudioPlayer } from '@/features/playback/hooks/useAudioPlayer.web';
+import { useAudioPlayerStatus } from '@/features/playback/hooks/useAudioPlayerStatus.web';
 
 const mockHls = {
 	instances: [] as {
