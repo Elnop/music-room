@@ -117,20 +117,6 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 	}
 }
 
-export function authRequest<T>(
-	endpoint: string,
-	accessToken: string,
-	options: RequestInit = {}
-): Promise<T> {
-	return apiRequest<T>(endpoint, {
-		...options,
-		headers: {
-			Authorization: `Bearer ${accessToken}`,
-			...(options.headers as Record<string, string>),
-		},
-	});
-}
-
 async function handleResponse<T>(response: Response): Promise<T> {
 	if (!response.ok) {
 		let errorMessage = `HTTP ${response.status}: ${response.statusText}`;

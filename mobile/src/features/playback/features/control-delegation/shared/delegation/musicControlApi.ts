@@ -1,7 +1,6 @@
-import { apiRequest, authRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import type {
 	CanControlResponse,
-	ControlActionResponse,
 	ControllableDevicesResponse,
 	DevicePickerResponse,
 	FriendUserSummary,
@@ -18,50 +17,31 @@ function licensePath(deviceId: string, userId: string): string {
 	return `/api/music-control/devices/${encodeURIComponent(deviceId)}/licenses/${encodeURIComponent(userId)}`;
 }
 
-function req<T>(path: string, token?: string, options: RequestInit = {}): Promise<T> {
-	if (token) return authRequest<T>(path, token, options);
-	return apiRequest<T>(path, options);
-}
-
 export const musicControlApi = {
-	async getMyPermissions(token?: string): Promise<string[]> {
-		const data = await req<MusicControlPermissionsResponse>(
-			'/api/music-control/permissions',
-			token
+	async getMyPermissions(): Promise<string[]> {
+		const data = await apiRequest<MusicControlPermissionsResponse>(
+			'/api/music-control/permissions'
 		);
 		return data.allowedUserIds;
 	},
 
-	async grantControl(userId: string, token?: string): Promise<void> {
-		await req<ControlActionResponse>(`/api/music-control/permissions/${userId}`, token, {
-			method: 'POST',
-		});
-	},
-
-	async revokeControl(userId: string, token?: string): Promise<void> {
-		await req<ControlActionResponse>(`/api/music-control/permissions/${userId}`, token, {
-			method: 'DELETE',
-		});
-	},
-
-	async canControl(userId: string, token?: string): Promise<boolean> {
+	async canControl(userId: string): Promise<boolean> {
 		try {
-			const data = await req<CanControlResponse>(`/api/music-control/can-control/${userId}`, token);
+			const data = await apiRequest<CanControlResponse>(`/api/music-control/can-control/${userId}`);
 			return data.canControl;
 		} catch {
 			return false;
 		}
 	},
 
-	async getMyDevices(token?: string): Promise<UserDeviceWithLicenses[]> {
-		const data = await req<MyDevicesResponse>('/api/music-control/devices', token);
+	async getMyDevices(): Promise<UserDeviceWithLicenses[]> {
+		const data = await apiRequest<MyDevicesResponse>('/api/music-control/devices');
 		return data.devices;
 	},
 
-	async renameDevice(deviceId: string, name: string | null, token?: string): Promise<UserDevice> {
-		const data = await req<RenameDeviceResponse>(
+	async renameDevice(deviceId: string, name: string | null): Promise<UserDevice> {
+		const data = await apiRequest<RenameDeviceResponse>(
 			`/api/music-control/devices/${encodeURIComponent(deviceId)}`,
-			token,
 			{
 				method: 'PATCH',
 				body: JSON.stringify({ name }),
@@ -70,40 +50,31 @@ export const musicControlApi = {
 		return data.device;
 	},
 
-	async getControllableDevices(
-		userId: string,
-		token?: string
-	): Promise<ControllableDevicesResponse> {
-		return req<ControllableDevicesResponse>(
-			`/api/music-control/users/${encodeURIComponent(userId)}/devices`,
-			token
+	async getControllableDevices(userId: string): Promise<ControllableDevicesResponse> {
+		return apiRequest<ControllableDevicesResponse>(
+			`/api/music-control/users/${encodeURIComponent(userId)}/devices`
 		);
 	},
 
-	async getFriends(token?: string): Promise<FriendUserSummary[]> {
-		return req<FriendUserSummary[]>('/api/friends', token);
+	async getFriends(): Promise<FriendUserSummary[]> {
+		return apiRequest<FriendUserSummary[]>('/api/friends');
 	},
 
-	async getDevicePicker(token?: string): Promise<DevicePickerResponse> {
-		return req<DevicePickerResponse>('/api/music-control/controllable-devices', token);
+	async getDevicePicker(): Promise<DevicePickerResponse> {
+		return apiRequest<DevicePickerResponse>('/api/music-control/controllable-devices');
 	},
 
-	async grantDeviceLicense(
-		deviceId: string,
-		userId: string,
-		token?: string
-	): Promise<GrantDeviceLicenseResponse> {
-		return req<GrantDeviceLicenseResponse>(licensePath(deviceId, userId), token, {
+	async grantDeviceLicense(deviceId: string, userId: string): Promise<GrantDeviceLicenseResponse> {
+		return apiRequest<GrantDeviceLicenseResponse>(licensePath(deviceId, userId), {
 			method: 'POST',
 		});
 	},
 
 	async revokeDeviceLicense(
 		deviceId: string,
-		userId: string,
-		token?: string
+		userId: string
 	): Promise<RevokeDeviceLicenseResponse> {
-		return req<RevokeDeviceLicenseResponse>(licensePath(deviceId, userId), token, {
+		return apiRequest<RevokeDeviceLicenseResponse>(licensePath(deviceId, userId), {
 			method: 'DELETE',
 		});
 	},

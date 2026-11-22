@@ -31,11 +31,6 @@ export type CanControlResponse = {
 	targetUserId: string;
 };
 
-export type ControlActionResponse = {
-	success: boolean;
-	allowedUserId: string;
-};
-
 export type FriendDeviceStatus = ListeningStatus & {
 	controllable: boolean;
 };

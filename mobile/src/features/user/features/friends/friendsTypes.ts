@@ -31,11 +31,6 @@ export type ProfileRecommendations = {
 	profiles: RecommendedProfile[];
 };
 
-export type MyStats = {
-	followersCount: number;
-	followingCount: number;
-};
-
 export type FriendPlaylistSummary = {
 	id: string;
 	name: string;

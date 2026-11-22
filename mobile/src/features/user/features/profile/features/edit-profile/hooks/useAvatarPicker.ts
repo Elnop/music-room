@@ -30,32 +30,27 @@ export function useAvatarPicker() {
 
 	async function pickAndUpload(source: ImageSource): Promise<void> {
 		if (!accessToken || isUploading) return;
-		const token = accessToken;
 		const asset = await pickImage(source, () => showError(PERMISSION_DENIED[source]));
 		if (!asset) return;
-		await changeAvatar(() => uploadAvatar(asset, token), UPLOAD_MESSAGES, setIsUploading);
+		await changeAvatar(() => uploadAvatar(asset), UPLOAD_MESSAGES, setIsUploading);
 	}
 
 	async function remove(): Promise<void> {
 		if (!accessToken || isUploading) return;
-		const token = accessToken;
-		await changeAvatar(() => removeAvatar(token), REMOVE_MESSAGES, setIsUploading);
+		await changeAvatar(removeAvatar, REMOVE_MESSAGES, setIsUploading);
 	}
 
 	return { isUploading, pickAndUpload, remove };
 }
 
-async function uploadAvatar(
-	asset: Parameters<typeof prepareSquareImage>[0],
-	token: string
-): Promise<void> {
+async function uploadAvatar(asset: Parameters<typeof prepareSquareImage>[0]): Promise<void> {
 	const uri = await prepareSquareImage(asset);
-	const { avatarUrl } = await profileApi.uploadAvatar(uri, token);
+	const { avatarUrl } = await profileApi.uploadAvatar(uri);
 	await setAvatarUrl(avatarUrl);
 }
 
-async function removeAvatar(token: string): Promise<void> {
-	await profileApi.removeAvatar(token);
+async function removeAvatar(): Promise<void> {
+	await profileApi.removeAvatar();
 	await setAvatarUrl(null);
 }
 
