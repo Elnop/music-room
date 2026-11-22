@@ -122,7 +122,7 @@ To test the responsive layout, resize the browser window (or use the browser's d
 - `npm run lint` - Lint the code
 - `npm run lint:fix` - Fix ESLint errors
 - `npm run format` - Format with Prettier
-- `npm run type-check` - Check the TypeScript types only
+- `npm run typecheck` - Check the TypeScript types only
 
 ### Maintenance and diagnosis
 
@@ -228,7 +228,7 @@ import { Button } from '@/shared/theme/components/Button';
 
 Every pressable element goes through `Pressable` or `Button` from `@/shared/theme/components/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden elsewhere (ESLint `guardrails/ui-primitives`). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
 
-The app has a single theme, `original` (`src/shared/theme/configs/originalThemeConfig.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/configs/tokensConfig.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
+The app has a single theme, `original` (`src/shared/theme/configs/originalThemeConfig.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/configs/tokensThemeConfig.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
 
 Icons are `PixelIcon` (`src/shared/theme/components/PixelIcon.tsx`), which draws an SVG of the [HackerNoon Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) with `react-native-svg`, filled with the requested colour. Each file imports the SVGs it uses straight from the npm package (`import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg'`) and passes the component: `<PixelIcon icon={PlaySolid} color={...} />`. `react-native-svg-transformer` (`metro.config.cjs`) turns each import into a component. There is no central list: only the icons a screen imports end up in the bundle.
 

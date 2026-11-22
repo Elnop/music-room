@@ -5,7 +5,7 @@ import { GENRE_INFO } from '@/shared/theme/configs/genresConfig';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
-import { GENRE_COLORS } from '@/shared/theme/configs/tokensConfig';
+import { GENRE_COLORS } from '@/shared/theme/configs/tokensThemeConfig';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { radarSpot } from '@/features/events/features/nearby/lib/radarSpot';

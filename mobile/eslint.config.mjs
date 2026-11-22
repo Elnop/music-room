@@ -263,7 +263,7 @@ export default [
       'src/features/shell/configs/navigationFontsConfig.ts',
       'src/shared/theme/configs/originalThemeConfig.ts',
       'src/shared/theme/lib/pixelFrame.ts',
-      'src/shared/theme/configs/tokensConfig.ts',
+      'src/shared/theme/configs/tokensThemeConfig.ts',
       'src/shared/theme/types/themeTypes.ts',
     ],
     rules: { 'guardrails/theme-tokens': 'off', 'guardrails/font-families': 'off' },

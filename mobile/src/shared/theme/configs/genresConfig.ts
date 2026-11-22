@@ -1,5 +1,5 @@
 import type { PixelIconSource } from '@/shared/theme/types/pixelIconTypes';
-import { GENRE_COLORS } from '@/shared/theme/configs/tokensConfig';
+import { GENRE_COLORS } from '@/shared/theme/configs/tokensThemeConfig';
 import type { MusicGenre, VisibilityLevel } from '@/shared/users/userTypes';
 import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';

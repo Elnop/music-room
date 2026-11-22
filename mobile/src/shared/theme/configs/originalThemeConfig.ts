@@ -6,7 +6,7 @@ import {
 	PIXEL_SHADOWS,
 	PIXEL_TYPOGRAPHY,
 	SPACING,
-} from '@/shared/theme/configs/tokensConfig';
+} from '@/shared/theme/configs/tokensThemeConfig';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 
 export const originalTheme: Theme = {

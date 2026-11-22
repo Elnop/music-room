@@ -8,15 +8,6 @@ title = "music-room"
 [extend]
 useDefault = true
 
-# The Facebook client token is public by design: Facebook embeds it in every
-# app build (AndroidManifest), it only identifies the app and grants nothing
-# without the app secret, which stays on the backend.
-[[allowlists]]
-description = "Facebook client token, public by design"
-paths = ['''^(.*/)?mobile/app\.config\.js$''']
-regexTarget = "match"
-regexes = ['''e7df3370baef0cac5ac750531fc3bcca''']
-
 # Documentation placeholders: truncated example tokens ending in "..." in the
 # OpenAPI examples, and YOUR_TOKEN_HERE in curl examples.
 [[allowlists]]

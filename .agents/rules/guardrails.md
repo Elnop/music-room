@@ -4,7 +4,10 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 
 ## what-check-runs
 
-`npm run check` in `backend/` or `mobile/` runs every check in parallel (`tools/guardrails/run-checks.mjs`) and prints `<check> OK`, or `FAILED` with the last 30 lines of the failure. Run one check alone with `npm run check:<name>` (`type-check` and `test` are the usual scripts).
+`npm run check` in `backend/` or `mobile/` runs every check in parallel and prints `<check> OK`, or `FAILED` with the output of the failure.
+
+- Backend: `tools/guardrails/run-checks.mjs` runs the scripts below, unit tests included, and shows the last 30 lines of a failure. Run one check alone with `npm run check:<name>` (`type-check` and `test` are the usual scripts).
+- Mobile: `brutal-check` (`@brutalway/check`) runs the scripts `typecheck`, `lint` (oxlint), `deps`, `tree`, `duplicates`, `unused` (knip), `secrets` and `exceptions`, each one runnable alone with `npm run <name>`. `run-checks.mjs` then runs the project rules brutalway does not cover yet: `lint:eslint`, `check:semgrep` and `check:ast-grep`. The unit tests are not part of the mobile check: `npm test` and the CI job `test` run them.
 
 | Check | Tool | Config | What fails |
 | --- | --- | --- | --- |
@@ -17,11 +20,11 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | duplication | jscpd | `.jscpd.json` | a clone of 5 lines and 50 tokens or more in `src/` (tests excluded) |
 | semgrep | semgrep (Docker) | `tools/semgrep/rules.yml` | a pattern rule below |
 | ast-grep | ast-grep | `sgconfig.yml`, `ast-grep/rules/` | a pattern rule below |
-| secrets | gitleaks (Docker) | `.gitleaks.toml` | a secret in a file git would commit ([no-secrets](#no-secrets)) |
-| test | Vitest / jest-expo | | a failing unit test |
+| secrets | gitleaks: Docker image (backend), `@brutalway/check-secrets` (mobile) | `.gitleaks.toml` (backend), `mobile/.gitleaksignore` | a secret in a file git would commit ([no-secrets](#no-secrets)) |
+| test | Vitest (backend only, see above) | | a failing unit test |
 | exceptions | `tools/guardrails/check-exceptions.mjs` (backend), `@brutalway/check-exceptions` (mobile) | | an exception list that grew ([exception-lists](#exception-lists)) |
 
-Every tool is a devDependency installed by `make install`, except semgrep and gitleaks, which run from Docker images pinned by digest in `tools/guardrails/docker-scan.mjs`: Docker must be running (it already is for `make dev-docker`). semgrep lists its files with git, so in a git worktree the script also mounts the main checkout's `.git`; a scan that reaches no file fails instead of passing. The CI job `check` runs the same command for both projects on every PR.
+Every tool is a devDependency installed by `make install`, except semgrep and the backend's gitleaks, which run from Docker images pinned by digest in `tools/guardrails/docker-scan.mjs`: Docker must be running (it already is for `make dev-docker`). On the mobile, `check-secrets` downloads the gitleaks binary on its first run and checks it against a pinned checksum. semgrep lists its files with git, so in a git worktree the script also mounts the main checkout's `.git`; a scan that reaches no file fails instead of passing. The CI job `check` runs the same command for both projects on every PR.
 
 ## exception-lists
 
@@ -33,19 +36,19 @@ The rules block from day one; the violations that existed when a rule arrived ar
 | oxlint | `mobile/oxlint-suppressions.json`, written by oxlint | a (file, rule) pair, with its count |
 | jscpd | the `ignore` globs of `<project>/.jscpd.json` | a glob (the first globs, tests and generated files, are permanent) |
 | semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
-| gitleaks | the `[[allowlists]]` of `.gitleaks.toml` | an allowed value or path, public by design |
+| gitleaks | the `[[allowlists]]` of `.gitleaks.toml` (backend), the fingerprints of `mobile/.gitleaksignore` | an allowed value or path, public by design |
 
 An exception list only shrinks. `check:exceptions` counts the entries of each list per rule and fails when a count is higher than at the fork point from `origin/develop` (the backend script also compares with `HEAD`). A story that cleans files then shrinks the list:
 
 - dependency-cruiser: `npx depcruise src --config .dependency-cruiser.cjs --output-type baseline --output-to .dependency-cruiser-known-violations.json` from `backend/`.
-- oxlint: `npm run check:oxlint -- --prune-suppressions` from `mobile/` (`check:oxlint` fails while a suppression allows more than what is left).
+- oxlint: `npm run lint -- --prune-suppressions` from `mobile/` (`lint` fails while a suppression allows more than what is left).
 - jscpd, semgrep, gitleaks: delete the entries by hand.
 
 For jscpd `ignore`, semgrep `exclude` and every string of the `.gitleaks.toml` allowlist and `[extend]` sections, the comparison is by value: every entry must already exist on `develop`, so an entry can be neither added nor widened (such as `**/src/store/authStore.ts` turned into `**/src/**`).
 
 A semgrep rule whose scope is a naming convention declares it in `metadata.allowed-paths` and repeats each glob in `paths.exclude`, since semgrep reads only `paths`. `check:exceptions` does not count an exclude entry that the same rule declares there, under these constraints: `allowed-paths` is read only directly under the rule's `metadata:`; only a suffix glob `*<Suffix>.<ext>` qualifies, Suffix being a capitalised word of 4 letters or more (`*Storage.ts`; not `*.ts`, not a file name), and any other value leaves its exclude entry counted as an exception; and each rule's `allowed-paths` is compared with the reference like an exception list, so a new glob fails unless it is recorded for that rule under `allowedPaths` in `tools/guardrails/new-rule-baselines.json`. Such a glob allows every file whose name ends that way, existing or future. Adding one changes the rule and takes a dedicated ticket ([append-only-rules](#append-only-rules)).
 
-The next two paragraphs describe the backend script, `tools/guardrails/check-exceptions.mjs`, which also watches the two lists both projects share (`tools/semgrep/rules.yml` and `.gitleaks.toml`). The mobile runs `@brutalway/check-exceptions --base origin/develop`: it reads `oxlint-suppressions.json`, `knip.json`, `.jscpd.json` and the inline escapes of `mobile/` (`oxlint-disable`, `eslint-disable`, `@ts-expect-error`, `@ts-ignore`, `@ts-nocheck`, `jscpd:ignore-start`, `gitleaks:allow`), and counts per rule over the whole project, so a moved file changes nothing. A rule absent at the fork point starts at 0; the ticket that adds it writes its count under `check-exceptions.newRules` in `mobile/package.json`, and the next ticket deletes that entry.
+The next two paragraphs describe the backend script, `tools/guardrails/check-exceptions.mjs`, which also watches the two lists both projects share (`tools/semgrep/rules.yml` and `.gitleaks.toml`). The mobile runs `@brutalway/check-exceptions --base origin/develop`: it reads `oxlint-suppressions.json`, `knip.json`, `.jscpd.json`, `.gitleaksignore` and the inline escapes of `mobile/` (`oxlint-disable`, `eslint-disable`, `@ts-expect-error`, `@ts-ignore`, `@ts-nocheck`, `jscpd:ignore-start`, `gitleaks:allow`), and counts per rule over the whole project, so a moved file changes nothing. A rule absent at the fork point starts at 0; the ticket that adds it writes its count under `check-exceptions.newRules` in `mobile/package.json`, and the next ticket deletes that entry.
 
 Two changes are not growth. A file moved with git (a rename) keeps its entries and inline escapes under its new path: update the path in the list, nothing else. A new rule lands with exceptions only through the versioned allowlist `tools/guardrails/new-rule-baselines.json` (`{ "<project>": { "<rule id>": <max entries> } }`): a rule listed there, with no entry in the reference list, may record up to that many entries (dependency-cruiser: violations), and `check:exceptions` prints `new rule, baseline accepted`. Adding the rule to the allowlist, with today's count, is part of the ticket that creates the rule. A baseline only counts while it is absent from `develop`'s copy of the allowlist: once on `develop`, the rule only shrinks like any other, even after its last entry is gone, and `check:exceptions` fails until the next ticket removes the stale baseline. A rule not in the allowlist (a renamed one included) starts at 0. The rename logic is in `tools/guardrails/renames.mjs`; the tests of `tools/guardrails/` (`*.test.mjs`) run in the mobile's `npm test`.
 
@@ -55,7 +58,7 @@ Never add an entry or an inline escape to make new code pass: fix the code. A js
 
 ## oxlint
 
-Mobile only. `npm run check:oxlint` runs oxlint with `oxlint.config.mjs`, which extends three presets of [brutalway](https://brutalway.elnop.dev/): `@brutalway/oxlint-config-react-native` (itself built on `@brutalway/oxlint-config-react`, `-typescript` and `-zustand`), `@brutalway/oxlint-config-tanstack-query` and `@brutalway/oxlint-config-react-hook-form`. It lints `src/`, `test-utils/` and `main.ts`, next to ESLint, which keeps the project's own rules. Each rule, what it rejects and how to fix it is described in the README of its preset, in `node_modules/@brutalway/oxlint-config-*/README.md`; the main ones:
+Mobile only. `npm run lint` runs oxlint with `oxlint.config.mjs`, which extends three presets of [brutalway](https://brutalway.elnop.dev/): `@brutalway/oxlint-config-react-native` (itself built on `@brutalway/oxlint-config-react`, `-typescript` and `-zustand`), `@brutalway/oxlint-config-tanstack-query` and `@brutalway/oxlint-config-react-hook-form`. It lints `src/`, `test-utils/` and `main.ts`, next to ESLint, which keeps the project's own rules. Each rule, what it rejects and how to fix it is described in the README of its preset, in `node_modules/@brutalway/oxlint-config-*/README.md`; the main ones:
 
 - styles: no literal color, size, spacing, font or shadow in `StyleSheet.create`, no object written in a `style` prop, no unused style, no raw text outside `<Text>` (`theme-styles`, `react-native/*`);
 - code shape: no comment, function declarations, small functions, types where they belong, exports at the end, no relative import (`no-comments`, `func-style`, `function-size`, `type-definitions`, `export-placement`, `no-restricted-imports`);
@@ -63,7 +66,7 @@ Mobile only. `npm run check:oxlint` runs oxlint with `oxlint.config.mjs`, which 
 - TanStack Query: keys from a key factory, complete `queryKey` dependencies (`query-conventions`, `tanstack-query/*`);
 - tests: `it` inside `describe`, `toStrictEqual`, `toHaveBeenCalledWith` (`jest/*`).
 
-oxlint reads `oxlint-suppressions.json` itself: the file recorded the 5205 violations left when oxlint arrived (#629) and holds 4 today. A count above its suppression fails and prints the violations; a suppression that allows more than what is left fails too, until `npm run check:oxlint -- --prune-suppressions` lowers it. The list only shrinks ([exception-lists](#exception-lists)); `--suppress-all` rewrites it from scratch and is for the ticket that adds a rule, with its `newRules` entry.
+oxlint reads `oxlint-suppressions.json` itself: the file recorded the 5205 violations left when oxlint arrived (#629) and holds 4 today. A count above its suppression fails and prints the violations; a suppression that allows more than what is left fails too, until `npm run lint -- --prune-suppressions` lowers it. The list only shrinks ([exception-lists](#exception-lists)); `--suppress-all` rewrites it from scratch and is for the ticket that adds a rule, with its `newRules` entry.
 
 ## pre-commit
 
@@ -102,4 +105,4 @@ ast-grep, mobile: no `@ts-ignore` or `@ts-nocheck` comment. Fix the type, or, wh
 
 ## no-secrets
 
-gitleaks (default rules, `.gitleaks.toml`) scans the files git would commit: tracked files and untracked files that are not ignored, so local `.env` files are skipped. On a finding, remove the secret, move it to `backend/.env` or `mobile/.env` with a placeholder in `.env.example`, and rotate it if it was ever pushed. Only a value public by design (such as the Facebook client token in `mobile/app.config.js`) goes in an allowlist of `.gitleaks.toml`, with a comment saying why.
+gitleaks (default rules, `.gitleaks.toml`) scans the files git would commit: tracked files and untracked files that are not ignored, so local `.env` files are skipped. On a finding, remove the secret, move it to `backend/.env` or `mobile/.env` with a placeholder in `.env.example`, and rotate it if it was ever pushed. Only a value public by design goes in an allowlist of `.gitleaks.toml`, with a comment saying why. The mobile runs the same gitleaks through `@brutalway/check-secrets`: a value public by design there (the Facebook client token in `mobile/app.config.js` and `mobile/.env.example`) is listed by its fingerprint in `mobile/.gitleaksignore`, which the failure message prints.
