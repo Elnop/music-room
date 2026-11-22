@@ -30,16 +30,6 @@ A hook lives in its own `useX.ts` file and contains logic only, no JSX element o
 
 ---
 
-## one-component-per-file
-
-Each component file in `src/**` must declare at most one React component.
-
-- **Forbidden**: Defining multiple components (e.g. `MainComponent` and helper subcomponents `SubHeader`, `CardRow`) inside the same file.
-- **Allowed**: Helper functions that return primitive values, data calculations, style factories (`createStyles`).
-- **Fix**: Extract each additional React component into its own dedicated file.
-
----
-
 ## orchestrator-no-fetch
 
 Orchestrators (`*/orchestrators/**`, or a file named `XContainer`, `XLayout`, `XPage`) must not perform direct network calls.

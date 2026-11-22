@@ -1,7 +1,4 @@
 {
-  "mobile": {
-    "oxlint": 4
-  },
   "allowedPaths": {
     "no-asyncstorage-outside-storage": [
       "*Storage.ts"

@@ -25,11 +25,11 @@ One command per project (`backend/`, `mobile/`) runs every guardrail in parallel
 | `check:semgrep`, `check:ast-grep` | semgrep (Docker image), ast-grep | patterns lint misses: `fetch` outside the API client, AsyncStorage outside the storage modules, `eval`, `@ts-ignore`… |
 | `check:secrets` | gitleaks (Docker image) | committed keys and tokens |
 | `test` | Vitest (backend), jest-expo (mobile) | unit tests |
-| `check:exceptions` | `tools/guardrails/check-exceptions.mjs` | an exception list that grew compared with `develop` |
+| `check:exceptions` | `tools/guardrails/check-exceptions.mjs` (backend), `@brutalway/check-exceptions` (mobile) | an exception list that grew compared with `develop` |
 
 semgrep and gitleaks run from Docker images, so Docker must be running. Details: [guardrails.md](../../.agents/rules/guardrails.md#what-check-runs).
 
-**Rules only get stricter.** No rule is disabled, weakened or switched to a warning to let code through, and the exception lists (`mobile/.oxlint-suppressions.json`, `backend/.dependency-cruiser-known-violations.json`, …) can only shrink, and one that reaches zero is deleted: fix the code instead. A new rule comes with its section in `.agents/rules/`.
+**Rules only get stricter.** No rule is disabled, weakened or switched to a warning to let code through, and the exception lists (`mobile/oxlint-suppressions.json`, `backend/.dependency-cruiser-known-violations.json`, …) can only shrink, and one that reaches zero is deleted: fix the code instead. A new rule comes with its section in `.agents/rules/`.
 
 ## When it runs
 
