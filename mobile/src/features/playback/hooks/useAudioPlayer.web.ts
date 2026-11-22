@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useMemo } from 'react';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { autoplayStore } from '@/features/playback/autoplayStore';
 import { HtmlAudioPlayer } from '@/features/playback/lib/HtmlAudioPlayer';
 import type {
 	AudioPlayer,
-	AudioPlayerStatus,
 	PlaybackEvents,
 } from '@/features/playback/shared/player/types/playerTypes';
 import type { StreamProtocol } from '@/shared/tracks/types/soundcloudTypes';
@@ -27,9 +26,4 @@ export function useAudioPlayer(source: string, protocol: StreamProtocol): AudioP
 		return () => player.detach();
 	}, [player]);
 	return player;
-}
-
-export function useAudioPlayerStatus(player: AudioPlayer): AudioPlayerStatus {
-	const browserPlayer = player as HtmlAudioPlayer;
-	return useSyncExternalStore(browserPlayer.subscribe, browserPlayer.getStatus);
 }

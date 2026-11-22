@@ -13,8 +13,11 @@ import {
 	installFakeDocument,
 } from '@test-utils/fakeMediaElement';
 
-jest.mock('@/features/playback/lib/audioPlayer', () =>
-	jest.requireActual('@/features/playback/lib/audioPlayer.web')
+jest.mock('@/features/playback/hooks/useAudioPlayer', () =>
+	jest.requireActual('@/features/playback/hooks/useAudioPlayer.web')
+);
+jest.mock('@/features/playback/hooks/useAudioPlayerStatus', () =>
+	jest.requireActual('@/features/playback/hooks/useAudioPlayerStatus.web')
 );
 jest.mock('hls.js', () => ({ __esModule: true, default: { isSupported: () => false } }));
 jest.mock('@/features/playback/lib/fetchStreamUrl', () => ({

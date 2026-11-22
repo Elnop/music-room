@@ -1,4 +1,4 @@
-import { useAudioPlayerStatus } from '@/features/playback/lib/audioPlayer';
+import { useAudioPlayerStatus } from '@/features/playback/hooks/useAudioPlayerStatus';
 import {
 	PREFETCH_AFTER_PLAYED_S,
 	PREFETCH_WINDOW_S,

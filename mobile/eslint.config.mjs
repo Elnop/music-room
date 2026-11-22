@@ -335,7 +335,7 @@ export default [
       'src/shared/image-colors/lib/adaptivePalette.ts',
       'src/shared/theme/lib/focusedFieldStyle.ts',
       'src/shared/theme/configs/fontsConfig.ts',
-      'src/features/shell/lib/navigationFonts.ts',
+      'src/features/shell/configs/navigationFontsConfig.ts',
       'src/shared/theme/configs/originalThemeConfig.ts',
       'src/shared/theme/lib/pixelFrame.ts',
       'src/shared/theme/configs/tokensConfig.ts',

@@ -1,7 +1,6 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import 'react-native-get-random-values';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'expo-crypto';
 import { deviceStorage } from '@/shared/backend/lib/deviceStorage';
 import { getDeviceName, getModelName } from '@/shared/backend/lib/deviceIdentity';
 import type { DeviceInfo } from '@/shared/backend/types/deviceTypes';
@@ -34,7 +33,7 @@ export const deviceService = {
 	async getDeviceInfo(): Promise<DeviceInfo> {
 		let deviceId = await deviceStorage.getDeviceId();
 		if (!deviceId) {
-			deviceId = uuidv4();
+			deviceId = randomUUID();
 			await deviceStorage.setDeviceId(deviceId);
 		}
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useAudioPlayerStatus } from '@/features/playback/lib/audioPlayer';
+import { useAudioPlayerStatus } from '@/features/playback/hooks/useAudioPlayerStatus';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 import { isLocalTarget } from '@/features/playback/lib/isLocalTarget';
 import { usePlayerState } from '@/features/playback/shared/player/hooks/usePlayerState';

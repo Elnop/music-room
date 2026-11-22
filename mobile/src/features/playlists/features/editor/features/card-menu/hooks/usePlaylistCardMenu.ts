@@ -1,4 +1,4 @@
-import type { PlanState } from '@/features/subscription/lib/subscription';
+import type { PlanState } from '@/features/subscription/subscriptionTypes';
 import { useCoverActions } from '@/features/playlists/features/editor/shared/playlist-mutations/hooks/useCoverActions';
 import { confirmPlaylistDelete } from '@/features/playlists/features/editor/shared/delete-confirmation/confirmPlaylistDelete';
 import { useCardMenuSelection } from '@/features/playlists/features/editor/features/card-menu/hooks/useCardMenuSelection';

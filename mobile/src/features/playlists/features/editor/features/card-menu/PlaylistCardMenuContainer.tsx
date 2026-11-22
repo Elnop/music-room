@@ -7,7 +7,7 @@ import type {
 } from '@/features/playlists/features/editor/features/card-menu/cardMenuTypes';
 import { PlaylistActionsSheet } from '@/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheet';
 import { useMenuAnchor } from '@/features/playlists/features/editor/shared/menu-anchor/hooks/useMenuAnchor';
-import type { PlanState } from '@/features/subscription/lib/subscription';
+import type { PlanState } from '@/features/subscription/subscriptionTypes';
 
 type PlaylistCardMenuContainerProps = {
 	navigation: CardMenuNavigation;

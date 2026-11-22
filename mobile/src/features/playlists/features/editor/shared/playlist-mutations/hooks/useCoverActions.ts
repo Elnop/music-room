@@ -1,4 +1,4 @@
-import type { PlanState } from '@/features/subscription/lib/subscription';
+import type { PlanState } from '@/features/subscription/subscriptionTypes';
 import { showCoverLocked } from '@/features/playlists/features/editor/shared/playlist-mutations/lib/showCoverLocked';
 import {
 	pickUploadTask,
