@@ -1,4 +1,5 @@
-import { ApiError, apiRequest } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import type {
 	QueueCallTarget,
 	QueueState,

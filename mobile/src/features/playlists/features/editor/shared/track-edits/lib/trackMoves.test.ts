@@ -3,7 +3,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import { pendingMovesStore } from '@/features/playlists/features/editor/shared/track-edits/pendingMovesStore';

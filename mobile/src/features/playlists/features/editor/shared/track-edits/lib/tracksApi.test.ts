@@ -1,9 +1,9 @@
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
 import * as peopleApi from '@/features/playlists/shared/playlist/lib/peopleApi';
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 
-jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/backend/lib/apiRequest', () => ({ apiRequest: jest.fn() }));
 
 const request = apiRequest as jest.MockedFunction<typeof apiRequest>;
 

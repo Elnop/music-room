@@ -9,7 +9,7 @@ import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { createStore } from 'zustand';
 import { streamPrefetch } from '@/features/playback/lib/streamPrefetch';
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { trackToSoundCloud } from '@/features/playback/shared/player/lib/trackToSoundCloud';
 import type { SoundCloudTrack, StreamUrlResponse } from '@/shared/tracks/types/soundcloudTypes';
 import type { QueueItem } from '@/shared/playback/types/queueTypes';
@@ -18,6 +18,7 @@ import { noop } from '@test-utils/noop';
 import { flushAct } from '@test-utils/flushAct';
 import { inMinutes } from '@test-utils/inMinutes';
 import { SeekProbe } from '@test-utils/SeekProbe';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 
 type MockPlayer = {
 	id: number;
@@ -90,21 +91,7 @@ jest.mock('expo-audio', () => ({
 	setAudioModeAsync: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('@/shared/backend/lib/api', () => {
-	class ApiError extends Error {
-		code: string;
-		details?: unknown;
-		status?: number;
-		constructor(message: string, code: string, details?: unknown, status?: number) {
-			super(message);
-			this.name = 'ApiError';
-			this.code = code;
-			this.details = details;
-			this.status = status;
-		}
-	}
-	return { ApiError, apiRequest: jest.fn() };
-});
+jest.mock('@/shared/backend/lib/apiRequest', () => ({ apiRequest: jest.fn() }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -115,9 +102,6 @@ jest.mock('@/shared/backend/deviceService', () => ({
 }));
 
 const mockApiRequest = apiRequest as jest.Mock;
-const { ApiError: MockApiError } = jest.requireMock('@/shared/backend/lib/api') as {
-	ApiError: new (message: string, code: string, details?: unknown, status?: number) => Error;
-};
 
 const track: SoundCloudTrack = {
 	id: 7,
@@ -397,7 +381,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		await startPlaying(inMinutes(1));
 		act(() => playerStore.getState().pause());
 		mockApiRequest.mockRejectedValueOnce(
-			new MockApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
+			new ApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
 		);
 
 		await act(async () => playerStore.getState().resume());
@@ -605,7 +589,7 @@ describe('PlayerProvider restored track (#312)', () => {
 	it('shows the existing error on play when the track is gone', async () => {
 		await renderRestored();
 		mockApiRequest.mockRejectedValueOnce(
-			new MockApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
+			new ApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
 		);
 
 		await act(async () => playerStore.getState().resume());

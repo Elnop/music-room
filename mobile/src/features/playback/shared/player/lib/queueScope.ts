@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { getSession } from '@/shared/backend/lib/authSession';
 import { connectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { showError } from '@/shared/theme/lib/toast';

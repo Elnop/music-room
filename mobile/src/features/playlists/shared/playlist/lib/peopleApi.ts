@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import type { UserSummary } from '@/features/playlists/shared/playlist/playlistTypes';
 
 export function getFriends(): Promise<UserSummary[]> {

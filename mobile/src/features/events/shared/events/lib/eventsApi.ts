@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import type { EventInput, MusicEvent } from '@/features/events/eventTypes';
 
 export async function fetchEvents(): Promise<MusicEvent[]> {

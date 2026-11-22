@@ -9,7 +9,7 @@ import { queueApi } from '@/features/playback/shared/player/lib/queueApi';
 import { registerAuthSession } from '@/shared/backend/lib/authSession';
 import type { SessionView } from '@/shared/backend/types/sessionTypes';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/musicControlApi';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { showError } from '@/shared/theme/lib/toast';
 import type { DevicePickerResponse } from '@/features/playback/features/control-delegation/shared/delegation/types/deviceTypes';
 import type { UserProfile } from '@/shared/users/userTypes';

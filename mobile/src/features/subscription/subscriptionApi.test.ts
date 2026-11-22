@@ -1,7 +1,7 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { subscriptionApi } from '@/features/subscription/subscriptionApi';
 
-jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/backend/lib/apiRequest', () => ({ apiRequest: jest.fn() }));
 
 describe('subscriptionApi', () => {
 	beforeEach(() => jest.clearAllMocks());

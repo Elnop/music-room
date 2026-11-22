@@ -1,8 +1,8 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import type { FollowStatus } from '@/features/user/features/friends/friendsTypes';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 
-jest.mock('@/shared/backend/lib/api', () => ({
+jest.mock('@/shared/backend/lib/apiRequest', () => ({
 	apiRequest: jest.fn(),
 }));
 

@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { postJson } from '@/features/user/features/auth/shared/sign-in/lib/postJson';
 import type {
 	LoginInput,

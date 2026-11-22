@@ -19,7 +19,7 @@ The subject asks for two of the three services of IV.2. Zumik delivers **Music P
 | IV.2.3 Music Playlist Editor | ✅ | `backend/src/features/playlists/`, `mobile/src/features/playlists/features/editor/`; [playlist-editor.md](../features/playlist-editor.md) |
 | IV.3 Server | ✅ | Supabase behind the backend |
 | IV.4 API | ✅ | Swagger UI `/api-docs`; [mobile-api.md](../features/mobile-api.md) |
-| IV.5 Mobile application | ✅ | `mobile/src/shared/backend/lib/api.ts`, `backendUrl.ts` |
+| IV.5 Mobile application | ✅ | `mobile/src/shared/backend/lib/apiRequest.ts`, `backendUrl.ts` |
 | IV.6 Security | ✅ | [threat-model.md](../security/threat-model.md) |
 | IV.7 Scaling | ⏳ | `make perf-test`, [backend/tests/performance/README.md](../../backend/tests/performance/README.md); reference machine and report: #103, #106 |
 | IV.8 Agility, quality, CI | ✅ | [quality-and-ci.md](../development/quality-and-ci.md), [testing.md](../development/testing.md) |

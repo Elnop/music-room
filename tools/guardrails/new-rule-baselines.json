@@ -1,10 +1,13 @@
 {
   "mobile": {
-    "oxlint": 11
+    "oxlint": 4
   },
   "allowedPaths": {
     "no-asyncstorage-outside-storage": [
       "*Storage.ts"
+    ],
+    "no-fetch-outside-api-client": [
+      "*Client.ts"
     ]
   }
 }

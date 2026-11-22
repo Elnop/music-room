@@ -1,10 +1,10 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import {
 	forgotPassword,
 	resetPassword,
 } from '@/features/user/features/auth/shared/password-reset/passwordApi';
 
-jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/backend/lib/apiRequest', () => ({ apiRequest: jest.fn() }));
 
 function bodyOf(call: number): unknown {
 	const init = jest.mocked(apiRequest).mock.calls[call][1] as RequestInit;

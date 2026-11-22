@@ -46,4 +46,4 @@ Every error response of the API has one shape, built in `backend/src/shared/midd
 
 To answer an error, throw or `next()` an `AppError(status, message, code, details?, { why?, fix? })`; `errorHandler` turns it, a `ZodError` or any other exception (500 `INTERNAL_ERROR`) into that shape and logs it (`warn` below 500, `error` with the stack from 500). A middleware that answers by itself (a rate-limiter handler, `authMiddleware`) calls `sendError(req, res, appError)`, which logs and answers the same way. Never write `res.status(4xx).json(...)` by hand.
 
-On the mobile, `ApiError` (`src/shared/backend/lib/api.ts`) reads that format: `message`, `code`, `details`, `why`, `fix`, and the HTTP `status` on every path. Show the user `apiErrorMessage(error, fallback)` (`src/shared/backend/lib/apiErrorMessage.ts`), never `why` or `fix`.
+On the mobile, `ApiError` (`src/shared/backend/lib/ApiError.ts`) reads that format: `message`, `code`, `details`, `why`, `fix`, and the HTTP `status` on every path. Show the user `apiErrorMessage(error, fallback)` (`src/shared/backend/lib/apiErrorMessage.ts`), never `why` or `fix`.

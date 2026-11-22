@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showWarning } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';

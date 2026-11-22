@@ -1,7 +1,7 @@
 import * as playlistEditsApi from '@/features/playlists/features/editor/shared/playlist-mutations/lib/playlistEditsApi';
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 
-jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/backend/lib/apiRequest', () => ({ apiRequest: jest.fn() }));
 
 const request = apiRequest as jest.MockedFunction<typeof apiRequest>;
 

@@ -1,7 +1,7 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { profileApi } from '@/features/user/features/profile/shared/profile/lib/profileApi';
 
-jest.mock('@/shared/backend/lib/api', () => ({
+jest.mock('@/shared/backend/lib/apiRequest', () => ({
 	apiRequest: jest.fn(),
 }));
 

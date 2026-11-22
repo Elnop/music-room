@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/backend/lib/api';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import type { Plan, Subscription } from '@/features/subscription/subscriptionTypes';
 
 export const subscriptionApi = {

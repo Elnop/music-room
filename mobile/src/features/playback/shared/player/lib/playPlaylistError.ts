@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 
 export function playPlaylistError(error: unknown): string {
 	if (error instanceof ApiError) {

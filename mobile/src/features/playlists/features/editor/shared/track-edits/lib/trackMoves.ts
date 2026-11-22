@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import * as tracksApi from '@/features/playlists/features/editor/shared/track-edits/lib/tracksApi';
 import { pendingMovesActions } from '@/features/playlists/features/editor/shared/track-edits/pendingMovesStore';
 import { CONFLICT_CODES } from '@/features/playlists/features/editor/shared/track-edits/moveConflictConfig';

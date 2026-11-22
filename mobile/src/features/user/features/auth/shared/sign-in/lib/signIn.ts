@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 import { logger } from '@/shared/logging/logger';
 import { authStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import type {

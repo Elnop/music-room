@@ -1,4 +1,6 @@
-import { ApiError, apiRequest, readLocalBlob } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
+import { readLocalBlob } from '@/shared/backend/lib/apiClient';
+import { apiRequest } from '@/shared/backend/lib/apiRequest';
 import { resetBackendUrl, setBackendUrl } from '@/shared/backend/lib/backendUrl';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

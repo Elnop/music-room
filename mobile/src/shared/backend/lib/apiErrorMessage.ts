@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/backend/lib/api';
+import { ApiError } from '@/shared/backend/lib/ApiError';
 
 const CODE_MESSAGES: Record<string, string> = {
 	NETWORK_ERROR: 'Impossible de joindre le serveur. Vérifiez votre connexion.',
