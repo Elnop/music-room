@@ -12,7 +12,7 @@ Subject IV.8: an agile process, tests on each layer, and continuous integration.
 
 ## `npm run check`
 
-One command per project (`backend/`, `mobile/`) runs every guardrail in parallel. The names below are the backend's; the mobile runs the same tools through `brutal-check` under the names `typecheck`, `lint`, `unused`, `deps`, `tree`, `duplicates`, `secrets` and `exceptions`, without the unit tests:
+One command per project (`backend/`, `mobile/`) runs every guardrail in parallel. The names below are the backend's; the mobile runs the same tools through `brutal-check` under the names `format:check` (prettier), `typecheck`, `lint`, `unused`, `deps`, `tree`, `duplicates`, `secrets` and `exceptions`, without the unit tests:
 
 | Check | Tool | Catches |
 |---|---|---|

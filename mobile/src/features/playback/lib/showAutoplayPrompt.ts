@@ -18,6 +18,6 @@ export function showAutoplayPrompt(play: () => void): void {
 					playerStore.getState().resume();
 				},
 			},
-		]
+		],
 	);
 }

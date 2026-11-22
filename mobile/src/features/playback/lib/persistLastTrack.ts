@@ -42,5 +42,5 @@ export function persistLastTrack(userId: string): void {
 	if (!isLocalTarget()) return;
 	const entry = snapshot();
 	const write = entry ? lastTrackStorage.save(userId, entry) : lastTrackStorage.clear(userId);
-	void write.catch(error => logger.warn('[lastTrackStorage] Save failed', error));
+	void write.catch((error) => logger.warn('[lastTrackStorage] Save failed', error));
 }

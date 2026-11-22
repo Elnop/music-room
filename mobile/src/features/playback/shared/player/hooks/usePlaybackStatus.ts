@@ -8,7 +8,7 @@ type PlaybackStatus = Pick<NowPlaying, 'isPlaying' | 'isLoading' | 'canToggle' |
 
 export function usePlaybackStatus(currentTrack: SoundCloudTrack | null): PlaybackStatus {
 	const { player } = usePlayer();
-	const playbackState = usePlayerState(state => state.playbackState);
+	const playbackState = usePlayerState((state) => state.playbackState);
 	const isPlaying = playbackState === 'playing';
 	const canToggle = Boolean(currentTrack) && (isPlaying || playbackState === 'paused');
 

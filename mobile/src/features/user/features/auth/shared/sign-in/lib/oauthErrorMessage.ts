@@ -6,7 +6,7 @@ import { isScriptLoadError } from '@/features/user/features/auth/shared/sign-in/
 const NETWORK_MESSAGE = 'Impossible de joindre le serveur. Vérifiez votre connexion.';
 
 const NATIVE_MESSAGES: Record<OAuthProvider, (message: string) => string | null> = {
-	google: message => {
+	google: (message) => {
 		if (message === 'Google Play Services not available') {
 			return 'Google Play Services est indisponible. Mettez-le à jour puis réessayez.';
 		}
@@ -17,7 +17,7 @@ const NATIVE_MESSAGES: Record<OAuthProvider, (message: string) => string | null>
 			? "La connexion avec Google n'est pas configurée."
 			: null;
 	},
-	facebook: message =>
+	facebook: (message) =>
 		message.includes('not configured') ? "La connexion avec Facebook n'est pas configurée." : null,
 };
 

@@ -57,7 +57,7 @@ describe('restoreRedirectedPath', () => {
 		expect(history.replaceState).toHaveBeenCalledWith(
 			null,
 			'',
-			`${BASE}/playlist/${ID}?tab=tracks#top`
+			`${BASE}/playlist/${ID}?tab=tracks#top`,
 		);
 	});
 
@@ -68,7 +68,7 @@ describe('restoreRedirectedPath', () => {
 		'?redirect=playlist',
 		'?redirect=%2F%2Fevil.example',
 		'?redirect=%E0%A4%A',
-	])('leaves the address of %j alone', search => {
+	])('leaves the address of %j alone', (search) => {
 		const history = fakeHistory();
 		restoreRedirectedPath(fakeLocation(search), history, BASE);
 		expect(history.replaceState).not.toHaveBeenCalled();

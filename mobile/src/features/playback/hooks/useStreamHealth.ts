@@ -6,7 +6,7 @@ import type { StreamWatch, WatchedStatus } from '@/features/playback/types/playb
 export function useStreamHealth(
 	player: AudioPlayer,
 	isPlaying: boolean,
-	{ id, playbackState, isLoaded, currentTime }: WatchedStatus
+	{ id, playbackState, isLoaded, currentTime }: WatchedStatus,
 ): void {
 	const watchRef = useRef<StreamWatch>({ loadedId: null, handledId: null, lastPositionMs: 0 });
 

@@ -7,7 +7,7 @@ function loadFor(os: string): Constants {
 	jest.isolateModules(() => {
 		jest.doMock('react-native', () => ({ Platform: { OS: os } }));
 		constants = jest.requireActual<Constants>(
-			'@/features/events/features/event-form/eventFormConfig'
+			'@/features/events/features/event-form/eventFormConfig',
 		);
 	});
 	return constants as Constants;

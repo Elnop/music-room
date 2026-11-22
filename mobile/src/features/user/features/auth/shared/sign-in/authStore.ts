@@ -19,6 +19,6 @@ registerAuthSession({
 	isTokenExpiringSoon: () => authStore.getState().isTokenExpiringSoon(),
 	refreshAccessToken: () => authStore.getState().refreshAccessToken(),
 	logout: () => authStore.getState().logout(),
-	setAvatarUrl: url => authStore.getState().setAvatarUrl(url),
-	setUser: user => authStore.getState().setUser(user),
+	setAvatarUrl: (url) => authStore.getState().setAvatarUrl(url),
+	setUser: (user) => authStore.getState().setUser(user),
 });

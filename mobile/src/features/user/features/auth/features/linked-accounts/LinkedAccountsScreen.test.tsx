@@ -6,7 +6,7 @@ import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
@@ -52,7 +52,7 @@ jest.mock(
 		}),
 		useLinkProvider: () => ({ mutateAsync: mockLinkProvider }),
 		useUnlinkProvider: () => ({ mutateAsync: mockUnlinkProvider }),
-	})
+	}),
 );
 
 jest.mock('@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons', () => ({

@@ -17,7 +17,7 @@ function renderOn(element: ReturnType<typeof fakeElement>, label: string | undef
 		({ text }: { text: string | undefined }) => useIconTooltip(text),
 		{
 			initialProps: { text: label },
-		}
+		},
 	);
 	result.current.current = element as unknown as View;
 	rerender({ text: label });

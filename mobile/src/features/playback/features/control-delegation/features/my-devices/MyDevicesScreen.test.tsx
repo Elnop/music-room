@@ -19,7 +19,7 @@ import { noop } from '@test-utils/noop';
 import { fail, ok } from '@test-utils/fetchResponses';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 const mockGetDeviceInfo = jest.fn();
@@ -55,7 +55,7 @@ const carol: FriendUserSummary = { id: 'user-c', username: 'carol' };
 function device(
 	deviceId: string,
 	deviceName: string,
-	licensed: FriendUserSummary[] = []
+	licensed: FriendUserSummary[] = [],
 ): UserDeviceWithLicenses {
 	return {
 		deviceId,
@@ -63,7 +63,7 @@ function device(
 		platform: 'android',
 		model: 'Pixel 8',
 		lastSeenAt: '2026-10-01T10:00:00Z',
-		licenses: licensed.map(friend => ({
+		licenses: licensed.map((friend) => ({
 			user: {
 				id: friend.id,
 				username: friend.username,
@@ -106,7 +106,7 @@ let sessionStore: StoreApi<SessionView>;
 async function renderLoaded(
 	devices: UserDeviceWithLicenses[],
 	friends: FriendUserSummary[],
-	allDevicesFriendIds: string[] = []
+	allDevicesFriendIds: string[] = [],
 ): Promise<void> {
 	fetchMock.mockResolvedValueOnce(ok({ devices }));
 	getFriends.mockResolvedValue(friends);
@@ -115,7 +115,7 @@ async function renderLoaded(
 	await screen.findByText(
 		'Choisissez quels amis peuvent contrôler la musique de chaque appareil',
 		{},
-		FIRST_RENDER
+		FIRST_RENDER,
 	);
 	await waitFor(() => expect(screen.queryByTestId('skeleton-list')).toBeNull(), FIRST_RENDER);
 }
@@ -185,7 +185,7 @@ describe('MyDevicesScreen', () => {
 
 		await screen.findByText('Impossible de charger vos appareils', {}, FIRST_RENDER);
 		expect(showError).toHaveBeenCalledWith(
-			'Le serveur a rencontré un problème. Réessayez plus tard.'
+			'Le serveur a rencontré un problème. Réessayez plus tard.',
 		);
 		expect(screen.queryByTestId('device-device-1')).toBeNull();
 	});
@@ -225,7 +225,7 @@ describe('MyDevicesScreen', () => {
 		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Bob peut contrôler Tablet'));
 		expect(requests()[1]).toMatchObject({ method: 'POST', authorization: 'Bearer access' });
 		expect(requests()[1].url).toMatch(
-			/\/api\/music-control\/devices\/device-2\/licenses\/user-b$/u
+			/\/api\/music-control\/devices\/device-2\/licenses\/user-b$/u,
 		);
 		expect(toggle('Bob sur Tablet').props.value).toBe(true);
 		expect(toggle('Bob sur Phone').props.value).toBe(false);
@@ -239,8 +239,8 @@ describe('MyDevicesScreen', () => {
 
 		await waitFor(() =>
 			expect(showError).toHaveBeenCalledWith(
-				"Seuls vos amis peuvent recevoir l'accès à vos appareils"
-			)
+				"Seuls vos amis peuvent recevoir l'accès à vos appareils",
+			),
 		);
 		expect(toggle('Bob sur Tablet').props.value).toBe(false);
 		expect(toggle('Bob sur Tablet')).toBeEnabled();
@@ -256,7 +256,7 @@ describe('MyDevicesScreen', () => {
 		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('alice ne contrôle plus Phone'));
 		expect(requests()[1]).toMatchObject({ method: 'DELETE' });
 		expect(requests()[1].url).toMatch(
-			/\/api\/music-control\/devices\/device-1\/licenses\/user-a$/u
+			/\/api\/music-control\/devices\/device-1\/licenses\/user-a$/u,
 		);
 		expect(toggle('alice sur Phone').props.value).toBe(false);
 	});
@@ -275,9 +275,9 @@ describe('MyDevicesScreen', () => {
 		await renderLoaded([phone, tablet], [alice, bob]);
 		let answer: (response: Response) => void = noop;
 		fetchMock.mockReturnValueOnce(
-			new Promise<Response>(resolve => {
+			new Promise<Response>((resolve) => {
 				answer = resolve;
-			})
+			}),
 		);
 
 		fireEvent(toggle('Bob sur Tablet'), 'valueChange', true);

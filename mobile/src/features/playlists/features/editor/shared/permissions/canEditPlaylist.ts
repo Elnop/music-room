@@ -2,7 +2,7 @@ import type { PlaylistEditFields } from '@/features/playlists/features/editor/sh
 
 export function canEditPlaylist(
 	userId: string | null | undefined,
-	playlist: PlaylistEditFields | null | undefined
+	playlist: PlaylistEditFields | null | undefined,
 ): boolean {
 	if (!userId || !playlist) return false;
 	if (playlist.ownerId === userId) return true;

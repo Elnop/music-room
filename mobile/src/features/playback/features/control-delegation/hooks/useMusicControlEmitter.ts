@@ -7,9 +7,9 @@ import { useDeviceInfo } from '@/features/playback/features/control-delegation/h
 
 export function useMusicControlEmitter() {
 	const deviceInfo = useDeviceInfo();
-	const socket = useSocketState(state => state.socket);
-	const isConnected = useSocketState(state => state.isConnected);
-	const user = useSession(state => state.user);
+	const socket = useSocketState((state) => state.socket);
+	const isConnected = useSocketState((state) => state.isConnected);
+	const user = useSession((state) => state.user);
 
 	useEffect(() => {
 		if (!socket || !isConnected || !user || !deviceInfo) return;

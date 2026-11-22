@@ -14,6 +14,6 @@ const STACK_ONLY_OPTIONS: readonly string[] = [
 
 export function headerOptions(options: NativeStackNavigationOptions): HeaderOptions {
 	return Object.fromEntries(
-		Object.entries(options).filter(([key]) => !STACK_ONLY_OPTIONS.includes(key))
+		Object.entries(options).filter(([key]) => !STACK_ONLY_OPTIONS.includes(key)),
 	) as HeaderOptions;
 }

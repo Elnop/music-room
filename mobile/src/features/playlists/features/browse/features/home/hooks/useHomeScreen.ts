@@ -30,8 +30,8 @@ export function useHomeScreen(navigation: Navigation): HomeScreen {
 		isRefreshing: refresher.isRefreshing,
 		refresh: refresher.refresh,
 		publicOpen,
-		togglePublic: () => setPublicOpen(open => !open),
-		openPlaylist: id => navigation.navigate('PlaylistDetail', { id }),
+		togglePublic: () => setPublicOpen((open) => !open),
+		openPlaylist: (id) => navigation.navigate('PlaylistDetail', { id }),
 		bottomPadding,
 	};
 }

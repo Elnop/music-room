@@ -13,7 +13,7 @@ function saved(state: PlayerState) {
 
 export function watchLastTrackSaves(userId: string): () => void {
 	let timer: ReturnType<typeof setTimeout> | null = null;
-	const stop = watchPlayerState(saved, state => {
+	const stop = watchPlayerState(saved, (state) => {
 		if (timer) clearTimeout(timer);
 		if (state.playbackState === 'ready') return;
 		if (state.playbackState === 'playing') {

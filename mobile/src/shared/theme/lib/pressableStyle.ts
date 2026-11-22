@@ -7,7 +7,7 @@ type PressState = PressableStateCallbackType & { hovered?: boolean };
 export function pressableStyle(
 	style: StyleProp<ViewStyle>,
 	{ pressed, hovered }: PressState,
-	disabled?: boolean | null
+	disabled?: boolean | null,
 ): StyleProp<ViewStyle> {
 	return [style, hovered && !pressed && !disabled && styles.hovered, pressed && styles.pressed];
 }

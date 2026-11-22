@@ -24,8 +24,8 @@ export function useMediaControlListener(latest: LatestRef, sent: SentRef): void 
 			}, STATE_RESYNC_MS);
 		}
 
-		const removeListener = addListener(event =>
-			handleMediaCommand(event, latest.current, scheduleResync)
+		const removeListener = addListener((event) =>
+			handleMediaCommand(event, latest.current, scheduleResync),
 		);
 		return () => {
 			if (resyncRef.current) clearTimeout(resyncRef.current);

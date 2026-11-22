@@ -9,7 +9,7 @@ import { useAutoplayPrompt } from '@/features/playback/hooks/useAutoplayPrompt';
 
 jest.mock('@/shared/alerts/showAlert', () => ({ showAlert: jest.fn() }));
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 const player = { play: jest.fn() } as unknown as AudioPlayer;
@@ -44,7 +44,7 @@ describe('useAutoplayPrompt', () => {
 		expect(showAlert).toHaveBeenCalledWith(
 			'Cliquer pour activer le son',
 			'Le navigateur attend un clic pour lire « Song ».',
-			expect.any(Array)
+			expect.any(Array),
 		);
 	});
 

@@ -11,7 +11,7 @@ describe('radarSpot', () => {
 		}
 
 		expect(distanceFromUser(radarSpot('event-a', 0, 3))).toBeLessThan(
-			distanceFromUser(radarSpot('event-a', 2, 3))
+			distanceFromUser(radarSpot('event-a', 2, 3)),
 		);
 	});
 

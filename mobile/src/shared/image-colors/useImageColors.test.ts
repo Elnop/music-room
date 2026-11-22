@@ -25,7 +25,7 @@ describe('useImageColors', () => {
 		});
 
 		const { result } = renderHook(() =>
-			useImageColors('https://example.com/art.jpg', FALLBACK_COLOR)
+			useImageColors('https://example.com/art.jpg', FALLBACK_COLOR),
 		);
 
 		await waitFor(() => {

@@ -15,7 +15,7 @@ export function AlertButtons({ buttons, onChoose }: AlertButtonsProps) {
 
 	return (
 		<View style={styles.buttons}>
-			{buttons.map(button => (
+			{buttons.map((button) => (
 				<Button
 					key={`${button.style ?? 'default'}-${button.text ?? 'OK'}`}
 					title={button.text ?? 'OK'}

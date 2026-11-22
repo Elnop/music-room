@@ -11,7 +11,7 @@ function orNull(text: string) {
 export function toEventInput(
 	data: EventFormInput,
 	draft: EventDraft,
-	coordinates: Coordinates
+	coordinates: Coordinates,
 ): EventInput {
 	return {
 		name: data.name.trim(),

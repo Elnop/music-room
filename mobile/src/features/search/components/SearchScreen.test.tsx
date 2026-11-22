@@ -16,7 +16,7 @@ jest.mock('@/features/search/searchApi', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -62,7 +62,7 @@ async function renderScreen() {
 	render(
 		<QueryClientProvider client={queryClient}>
 			<SearchContainer TrackActionsSheet={() => null} playback={testPlayback} />
-		</QueryClientProvider>
+		</QueryClientProvider>,
 	);
 	await act(async () => {});
 }

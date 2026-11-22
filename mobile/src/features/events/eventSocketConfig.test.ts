@@ -5,19 +5,19 @@ import { musicEvent } from '@test-utils/musicEvent';
 import { EVENT_SOCKET_RULES } from '@/features/events/eventSocketConfig';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const client = createQueryClient();
 
 function emit(event: string, payload: unknown) {
-	for (const rule of EVENT_SOCKET_RULES.filter(current => current.event === event)) {
+	for (const rule of EVENT_SOCKET_RULES.filter((current) => current.event === event)) {
 		rule.apply(client, payload);
 	}
 }
 function shown() {
-	return client.getQueryData<MusicEvent[]>(queryKeys.events.list())?.map(event => event.name);
+	return client.getQueryData<MusicEvent[]>(queryKeys.events.list())?.map((event) => event.name);
 }
 
 beforeEach(() => {

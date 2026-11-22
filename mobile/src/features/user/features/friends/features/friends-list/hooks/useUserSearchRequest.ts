@@ -8,7 +8,7 @@ export function useUserSearchRequest() {
 	const [request, setRequest] = useState<UserSearchRequest>(IDLE_REQUEST);
 	const performSearch = useCallback(
 		(query: string, isRefresh = false) => runUserSearch(query, isRefresh, setRequest),
-		[]
+		[],
 	);
 	return { request, setRequest, performSearch };
 }

@@ -7,7 +7,7 @@ import { subscriptionApi } from '@/features/subscription/subscriptionApi';
 import type { Subscription } from '@/features/subscription/subscriptionTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
@@ -66,7 +66,9 @@ describe('useChangePlan', () => {
 
 		act(() => result.current.mutate('premium'));
 		await waitFor(() =>
-			expect(client.getQueryData<Subscription>(queryKeys.subscription.plan())?.plan).toBe('premium')
+			expect(client.getQueryData<Subscription>(queryKeys.subscription.plan())?.plan).toBe(
+				'premium',
+			),
 		);
 
 		await act(async () => request.resolve(PREMIUM));

@@ -16,7 +16,7 @@ export function useHomeQueries() {
 		useCallback(() => {
 			void refetchFriends();
 			void refetchPublic();
-		}, [refetchFriends, refetchPublic])
+		}, [refetchFriends, refetchPublic]),
 	);
 	useLoadErrorLog(friends.error, '[HomeScreen] Failed to load friends playlists:');
 	useLoadErrorLog(publics.error, '[HomeScreen] Failed to load public playlists:');

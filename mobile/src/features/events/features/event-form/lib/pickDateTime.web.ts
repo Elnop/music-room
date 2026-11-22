@@ -34,7 +34,7 @@ function buildDialog(doc: DomDocument, current: Date) {
 	const actions = element(doc, 'div');
 	actions.append(
 		button(doc, 'Annuler', { value: 'cancel', formnovalidate: '' }),
-		button(doc, 'OK', { value: CONFIRM })
+		button(doc, 'OK', { value: CONFIRM }),
 	);
 	Object.assign(form.style, { display: 'flex', flexDirection: 'column', gap: '12px' });
 	Object.assign(actions.style, { display: 'flex', justifyContent: 'flex-end', gap: '8px' });
@@ -47,7 +47,7 @@ export function pickDateTime(current: Date): Promise<Date | null> {
 	const doc = (globalThis as unknown as { document: DomDocument }).document;
 	const { dialog, input } = buildDialog(doc, current);
 
-	return new Promise(resolve => {
+	return new Promise((resolve) => {
 		dialog.addEventListener(
 			'close',
 			() => {
@@ -55,7 +55,7 @@ export function pickDateTime(current: Date): Promise<Date | null> {
 				dialog.remove();
 				resolve(picked);
 			},
-			{ once: true }
+			{ once: true },
 		);
 		doc.body.append(dialog);
 		dialog.showModal();

@@ -11,7 +11,7 @@ describe('upsertEvent', () => {
 		const late = musicEvent({ id: 'late', startsAt: at(5 * HOUR), endsAt: at(6 * HOUR) });
 		const early = musicEvent({ id: 'early' });
 		const list = upsertEvent([late], early);
-		expect(list.map(event => event.id)).toStrictEqual(['early', 'late']);
+		expect(list.map((event) => event.id)).toStrictEqual(['early', 'late']);
 
 		const renamed = upsertEvent(list, { ...early, name: 'Renamed' });
 		expect(renamed).toHaveLength(2);

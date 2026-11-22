@@ -9,7 +9,7 @@ import type {
 
 export function useResetPassword(
 	email: string,
-	navigation: ResetPasswordNavigation
+	navigation: ResetPasswordNavigation,
 ): ResetPassword {
 	const code = useCodeInput();
 	const password = useNewPassword();

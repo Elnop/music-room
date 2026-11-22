@@ -31,10 +31,10 @@ describe('useConnectionStatus', () => {
 
 	it.each<SocketStatus>(['idle', 'connecting'])(
 		'hides the banner when the socket is %s',
-		status => {
+		(status) => {
 			mockSocketState.status = status;
 			expect(render().result.current).toBeNull();
-		}
+		},
 	);
 
 	it('counts an unknown network state as online', () => {
@@ -46,7 +46,7 @@ describe('useConnectionStatus', () => {
 		{ isConnected: false, isInternetReachable: false },
 		{ isConnected: false },
 		{ isConnected: true, isInternetReachable: false },
-	])('is offline for %o, whatever the socket says', network => {
+	])('is offline for %o, whatever the socket says', (network) => {
 		mockNetwork = network;
 		mockSocketState.status = 'connected';
 		expect(render().result.current).toBe('offline');

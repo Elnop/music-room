@@ -8,7 +8,7 @@ import type {
 export function selectRemote(
 	set: StoreApi<ConnectState>['setState'],
 	get: StoreApi<ConnectState>['getState'],
-	{ ownerId, deviceId, ownerUsername }: Omit<RemoteTarget, 'kind'>
+	{ ownerId, deviceId, ownerUsername }: Omit<RemoteTarget, 'kind'>,
 ): void {
 	const { target } = get();
 	if (target.kind === 'remote' && target.ownerId === ownerId && target.deviceId === deviceId) {

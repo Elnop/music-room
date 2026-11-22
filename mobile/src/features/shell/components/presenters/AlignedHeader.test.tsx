@@ -14,7 +14,7 @@ const goBack = jest.fn();
 
 function headerProps(
 	name: string,
-	options: NativeStackHeaderProps['options'] = {}
+	options: NativeStackHeaderProps['options'] = {},
 ): NativeStackHeaderProps {
 	return {
 		options: { title: 'Titre', ...options },
@@ -39,7 +39,7 @@ describe('AlignedHeader', () => {
 		render(
 			<AlignedHeader
 				{...headerProps('Login', { headerStyle: { backgroundColor: 'transparent' } })}
-			/>
+			/>,
 		);
 
 		const [row, column] = screen.UNSAFE_getAllByType(View);

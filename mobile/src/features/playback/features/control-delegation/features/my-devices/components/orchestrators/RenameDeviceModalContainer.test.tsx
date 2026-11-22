@@ -22,7 +22,7 @@ describe('RenameDeviceModalContainer', () => {
 				saving={false}
 				onClose={onClose}
 				onSubmit={onSubmit}
-			/>
+			/>,
 		);
 
 		expect(screen.getByText("Renommer l'appareil")).toBeTruthy();
@@ -36,7 +36,7 @@ describe('RenameDeviceModalContainer', () => {
 				saving={false}
 				onClose={onClose}
 				onSubmit={onSubmit}
-			/>
+			/>,
 		);
 
 		fireEvent.changeText(screen.getByDisplayValue('Mon Enceinte'), '  Salon  ');
@@ -52,7 +52,7 @@ describe('RenameDeviceModalContainer', () => {
 				saving={false}
 				onClose={onClose}
 				onSubmit={onSubmit}
-			/>
+			/>,
 		);
 
 		fireEvent.changeText(screen.getByDisplayValue('Mon Enceinte'), '   ');
@@ -69,7 +69,7 @@ describe('RenameDeviceModalContainer', () => {
 				saving={false}
 				onClose={onClose}
 				onSubmit={onSubmit}
-			/>
+			/>,
 		);
 
 		fireEvent.changeText(screen.getByDisplayValue('Mon Enceinte'), 'a'.repeat(45));
@@ -86,7 +86,7 @@ describe('RenameDeviceModalContainer', () => {
 				saving={false}
 				onClose={onClose}
 				onSubmit={onSubmit}
-			/>
+			/>,
 		);
 
 		fireEvent.press(screen.getByText("Nom d'origine"));
@@ -100,7 +100,7 @@ describe('RenameDeviceModalContainer', () => {
 				saving={false}
 				onClose={onClose}
 				onSubmit={onSubmit}
-			/>
+			/>,
 		);
 
 		fireEvent.press(screen.getByText('Annuler'));

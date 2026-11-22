@@ -15,7 +15,7 @@ const PLAYLIST_LIMITS = { NAME_MAX: 50, DESCRIPTION_MAX: 500 } as const;
 
 export function usePlaylistForm(
 	navigation: PlaylistFormNavigation,
-	editedId: string | undefined
+	editedId: string | undefined,
 ): PlaylistForm {
 	const edited = useEditedPlaylist(editedId);
 	const settings = usePlaylistSettings();

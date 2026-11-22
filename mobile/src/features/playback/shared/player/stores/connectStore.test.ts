@@ -9,7 +9,7 @@ import type { ListeningStatus } from '@/features/playback/shared/player/types/li
 import type { UserProfile } from '@/shared/users/userTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({

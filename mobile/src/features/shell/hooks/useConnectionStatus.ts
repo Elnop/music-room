@@ -5,8 +5,8 @@ import type { ConnectionStatus } from '@/features/shell/types/connectionTypes';
 
 export function useConnectionStatus(): ConnectionStatus {
 	const network = useNetworkState();
-	const status = useSocketState(state => state.status);
-	const retry = useSocketState(state => state.retry);
+	const status = useSocketState((state) => state.status);
+	const retry = useSocketState((state) => state.retry);
 
 	const offline = network.isConnected === false || network.isInternetReachable === false;
 

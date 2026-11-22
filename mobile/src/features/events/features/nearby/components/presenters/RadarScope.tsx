@@ -26,7 +26,7 @@ export function RadarScope({ children }: RadarScopeProps) {
 
 	return (
 		<View style={styles.scope}>
-			{RADAR_RINGS.map(radius => (
+			{RADAR_RINGS.map((radius) => (
 				<View key={radius} style={[styles.ring, ringStyle(radius)]} />
 			))}
 			<RadarSweep />

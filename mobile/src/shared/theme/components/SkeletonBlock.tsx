@@ -16,7 +16,7 @@ function blockStyle(
 	width: DimensionValue,
 	height: DimensionValue,
 	radius: number,
-	opacity: Animated.Value
+	opacity: Animated.Value,
 ) {
 	return { width, height, borderRadius: radius, opacity };
 }

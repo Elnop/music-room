@@ -10,7 +10,7 @@ export function useCountdown(): Countdown {
 
 	useEffect(() => {
 		if (seconds <= 0) return;
-		const timer = setTimeout(() => setSeconds(value => value - 1), 1000);
+		const timer = setTimeout(() => setSeconds((value) => value - 1), 1000);
 		return () => clearTimeout(timer);
 	}, [seconds]);
 

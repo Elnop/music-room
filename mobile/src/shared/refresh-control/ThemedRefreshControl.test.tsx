@@ -16,7 +16,7 @@ describe('ThemedRefreshControl', () => {
 				style={style}
 			>
 				{list}
-			</ThemedRefreshControl>
+			</ThemedRefreshControl>,
 		);
 
 		const control = screen.UNSAFE_getByType(RefreshControl);

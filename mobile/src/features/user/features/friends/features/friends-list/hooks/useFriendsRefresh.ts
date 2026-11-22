@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 export function useFriendsRefresh(
 	refetchFriends: () => unknown,
-	refetchPermissions: () => unknown
+	refetchPermissions: () => unknown,
 ) {
 	const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -20,7 +20,7 @@ export function useFriendsRefresh(
 		useCallback(() => {
 			refetchFriends();
 			refetchPermissions();
-		}, [refetchFriends, refetchPermissions])
+		}, [refetchFriends, refetchPermissions]),
 	);
 
 	return { isRefreshing, onRefresh };

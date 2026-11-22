@@ -72,13 +72,13 @@ describe('ProfileScreen logout', () => {
 
 	it('logs out once confirmed', () => {
 		const buttons = pressLogout();
-		buttons?.find(b => b.text === 'Se déconnecter')?.onPress?.();
+		buttons?.find((b) => b.text === 'Se déconnecter')?.onPress?.();
 		expect(mockLogout).toHaveBeenCalledTimes(1);
 	});
 
 	it('stays signed in when cancelled', () => {
 		const buttons = pressLogout();
-		buttons?.find(b => b.text === 'Annuler')?.onPress?.();
+		buttons?.find((b) => b.text === 'Annuler')?.onPress?.();
 		expect(mockLogout).not.toHaveBeenCalled();
 	});
 });

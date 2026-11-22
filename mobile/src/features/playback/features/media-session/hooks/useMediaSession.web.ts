@@ -23,6 +23,6 @@ export function useMediaSession(): void {
 			session.metadata = null;
 			session.playbackState = 'none';
 		},
-		[session]
+		[session],
 	);
 }

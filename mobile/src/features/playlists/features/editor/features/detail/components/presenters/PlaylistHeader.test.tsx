@@ -42,7 +42,7 @@ describe('PlaylistHeader', () => {
 				playButton={null}
 				canEdit={false}
 				onAddTrack={jest.fn()}
-			/>
+			/>,
 		);
 
 		fireEvent.press(screen.getByRole('button', { name: 'Partager' }));
@@ -51,7 +51,7 @@ describe('PlaylistHeader', () => {
 			expect(share).toHaveBeenCalledWith({
 				message: `Chill\nhttps://elnop.github.io/music-room/playlist/${ID}`,
 				title: 'Chill',
-			})
+			}),
 		);
 	});
 
@@ -65,7 +65,7 @@ describe('PlaylistHeader', () => {
 					...playlist,
 					owner: { id: 'owner', username: 'alice', displayName: null } as unknown as UserProfile,
 				}}
-			/>
+			/>,
 		);
 
 		expect(screen.getByText('A')).toBeTruthy();
@@ -81,12 +81,12 @@ describe('PlaylistHeader', () => {
 				playButton={null}
 				canEdit={false}
 				onAddTrack={onAddTrack}
-			/>
+			/>,
 		);
 		expect(screen.queryByLabelText('Ajouter un titre')).toBeNull();
 
 		rerender(
-			<PlaylistHeader playlist={playlist} playButton={null} canEdit onAddTrack={onAddTrack} />
+			<PlaylistHeader playlist={playlist} playButton={null} canEdit onAddTrack={onAddTrack} />,
 		);
 		fireEvent.press(screen.getByLabelText('Ajouter un titre'));
 		expect(onAddTrack).toHaveBeenCalledWith(undefined);
@@ -103,7 +103,7 @@ describe('PlaylistHeader play button', () => {
 				playButton={button}
 				canEdit={false}
 				onAddTrack={jest.fn()}
-			/>
+			/>,
 		);
 		expect(screen.queryByText('PLAY')).toBeNull();
 		rerender(
@@ -112,7 +112,7 @@ describe('PlaylistHeader play button', () => {
 				playButton={button}
 				canEdit={false}
 				onAddTrack={jest.fn()}
-			/>
+			/>,
 		);
 		expect(screen.getByText('PLAY')).toBeTruthy();
 		expect(screen.getByLabelText('1 titre')).toBeTruthy();

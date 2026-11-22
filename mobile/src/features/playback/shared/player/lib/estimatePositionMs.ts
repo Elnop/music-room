@@ -3,7 +3,7 @@ import type { ListeningStatus } from '@/features/playback/shared/player/types/li
 export function estimatePositionMs(
 	status: Pick<ListeningStatus, 'positionMs' | 'updatedAt' | 'isPlaying'>,
 	now: number,
-	durationMs: number | null
+	durationMs: number | null,
 ): number {
 	const base = status.positionMs ?? 0;
 	const sentAt = Date.parse(status.updatedAt);

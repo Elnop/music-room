@@ -24,7 +24,7 @@ describe('ErrorBoundary', () => {
 		render(
 			<ErrorBoundary>
 				<Child />
-			</ErrorBoundary>
+			</ErrorBoundary>,
 		);
 		expect(screen.getByText('Child content')).toBeTruthy();
 		expect(screen.queryByText("Une erreur s'est produite")).toBeNull();
@@ -38,7 +38,7 @@ describe('ErrorBoundary', () => {
 		render(
 			<ErrorBoundary>
 				<Child />
-			</ErrorBoundary>
+			</ErrorBoundary>,
 		);
 
 		expect(screen.getByText("Une erreur s'est produite")).toBeTruthy();

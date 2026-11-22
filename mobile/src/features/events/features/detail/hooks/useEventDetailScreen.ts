@@ -29,16 +29,16 @@ function detailActions({ navigation, id, event, confirmDelete }: DetailActionsAr
 				[
 					{ text: 'Annuler', style: 'cancel' },
 					{ text: 'Supprimer', style: 'destructive', onPress: () => void confirmDelete() },
-				]
+				],
 			),
 	};
 }
 
 export function useEventDetailScreen(
 	navigation: EventDetailNavigation,
-	id: string
+	id: string,
 ): EventDetailScreen {
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	const query = useEvent(id);
 	const gone = query.error instanceof ApiError && query.error.status === 404;
 	const deletion = useEventDeletion({ navigation, id, gone });

@@ -5,12 +5,12 @@ import type { CappedField } from '@/shared/theme/types/cappedFieldTypes';
 export function useCappedField<Form extends FieldValues>(
 	control: Control<Form>,
 	name: Path<Form>,
-	max: number
+	max: number,
 ): CappedField {
 	const { field, fieldState } = useController({ control, name });
 	return {
 		value: (field.value as string | undefined) ?? '',
-		onChangeText: text => field.onChange(text.slice(0, max)),
+		onChangeText: (text) => field.onChange(text.slice(0, max)),
 		error: fieldState.error?.message,
 		max,
 	};

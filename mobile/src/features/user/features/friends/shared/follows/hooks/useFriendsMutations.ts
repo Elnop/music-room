@@ -14,9 +14,9 @@ export function useToggleControlMutation() {
 			return { userId, shouldGrant };
 		},
 		onSuccess: ({ userId, shouldGrant }) => {
-			client.setQueryData<string[]>(queryKeys.friends.permissions(), prev => {
+			client.setQueryData<string[]>(queryKeys.friends.permissions(), (prev) => {
 				if (!prev) return shouldGrant ? [userId] : [];
-				return shouldGrant ? [...prev, userId] : prev.filter(id => id !== userId);
+				return shouldGrant ? [...prev, userId] : prev.filter((id) => id !== userId);
 			});
 		},
 	});

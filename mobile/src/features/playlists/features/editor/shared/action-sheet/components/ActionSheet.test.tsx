@@ -31,7 +31,7 @@ function renderSheet(placement: React.ComponentProps<typeof ActionSheet>['placem
 	render(
 		<ActionSheet visible heading={{ title: 'Playlist' }} onClose={onClose} placement={placement}>
 			<Text>Modifier</Text>
-		</ActionSheet>
+		</ActionSheet>,
 	);
 	return onClose;
 }

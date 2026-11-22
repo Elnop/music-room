@@ -4,8 +4,8 @@ import { controlEventHandlers } from '@/features/playback/features/control-deleg
 import type { ControlError } from '@/shared/control-error/controlErrorTypes';
 
 export function useControlErrors(targetUserId: string | null, reload: () => void) {
-	const socket = useSocketState(state => state.socket);
-	const isConnected = useSocketState(state => state.isConnected);
+	const socket = useSocketState((state) => state.socket);
+	const isConnected = useSocketState((state) => state.isConnected);
 	const [controlError, setControlError] = useState<ControlError | null>(null);
 
 	useEffect(() => {
@@ -13,7 +13,7 @@ export function useControlErrors(targetUserId: string | null, reload: () => void
 		const { handlePermissionChanged, handleControlError } = controlEventHandlers(
 			targetUserId,
 			reload,
-			setControlError
+			setControlError,
 		);
 		socket.on('permission:changed', handlePermissionChanged);
 		socket.on('control:error', handleControlError);

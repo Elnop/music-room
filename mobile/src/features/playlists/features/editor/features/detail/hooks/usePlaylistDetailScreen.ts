@@ -13,7 +13,7 @@ import type {
 
 export function usePlaylistDetailScreen(
 	navigation: DetailNavigation,
-	id: string
+	id: string,
 ): PlaylistDetailScreen {
 	const room = useDeletedPlaylist(navigation, id);
 	const detail = usePlaylistDetail(id, room.active);
@@ -23,7 +23,7 @@ export function usePlaylistDetailScreen(
 	useRefetchOnFocus(
 		useCallback(() => {
 			if (active) void refetch();
-		}, [active, refetch])
+		}, [active, refetch]),
 	);
 
 	return {

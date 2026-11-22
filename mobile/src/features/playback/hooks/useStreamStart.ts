@@ -12,9 +12,9 @@ import type {
 import type { PlaybackState } from '@/shared/playback/types/playbackTypes';
 
 export function useStreamStart(player: AudioPlayer, playbackState: PlaybackState): void {
-	const trackId = usePlayerState(state => state.currentTrack?.id ?? null);
-	const streamUrl = usePlayerState(state => state.streamUrl);
-	const loadCounter = usePlayerState(state => state.loadCounter);
+	const trackId = usePlayerState((state) => state.currentTrack?.id ?? null);
+	const streamUrl = usePlayerState((state) => state.streamUrl);
+	const loadCounter = usePlayerState((state) => state.loadCounter);
 	const watchRef = useRef<StreamLoadWatch>({
 		trackId: null,
 		tried: false,

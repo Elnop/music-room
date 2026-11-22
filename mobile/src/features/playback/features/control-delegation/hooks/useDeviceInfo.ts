@@ -6,7 +6,7 @@ export function useDeviceInfo(): DeviceInfo | null {
 	const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
 
 	useEffect(() => {
-		deviceService.getDeviceInfo().then(info => {
+		deviceService.getDeviceInfo().then((info) => {
 			setDeviceInfo(info);
 		});
 	}, []);

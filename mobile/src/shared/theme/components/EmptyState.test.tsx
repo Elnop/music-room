@@ -31,7 +31,7 @@ describe('EmptyState', () => {
 	it('renders the action as a button that calls onPress', () => {
 		const onPress = jest.fn();
 		render(
-			<EmptyState message="Aucune playlist" action={{ label: 'Créer une playlist', onPress }} />
+			<EmptyState message="Aucune playlist" action={{ label: 'Créer une playlist', onPress }} />,
 		);
 		fireEvent.press(screen.getByRole('button', { name: 'Créer une playlist' }));
 		expect(onPress).toHaveBeenCalledTimes(1);

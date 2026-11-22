@@ -14,12 +14,12 @@ export function nearbyByGps(
 	events: MusicEvent[],
 	position: Coordinates,
 	now = Date.now(),
-	radius = NEARBY_RADIUS_M
+	radius = NEARBY_RADIUS_M,
 ): NearbyEvent[] {
 	return events
-		.filter(event => isOngoing(event, now))
-		.map(event => ({ event, distance: distanceMeters(position, event) }))
-		.filter(nearby => nearby.distance <= radius)
+		.filter((event) => isOngoing(event, now))
+		.map((event) => ({ event, distance: distanceMeters(position, event) }))
+		.filter((nearby) => nearby.distance <= radius)
 		.toSorted((a, b) => a.distance - b.distance);
 }
 
@@ -27,11 +27,11 @@ export function mergeNearby(
 	events: MusicEvent[],
 	sightings: ReadonlyMap<number, BeaconSighting>,
 	position: Coordinates | null,
-	now = Date.now()
+	now = Date.now(),
 ): NearbyItem[] {
-	const ongoing = events.filter(event => isOngoing(event, now));
+	const ongoing = events.filter((event) => isOngoing(event, now));
 	const heard = ongoing
-		.flatMap(event => {
+		.flatMap((event) => {
 			const sighting = sightings.get(event.beaconMinor);
 			return sighting
 				? [{ event, meters: estimateDistance(sighting.rssi, sighting.measuredPower) }]
@@ -39,7 +39,7 @@ export function mergeNearby(
 		})
 		.toSorted((a, b) => a.meters - b.meters)
 		.map(({ event }) => ({ event, proximity: 'Tout près' }));
-	const heardIds = new Set(heard.map(item => item.event.id));
+	const heardIds = new Set(heard.map((item) => item.event.id));
 	const located = position
 		? nearbyByGps(ongoing, position, now)
 				.filter(({ event }) => !heardIds.has(event.id))

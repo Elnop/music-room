@@ -13,7 +13,7 @@ type ResendResetCode = {
 export function useResendResetCode(
 	email: string,
 	forgotPassword: ReturnType<typeof useForgotPasswordMutation>,
-	onSend: () => void
+	onSend: () => void,
 ): ResendResetCode {
 	const countdown = useCountdown();
 

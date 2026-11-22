@@ -24,20 +24,20 @@ function playlist(tracksVersion: number, tracks: TrackInPlaylist[]): PlaylistWit
 
 const base = playlist(10, [track('A', 'a'), track('B', 'h'), track('C', 'p')]);
 function ids(p: PlaylistWithTracks | 'ignore' | 'reload') {
-	return (p as PlaylistWithTracks).tracks.map(t => t.id);
+	return (p as PlaylistWithTracks).tracks.map((t) => t.id);
 }
 
 describe('sortByRank', () => {
 	it('sorts by byte order, digits before upper case before lower case', () => {
 		expect(
-			sortByRank([track('x', 'a'), track('y', 'Z'), track('z', '1')]).map(t => t.id)
+			sortByRank([track('x', 'a'), track('y', 'Z'), track('z', '1')]).map((t) => t.id),
 		).toStrictEqual(['z', 'y', 'x']);
 	});
 
 	it('does not mutate its input', () => {
 		const input = [track('x', 'b'), track('y', 'a')];
 		sortByRank(input);
-		expect(input.map(t => t.id)).toStrictEqual(['x', 'y']);
+		expect(input.map((t) => t.id)).toStrictEqual(['x', 'y']);
 	});
 });
 
@@ -46,16 +46,16 @@ describe('applyPlaylistEvent', () => {
 
 	it('ignores a version already displayed or older', () => {
 		expect(
-			applyPlaylistEvent(base, { ...ev, tracksVersion: 10, event: 'track_removed', trackId: 'A' })
+			applyPlaylistEvent(base, { ...ev, tracksVersion: 10, event: 'track_removed', trackId: 'A' }),
 		).toBe('ignore');
 		expect(
-			applyPlaylistEvent(base, { ...ev, tracksVersion: 3, event: 'track_removed', trackId: 'A' })
+			applyPlaylistEvent(base, { ...ev, tracksVersion: 3, event: 'track_removed', trackId: 'A' }),
 		).toBe('ignore');
 	});
 
 	it('asks for a reload when a version was skipped', () => {
 		expect(
-			applyPlaylistEvent(base, { ...ev, tracksVersion: 12, event: 'track_removed', trackId: 'A' })
+			applyPlaylistEvent(base, { ...ev, tracksVersion: 12, event: 'track_removed', trackId: 'A' }),
 		).toBe('reload');
 	});
 
@@ -68,7 +68,7 @@ describe('applyPlaylistEvent', () => {
 				event: 'track_moved',
 				trackId: 'C',
 				rank: '1',
-			})
+			}),
 		).toBe('reload');
 	});
 
@@ -82,7 +82,7 @@ describe('applyPlaylistEvent', () => {
 		});
 		expect(ids(next)).toStrictEqual(['A', 'C', 'B']);
 		expect((next as PlaylistWithTracks).tracksVersion).toBe(11);
-		expect(base.tracks.map(t => t.id)).toStrictEqual(['A', 'B', 'C']);
+		expect(base.tracks.map((t) => t.id)).toStrictEqual(['A', 'B', 'C']);
 	});
 
 	it('applies an add and a remove', () => {

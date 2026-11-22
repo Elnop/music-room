@@ -12,7 +12,7 @@ function watchConnection({ store, socket, attempts }: WatchedSocket): void {
 		}
 	});
 
-	socket.on('disconnect', reason => {
+	socket.on('disconnect', (reason) => {
 		if (store.getState().socket !== socket) return;
 		if (reason === 'io client disconnect') {
 			store.setState({ isConnected: false });
@@ -27,7 +27,7 @@ function watchConnection({ store, socket, attempts }: WatchedSocket): void {
 
 function watchConnectError(watched: WatchedSocket, url: string): void {
 	const { socket } = watched;
-	socket.on('connect_error', error => {
+	socket.on('connect_error', (error) => {
 		reportBackendError('error', '[Socket] ❌ Connection error:', error.message);
 		if (HANDSHAKE_CODES.includes(error.message)) {
 			void handleRefusal(watched, error.message);
@@ -45,7 +45,7 @@ function watchManager({ store, socket }: WatchedSocket): void {
 		if (store.getState().socket === socket) store.setState({ status: 'reconnecting' });
 	});
 
-	manager.on('reconnect_error', error => {
+	manager.on('reconnect_error', (error) => {
 		reportBackendError('error', '[Socket] ❌ Reconnect error:', error.message);
 	});
 

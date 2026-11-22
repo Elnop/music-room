@@ -7,7 +7,7 @@ import { LAST_TRACK_SAVE_INTERVAL_MS } from '@/features/playback/lastTrackConfig
 
 export function useLastTrackSaves(saveUserId: string | null): void {
 	const local = useIsLocalTarget();
-	const playbackState = usePlayerState(state => state.playbackState);
+	const playbackState = usePlayerState((state) => state.playbackState);
 
 	useEffect(() => {
 		if (!saveUserId || !local || playbackState !== 'playing') return;
@@ -17,7 +17,7 @@ export function useLastTrackSaves(saveUserId: string | null): void {
 
 	useEffect(() => {
 		if (!saveUserId) return;
-		const subscription = AppState.addEventListener('change', next => {
+		const subscription = AppState.addEventListener('change', (next) => {
 			if (next !== 'active') persistLastTrack(saveUserId);
 		});
 		return () => subscription.remove();

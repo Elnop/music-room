@@ -23,7 +23,7 @@ export function Pressable({
 	...rest
 }: PressableProps) {
 	const tooltipRef = useIconTooltip(
-		accessibilityRole === 'none' ? undefined : rest.accessibilityLabel
+		accessibilityRole === 'none' ? undefined : rest.accessibilityLabel,
 	);
 	return (
 		<NativePressable

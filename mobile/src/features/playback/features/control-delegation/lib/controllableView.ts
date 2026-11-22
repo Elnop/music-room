@@ -7,7 +7,7 @@ const NO_IDS: string[] = [];
 
 export function controllableView(
 	controllable: ControllableIds | null,
-	targetUserId: string | null
+	targetUserId: string | null,
 ): ControllableView {
 	const current = controllable && controllable.userId === targetUserId ? controllable : null;
 	const allDevices = current?.allDevices ?? false;

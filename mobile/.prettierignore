@@ -1,0 +1,7 @@
+package-lock.json
+oxlint-suppressions.json
+patches/
+assets/
+public/
+site/
+android/

@@ -27,7 +27,7 @@ export function ProfilePreferencesSection(props: ProfilePreferencesSectionProps)
 		>
 			{props.genres.length > 0 ? (
 				<View style={styles.genresContainer}>
-					{props.genres.map(genre => (
+					{props.genres.map((genre) => (
 						<GenreChip key={genre} genre={genre} selected size="sm" />
 					))}
 				</View>

@@ -15,7 +15,7 @@ export function useResultActions(playback: PlaybackActions): ResultActions {
 			(track: SoundCloudTrack) => {
 				void playback.addToQueue(toTrackInput(track));
 			},
-			[playback]
+			[playback],
 		),
 		actionTrack,
 		showActions: useCallback((track: SoundCloudTrack, anchor?: MenuAnchor) => {

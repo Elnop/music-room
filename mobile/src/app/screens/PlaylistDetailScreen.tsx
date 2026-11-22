@@ -11,9 +11,9 @@ type PlaylistDetailScreenProps = NativeStackScreenProps<PlaylistStackParamList, 
 export function PlaylistDetailScreen(props: PlaylistDetailScreenProps) {
 	return (
 		<PlanContainer>
-			{plan => (
+			{(plan) => (
 				<PlaylistPlaybackContainer playlistId={props.route.params.id}>
-					{playback => (
+					{(playback) => (
 						<PlaylistDetailContainer
 							{...props}
 							premium={plan}

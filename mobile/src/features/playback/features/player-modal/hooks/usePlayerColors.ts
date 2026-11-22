@@ -13,7 +13,7 @@ export function usePlayerColors(artworkUrl: string | null) {
 	const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
 	const adaptive = useMemo(
 		() => (dominantColor ? getAdaptiveColors(dominantColor, theme.colors.background) : null),
-		[dominantColor, theme.colors.background]
+		[dominantColor, theme.colors.background],
 	);
 	const colors = useMemo(() => playerColors(theme, adaptive), [adaptive, theme]);
 	const backgroundStyle = useColorFade(playerGradient(theme, adaptive)[0]);

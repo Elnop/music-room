@@ -13,7 +13,7 @@ describe('Card', () => {
 		render(
 			<Card>
 				<Text>Content</Text>
-			</Card>
+			</Card>,
 		);
 		expect(screen.getByText('Content')).toBeTruthy();
 	});
@@ -23,7 +23,7 @@ describe('Card', () => {
 		render(
 			<Card onPress={onPress} accessibilityLabel="Open">
 				<Text>Content</Text>
-			</Card>
+			</Card>,
 		);
 
 		fireEvent.press(screen.getByRole('button', { name: 'Open' }));
@@ -35,7 +35,7 @@ describe('Card', () => {
 		render(
 			<Card>
 				<Text>Content</Text>
-			</Card>
+			</Card>,
 		);
 		expect(screen.queryByRole('button')).toBeNull();
 	});

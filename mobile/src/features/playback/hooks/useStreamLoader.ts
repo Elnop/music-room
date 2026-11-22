@@ -4,8 +4,8 @@ import { loadStream } from '@/features/playback/lib/loadStream';
 import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 
 export function useStreamLoader(): void {
-	const currentTrack = usePlayerState(state => state.currentTrack);
-	const loadCounter = usePlayerState(state => state.loadCounter);
+	const currentTrack = usePlayerState((state) => state.currentTrack);
+	const loadCounter = usePlayerState((state) => state.loadCounter);
 	const loadCounterRef = useRef(loadCounter);
 
 	useEffect(() => {

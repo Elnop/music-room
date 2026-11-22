@@ -22,7 +22,7 @@ export function PlaylistDetailView({ page, playlist, header }: PlaylistDetailVie
 	const bottom = page.screen.bottomPadding;
 	const styles = React.useMemo(
 		() => createDetailStyles(theme, { top, bottom }),
-		[theme, top, bottom]
+		[theme, top, bottom],
 	);
 	const { isWide } = useBreakpoint();
 

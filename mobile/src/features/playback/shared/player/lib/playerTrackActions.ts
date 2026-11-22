@@ -18,16 +18,16 @@ type PlayerTrackActions = Pick<
 export function playerTrackActions(set: PlayerSet, get: PlayerGet): PlayerTrackActions {
 	return {
 		playTrack: (track, queueItemId = null, startPositionMs = null) => {
-			set(state => playTrackPatch(state, { track, queueItemId, startPositionMs }));
+			set((state) => playTrackPatch(state, { track, queueItemId, startPositionMs }));
 		},
 		renewStream: (positionMs, keepPlaying, afterFailure = false) => {
 			if (!get().currentTrack) return;
-			set(state => renewStreamPatch(state, positionMs, { keepPlaying, afterFailure }));
+			set((state) => renewStreamPatch(state, positionMs, { keepPlaying, afterFailure }));
 		},
 		restoreTrack: (track, queueItemId, positionMs) => {
 			set(restoreTrackPatch(get(), { track, queueItemId, startPositionMs: positionMs }));
 		},
-		setRestoredPosition: pos => {
+		setRestoredPosition: (pos) => {
 			if (!get().needsStreamLoad) return;
 			set({ startPositionMs: validPos(pos) });
 		},

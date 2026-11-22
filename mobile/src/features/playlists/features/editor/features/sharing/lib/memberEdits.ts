@@ -10,17 +10,17 @@ export function addMember(
 	edits: MemberEdits,
 	user: UserSummary,
 	asViewer: boolean,
-	canEdit: boolean
+	canEdit: boolean,
 ): void {
 	const { id, setMembers } = edits;
 	if (edits.processing) return;
-	setMembers(list => [...list, toMember(user, canEdit)]);
+	setMembers((list) => [...list, toMember(user, canEdit)]);
 	edits
 		.run(user.id, () =>
-			asViewer ? membersApi.addViewer(id, user.id) : membersApi.addCollaborator(id, user.id)
+			asViewer ? membersApi.addViewer(id, user.id) : membersApi.addCollaborator(id, user.id),
 		)
-		.catch(err => {
-			setMembers(list => list.filter(m => m.id !== user.id));
+		.catch((err) => {
+			setMembers((list) => list.filter((m) => m.id !== user.id));
 			showError(apiErrorMessage(err, "Impossible d'ajouter l'utilisateur"));
 		});
 }
@@ -28,12 +28,12 @@ export function addMember(
 export async function removeMember(
 	edits: MemberEdits,
 	userId: string,
-	isPrivate: boolean
+	isPrivate: boolean,
 ): Promise<void> {
 	const { id, members, setMembers } = edits;
-	const member = members.find(m => m.id === userId);
+	const member = members.find((m) => m.id === userId);
 	if (edits.processing || !member) return;
-	setMembers(list => list.filter(m => m.id !== userId));
+	setMembers((list) => list.filter((m) => m.id !== userId));
 	try {
 		await edits.run(userId, async () => {
 			if (!isPrivate || member.canEdit) await membersApi.removeCollaborator(id, userId);

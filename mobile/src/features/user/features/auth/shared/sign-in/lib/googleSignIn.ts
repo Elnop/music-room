@@ -68,7 +68,7 @@ function rethrowGoogleError(error: unknown): never {
 export async function signInWithGoogle(): Promise<string> {
 	if (!WEB_CLIENT_ID) {
 		throw new Error(
-			'Google Sign-In is not configured. Please set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in your .env file.'
+			'Google Sign-In is not configured. Please set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in your .env file.',
 		);
 	}
 

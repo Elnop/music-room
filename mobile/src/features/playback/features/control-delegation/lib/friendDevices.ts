@@ -4,10 +4,10 @@ import type { FriendDeviceStatus } from '@/features/playback/features/control-de
 export function friendDevices(
 	statuses: ListeningStatus[],
 	canControl: boolean,
-	isControllable: (deviceId: string) => boolean
+	isControllable: (deviceId: string) => boolean,
 ): FriendDeviceStatus[] {
 	if (!canControl) return [];
-	return statuses.map(status => ({
+	return statuses.map((status) => ({
 		...status,
 		controllable: isControllable(status.device.deviceId),
 	}));

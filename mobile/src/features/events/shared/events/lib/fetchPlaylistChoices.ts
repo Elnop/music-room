@@ -11,6 +11,6 @@ type OwnPlaylist = {
 export async function fetchPlaylistChoices(userId: string): Promise<PlaylistChoice[]> {
 	const data = await apiRequest<{ playlists: OwnPlaylist[] }>('/api/playlists');
 	return data.playlists
-		.filter(playlist => playlist.ownerId === userId && playlist.visibility === 'public')
+		.filter((playlist) => playlist.ownerId === userId && playlist.visibility === 'public')
 		.map(({ id, name }) => ({ id, name }));
 }

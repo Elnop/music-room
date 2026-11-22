@@ -7,11 +7,11 @@ import type { DevicePicker } from '@/features/playback/features/control-delegati
 
 export function useDevicePicker(visible: boolean, onClose: () => void): DevicePicker {
 	const list = useDeviceList(visible);
-	const target = useConnectState(state => state.target);
+	const target = useConnectState((state) => state.target);
 	const { pendingKey, onPick } = usePickTransfer(onClose);
 	const sections = useMemo(
 		() => list.loaded && pickerSections(list.loaded, { target, pendingKey }),
-		[list.loaded, target, pendingKey]
+		[list.loaded, target, pendingKey],
 	);
 
 	return {

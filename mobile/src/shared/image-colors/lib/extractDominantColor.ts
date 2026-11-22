@@ -15,7 +15,7 @@ function dominantColorOf(colors: ImageColorsResult): string | null {
 
 export async function extractDominantColor(
 	imageUrl: string,
-	fallbackColor: string
+	fallbackColor: string,
 ): Promise<string | null> {
 	const colors = await getColors(imageUrl, { fallback: fallbackColor, cache: true, key: imageUrl });
 	return dominantColorOf(colors);

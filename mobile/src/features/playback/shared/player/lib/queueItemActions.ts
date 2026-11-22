@@ -15,13 +15,13 @@ import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';
 
 export async function addItemAction(
 	track: AddQueueItemBody,
-	applyState: (state: QueueState) => void
+	applyState: (state: QueueState) => void,
 ): Promise<boolean> {
 	const added = await mutate(
-		call => queueApi.addItem(track, call),
+		(call) => queueApi.addItem(track, call),
 		'Add',
 		applyState,
-		error => apiErrorMessage(error, "Impossible d'ajouter à la file d'attente")
+		(error) => apiErrorMessage(error, "Impossible d'ajouter à la file d'attente"),
 	);
 	if (added) {
 		showSuccess("Ajouté à la file d'attente");
@@ -32,13 +32,13 @@ export async function addItemAction(
 
 export async function playNextAction(
 	track: AddQueueItemBody,
-	applyState: (state: QueueState) => void
+	applyState: (state: QueueState) => void,
 ): Promise<boolean> {
 	const added = await mutate(
-		call => queueApi.addItem({ ...track, next: true }, call),
+		(call) => queueApi.addItem({ ...track, next: true }, call),
 		'Play next',
 		applyState,
-		error => apiErrorMessage(error, "Impossible d'ajouter ce titre")
+		(error) => apiErrorMessage(error, "Impossible d'ajouter ce titre"),
 	);
 	if (added) {
 		showSuccess('Lira ensuite');
@@ -49,26 +49,31 @@ export async function playNextAction(
 
 export async function removeItemAction(
 	itemId: string,
-	applyState: (state: QueueState) => void
+	applyState: (state: QueueState) => void,
 ): Promise<boolean> {
 	const errorMessage = 'Impossible de retirer ce titre';
 	const { queueItemId } = getPlayerState();
 	if (connectStore.getState().target.kind === 'local' && queueItemId === itemId) {
 		const outcome = await runStep(
-			asStep(call => queueApi.removeItem(itemId, call)),
+			asStep((call) => queueApi.removeItem(itemId, call)),
 			'Remove current item',
 			applyState,
-			{ errorMessage, stopWhenEmpty: true }
+			{ errorMessage, stopWhenEmpty: true },
 		);
 		if (outcome === 'ignored') showInfo('Une action est déjà en cours');
 		return outcome === 'played' || outcome === 'stopped';
 	}
-	return mutate(call => queueApi.removeItem(itemId, call), 'Remove item', applyState, errorMessage);
+	return mutate(
+		(call) => queueApi.removeItem(itemId, call),
+		'Remove item',
+		applyState,
+		errorMessage,
+	);
 }
 
 export async function playListTrackAction(
 	track: SoundCloudTrack,
-	applyState: (state: QueueState) => void
+	applyState: (state: QueueState) => void,
 ): Promise<void> {
 	const { target } = connectStore.getState();
 	if (target.kind === 'local') {

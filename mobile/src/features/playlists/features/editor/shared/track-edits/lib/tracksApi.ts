@@ -30,7 +30,7 @@ export function moveTrack(
 	playlistId: string,
 	trackId: string,
 	afterRank: string | null,
-	expectedVersion: number
+	expectedVersion: number,
 ): Promise<MoveTrackResult> {
 	return apiRequest<MoveTrackResult>(`/api/playlists/${playlistId}/tracks/${trackId}/move`, {
 		method: 'POST',

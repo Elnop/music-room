@@ -12,7 +12,7 @@ export function MembersList({ members, onRemove }: MembersListProps) {
 	return (
 		<FlatList
 			data={members}
-			keyExtractor={item => item.id}
+			keyExtractor={(item) => item.id}
 			style={styles.list}
 			scrollEnabled={false}
 			renderItem={({ item }) => (

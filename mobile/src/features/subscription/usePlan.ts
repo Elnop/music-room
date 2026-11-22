@@ -6,7 +6,7 @@ import { subscriptionApi } from '@/features/subscription/subscriptionApi';
 import type { Plan, Subscription } from '@/features/subscription/subscriptionTypes';
 
 export function usePlan({ enabled = true }: { enabled?: boolean } = {}) {
-	const authenticated = useSession(s => s.isAuthenticated);
+	const authenticated = useSession((s) => s.isAuthenticated);
 	const query = useQuery({
 		queryKey: queryKeys.subscription.plan(),
 		queryFn: () => subscriptionApi.getSubscription(),
@@ -20,7 +20,7 @@ export function useChangePlan() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (plan: Plan) => subscriptionApi.changePlan(plan),
-		onMutate: async plan => {
+		onMutate: async (plan) => {
 			await queryClient.cancelQueries({ queryKey: queryKeys.subscription.plan() });
 			const previous = queryClient.getQueryData<Subscription>(queryKeys.subscription.plan());
 			if (previous) {
@@ -36,7 +36,7 @@ export function useChangePlan() {
 				queryClient.setQueryData(queryKeys.subscription.plan(), context.previous);
 			}
 		},
-		onSuccess: data => {
+		onSuccess: (data) => {
 			queryClient.setQueryData(queryKeys.subscription.plan(), data);
 		},
 	});

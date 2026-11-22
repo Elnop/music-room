@@ -35,7 +35,7 @@ function setPlaying(current: NowPlaying, playing: boolean, onToggled: () => void
 export function handleMediaCommand(
 	event: MediaControlEvent,
 	latest: MediaSessionLatest,
-	onToggled: () => void
+	onToggled: () => void,
 ): void {
 	const current = latest.nowPlaying;
 	switch (event.command) {

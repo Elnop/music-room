@@ -19,7 +19,7 @@ export function PolicyText({ spans, style, onOpenLink }: PolicyTextProps) {
 
 	return (
 		<Text style={[styles.paragraph, style]}>
-			{spans.map(span => (
+			{spans.map((span) => (
 				<PolicySpanText key={policyKey(span)} span={span} onOpenLink={onOpenLink} />
 			))}
 		</Text>

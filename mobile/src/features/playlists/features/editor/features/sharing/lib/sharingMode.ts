@@ -13,7 +13,7 @@ export function sharingModeOf(playlist: PlaylistWithTracks | undefined): Sharing
 
 export function memberIdsOf(
 	playlist: PlaylistWithTracks | undefined,
-	members: PlaylistMember[]
+	members: PlaylistMember[],
 ): string[] {
-	return [...(playlist ? [playlist.ownerId] : []), ...members.map(member => member.id)];
+	return [...(playlist ? [playlist.ownerId] : []), ...members.map((member) => member.id)];
 }

@@ -11,7 +11,7 @@ export function useTrackActions(
 	track: AddQueueItemBody | null,
 	onClose: () => void,
 	start: TrackActionsStart = 'actions',
-	playback: PlaybackActions
+	playback: PlaybackActions,
 ): TrackActions {
 	const { goTo, ...flow } = useActionFlow(track, start);
 	const newPlaylist = useNewPlaylistFromTrack(flow.shown, onClose);

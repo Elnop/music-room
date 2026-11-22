@@ -40,7 +40,7 @@ describe('PrivacyPolicyContainer', () => {
 		expect(openExternalUrl).toHaveBeenNthCalledWith(
 			2,
 			'mailto:leon.perrotin@gmail.com',
-			expect.any(Function)
+			expect.any(Function),
 		);
 	});
 });

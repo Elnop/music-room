@@ -43,7 +43,7 @@ describe('prepareSquareImage', () => {
 			height: 600,
 		});
 		expect(mockContext.crop.mock.invocationCallOrder[0]).toBeLessThan(
-			mockContext.resize.mock.invocationCallOrder[0]
+			mockContext.resize.mock.invocationCallOrder[0],
 		);
 	});
 });

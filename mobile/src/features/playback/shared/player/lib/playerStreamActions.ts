@@ -21,7 +21,7 @@ export function playerStreamActions(set: PlayerSet, get: PlayerGet): PlayerStrea
 		setStreamUrl: (url, expiresAt = null, protocol = 'hls') => {
 			set({ streamUrl: url, streamProtocol: protocol, streamExpiresAt: url ? expiresAt : null });
 		},
-		setTrackUnavailableError: message => {
+		setTrackUnavailableError: (message) => {
 			set({ ...initialPlayerState, error: message, loadCounter: get().loadCounter });
 		},
 		clearError: () => set({ error: null }),

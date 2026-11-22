@@ -12,10 +12,10 @@ export function usePlaylistAdds(playlistId: string): PlaylistAdds {
 	const { mutateAsync } = useAddTrack();
 
 	return {
-		isAdded: track => uris.has(track.permalink_url) || playlistUris.has(track.permalink_url),
+		isAdded: (track) => uris.has(track.permalink_url) || playlistUris.has(track.permalink_url),
 		add: useCallback(
 			(track: SoundCloudTrack) => void sendAdd({ playlistId, tracker, mutate: mutateAsync }, track),
-			[playlistId, tracker, mutateAsync]
+			[playlistId, tracker, mutateAsync],
 		),
 	};
 }

@@ -26,11 +26,11 @@ export function useVerifyCode({ userId, code, reportError }: VerificationRequest
 		mutation.mutate(
 			{ userId, code: fullCode },
 			{
-				onError: failure => {
+				onError: (failure) => {
 					reportError(apiErrorMessage(failure, 'Vérification impossible, réessayez'));
 					code.reset();
 				},
-			}
+			},
 		);
 	}
 

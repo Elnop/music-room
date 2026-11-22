@@ -7,7 +7,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 `npm run check` in `backend/` or `mobile/` runs every check in parallel and prints `<check> OK`, or `FAILED` with the output of the failure.
 
 - Backend: `tools/guardrails/run-checks.mjs` runs the scripts below, unit tests included, and shows the last 30 lines of a failure. Run one check alone with `npm run check:<name>` (`type-check` and `test` are the usual scripts).
-- Mobile: `brutal-check` (`@brutalway/check`) runs the scripts `typecheck`, `lint` (oxlint), `deps`, `tree`, `duplicates`, `unused` (knip), `secrets` and `exceptions`, each one runnable alone with `npm run <name>`. `run-checks.mjs` then runs the project rules brutalway does not cover yet: `lint:eslint`, `check:semgrep` and `check:ast-grep`. The unit tests are not part of the mobile check: `npm test` and the CI job `test` run them.
+- Mobile: `brutal-check` (`@brutalway/check`) runs the scripts `format:check` (prettier with `@brutalway/prettier-config`; `npm run format` rewrites the files), `typecheck`, `lint` (oxlint), `deps`, `tree`, `duplicates`, `unused` (knip), `secrets` and `exceptions`, each one runnable alone with `npm run <name>`. `run-checks.mjs` then runs the project rules brutalway does not cover yet: `lint:eslint`, `check:semgrep` and `check:ast-grep`. The unit tests are not part of the mobile check: `npm test` and the CI job `test` run them.
 
 | Check | Tool | Config | What fails |
 | --- | --- | --- | --- |

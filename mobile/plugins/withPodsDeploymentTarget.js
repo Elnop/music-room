@@ -5,7 +5,7 @@ const DEPLOYMENT_TARGET = '15.1';
 const MARKER = '# Pods deployment target raised by withPodsDeploymentTarget';
 
 function withPodsDeploymentTarget(config) {
-	return withPodfile(config, config => {
+	return withPodfile(config, (config) => {
 		const contents = config.modResults.contents;
 		if (contents.includes(MARKER)) return config;
 		config.modResults.contents = contents.replace(
@@ -19,7 +19,7 @@ function withPodsDeploymentTarget(config) {
           build.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${DEPLOYMENT_TARGET}'
         end
       end
-    end`
+    end`,
 		);
 		return config;
 	});

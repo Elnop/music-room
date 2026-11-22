@@ -30,7 +30,7 @@ export function ButtonBody({ label, look, icon, loading }: ButtonBodyProps) {
 
 function labelStyle(
 	styles: ReturnType<typeof createStyles>,
-	look: ButtonLook
+	look: ButtonLook,
 ): StyleProp<TextStyle> {
 	const variant = {
 		primary: styles.primaryText,

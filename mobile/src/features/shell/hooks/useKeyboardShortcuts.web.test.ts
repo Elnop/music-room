@@ -49,7 +49,7 @@ describe('useKeyboardShortcuts (web)', () => {
 			({ shortcuts }: { shortcuts: KeyboardShortcut[] }) => useKeyboardShortcuts(shortcuts),
 			{
 				initialProps: { shortcuts: [first] },
-			}
+			},
 		);
 		rerender({ shortcuts: [latest] });
 

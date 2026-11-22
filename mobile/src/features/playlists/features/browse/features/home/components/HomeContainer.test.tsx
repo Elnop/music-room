@@ -17,7 +17,7 @@ import { Text } from '@/shared/theme/components/Text';
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
@@ -73,7 +73,7 @@ function renderHome(nearbyEvents?: React.ReactNode) {
 			route={{ key: 'k', name: 'Home' } as Props['route']}
 			navigation={navigation as unknown as Props['navigation']}
 			nearbyEvents={nearbyEvents}
-		/>
+		/>,
 	);
 	clear = () => view.client.clear();
 	return view;

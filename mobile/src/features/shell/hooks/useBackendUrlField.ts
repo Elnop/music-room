@@ -23,10 +23,10 @@ function withUrl(url: string) {
 }
 
 async function saveUrl(draft: string, setField: SetField) {
-	setField(field => ({ ...field, isSaving: true }));
+	setField((field) => ({ ...field, isSaving: true }));
 	const result = await setBackendUrl(draft);
 	if ('error' in result) {
-		setField(field => ({ ...field, isSaving: false, error: result.error }));
+		setField((field) => ({ ...field, isSaving: false, error: result.error }));
 		return;
 	}
 	setField(withUrl(result.url));
@@ -34,7 +34,7 @@ async function saveUrl(draft: string, setField: SetField) {
 }
 
 async function resetUrl(setField: SetField) {
-	setField(field => ({ ...field, isSaving: true }));
+	setField((field) => ({ ...field, isSaving: true }));
 	const url = await resetBackendUrl();
 	setField(withUrl(url));
 	showSuccess('Adresse du serveur par défaut rétablie');
@@ -45,13 +45,16 @@ export function useBackendUrlField() {
 
 	useEffect(
 		() =>
-			onBackendUrlChange(url => setField(current => ({ ...current, currentUrl: url, draft: url }))),
-		[]
+			onBackendUrlChange((url) =>
+				setField((current) => ({ ...current, currentUrl: url, draft: url })),
+			),
+		[],
 	);
 
 	return {
 		field,
-		changeDraft: (draft: string) => setField(current => ({ ...current, draft, error: undefined })),
+		changeDraft: (draft: string) =>
+			setField((current) => ({ ...current, draft, error: undefined })),
 		save: () => saveUrl(field.draft, setField),
 		reset: () => resetUrl(setField),
 	};

@@ -19,7 +19,7 @@ import { formatEventDate } from '@/features/events/shared/event-dates/eventDates
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('@/shared/theme/hooks/useTheme', () => {
@@ -54,7 +54,7 @@ function renderForm(eventId?: string) {
 	const client = createQueryClient();
 	client.setQueryData(
 		queryKeys.events.detail('e1'),
-		musicEvent({ organizer: { id: 'me', username: 'me' } })
+		musicEvent({ organizer: { id: 'me', username: 'me' } }),
 	);
 	const view = renderWithClient(
 		<EventFormContainer
@@ -63,7 +63,7 @@ function renderForm(eventId?: string) {
 			}
 			navigation={navigation as unknown as Props['navigation']}
 		/>,
-		client
+		client,
 	);
 	clear = () => client.clear();
 	return view;
@@ -95,11 +95,11 @@ beforeEach(async () => {
 				{ id: 'p3', name: 'Not mine', ownerId: 'bob', visibility: 'public' },
 			],
 		}),
-		'POST /api/events': body => {
+		'POST /api/events': (body) => {
 			sent = body as Record<string, unknown>;
 			return ok({ event: musicEvent({ id: 'new' }) });
 		},
-		'PATCH /api/events/e1': body => {
+		'PATCH /api/events/e1': (body) => {
 			sent = body as Record<string, unknown>;
 			return ok({ event: musicEvent({ name: 'Renamed' }) });
 		},
@@ -189,8 +189,8 @@ describe('EventFormContainer', () => {
 			.mockImplementation(({ onChange }) =>
 				onChange?.(
 					{ type: 'set', nativeEvent: { timestamp: later.getTime(), utcOffset: 0 } },
-					later
-				)
+					later,
+				),
 			);
 		renderForm();
 		await act(async () => fireEvent.press(screen.getByLabelText(/^Début :/u)));

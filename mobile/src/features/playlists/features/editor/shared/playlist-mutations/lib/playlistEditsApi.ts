@@ -12,7 +12,7 @@ export async function createPlaylist(input: PlaylistInput): Promise<Playlist> {
 
 export async function updatePlaylist(
 	id: string,
-	updates: Partial<PlaylistInput>
+	updates: Partial<PlaylistInput>,
 ): Promise<Playlist> {
 	const data = await apiRequest<{ playlist: Playlist }>(`/api/playlists/${id}`, {
 		method: 'PATCH',

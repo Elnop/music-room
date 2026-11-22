@@ -22,7 +22,7 @@ export function RowGrid({ children }: RowGridProps) {
 
 	return (
 		<View style={styles.grid}>
-			{React.Children.map(children, child => (
+			{React.Children.map(children, (child) => (
 				<View style={[styles.cell, cellWidth(columns)]}>
 					<View style={styles.card}>{child}</View>
 				</View>

@@ -24,7 +24,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -97,7 +97,7 @@ function setQueue(state: Pick<QueueState, 'currentItemId' | 'items'>, ownerId = 
 }
 
 function titles() {
-	return screen.queryAllByText(/^Title /u).map(node => node.props.children);
+	return screen.queryAllByText(/^Title /u).map((node) => node.props.children);
 }
 
 async function renderModal() {

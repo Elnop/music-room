@@ -6,6 +6,6 @@ export function useContentColumn(): ViewStyle | null {
 	const maxWidth = useContext(ContentColumnContext);
 	return useMemo(
 		() => (maxWidth ? { width: '100%', maxWidth, alignSelf: 'center' } : null),
-		[maxWidth]
+		[maxWidth],
 	);
 }

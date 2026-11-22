@@ -16,7 +16,7 @@ jest.mock('@/features/playback/shared/player/hooks/usePlaybackControls', () => (
 
 function run(key: string, shift?: boolean) {
 	const { result } = renderHook(() => usePlayerShortcuts());
-	const shortcut = result.current.find(item => item.key === key && item.shift === shift);
+	const shortcut = result.current.find((item) => item.key === key && item.shift === shift);
 	shortcut?.run();
 }
 

@@ -69,7 +69,7 @@ function keyStyle(
 	styles: ReturnType<typeof createStyles>,
 	appearance: KeyAppearance,
 	disabled: boolean | undefined,
-	withLabel: boolean
+	withLabel: boolean,
 ): StyleProp<ViewStyle> {
 	const size = appearance.size ?? 48;
 	const tone = { primary: styles.primary, surface: styles.surface, device: styles.device };

@@ -19,7 +19,7 @@ export function FriendsContainer({ navigation, onNavigateToProfile }: FriendsOrc
 				navigation.navigate('UserProfile', { userId });
 			}
 		},
-		[navigation, onNavigateToProfile]
+		[navigation, onNavigateToProfile],
 	);
 
 	const screen = useFriendsListScreen(handleSelectUser);

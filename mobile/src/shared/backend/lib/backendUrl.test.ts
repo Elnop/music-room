@@ -14,7 +14,7 @@ import { onBackendUrlChange } from '@/shared/backend/lib/backendUrlListeners';
 import { normalizeBackendUrl } from '@/shared/backend/lib/normalizeBackendUrl';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 const STORAGE_KEY = 'zumik.backendUrl';
@@ -111,7 +111,7 @@ describe('backendUrl invalid input', () => {
 		'https://host/api//',
 		'http://host:0',
 		'http://host:70000',
-	])('refuses %p and keeps the current address', async input => {
+	])('refuses %p and keeps the current address', async (input) => {
 		await setBackendUrl('http://192.168.1.20:3000');
 		storage.setItem.mockClear();
 

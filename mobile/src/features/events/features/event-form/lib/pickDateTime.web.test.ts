@@ -47,7 +47,7 @@ function fakeNode(tag: string): FakeNode {
 }
 
 function find(root: FakeNode, tag: string): FakeNode[] {
-	return root.children.flatMap(child => [
+	return root.children.flatMap((child) => [
 		...(child.tag === tag ? [child] : []),
 		...find(child, tag),
 	]);
@@ -91,7 +91,7 @@ describe('pickDateTime (web)', () => {
 		expect(dialog.showModal).toHaveBeenCalledWith();
 		expect(input.attributes.type).toBe('datetime-local');
 		expect(input.value).toBe('2026-11-06T20:00');
-		expect(find(dialog, 'button').map(button => button.textContent)).toStrictEqual([
+		expect(find(dialog, 'button').map((button) => button.textContent)).toStrictEqual([
 			'Annuler',
 			'OK',
 		]);

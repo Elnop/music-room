@@ -9,14 +9,14 @@ export function useSearchPlayback(playback: PlaybackActions): SearchPlaybackHand
 		(track: SoundCloudTrack) => {
 			void playback.playListTrack(track);
 		},
-		[playback]
+		[playback],
 	);
 
 	const onAddToQueue = useCallback(
 		(track: SoundCloudTrack) => {
 			void playback.addToQueue(toTrackInput(track));
 		},
-		[playback]
+		[playback],
 	);
 
 	return { onPlay, onAddToQueue };

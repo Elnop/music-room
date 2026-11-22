@@ -7,14 +7,14 @@ describe('isPreviewOnly', () => {
 
 	it('flags a track whose transcodings are all snipped', () => {
 		expect(isPreviewOnly({ media: { transcodings: [{ snipped: true }, { snipped: true }] } })).toBe(
-			true
+			true,
 		);
 	});
 
 	it('does not flag a full track', () => {
 		expect(isPreviewOnly({ policy: 'ALLOW' })).toBe(false);
 		expect(
-			isPreviewOnly({ media: { transcodings: [{ snipped: true }, { snipped: false }] } })
+			isPreviewOnly({ media: { transcodings: [{ snipped: true }, { snipped: false }] } }),
 		).toBe(false);
 	});
 

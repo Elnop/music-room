@@ -13,7 +13,7 @@ export function usePrivacyDraft(data: ProfilePrivacy | undefined) {
 				[field]: value,
 			});
 		},
-		[privacy]
+		[privacy],
 	);
 
 	const reset = useCallback(() => setCustomPrivacy(null), []);

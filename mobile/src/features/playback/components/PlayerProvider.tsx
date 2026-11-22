@@ -23,8 +23,8 @@ type PlayerProviderProps = {
 
 export function PlayerProvider({ children }: PlayerProviderProps) {
 	const { player, seekTo } = usePlayerAudio();
-	const loading = usePlayerState(state => state.loading);
-	const error = usePlayerState(state => state.error);
+	const loading = usePlayerState((state) => state.loading);
+	const error = usePlayerState((state) => state.error);
 
 	useLastTrackPersistence();
 	useQueueAutoAdvance(player);
@@ -37,7 +37,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
 
 	const value = React.useMemo(
 		() => ({ player, seekTo, loading, error }),
-		[player, seekTo, loading, error]
+		[player, seekTo, loading, error],
 	);
 
 	return (

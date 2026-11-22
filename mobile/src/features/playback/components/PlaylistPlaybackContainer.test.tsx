@@ -8,7 +8,7 @@ import { PlaylistPlaybackContainer } from '@/features/playback/components/Playli
 import { signIn } from '@test-utils/signIn';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
@@ -19,11 +19,11 @@ function playbackOf(playlistId: string) {
 	let reported: PlaylistPlayback | undefined;
 	render(
 		<PlaylistPlaybackContainer playlistId={playlistId}>
-			{playback => {
+			{(playback) => {
 				reported = playback;
 				return null;
 			}}
-		</PlaylistPlaybackContainer>
+		</PlaylistPlaybackContainer>,
 	);
 	return reported;
 }

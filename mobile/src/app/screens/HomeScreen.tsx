@@ -12,9 +12,9 @@ type HomeScreenProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'>;
 export function HomeScreen(props: HomeScreenProps) {
 	return (
 		<PlanContainer>
-			{plan => (
+			{(plan) => (
 				<PlaylistCardMenuContainer navigation={props.navigation} premium={plan}>
-					{actionsFor => (
+					{(actionsFor) => (
 						<HomeContainer
 							{...props}
 							onPlaylistActions={actionsFor}

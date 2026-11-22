@@ -21,7 +21,7 @@ function requestHeaders(options: RequestInit, token: string | undefined): Record
 export async function sendApiRequest(
 	endpoint: string,
 	options: RequestInit,
-	token?: string
+	token?: string,
 ): Promise<Response> {
 	const timeout = new AbortController();
 	const timer = setTimeout(() => timeout.abort(), API_CONFIG.TIMEOUT);

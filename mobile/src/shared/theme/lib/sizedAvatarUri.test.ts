@@ -9,7 +9,7 @@ describe('sizedAvatarUri', () => {
 
 	it('keeps any other address as it is', () => {
 		expect(sizedAvatarUri('https://cdn.example.com/a.jpg=s96-c', 120)).toBe(
-			'https://cdn.example.com/a.jpg=s96-c'
+			'https://cdn.example.com/a.jpg=s96-c',
 		);
 		expect(sizedAvatarUri(`${GOOGLE}?sz=50`, 120)).toBe(`${GOOGLE}?sz=50`);
 	});

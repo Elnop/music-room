@@ -13,7 +13,7 @@ describe('nearbyByGps', () => {
 		const nearest = musicEvent({ id: 'nearest' });
 		const far = musicEvent({ id: 'far', latitude: 48.91 });
 		const result = nearbyByGps([near, far, nearest], here);
-		expect(result.map(item => item.event.id)).toStrictEqual(['nearest', 'near']);
+		expect(result.map((item) => item.event.id)).toStrictEqual(['nearest', 'near']);
 		expect(result[1].distance).toBeCloseTo(111, -1);
 	});
 
@@ -67,7 +67,7 @@ describe('mergeNearby', () => {
 			[3, sighting(-50)],
 		]);
 		expect(
-			mergeNearby([farther, ended, near], heard, null).map(item => item.event.id)
+			mergeNearby([farther, ended, near], heard, null).map((item) => item.event.id),
 		).toStrictEqual(['near', 'farther']);
 	});
 });

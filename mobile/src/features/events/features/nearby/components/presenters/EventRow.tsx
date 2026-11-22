@@ -19,7 +19,7 @@ type EventRowProps = {
 export function EventRow({ event, onPress }: EventRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const when = isOngoing(event) ? 'En cours' : formatEventDate(event.startsAt);
-	const genres = event.genres.map(genre => GENRE_INFO[genre].label).join(' · ');
+	const genres = event.genres.map((genre) => GENRE_INFO[genre].label).join(' · ');
 
 	return (
 		<Pressable

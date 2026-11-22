@@ -11,7 +11,9 @@ export function useEditedPlaylist(editedId: string | undefined): EditedPlaylist 
 		editedId === undefined
 			? undefined
 			: (client.getQueryData<Playlist>(queryKeys.playlists.detail(editedId)) ??
-				client.getQueryData<Playlist[]>(queryKeys.playlists.list())?.find(p => p.id === editedId))
+				client
+					.getQueryData<Playlist[]>(queryKeys.playlists.list())
+					?.find((p) => p.id === editedId)),
 	);
 	return edited;
 }

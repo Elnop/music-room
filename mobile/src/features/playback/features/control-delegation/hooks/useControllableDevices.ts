@@ -10,7 +10,7 @@ export function useControllableDevices(targetUserId: string | null) {
 
 	const isControllable = useCallback(
 		(deviceId: string) => view.allDevices || view.ids.includes(deviceId),
-		[view.allDevices, view.ids]
+		[view.allDevices, view.ids],
 	);
 
 	return { canControl: view.canControl, isControllable, controlError };

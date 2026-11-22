@@ -1,2 +1,2 @@
 .env.example:facebook-secret:20
-app.config.js:facebook-secret:120
+app.config.js:facebook-secret:117

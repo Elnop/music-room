@@ -4,7 +4,7 @@ import { jsKeepAlive } from '@/features/playback/lib/jsKeepAlive';
 
 export function useBackgroundKeepAlive(): void {
 	const active = usePlayerState(
-		state => state.playbackState === 'playing' || state.playbackState === 'loading'
+		(state) => state.playbackState === 'playing' || state.playbackState === 'loading',
 	);
 
 	useEffect(() => {

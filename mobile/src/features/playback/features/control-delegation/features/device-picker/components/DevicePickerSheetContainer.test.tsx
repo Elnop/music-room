@@ -26,7 +26,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -38,7 +38,7 @@ jest.mock(
 	'@/features/playback/features/control-delegation/shared/delegation/musicControlApi',
 	() => ({
 		musicControlApi: { getDevicePicker: jest.fn() },
-	})
+	}),
 );
 
 jest.mock('@/features/playback/shared/player/lib/queueApi', () => ({
@@ -132,7 +132,7 @@ beforeEach(() => {
 	});
 	playerStore.setState(
 		{ ...initialPlayerState, currentTrack: soundCloudTrack, queueItemId: 'i1' },
-		true
+		true,
 	);
 	mockGetDevicePicker.mockResolvedValue(picker);
 	transfer.mockResolvedValue({ ownerId: 'me', deviceId: 'pc', queue: null });
@@ -191,7 +191,7 @@ describe('DevicePickerSheetContainer', () => {
 				targetUserId: 'me',
 				targetDeviceId: 'pc',
 				playing: { queueItemId: 'i1' },
-			})
+			}),
 		);
 		expect(connectStore.getState().target).toMatchObject({ kind: 'remote', deviceId: 'pc' });
 	});

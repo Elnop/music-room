@@ -25,7 +25,7 @@ let initialized = false;
 async function loadSdk(): Promise<FacebookSdk> {
 	if (!FACEBOOK_APP_ID) {
 		throw new Error(
-			'Facebook App ID not configured. Please set EXPO_PUBLIC_FACEBOOK_APP_ID in your .env file.'
+			'Facebook App ID not configured. Please set EXPO_PUBLIC_FACEBOOK_APP_ID in your .env file.',
 		);
 	}
 	await loadScript(SDK_SCRIPT);
@@ -50,8 +50,8 @@ export function preloadFacebookSdk(): void {
 
 export async function signInWithFacebook(): Promise<string> {
 	const sdk = await loadSdk();
-	const response = await new Promise<LoginResponse>(resolve =>
-		sdk.login(resolve, { scope: 'public_profile,email' })
+	const response = await new Promise<LoginResponse>((resolve) =>
+		sdk.login(resolve, { scope: 'public_profile,email' }),
 	);
 	const accessToken = response.authResponse?.accessToken;
 	if (response.status !== 'connected' || !accessToken) throw new Error(SIGN_IN_CANCELLED);

@@ -26,7 +26,7 @@ let moveQueue: Promise<unknown> = Promise.resolve();
 async function sendMove(
 	client: QueryClient,
 	{ playlistId, trackId, afterRank }: MoveRequest,
-	tracksVersion: number
+	tracksVersion: number,
 ): Promise<void> {
 	const result = await tracksApi.moveTrack(playlistId, trackId, afterRank, tracksVersion);
 	await settleTrackEvent(client, {
@@ -56,12 +56,12 @@ export function moveTrack(
 	client: QueryClient,
 	playlistId: string,
 	trackId: string,
-	afterRank: string | null
+	afterRank: string | null,
 ): Promise<'moved' | 'skipped'> {
 	pendingMovesActions.change(1);
 	function run() {
 		return runMove(client, { playlistId, trackId, afterRank }).finally(() =>
-			pendingMovesActions.change(-1)
+			pendingMovesActions.change(-1),
 		);
 	}
 	const next = moveQueue.then(run, run);

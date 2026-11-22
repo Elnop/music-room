@@ -26,14 +26,14 @@ function webLinking(): Partial<LinkingOptions<AppTabsParamList>> {
 	const base = webBasePath();
 	return {
 		prefixes: [LINK_PREFIX, `${origin}${base}`],
-		getPathFromState: state => `${base}${pathFromState(state)}`,
+		getPathFromState: (state) => `${base}${pathFromState(state)}`,
 	};
 }
 
 export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabsParamList> {
 	return {
 		prefixes: [LINK_PREFIX],
-		getStateFromPath: fullPath => {
+		getStateFromPath: (fullPath) => {
 			const path = stripBasePath(fullPath);
 			const signedIn = isSignedIn();
 			const match = matchLink(path, signedIn);

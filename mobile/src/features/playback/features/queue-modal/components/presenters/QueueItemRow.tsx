@@ -42,7 +42,7 @@ export function QueueItemRow({ item, isCurrent = false, actions, drag }: QueueIt
 				style={[styles.row, isCurrent && styles.rowCurrent, drag?.isDragActive && styles.rowActive]}
 			>
 				<QueueRowMain item={item} isCurrent={isCurrent} actions={actions} />
-				<TrackActionsButton onPress={anchor => actions.onShowActions(item, anchor)} />
+				<TrackActionsButton onPress={(anchor) => actions.onShowActions(item, anchor)} />
 				{drag?.onDragStart && <TrackDragHandle onDragStart={drag.onDragStart} />}
 			</View>
 		</Swipeable>

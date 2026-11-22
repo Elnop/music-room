@@ -28,7 +28,7 @@ describe('Pressable', () => {
 		render(
 			<Pressable accessibilityLabel="Play" onPress={onPress}>
 				<Text>Play</Text>
-			</Pressable>
+			</Pressable>,
 		);
 
 		fireEvent.press(screen.getByRole('button', { name: 'Play' }));
@@ -46,7 +46,11 @@ describe('Pressable', () => {
 		const calls: string[] = [];
 		jest.mocked(hapticSelection).mockImplementation(() => calls.push('haptic'));
 		render(
-			<Pressable accessibilityLabel="Pick" haptic="selection" onPress={() => calls.push('press')} />
+			<Pressable
+				accessibilityLabel="Pick"
+				haptic="selection"
+				onPress={() => calls.push('press')}
+			/>,
 		);
 
 		fireEvent.press(screen.getByRole('button', { name: 'Pick' }));
@@ -66,7 +70,7 @@ describe('Pressable', () => {
 
 	it('dims to the shared opacity while pressed', () => {
 		const { rerender } = render(
-			<Pressable accessibilityLabel="Hold" onPress={jest.fn()} style={styles.spaced} />
+			<Pressable accessibilityLabel="Hold" onPress={jest.fn()} style={styles.spaced} />,
 		);
 		function style() {
 			return StyleSheet.flatten(screen.getByRole('button').props.style);
@@ -79,7 +83,7 @@ describe('Pressable', () => {
 				onPress={jest.fn()}
 				style={styles.spaced}
 				testOnly_pressed
-			/>
+			/>,
 		);
 		expect(style()).toMatchObject({ margin: MARGIN, opacity: PRESSED_OPACITY });
 	});

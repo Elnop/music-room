@@ -19,7 +19,7 @@ export const registerSchema = z.object({
 		.max(20, "Le nom d'utilisateur doit contenir moins de 20 caractères")
 		.regex(
 			/^[a-zA-Z0-9_]+$/u,
-			"Le nom d'utilisateur ne peut contenir que des lettres, chiffres et tirets bas"
+			"Le nom d'utilisateur ne peut contenir que des lettres, chiffres et tirets bas",
 		),
 	displayName: z
 		.string()

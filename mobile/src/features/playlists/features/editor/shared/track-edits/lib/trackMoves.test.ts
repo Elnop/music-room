@@ -21,7 +21,7 @@ import {
 import { moveTrack } from '@/features/playlists/features/editor/shared/track-edits/lib/trackMoves';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
@@ -62,7 +62,7 @@ function shown() {
 	return client.getQueryData<PlaylistWithTracks>(queryKeys.playlists.detail('p'))!;
 }
 function order() {
-	return shown().tracks.map(t => t.id);
+	return shown().tracks.map((t) => t.id);
 }
 
 function open() {
@@ -95,7 +95,7 @@ describe('loadPlaylist', () => {
 			tracks: [playlistTrack('C', 'p'), playlistTrack('A', 'a')],
 		});
 		const playlist = await loadPlaylist(client, 'p');
-		expect(playlist.tracks.map(t => t.id)).toStrictEqual(['A', 'C']);
+		expect(playlist.tracks.map((t) => t.id)).toStrictEqual(['A', 'C']);
 	});
 
 	it('keeps a newer track list applied while the request was in flight', async () => {
@@ -196,13 +196,13 @@ describe('moveTrack', () => {
 
 	it.each(['TRACK_MOVED_CONCURRENTLY', 'TRACK_NOT_IN_PLAYLIST', 'PLAYLIST_REBALANCED'])(
 		'reloads and rethrows on %s',
-		async code => {
+		async (code) => {
 			api.moveTrack.mockRejectedValue(new ApiError('conflict', code, undefined, 409));
 			fetchPlaylist.mockResolvedValue(start(13));
 			await expect(moveTrack(client, 'p', 'C', 'a')).rejects.toMatchObject({ code });
 			expect(shown().tracksVersion).toBe(13);
 			expect(pendingMovesStore.getState().count).toBe(0);
-		}
+		},
 	);
 
 	it('does not reload on another error and keeps the order', async () => {
@@ -221,7 +221,7 @@ describe('moveTrack', () => {
 			moveTrack(client, 'p', 'C', 'a'),
 			moveTrack(client, 'p', 'B', null),
 		]);
-		expect(results.map(r => r.status)).toStrictEqual(['rejected', 'fulfilled']);
+		expect(results.map((r) => r.status)).toStrictEqual(['rejected', 'fulfilled']);
 		expect(api.moveTrack).toHaveBeenNthCalledWith(2, 'p', 'B', null, 13);
 		expect(shown().tracksVersion).toBe(14);
 	});

@@ -33,7 +33,7 @@ export function EditProfileCappedField({
 			<Input
 				{...inputOptions}
 				value={field.value}
-				onChangeText={text => field.onChange(text.slice(0, max))}
+				onChangeText={(text) => field.onChange(text.slice(0, max))}
 				onBlur={field.onBlur}
 				error={error}
 				style={config.multiline ? styles.multilineInput : undefined}

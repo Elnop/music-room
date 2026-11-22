@@ -15,7 +15,7 @@ import * as scanPermission from '@/features/events/features/nearby/lib/scanPermi
 import { noop } from '@test-utils/noop';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('@/shared/theme/hooks/useTheme', () => {
@@ -83,11 +83,11 @@ beforeEach(async () => {
 	});
 	permission.hasScanPermission.mockResolvedValue(true);
 	permission.requestScanPermission.mockResolvedValue(true);
-	scanner.watchBluetoothState.mockImplementation(listener => {
+	scanner.watchBluetoothState.mockImplementation((listener) => {
 		listener('on');
 		return () => undefined;
 	});
-	scanner.scanEventBeacons.mockImplementation(onFrame => {
+	scanner.scanEventBeacons.mockImplementation((onFrame) => {
 		hear = (minor, rssi = -65) => onFrame({ minor, rssi, measuredPower: -59 });
 		return stopScan;
 	});
@@ -118,8 +118,8 @@ describe('NearbyEventsContainer', () => {
 		await waitFor(() =>
 			expect(location.watchPositionAsync).toHaveBeenCalledWith(
 				expect.anything(),
-				expect.any(Function)
-			)
+				expect.any(Function),
+			),
 		);
 		expect(screen.getByText('Recherche de votre position…')).toBeTruthy();
 
@@ -137,8 +137,8 @@ describe('NearbyEventsContainer', () => {
 		await waitFor(() =>
 			expect(location.watchPositionAsync).toHaveBeenCalledWith(
 				expect.anything(),
-				expect.any(Function)
-			)
+				expect.any(Function),
+			),
 		);
 		await act(async () => moveTo(RIVER.latitude, RIVER.longitude));
 		const sent = routes.fetchMock.mock.calls.map(([url, init]) => `${url} ${init?.body ?? ''}`);
@@ -150,8 +150,8 @@ describe('NearbyEventsContainer', () => {
 		await waitFor(() =>
 			expect(location.watchPositionAsync).toHaveBeenCalledWith(
 				expect.anything(),
-				expect.any(Function)
-			)
+				expect.any(Function),
+			),
 		);
 		mockFocused = false;
 		view.rerender(<NearbyEventsContainer />);
@@ -224,8 +224,8 @@ describe('NearbyEventsContainer', () => {
 			await waitFor(() =>
 				expect(location.watchPositionAsync).toHaveBeenCalledWith(
 					expect.anything(),
-					expect.any(Function)
-				)
+					expect.any(Function),
+				),
 			);
 
 			act(() => jest.advanceTimersByTime(60_000));
@@ -245,7 +245,7 @@ describe('NearbyEventsContainer', () => {
 		location.hasServicesEnabledAsync.mockResolvedValue(false);
 		await renderSection();
 		await waitFor(() =>
-			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function))
+			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function)),
 		);
 		expect(screen.getByText('Détection des balises Bluetooth active')).toBeTruthy();
 
@@ -261,7 +261,7 @@ describe('NearbyEventsContainer', () => {
 		try {
 			await renderSection();
 			await waitFor(() =>
-				expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function))
+				expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function)),
 			);
 			await act(async () => hear(7));
 			expect(screen.getByText('Tout près')).toBeTruthy();
@@ -276,7 +276,7 @@ describe('NearbyEventsContainer', () => {
 	it('shows an event seen by GPS and by beacon once, as "Tout près"', async () => {
 		await renderSection();
 		await waitFor(() =>
-			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function))
+			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function)),
 		);
 		await act(async () => moveTo(RIVER.latitude, RIVER.longitude));
 		await act(async () => hear(7));
@@ -287,7 +287,7 @@ describe('NearbyEventsContainer', () => {
 	it('stops scanning when the home is left', async () => {
 		const view = await renderSection();
 		await waitFor(() =>
-			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function))
+			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function)),
 		);
 		mockFocused = false;
 		view.rerender(<NearbyEventsContainer />);
@@ -298,29 +298,29 @@ describe('NearbyEventsContainer', () => {
 		permission.hasScanPermission.mockResolvedValue(false);
 		await renderSection();
 		await act(async () =>
-			fireEvent.press(await screen.findByText('Détecter aussi les balises Bluetooth'))
+			fireEvent.press(await screen.findByText('Détecter aussi les balises Bluetooth')),
 		);
 		expect(permission.requestScanPermission).toHaveBeenCalledWith();
 		await waitFor(() =>
-			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function))
+			expect(scanner.scanEventBeacons).toHaveBeenCalledWith(expect.any(Function)),
 		);
 	});
 
 	it('goes on with the GPS alone when Bluetooth is off', async () => {
-		scanner.watchBluetoothState.mockImplementation(listener => {
+		scanner.watchBluetoothState.mockImplementation((listener) => {
 			listener('off');
 			return () => undefined;
 		});
 		await renderSection();
 		expect(
-			await screen.findByText('Bluetooth désactivé : détection par la position seulement')
+			await screen.findByText('Bluetooth désactivé : détection par la position seulement'),
 		).toBeTruthy();
 		expect(scanner.scanEventBeacons).not.toHaveBeenCalled();
 		await waitFor(() =>
 			expect(location.watchPositionAsync).toHaveBeenCalledWith(
 				expect.anything(),
-				expect.any(Function)
-			)
+				expect.any(Function),
+			),
 		);
 		await act(async () => moveTo(RIVER.latitude, RIVER.longitude));
 		expect(screen.getByText('River party')).toBeTruthy();

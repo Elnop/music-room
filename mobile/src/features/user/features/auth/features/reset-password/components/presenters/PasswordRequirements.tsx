@@ -17,7 +17,7 @@ export function PasswordRequirements() {
 
 	return (
 		<View style={styles.requirements}>
-			{LINES.map(line => (
+			{LINES.map((line) => (
 				<Text key={line} style={styles.requirementText}>
 					{line}
 				</Text>

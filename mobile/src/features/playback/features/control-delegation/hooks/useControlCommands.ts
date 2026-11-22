@@ -3,8 +3,8 @@ import { useSocketState } from '@/shared/backend/hooks/useSocketState';
 import { handleControlCommand } from '@/features/playback/features/control-delegation/lib/handleControlCommand';
 
 export function useControlCommands() {
-	const socket = useSocketState(state => state.socket);
-	const isConnected = useSocketState(state => state.isConnected);
+	const socket = useSocketState((state) => state.socket);
+	const isConnected = useSocketState((state) => state.isConnected);
 
 	useEffect(() => {
 		if (!socket || !isConnected) return;

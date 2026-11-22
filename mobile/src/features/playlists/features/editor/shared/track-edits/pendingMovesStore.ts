@@ -9,5 +9,6 @@ export const pendingMovesStore = createStore<PendingMovesState>(() => ({
 }));
 
 export const pendingMovesActions = {
-	change: (delta: 1 | -1) => pendingMovesStore.setState(state => ({ count: state.count + delta })),
+	change: (delta: 1 | -1) =>
+		pendingMovesStore.setState((state) => ({ count: state.count + delta })),
 };

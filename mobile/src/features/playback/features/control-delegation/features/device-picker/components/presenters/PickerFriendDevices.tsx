@@ -34,7 +34,7 @@ export function PickerFriendDevices({ group, onPick }: PickerFriendDevicesProps)
 	return (
 		<View>
 			<Text style={styles.ownerName}>{group.owner.username}</Text>
-			{group.rows.map(row => (
+			{group.rows.map((row) => (
 				<DeviceRow key={row.key} row={row} onPick={onPick} />
 			))}
 		</View>

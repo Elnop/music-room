@@ -5,7 +5,7 @@ import { syncPlayback } from '@/features/playback/lib/syncPlayback';
 import type { AudioPlayer } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useAudioPlaybackSync(player: AudioPlayer): void {
-	const playbackState = usePlayerState(state => state.playbackState);
+	const playbackState = usePlayerState((state) => state.playbackState);
 	useStreamStart(player, playbackState);
 
 	useEffect(() => {

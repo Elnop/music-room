@@ -24,7 +24,7 @@ export function UserResultsList({ results, busy, onAdd }: UserResultsListProps) 
 	return (
 		<FlatList
 			data={results}
-			keyExtractor={item => item.id}
+			keyExtractor={(item) => item.id}
 			style={styles.list}
 			scrollEnabled={false}
 			renderItem={({ item }) => <UserResultRow user={item} busy={busy} onAdd={onAdd} />}

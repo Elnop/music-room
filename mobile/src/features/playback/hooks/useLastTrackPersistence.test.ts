@@ -20,7 +20,7 @@ import { queueTrackToSoundCloud } from '@/features/playback/shared/player/lib/tr
 import type { UserProfile } from '@/shared/users/userTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -225,7 +225,7 @@ describe('useLastTrackPersistence save', () => {
 		position = 12_000;
 
 		act(() =>
-			jest.advanceTimersByTime(LAST_TRACK_SAVE_INTERVAL_MS - LAST_TRACK_PLAY_SAVE_DELAY_MS)
+			jest.advanceTimersByTime(LAST_TRACK_SAVE_INTERVAL_MS - LAST_TRACK_PLAY_SAVE_DELAY_MS),
 		);
 		await flush();
 
@@ -320,7 +320,7 @@ describe('logout (#312)', () => {
 		await act(async () => mockLogout());
 		expect(playerStore.getState().currentTrack).toBeNull();
 		await act(async () =>
-			testSessionStore.setState({ user: { id: 'b' } as UserProfile, isAuthenticated: true })
+			testSessionStore.setState({ user: { id: 'b' } as UserProfile, isAuthenticated: true }),
 		);
 		view.rerender({});
 		await flush();

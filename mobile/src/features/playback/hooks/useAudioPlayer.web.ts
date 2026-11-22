@@ -19,7 +19,7 @@ const playbackEvents: PlaybackEvents = {
 export function useAudioPlayer(source: string, protocol: StreamProtocol): AudioPlayer {
 	const player = useMemo(
 		() => new HtmlAudioPlayer(source, protocol, playbackEvents),
-		[source, protocol]
+		[source, protocol],
 	);
 	useEffect(() => {
 		player.attach();

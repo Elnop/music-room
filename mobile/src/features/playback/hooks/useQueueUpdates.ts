@@ -6,11 +6,11 @@ import type { QueueStoreState } from '@/features/playback/shared/player/types/qu
 
 export function useQueueUpdates(
 	load: QueueStoreState['load'],
-	applyState: QueueStoreState['applyState']
+	applyState: QueueStoreState['applyState'],
 ): void {
-	const socket = useSocketState(state => state.socket);
-	const isConnected = useSocketState(state => state.isConnected);
-	const userId = useSession(state => state?.user?.id);
+	const socket = useSocketState((state) => state.socket);
+	const isConnected = useSocketState((state) => state.isConnected);
+	const userId = useSession((state) => state?.user?.id);
 	const userIdRef = useRef(userId);
 	const connectedOnceRef = useRef(false);
 

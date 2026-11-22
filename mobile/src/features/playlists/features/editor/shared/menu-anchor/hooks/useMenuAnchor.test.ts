@@ -12,7 +12,7 @@ describe('useMenuAnchor', () => {
 			({ visible }: { visible: boolean }) => useMenuAnchor(visible),
 			{
 				initialProps: { visible: false },
-			}
+			},
 		);
 		act(() => menuAnchorActions.set(anchor));
 		rerender({ visible: true });
@@ -28,7 +28,7 @@ describe('useMenuAnchor', () => {
 			({ visible }: { visible: boolean }) => useMenuAnchor(visible),
 			{
 				initialProps: { visible: false },
-			}
+			},
 		);
 		rerender({ visible: true });
 		expect(result.current).toBeNull();

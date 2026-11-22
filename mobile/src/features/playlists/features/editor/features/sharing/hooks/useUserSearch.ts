@@ -9,7 +9,7 @@ import type { UserSearch } from '@/features/playlists/features/editor/features/s
 
 export function useUserSearch(excludedIds: string[]): UserSearch {
 	const search = useDebouncedText();
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	const query = search.settled.trim();
 	const found = useQuery({
 		queryKey: queryKeys.friends.search(query),
@@ -25,7 +25,7 @@ export function useUserSearch(excludedIds: string[]): UserSearch {
 
 	return {
 		search,
-		results: query ? (found.data ?? []).filter(user => !excludedIds.includes(user.id)) : [],
+		results: query ? (found.data ?? []).filter((user) => !excludedIds.includes(user.id)) : [],
 		isSearching: found.isFetching,
 	};
 }

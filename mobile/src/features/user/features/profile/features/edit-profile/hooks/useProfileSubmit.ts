@@ -26,7 +26,7 @@ export function useProfileSubmit(user: UserProfile | null) {
 				onSaved: () => navigation.goBack(),
 				setError,
 			}),
-		[navigation, updateMutation, user]
+		[navigation, updateMutation, user],
 	);
 
 	return { error, submit, isLoading: updateMutation.isPending, cancel: () => navigation.goBack() };

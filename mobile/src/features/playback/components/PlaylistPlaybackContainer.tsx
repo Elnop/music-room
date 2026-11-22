@@ -18,9 +18,9 @@ export function PlaylistPlaybackContainer({
 	playlistId,
 	children,
 }: PlaylistPlaybackContainerProps) {
-	const queueItemId = usePlayerState(state => state.queueItemId);
-	const playbackState = usePlayerState(state => state.playbackState);
-	const uri = usePlayerState(state => state.currentTrack?.permalink_url ?? null);
+	const queueItemId = usePlayerState((state) => state.queueItemId);
+	const playbackState = usePlayerState((state) => state.playbackState);
+	const uri = usePlayerState((state) => state.currentTrack?.permalink_url ?? null);
 	const fromPlaylist = selectPlaysPlaylist(useActiveQueue(), queueItemId, playlistId);
 	return (
 		<>

@@ -10,10 +10,10 @@ import type {
 
 export function useOwnerActions(
 	navigation: DetailNavigation,
-	screen: PlaylistDetailScreen
+	screen: PlaylistDetailScreen,
 ): OwnerActions {
 	const { id } = screen;
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	const [sheetVisible, setSheetVisible] = useState(false);
 
 	return {

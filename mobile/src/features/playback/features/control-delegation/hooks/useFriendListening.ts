@@ -12,7 +12,7 @@ export function useFriendListening(targetUserId: string | null): FriendListening
 
 	const devices = useMemo(
 		() => friendDevices(listening.statuses, control.canControl, control.isControllable),
-		[listening.statuses, control.canControl, control.isControllable]
+		[listening.statuses, control.canControl, control.isControllable],
 	);
 
 	return {

@@ -19,7 +19,7 @@ export function MyEvents({ events, onOpen, onCreate }: MyEventsProps) {
 	return (
 		<View style={styles.mine}>
 			<View style={styles.list}>
-				{events.map(event => (
+				{events.map((event) => (
 					<EventRow key={event.id} event={event} onPress={() => onOpen(event.id)} />
 				))}
 			</View>

@@ -11,7 +11,7 @@ type PrefetchTarget = {
 export function dropStalePrefetch(
 	isLocal: boolean,
 	nextKey: string | null,
-	currentId: string | null
+	currentId: string | null,
 ): void {
 	const held = streamPrefetch.peek();
 	if (!held) return;
@@ -24,7 +24,7 @@ export function prefetchStream(target: PrefetchTarget, stillWanted: () => boolea
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 	fetchStreamUrl(target.permalink, controller.signal)
-		.then(stream => {
+		.then((stream) => {
 			if (!stillWanted() || !isLocalTarget()) return;
 			streamPrefetch.set({ ...stream, ...target });
 		})

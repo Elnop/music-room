@@ -20,7 +20,7 @@ import type {
 
 async function sendTransfer(
 	destination: TransferDestination,
-	playback: TransferPlayback
+	playback: TransferPlayback,
 ): Promise<boolean> {
 	try {
 		const result = await queueApi.transfer({

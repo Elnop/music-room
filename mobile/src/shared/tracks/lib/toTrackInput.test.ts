@@ -28,14 +28,14 @@ describe('toTrackInput', () => {
 
 	it('falls back to the avatar, then to no artwork', () => {
 		expect(toTrackInput({ ...soundCloudTrack, artwork_url: null }).albumArt).toBe(
-			'https://img/avatar.jpg'
+			'https://img/avatar.jpg',
 		);
 		expect(
 			toTrackInput({
 				...soundCloudTrack,
 				artwork_url: null,
 				user: { ...soundCloudTrack.user, avatar_url: null },
-			}).albumArt
+			}).albumArt,
 		).toBeUndefined();
 	});
 

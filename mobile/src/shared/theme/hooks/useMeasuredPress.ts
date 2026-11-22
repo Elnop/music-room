@@ -5,7 +5,7 @@ import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
 
 export function useMeasuredPress(
 	button: RefObject<View | null>,
-	onPress: (anchor?: MenuAnchor) => void
+	onPress: (anchor?: MenuAnchor) => void,
 ): () => void {
 	const { isWide } = useBreakpoint();
 

@@ -10,7 +10,7 @@ import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/pl
 const ON_EVERY_VISIT = { staleTime: STALE.none, retry: false } as const;
 
 export function usePlaylists(enabled = true) {
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.playlists.list(),
 		queryFn: playlistApi.fetchPlaylists,
@@ -20,7 +20,7 @@ export function usePlaylists(enabled = true) {
 }
 
 export function usePublicPlaylists() {
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.playlists.public(),
 		queryFn: playlistApi.fetchPublicPlaylists,
@@ -30,7 +30,7 @@ export function usePublicPlaylists() {
 }
 
 export function useFriendsPlaylists() {
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.playlists.friends(),
 		queryFn: loadFriendsPlaylists,
@@ -42,7 +42,7 @@ export function useFriendsPlaylists() {
 export function usePlaylistDetail(id: string, enabled = true) {
 	return useQuery({
 		queryKey: queryKeys.playlists.detail(id),
-		queryFn: context => loadPlaylist(context.client, id),
+		queryFn: (context) => loadPlaylist(context.client, id),
 		enabled,
 		...ON_EVERY_VISIT,
 	});
@@ -51,7 +51,7 @@ export function usePlaylistDetail(id: string, enabled = true) {
 export function useCachedPlaylist(id: string): PlaylistWithTracks | undefined {
 	return useQuery({
 		queryKey: queryKeys.playlists.detail(id),
-		queryFn: context => loadPlaylist(context.client, id),
+		queryFn: (context) => loadPlaylist(context.client, id),
 		enabled: false,
 	}).data;
 }

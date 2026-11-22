@@ -12,7 +12,7 @@ export function DetailSkeleton() {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const layout = React.useMemo(
 		() => createDetailStyles(theme, { top: insets.top, bottom: theme.spacing.xxl }),
-		[theme, insets.top]
+		[theme, insets.top],
 	);
 	const { isWide } = useBreakpoint();
 

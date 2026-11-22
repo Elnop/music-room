@@ -16,7 +16,7 @@ export async function loadPlaylist(client: QueryClient, id: string): Promise<Pla
 export function refreshPlaylist(client: QueryClient, id: string): Promise<PlaylistWithTracks> {
 	return client.fetchQuery({
 		queryKey: queryKeys.playlists.detail(id),
-		queryFn: context => loadPlaylist(context.client, id),
+		queryFn: (context) => loadPlaylist(context.client, id),
 		staleTime: STALE.none,
 		retry: false,
 	});

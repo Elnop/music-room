@@ -15,8 +15,8 @@ type Node = {
 };
 
 function outline(state: { routes: readonly Node[] }): unknown[] {
-	return state.routes.map(route =>
-		route.state ? [route.name, outline(route.state)] : [route.name, route.params ?? null]
+	return state.routes.map((route) =>
+		route.state ? [route.name, outline(route.state)] : [route.name, route.params ?? null],
 	);
 }
 
@@ -78,7 +78,7 @@ describe('screen paths', () => {
 				],
 			],
 		],
-		...(['edit', 'sharing', 'add-tracks'] as const).map(suffix => [
+		...(['edit', 'sharing', 'add-tracks'] as const).map((suffix) => [
 			`/playlist/${ID}/${suffix}`,
 			[
 				[
@@ -188,7 +188,7 @@ describe('screen paths', () => {
 			const state = stateOf(path, expected[0][0].endsWith('Tab'));
 			expect(outline(state as { routes: Node[] })).toStrictEqual(expected);
 			expect(pathFromState(state as { routes: Node[] })).toBe(path);
-		}
+		},
 	);
 
 	it.each([
@@ -196,7 +196,7 @@ describe('screen paths', () => {
 		['/reset-password', ['Welcome', 'Login', 'ForgotPassword']],
 	])('reloads %s on the screen before it, its email being out of the address', (path, names) => {
 		const state = stateOf(path);
-		expect(state.routes.map(route => route.name)).toStrictEqual(names);
+		expect(state.routes.map((route) => route.name)).toStrictEqual(names);
 		expect(
 			pathFromState({
 				routes: [
@@ -205,13 +205,13 @@ describe('screen paths', () => {
 						params: { email: 'a@b.c' },
 					},
 				],
-			})
+			}),
 		).toBe(path);
 	});
 
 	it('opens the /welcome alias on the welcome screen, written /', () => {
 		const state = stateOf('/welcome', false);
-		expect(state.routes.map(route => route.name)).toStrictEqual(['Welcome']);
+		expect(state.routes.map((route) => route.name)).toStrictEqual(['Welcome']);
 		expect(pathFromState(state)).toBe('/');
 	});
 
@@ -233,15 +233,15 @@ describe('screen paths', () => {
 
 	it('ignores the query, a trailing slash and the case of an identifier', () => {
 		expect(matchScreenPath(`/PLAYLIST/${ID.toUpperCase()}/?from=share`)?.entry.screen).toBe(
-			'PlaylistDetail'
+			'PlaylistDetail',
 		);
 	});
 
 	it.each(['/nowhere', '/playlist/abc', `/playlist/${ID}/extra`, '/profile/unknown'])(
 		'matches no screen for %s',
-		path => {
+		(path) => {
 			expect(matchScreenPath(path)).toBeUndefined();
-		}
+		},
 	);
 });
 
@@ -262,26 +262,26 @@ describe('pathFromState', () => {
 				tab('FriendsTab', [
 					{ name: 'Friends' },
 					{ name: 'SearchTracks', params: { playlistId: ID } },
-				])
-			)
+				]),
+			),
 		).toBe(`/playlist/${ID}/add-tracks`);
 	});
 
 	it('tells the creation form from the edit form', () => {
 		expect(pathFromState(tab('PlaylistsTab', [{ name: 'CreatePlaylist' }]))).toBe('/playlists/new');
 		expect(pathFromState(tab('HomeTab', [{ name: 'EventForm', params: { eventId: ID } }]))).toBe(
-			`/event/${ID}/edit`
+			`/event/${ID}/edit`,
 		);
 	});
 
 	it('reads a tab not rendered yet from its first screen or its screen param', () => {
 		expect(pathFromState({ index: 1, routes: [{ name: 'HomeTab' }, { name: 'FriendsTab' }] })).toBe(
-			'/friends'
+			'/friends',
 		);
 		expect(
 			pathFromState({
 				routes: [{ name: 'ProfileTab', params: { screen: 'Settings', initial: false } }],
-			})
+			}),
 		).toBe('/settings');
 	});
 

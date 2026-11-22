@@ -10,7 +10,7 @@ import type {
 
 export function usePlayPlaylist(
 	playlistId: string,
-	playback: PlaybackActions & PlaylistPlayback
+	playback: PlaybackActions & PlaylistPlayback,
 ): PlayPlaylist {
 	const { state } = playback;
 	const { pending, pendingRef, start } = usePlayStart(playlistId, playback);
@@ -32,6 +32,6 @@ export function usePlayPlaylist(
 		playing: state === 'playing',
 		press: () => void press(),
 		pendingTrackId: pending.trackId,
-		playFrom: track => void playFrom(track),
+		playFrom: (track) => void playFrom(track),
 	};
 }

@@ -24,7 +24,7 @@ const PLAYER_SHEETS: PlayerSheets = {
 };
 
 export function AppNavigator() {
-	const panelOpen = useNowPlayingPanelState(state => state.isOpen);
+	const panelOpen = useNowPlayingPanelState((state) => state.isOpen);
 	useQueueSync();
 	useEventsSync();
 	useRemoteTarget();

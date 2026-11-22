@@ -6,7 +6,7 @@ import type { DeviceListState } from '@/features/playback/features/control-deleg
 
 export function loadDevices<T extends DeviceListState>(
 	generation: RefObject<number>,
-	setList: Dispatch<SetStateAction<T>>
+	setList: Dispatch<SetStateAction<T>>,
 ): void {
 	generation.current += 1;
 	const request = generation.current;
@@ -16,13 +16,13 @@ export function loadDevices<T extends DeviceListState>(
 	Promise.all([musicControlApi.getDevicePicker(), deviceService.getDeviceInfo()])
 		.then(([picker, info]) => {
 			if (!isCurrent()) return;
-			setList(list => ({ ...list, loaded: { owners: picker.owners, phoneId: info.deviceId } }));
+			setList((list) => ({ ...list, loaded: { owners: picker.owners, phoneId: info.deviceId } }));
 		})
-		.catch(error => {
+		.catch((error) => {
 			logger.error('[DevicePickerSheetContainer] Loading devices failed:', error);
-			if (isCurrent()) setList(list => ({ ...list, loadError: true }));
+			if (isCurrent()) setList((list) => ({ ...list, loadError: true }));
 		})
 		.finally(() => {
-			if (isCurrent()) setList(list => ({ ...list, loading: false }));
+			if (isCurrent()) setList((list) => ({ ...list, loading: false }));
 		});
 }

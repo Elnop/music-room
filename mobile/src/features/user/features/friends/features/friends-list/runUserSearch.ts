@@ -9,18 +9,18 @@ type SetRequest = React.Dispatch<React.SetStateAction<UserSearchRequest>>;
 
 export async function runUserSearch(query: string, isRefresh: boolean, setRequest: SetRequest) {
 	if (!query.trim()) {
-		setRequest(request => ({ ...request, results: [] }));
+		setRequest((request) => ({ ...request, results: [] }));
 		return;
 	}
-	setRequest(request => ({ ...request, isSearching: true, failed: isRefresh && request.failed }));
+	setRequest((request) => ({ ...request, isSearching: true, failed: isRefresh && request.failed }));
 	try {
 		const results = await friendsApi.searchUsers(query);
-		setRequest(request => ({ ...request, results }));
+		setRequest((request) => ({ ...request, results }));
 	} catch (error) {
 		logger.error('[FriendsList] User search failed:', error);
 		showError(apiErrorMessage(error, 'La recherche a échoué'));
-		if (!isRefresh) setRequest(request => ({ ...request, results: [], failed: true }));
+		if (!isRefresh) setRequest((request) => ({ ...request, results: [], failed: true }));
 	} finally {
-		setRequest(request => ({ ...request, isSearching: false }));
+		setRequest((request) => ({ ...request, isSearching: false }));
 	}
 }

@@ -33,7 +33,7 @@ describe('useContextMenu (web)', () => {
 				width: 0,
 				height: 0,
 				align: 'start',
-			})
+			}),
 		);
 		const event = browserEvent({ clientX: 320, clientY: 410 });
 		handlers(onOpen).onContextMenu?.(event);

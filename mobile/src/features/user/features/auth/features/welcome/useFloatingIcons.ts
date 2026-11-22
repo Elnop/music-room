@@ -7,13 +7,13 @@ import type { FloatingIconMotion } from '@/features/user/features/auth/features/
 export function useFloatingIcons(): FloatingIconMotion[] {
 	const values = useMemo(
 		() =>
-			FLOATING_ICONS.map(spec => ({
+			FLOATING_ICONS.map((spec) => ({
 				spec,
 				float: new Animated.Value(0),
 				spin: new Animated.Value(0),
 				scale: new Animated.Value(1),
 			})),
-		[]
+		[],
 	);
 
 	useEffect(() => {

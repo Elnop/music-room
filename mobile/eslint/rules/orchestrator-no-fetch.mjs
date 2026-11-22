@@ -22,7 +22,8 @@ export default {
 		const filename = rawPath.replace(/\\/g, '/');
 
 		const isOrchestrator =
-			(filename.includes('/orchestrators/') || /(Container|Layout|Page)\.[jt]sx?$/.test(filename)) &&
+			(filename.includes('/orchestrators/') ||
+				/(Container|Layout|Page)\.[jt]sx?$/.test(filename)) &&
 			!filename.includes('.test.');
 
 		if (!isOrchestrator) return {};

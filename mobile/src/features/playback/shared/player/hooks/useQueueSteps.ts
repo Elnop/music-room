@@ -9,7 +9,7 @@ import type { NowPlaying } from '@/features/playback/shared/player/types/playerT
 type QueueSteps = Pick<NowPlaying, 'hasNext' | 'hasPrevious'>;
 
 export function useQueueSteps(): QueueSteps {
-	const queueItemId = usePlayerState(state => state.queueItemId);
+	const queueItemId = usePlayerState((state) => state.queueItemId);
 	const queue = useActiveQueue();
 	return {
 		hasPrevious: selectHasPrevious(queue) && queueItemId !== null,

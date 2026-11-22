@@ -23,7 +23,7 @@ function mockWidth(width: number) {
 function cellWidths() {
 	return screen
 		.UNSAFE_getAllByType(View)
-		.map(view => StyleSheet.flatten(view.props.style)?.width)
+		.map((view) => StyleSheet.flatten(view.props.style)?.width)
 		.filter(Boolean);
 }
 
@@ -33,7 +33,7 @@ function renderRows() {
 			<Text>one</Text>
 			<Text>two</Text>
 			<Text>three</Text>
-		</RowGrid>
+		</RowGrid>,
 	);
 }
 

@@ -17,7 +17,7 @@ type HandlerCapabilities = Pick<NowPlaying, 'isRemote' | 'hasNext' | 'hasPreviou
 
 export function browserMediaHandlers(
 	latest: LatestRef,
-	capabilities: HandlerCapabilities
+	capabilities: HandlerCapabilities,
 ): MediaHandlers {
 	function current() {
 		return latest.current.nowPlaying;

@@ -1,8 +1,5 @@
 import { STREAM_RENEW_MARGIN_MS } from '@/features/playback/shared/player/configs/playerConfig';
-import {
-	isStreamStale,
-	streamPrefetch,
-} from '@/features/playback/lib/streamPrefetch';
+import { isStreamStale, streamPrefetch } from '@/features/playback/lib/streamPrefetch';
 
 const NOW = 1_000_000_000;
 const MINUTE_MS = 60 * 1000;

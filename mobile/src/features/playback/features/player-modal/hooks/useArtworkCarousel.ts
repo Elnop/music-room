@@ -17,7 +17,7 @@ function stepQueue(direction: 'next' | 'previous') {
 
 export function useArtworkCarousel(
 	track: NowPlayingTrack | null,
-	artworkUrl: string | null
+	artworkUrl: string | null,
 ): ArtworkCarousel {
 	const artwork = useArtworkSize();
 	const view = carouselView(useActiveQueue(), { track, artworkUrl });

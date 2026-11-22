@@ -13,7 +13,7 @@ export function useAvatarPhoto(uri: string | undefined, size: number) {
 	return {
 		uri: photo,
 		showInitials: status.loaded !== photo,
-		onLoad: () => setStatus(current => ({ ...current, loaded: photo ?? null })),
-		onError: () => setStatus(current => ({ ...current, failed: photo ?? null })),
+		onLoad: () => setStatus((current) => ({ ...current, loaded: photo ?? null })),
+		onError: () => setStatus((current) => ({ ...current, failed: photo ?? null })),
 	};
 }

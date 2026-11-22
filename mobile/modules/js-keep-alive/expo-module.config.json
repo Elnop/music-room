@@ -1,6 +1,6 @@
 {
-  "platforms": ["android"],
-  "android": {
-    "modules": ["expo.modules.jskeepalive.JsKeepAliveModule"]
-  }
+	"platforms": ["android"],
+	"android": {
+		"modules": ["expo.modules.jskeepalive.JsKeepAliveModule"]
+	}
 }

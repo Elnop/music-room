@@ -25,12 +25,12 @@ export function DeviceFriendList({ device, access, actions }: DeviceFriendListPr
 	}
 	return (
 		<>
-			{friendLicenses(device, access).map(license => (
+			{friendLicenses(device, access).map((license) => (
 				<DeviceFriendRow
 					key={license.friend.id}
 					license={license}
 					deviceName={device.deviceName}
-					onToggle={next => actions.onToggle(device, license.friend, next)}
+					onToggle={(next) => actions.onToggle(device, license.friend, next)}
 				/>
 			))}
 		</>

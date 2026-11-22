@@ -5,7 +5,7 @@ import type { SessionAccess } from '@/features/user/features/auth/shared/sign-in
 
 async function handleRefreshFailure(
 	error: unknown,
-	{ set, writer }: SessionAccess
+	{ set, writer }: SessionAccess,
 ): Promise<boolean> {
 	logger.error('[AuthStore] Token refresh failed:', {
 		error,

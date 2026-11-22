@@ -20,7 +20,7 @@ export function AppFrameLayout({ children, panelOpen, slots }: AppFrameLayoutPro
 	const insets = useSafeAreaInsets();
 	const { breakpoint } = useBreakpoint();
 	const connectionStatus = useConnectionStatus();
-	const retryConnection = useSocketState(state => state.retry);
+	const retryConnection = useSocketState((state) => state.retry);
 
 	return (
 		<View style={styles.container}>

@@ -17,15 +17,15 @@ export function FeaturesSection() {
 	const { isWide, isDesktop } = useBreakpoint();
 	const columns = columnCount(isWide, isDesktop);
 	const rows = Array.from({ length: Math.ceil(LANDING_FEATURES.length / columns) }, (_, row) =>
-		LANDING_FEATURES.slice(row * columns, (row + 1) * columns)
+		LANDING_FEATURES.slice(row * columns, (row + 1) * columns),
 	);
 
 	return (
 		<View style={styles.section}>
 			<LandingTitle title="Fonctionnalités" />
-			{rows.map(features => (
+			{rows.map((features) => (
 				<View key={features[0].title} style={styles.row}>
-					{features.map(feature => (
+					{features.map((feature) => (
 						<FeatureCard key={feature.title} feature={feature} />
 					))}
 				</View>

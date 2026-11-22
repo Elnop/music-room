@@ -9,7 +9,7 @@ export async function requestScanPermission(): Promise<boolean> {
 				]
 			: [PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION];
 	const results = await PermissionsAndroid.requestMultiple(wanted);
-	return wanted.every(permission => results[permission] === PermissionsAndroid.RESULTS.GRANTED);
+	return wanted.every((permission) => results[permission] === PermissionsAndroid.RESULTS.GRANTED);
 }
 
 export async function hasScanPermission(): Promise<boolean> {

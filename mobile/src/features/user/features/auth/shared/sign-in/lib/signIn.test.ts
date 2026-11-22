@@ -15,7 +15,7 @@ import { SIGNED_OUT } from '@/features/user/features/auth/shared/sign-in/configs
 import { fail, ok } from '@test-utils/fetchResponses';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/features/user/features/auth/shared/sign-in/lib/googleSignIn', () => ({
@@ -101,7 +101,7 @@ const SIGNED_OUT_STATE = {
 	isLoading: false,
 };
 
-const NOTHING_STORED = Object.values(KEYS).map(key => [key, null]);
+const NOTHING_STORED = Object.values(KEYS).map((key) => [key, null]);
 
 async function expectPersisted(): Promise<void> {
 	expect(JSON.parse((await AsyncStorage.getItem(KEYS.user)) as string)).toStrictEqual(user);
@@ -134,7 +134,7 @@ describe('login', () => {
 		fetchMock.mockResolvedValue(fail(401, 'INVALID_CREDENTIALS', 'Invalid email or password'));
 
 		await expect(login({ email: 'a@example.com', password: 'wrong' })).rejects.toThrow(
-			'Invalid email or password'
+			'Invalid email or password',
 		);
 
 		expect(calledUrls()).toHaveLength(1);
@@ -154,7 +154,7 @@ describe('register', () => {
 
 	it('returns the verification step without signing in', async () => {
 		fetchMock.mockResolvedValue(
-			ok({ user: { ...user, id: 'user-new' }, requiresVerification: true })
+			ok({ user: { ...user, id: 'user-new' }, requiresVerification: true }),
 		);
 
 		await expect(register(input)).resolves.toStrictEqual({
@@ -226,7 +226,7 @@ describe('loginWithGoogle', () => {
 		const failure = await signInWithProvider('google').catch((error: unknown) => error);
 
 		expect(oauthErrorMessage('google', failure)).toBe(
-			'La connexion avec Google a échoué. Réessayez.'
+			'La connexion avec Google a échoué. Réessayez.',
 		);
 		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
 		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);
@@ -266,7 +266,7 @@ describe('loginWithFacebook', () => {
 		const failure = await signInWithProvider('facebook').catch((error: unknown) => error);
 
 		expect(oauthErrorMessage('facebook', failure)).toBe(
-			'La connexion avec Facebook a échoué. Réessayez.'
+			'La connexion avec Facebook a échoué. Réessayez.',
 		);
 		expect(authStore.getState()).toMatchObject(SIGNED_OUT_STATE);
 		expect(await storedSessionValues()).toStrictEqual(NOTHING_STORED);

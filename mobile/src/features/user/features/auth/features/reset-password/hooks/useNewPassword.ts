@@ -15,7 +15,7 @@ export function useNewPassword(): NewPassword {
 
 	function change(key: 'newPassword' | 'confirmation') {
 		return (text: string) =>
-			setFields(current => ({ ...current, [key]: text, passwordError: null }));
+			setFields((current) => ({ ...current, [key]: text, passwordError: null }));
 	}
 
 	return {
@@ -27,7 +27,7 @@ export function useNewPassword(): NewPassword {
 		confirmation: { value: fields.confirmation, onChangeText: change('confirmation') },
 		validate: () => {
 			const invalid = newPasswordError(fields.newPassword, fields.confirmation);
-			setFields(current => ({ ...current, passwordError: invalid }));
+			setFields((current) => ({ ...current, passwordError: invalid }));
 			return invalid === null;
 		},
 		isFilled: Boolean(fields.newPassword) && Boolean(fields.confirmation),

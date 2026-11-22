@@ -20,7 +20,7 @@ type DetailServices = {
 export function usePlaylistDetailPage(
 	navigation: DetailNavigation,
 	id: string,
-	{ premium, playback }: DetailServices
+	{ premium, playback }: DetailServices,
 ): DetailPage {
 	const screen = usePlaylistDetailScreen(navigation, id);
 

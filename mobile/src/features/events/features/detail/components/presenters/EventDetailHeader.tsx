@@ -27,7 +27,7 @@ export function EventDetailHeader({ event }: EventDetailHeaderProps) {
 				</View>
 			</View>
 			<View style={styles.genres}>
-				{event.genres.map(genre => (
+				{event.genres.map((genre) => (
 					<GenreChip key={genre} genre={genre} size="sm" selected />
 				))}
 			</View>

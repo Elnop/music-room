@@ -19,7 +19,7 @@ async function createPlaylist(context: NewPlaylistContext, name: string): Promis
 async function addToNewPlaylist(
 	context: NewPlaylistContext,
 	created: Playlist,
-	track: AddQueueItemBody
+	track: AddQueueItemBody,
 ): Promise<void> {
 	try {
 		await context.addTrack({ playlistId: created.id, track });
@@ -32,7 +32,7 @@ async function addToNewPlaylist(
 
 export async function submitNewPlaylist(
 	context: NewPlaylistContext,
-	track: AddQueueItemBody
+	track: AddQueueItemBody,
 ): Promise<void> {
 	const parsed = playlistFormSchema.shape.name.safeParse(context.draft.name.trim());
 	if (!parsed.success) {

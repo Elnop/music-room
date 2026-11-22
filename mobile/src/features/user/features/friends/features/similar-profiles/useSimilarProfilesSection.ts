@@ -25,7 +25,7 @@ export function useSimilarProfilesSection(): SimilarProfilesSection {
 	return {
 		status: statusOf(query),
 		profiles: query.data?.profiles ?? [],
-		openProfile: userId =>
+		openProfile: (userId) =>
 			tabs().navigate('FriendsTab', { screen: 'UserProfile', params: { userId }, initial: false }),
 		openPreferences: () =>
 			tabs().navigate('ProfileTab', { screen: 'MusicPreferences', initial: false }),

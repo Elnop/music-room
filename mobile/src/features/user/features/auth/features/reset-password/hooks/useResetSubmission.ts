@@ -39,7 +39,7 @@ export function useResetSubmission(request: ResetRequest): ResetSubmission {
 		forgot.reset();
 		reset.mutate(
 			{ email, code: fullCode, password: password.newPassword.value },
-			{ onSuccess: () => backToLogin(request.navigation) }
+			{ onSuccess: () => backToLogin(request.navigation) },
 		);
 	}
 

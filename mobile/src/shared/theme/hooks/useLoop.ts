@@ -12,7 +12,7 @@ export function useLoop(running: boolean, durationMs: number): Animated.Value {
 				duration: durationMs,
 				easing: Easing.linear,
 				useNativeDriver: true,
-			})
+			}),
 		);
 		loop.start();
 		return () => loop.stop();

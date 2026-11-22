@@ -13,7 +13,7 @@ function sessionToken(): string | undefined {
 async function sendAuthorized(
 	endpoint: string,
 	options: RequestInit,
-	session: AuthSession
+	session: AuthSession,
 ): Promise<Response> {
 	const token = sessionToken();
 	if (token && session.isTokenExpiringSoon()) {

@@ -5,7 +5,7 @@ import { signIn } from '@test-utils/signIn';
 import { geocodeAddress, placeName } from '@/features/events/shared/location/lib/geocoder.web';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 

@@ -21,7 +21,7 @@ const LEGACY_SDK_SESSION_KEY = /^sb-.+-auth-token$/u;
 
 async function removeLegacySdkSession(): Promise<void> {
 	const keys = await AsyncStorage.getAllKeys();
-	const legacy = keys.filter(key => LEGACY_SDK_SESSION_KEY.test(key));
+	const legacy = keys.filter((key) => LEGACY_SDK_SESSION_KEY.test(key));
 	if (legacy.length > 0) await AsyncStorage.multiRemove(legacy);
 }
 
@@ -60,7 +60,7 @@ export async function save(session: StoredSession): Promise<void> {
 export async function clear(): Promise<void> {
 	try {
 		await Promise.all([
-			...Object.values(KEYS).map(key => AsyncStorage.removeItem(key)),
+			...Object.values(KEYS).map((key) => AsyncStorage.removeItem(key)),
 			removeLegacySdkSession(),
 		]);
 	} catch (error) {

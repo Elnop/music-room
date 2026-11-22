@@ -37,7 +37,7 @@ describe('ContentFrame', () => {
 		render(
 			<ContentFrame width="content" besideSidebar>
 				<WidthProbe />
-			</ContentFrame>
+			</ContentFrame>,
 		);
 		expect(screen.getByText('375')).toBeTruthy();
 		expect(screen.UNSAFE_queryAllByType(View)).toHaveLength(0);
@@ -48,7 +48,7 @@ describe('ContentFrame', () => {
 		render(
 			<ContentFrame width="content" besideSidebar>
 				<WidthProbe />
-			</ContentFrame>
+			</ContentFrame>,
 		);
 		expect(screen.getByText('960')).toBeTruthy();
 		const inner = screen.UNSAFE_getAllByType(View)[1];
@@ -60,7 +60,7 @@ describe('ContentFrame', () => {
 		render(
 			<ContentFrame width="wide" besideSidebar>
 				<WidthProbe />
-			</ContentFrame>
+			</ContentFrame>,
 		);
 		expect(screen.getByText(String(800 - SIDEBAR_WIDTH.tablet))).toBeTruthy();
 	});
@@ -70,7 +70,7 @@ describe('ContentFrame', () => {
 		render(
 			<ContentFrame width="wide">
 				<WidthProbe />
-			</ContentFrame>
+			</ContentFrame>,
 		);
 		expect(screen.getByText('800')).toBeTruthy();
 	});
@@ -80,10 +80,10 @@ describe('ContentFrame', () => {
 		render(
 			<ContentFrame width="wide" besideSidebar panelOpen>
 				<WidthProbe />
-			</ContentFrame>
+			</ContentFrame>,
 		);
 		expect(
-			screen.getByText(String(1440 - SIDEBAR_WIDTH.desktop - NOW_PLAYING_PANEL_WIDTH))
+			screen.getByText(String(1440 - SIDEBAR_WIDTH.desktop - NOW_PLAYING_PANEL_WIDTH)),
 		).toBeTruthy();
 	});
 
@@ -92,12 +92,12 @@ describe('ContentFrame', () => {
 		render(
 			<ContentFrame width="content" besideSidebar scrollsAtEdge>
 				<ColumnProbe />
-			</ContentFrame>
+			</ContentFrame>,
 		);
 		const inner = screen.UNSAFE_getAllByType(View)[1];
 		expect(StyleSheet.flatten(inner.props.style).maxWidth).toBeUndefined();
 		expect(
-			screen.getByText(JSON.stringify({ width: '100%', maxWidth: 960, alignSelf: 'center' }))
+			screen.getByText(JSON.stringify({ width: '100%', maxWidth: 960, alignSelf: 'center' })),
 		).toBeTruthy();
 	});
 
@@ -106,7 +106,7 @@ describe('ContentFrame', () => {
 		render(
 			<ContentFrame width="content" besideSidebar>
 				<ColumnProbe />
-			</ContentFrame>
+			</ContentFrame>,
 		);
 		expect(screen.getByText('null')).toBeTruthy();
 	});

@@ -29,7 +29,7 @@ describe('Text', () => {
 		render(
 			<Text testID="title" style={styles.bold}>
 				Title
-			</Text>
+			</Text>,
 		);
 
 		expect(fontOf('title')).toBe(FONT_FAMILIES.bold);
@@ -39,7 +39,7 @@ describe('Text', () => {
 		render(
 			<Text style={styles.semibold}>
 				Hello <Text testID="nested">Bob</Text>
-			</Text>
+			</Text>,
 		);
 
 		expect(fontOf('nested')).toBeUndefined();

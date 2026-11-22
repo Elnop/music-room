@@ -32,7 +32,7 @@ function placeDigits(code: readonly string[], index: number, digits: string): Co
 export function fillCodeDigits(
 	code: readonly string[],
 	index: number,
-	text: string
+	text: string,
 ): CodeFillResult | null {
 	if (text === '') return clearDigit(code, index);
 	const digits = typedDigits(code[index] ?? '', text);

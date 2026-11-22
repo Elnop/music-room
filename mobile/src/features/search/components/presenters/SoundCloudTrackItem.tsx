@@ -36,7 +36,7 @@ export function SoundCloudTrackItem({ track, ...handlers }: SoundCloudTrackItemP
 					<SoundCloudTrackInfo track={track} />
 					<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
 				</Pressable>
-				<TrackActionsButton onPress={anchor => handlers.onShowActions(track, anchor)} />
+				<TrackActionsButton onPress={(anchor) => handlers.onShowActions(track, anchor)} />
 			</View>
 		</QueueSwipe>
 	);

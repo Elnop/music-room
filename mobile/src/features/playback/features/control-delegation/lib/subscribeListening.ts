@@ -9,11 +9,11 @@ import type { SetListening } from '@/features/playback/features/control-delegati
 export function subscribeListening(
 	socket: Socket,
 	targetUserId: string,
-	setListening: SetListening
+	setListening: SetListening,
 ): () => void {
 	let subscribed = false;
 	const subscribeTimer = setTimeout(() => {
-		setListening(current => ({ ...current, isLoading: true, error: null }));
+		setListening((current) => ({ ...current, isLoading: true, error: null }));
 		acquireListening(socket, targetUserId);
 		subscribed = true;
 	}, 200);

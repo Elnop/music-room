@@ -24,7 +24,7 @@ function renderSheet(onClose = jest.fn()) {
 	render(
 		<FullScreenSheet visible onClose={onClose}>
 			<Text>queue</Text>
-		</FullScreenSheet>
+		</FullScreenSheet>,
 	);
 	return onClose;
 }

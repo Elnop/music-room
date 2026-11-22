@@ -8,7 +8,7 @@ export function attachStream(
 	media: MediaElement,
 	url: string,
 	protocol: StreamProtocol,
-	onFatalError: () => void
+	onFatalError: () => void,
 ): () => void {
 	if (
 		protocol === 'progressive' ||

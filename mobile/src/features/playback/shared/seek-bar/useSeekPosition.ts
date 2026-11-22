@@ -6,7 +6,7 @@ const HOLD_MS = 3000;
 
 export function useSeekPosition(
 	currentTime: number,
-	onSeek: (value: number) => void
+	onSeek: (value: number) => void,
 ): SeekPosition {
 	const [dragValue, setDragValue] = useState<number | null>(null);
 	const [target, setTarget] = useState<number | null>(null);
@@ -22,8 +22,8 @@ export function useSeekPosition(
 	return {
 		position: dragValue ?? target ?? currentTime,
 		onSlidingStart: setDragValue,
-		onValueChange: value => setDragValue(current => (current === null ? current : value)),
-		onSlidingComplete: value => {
+		onValueChange: (value) => setDragValue((current) => (current === null ? current : value)),
+		onSlidingComplete: (value) => {
 			setDragValue(null);
 			setTarget(value);
 			onSeek(value);

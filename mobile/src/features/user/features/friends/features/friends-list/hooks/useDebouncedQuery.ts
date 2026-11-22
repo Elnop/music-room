@@ -5,12 +5,12 @@ import type { UserSearchRequest } from '@/features/user/features/friends/feature
 
 export function useDebouncedQuery(
 	performSearch: (query: string) => Promise<void>,
-	setRequest: React.Dispatch<React.SetStateAction<UserSearchRequest>>
+	setRequest: React.Dispatch<React.SetStateAction<UserSearchRequest>>,
 ) {
 	const [searchQuery, setSearchQuery] = useState('');
 	const debouncedSearch = useMemo(
 		() => debounce((q: string) => performSearch(q), 500),
-		[performSearch]
+		[performSearch],
 	);
 
 	useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
@@ -18,15 +18,15 @@ export function useDebouncedQuery(
 	const onSearchChange = useCallback(
 		(text: string) => {
 			setSearchQuery(text);
-			setRequest(request => ({ ...request, failed: false }));
+			setRequest((request) => ({ ...request, failed: false }));
 			if (text.trim()) {
 				debouncedSearch(text);
 			} else {
 				debouncedSearch.cancel();
-				setRequest(request => ({ ...request, results: [] }));
+				setRequest((request) => ({ ...request, results: [] }));
 			}
 		},
-		[debouncedSearch, setRequest]
+		[debouncedSearch, setRequest],
 	);
 
 	return { searchQuery, onSearchChange };

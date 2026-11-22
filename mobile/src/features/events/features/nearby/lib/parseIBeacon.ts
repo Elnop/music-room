@@ -6,7 +6,7 @@ import {
 import type { IBeaconFrame } from '@/features/events/shared/beacon/ibeaconTypes';
 
 function hex(bytes: number[]) {
-	return bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
+	return bytes.map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 function formatUuid(bytes: number[]): string {

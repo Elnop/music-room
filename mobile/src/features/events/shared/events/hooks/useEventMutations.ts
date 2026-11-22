@@ -7,8 +7,8 @@ import type { EventInput, MusicEvent } from '@/features/events/eventTypes';
 
 function storeEvent(client: QueryClient, event: MusicEvent): void {
 	client.setQueryData(queryKeys.events.detail(event.id), event);
-	client.setQueryData<MusicEvent[]>(queryKeys.events.list(), list =>
-		list ? upsertEvent(list, event) : list
+	client.setQueryData<MusicEvent[]>(queryKeys.events.list(), (list) =>
+		list ? upsertEvent(list, event) : list,
 	);
 }
 
@@ -16,7 +16,7 @@ export function useCreateEvent() {
 	const client = useQueryClient();
 	return useMutation({
 		mutationFn: (input: EventInput) => eventsApi.createEvent(input),
-		onSuccess: event => storeEvent(client, event),
+		onSuccess: (event) => storeEvent(client, event),
 	});
 }
 
@@ -29,7 +29,7 @@ export function useUpdateEvent() {
 	const client = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, changes }: UpdateVariables) => eventsApi.updateEvent(id, changes),
-		onSuccess: event => storeEvent(client, event),
+		onSuccess: (event) => storeEvent(client, event),
 	});
 }
 
@@ -39,8 +39,8 @@ export function useDeleteEvent() {
 		mutationFn: (id: string) => eventsApi.deleteEvent(id),
 		onSuccess: (_result, id) => {
 			client.removeQueries({ queryKey: queryKeys.events.detail(id) });
-			client.setQueryData<MusicEvent[]>(queryKeys.events.list(), list =>
-				list ? removeEvent(list, id) : list
+			client.setQueryData<MusicEvent[]>(queryKeys.events.list(), (list) =>
+				list ? removeEvent(list, id) : list,
 			);
 		},
 	});

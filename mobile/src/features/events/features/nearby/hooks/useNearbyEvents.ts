@@ -19,7 +19,7 @@ import type {
 import type { EventStackParamList, MusicEvent } from '@/features/events/eventTypes';
 
 function useEventLists() {
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	const events = useEvents();
 
 	useEffect(() => {
@@ -27,19 +27,19 @@ function useEventLists() {
 	}, [events.error]);
 
 	const all = events.data;
-	return { all, mine: (all ?? []).filter(event => event.organizer.id === userId) };
+	return { all, mine: (all ?? []).filter((event) => event.organizer.id === userId) };
 }
 
 function useNearbyItems(
 	all: MusicEvent[] | undefined,
 	sightings: ReadonlyMap<number, BeaconSighting>,
-	position: PositionState
+	position: PositionState,
 ): NearbyItem[] {
 	const now = useNow(NEARBY_CLOCK_MS);
 	const located = position.status === 'located' ? position.position : null;
 	return useMemo(
 		() => (all ? mergeNearby(all, sightings, located, now) : []),
-		[all, sightings, located, now]
+		[all, sightings, located, now],
 	);
 }
 
@@ -54,7 +54,7 @@ export function useNearbyEvents(): NearbyEvents {
 		items,
 		notice: nearbyNotice(position.state),
 		mine: lists.mine,
-		openEvent: id => navigation.navigate('EventDetail', { id }),
+		openEvent: (id) => navigation.navigate('EventDetail', { id }),
 		createEvent: () => navigation.navigate('EventForm'),
 		requestPermission: position.requestPermission,
 		openSettings: position.openSettings,

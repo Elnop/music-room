@@ -13,7 +13,7 @@ type HeaderLeftProps = Parameters<NonNullable<HeaderLeft>>[0];
 export function headerLeftFor(
 	options: NativeStackNavigationOptions,
 	back: NativeStackHeaderProps['back'],
-	goBack: () => void
+	goBack: () => void,
 ): HeaderLeft {
 	const { headerLeft, headerBackTitle } = options;
 	if (typeof headerLeft === 'function') {

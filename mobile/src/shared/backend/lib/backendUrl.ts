@@ -28,7 +28,7 @@ export async function loadBackendUrl(): Promise<string> {
 		reportBackendError(
 			'warn',
 			'[BackendUrl] Could not read the stored address, using the default:',
-			error
+			error,
 		);
 		update(DEFAULT_BACKEND_URL);
 	}

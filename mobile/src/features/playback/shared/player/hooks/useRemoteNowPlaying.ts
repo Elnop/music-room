@@ -6,9 +6,9 @@ import { remoteNowPlaying } from '@/features/playback/shared/player/lib/remoteNo
 import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 
 export function useRemoteNowPlaying(): NowPlaying | null {
-	const target = useConnectState(state => state.target);
-	const status = useConnectState(state => state.remoteStatus);
-	const userId = useSession(session => session?.user?.id ?? null);
+	const target = useConnectState((state) => state.target);
+	const status = useConnectState((state) => state.remoteStatus);
+	const userId = useSession((session) => session?.user?.id ?? null);
 	const queue = useActiveQueue();
 	const now = useRemoteClock(target, status);
 

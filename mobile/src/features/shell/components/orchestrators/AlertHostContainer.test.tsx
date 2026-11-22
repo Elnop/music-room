@@ -11,7 +11,7 @@ jest.mock('@/shared/theme/hooks/useTheme', () => {
 
 function push(buttons: Parameters<ReturnType<typeof alertStore.getState>['push']>[0]['buttons']) {
 	return act(() =>
-		alertStore.getState().push({ title: 'Supprimer ?', message: 'Définitif.', buttons })
+		alertStore.getState().push({ title: 'Supprimer ?', message: 'Définitif.', buttons }),
 	);
 }
 

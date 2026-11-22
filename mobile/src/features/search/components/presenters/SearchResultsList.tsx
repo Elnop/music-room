@@ -27,7 +27,7 @@ export function SearchResultsList({
 		<FlatList
 			data={results.tracks}
 			refreshControl={searchRefreshControl(results, theme.colors.primary)}
-			keyExtractor={item => item.id.toString()}
+			keyExtractor={(item) => item.id.toString()}
 			renderItem={({ item }) => <SoundCloudTrackItem track={item} {...trackHandlers} />}
 			contentContainerStyle={[styles.content, paddingBottomStyle(bottomPadding), column]}
 			ListEmptyComponent={<SearchEmptyState results={results} searchQuery={searchQuery} />}

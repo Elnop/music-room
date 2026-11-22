@@ -8,7 +8,7 @@ const APP_NAME = 'Zumik Dev';
 const DEBUG_BLOCK = /(buildTypes\s*\{\s*debug\s*\{)/;
 
 function withDevApplicationId(config) {
-	return withAppBuildGradle(config, config => {
+	return withAppBuildGradle(config, (config) => {
 		const contents = config.modResults.contents;
 		if (config.modResults.language !== 'groovy' || contents.includes('applicationIdSuffix')) {
 			return config;
@@ -28,8 +28,15 @@ function withDevApplicationId(config) {
 function withDevAppName(config) {
 	return withDangerousMod(config, [
 		'android',
-		async config => {
-			const dir = path.join(config.modRequest.platformProjectRoot, 'app', 'src', 'debug', 'res', 'values');
+		async (config) => {
+			const dir = path.join(
+				config.modRequest.platformProjectRoot,
+				'app',
+				'src',
+				'debug',
+				'res',
+				'values',
+			);
 			fs.mkdirSync(dir, { recursive: true });
 			fs.writeFileSync(
 				path.join(dir, 'strings.xml'),

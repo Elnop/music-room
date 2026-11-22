@@ -25,7 +25,7 @@ export function getBuildLabel(): string {
 	return formatBuildLabel(
 		getAppVersion(),
 		process.env.EXPO_PUBLIC_BUILD_NUMBER,
-		process.env.EXPO_PUBLIC_COMMIT_SHA
+		process.env.EXPO_PUBLIC_COMMIT_SHA,
 	);
 }
 

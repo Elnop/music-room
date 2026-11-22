@@ -6,7 +6,7 @@ import type {
 } from '@/features/playback/features/mini-player/miniPlayerTypes';
 
 export function useMiniPlayerSwipe(
-	swipe: MiniPlayerSwipe
+	swipe: MiniPlayerSwipe,
 ): Pick<MiniPlayerData, 'infoStyle' | 'panGesture'> {
 	const translateX = useSharedValue(0);
 	const panGesture = miniPlayerPanGesture(translateX, swipe);

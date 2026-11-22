@@ -27,7 +27,7 @@ export function PrivacyPolicyView({ bottomPadding, onOpenLink }: PrivacyPolicyVi
 		>
 			<Text style={styles.updatedAt}>{POLICY_UPDATED_AT}</Text>
 			<PolicyText spans={POLICY_INTRO} onOpenLink={onOpenLink} />
-			{POLICY_SECTIONS.map(section => (
+			{POLICY_SECTIONS.map((section) => (
 				<PolicySectionItem key={section.title} section={section} onOpenLink={onOpenLink} />
 			))}
 		</ScrollView>

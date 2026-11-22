@@ -23,7 +23,7 @@ export function GenreSelector({ selected, onToggle, error }: GenreSelectorProps)
 		<View>
 			<FieldLabel label={`Genres (${selected.length}/${EVENT_LIMITS.GENRES_MAX})`} />
 			<View style={styles.chips}>
-				{MUSIC_GENRES.map(genre => {
+				{MUSIC_GENRES.map((genre) => {
 					const isSelected = selected.includes(genre);
 					return (
 						<GenreChip

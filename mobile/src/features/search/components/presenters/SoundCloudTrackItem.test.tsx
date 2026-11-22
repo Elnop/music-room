@@ -41,7 +41,7 @@ describe('SoundCloudTrackItem', () => {
 				onPlay={onPlay}
 				onAddToQueue={onAddToQueue}
 				onShowActions={onShowActions}
-			/>
+			/>,
 		);
 		await act(async () => {});
 	}

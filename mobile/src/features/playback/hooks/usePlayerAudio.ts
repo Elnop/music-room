@@ -13,8 +13,8 @@ type PlayerAudio = {
 };
 
 export function usePlayerAudio(): PlayerAudio {
-	const streamUrl = usePlayerState(state => state.streamUrl);
-	const streamProtocol = usePlayerState(state => state.streamProtocol);
+	const streamUrl = usePlayerState((state) => state.streamUrl);
+	const streamProtocol = usePlayerState((state) => state.streamProtocol);
 	const player = useAudioPlayer(streamUrl || '', streamProtocol);
 
 	useStreamLoader();

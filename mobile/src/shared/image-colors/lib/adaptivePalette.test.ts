@@ -21,7 +21,7 @@ function rgba(value: string): { rgb: Rgb; alpha: number } {
 }
 
 function gradientEnds(palette: AdaptivePalette, base: string): Rgb[] {
-	return [palette.gradient[0], palette.gradient[3]].map(stop => {
+	return [palette.gradient[0], palette.gradient[3]].map((stop) => {
 		const { rgb, alpha } = rgba(stop);
 		return compositeOver(rgb, alpha, hex(base));
 	});
@@ -31,8 +31,8 @@ const THEME_BACKGROUNDS = ['#0D0D0D', '#FEFCE8', '#F8FAFC', '#FFFBEB'];
 const ARTWORK_COLORS = ['#F5F5F5', '#0A0A0A', '#808080'];
 
 describe('getAdaptiveColors', () => {
-	describe.each(THEME_BACKGROUNDS)('over the %s theme background', base => {
-		it.each(ARTWORK_COLORS)('keeps text and secondary text at AA over %s artwork', dominant => {
+	describe.each(THEME_BACKGROUNDS)('over the %s theme background', (base) => {
+		it.each(ARTWORK_COLORS)('keeps text and secondary text at AA over %s artwork', (dominant) => {
 			const palette = getAdaptiveColors(dominant, base);
 			if (!palette) throw new Error('no palette');
 
@@ -51,12 +51,12 @@ describe('getAdaptiveColors', () => {
 	it('keeps the translucent gradient when the text reaches AA on it', () => {
 		const palette = getAdaptiveColors('#0A0A0A', '#0D0D0D');
 		expect(palette?.text).toBe('#FFFFFF');
-		expect(palette?.gradient.map(stop => rgba(stop).alpha)).toStrictEqual([...GRADIENT_ALPHAS]);
+		expect(palette?.gradient.map((stop) => rgba(stop).alpha)).toStrictEqual([...GRADIENT_ALPHAS]);
 	});
 
 	it('turns the gradient opaque when no text colour reaches AA on both ends', () => {
 		const palette = getAdaptiveColors('#F5F5F5', '#0D0D0D');
-		expect(palette?.gradient.map(stop => rgba(stop).alpha)).toStrictEqual([1, 1, 1, 1]);
+		expect(palette?.gradient.map((stop) => rgba(stop).alpha)).toStrictEqual([1, 1, 1, 1]);
 		expect(palette?.text).toBe('#000000');
 	});
 

@@ -3,15 +3,15 @@ import { useQueueState } from '@/features/playback/shared/player/hooks/useQueueS
 import type { QueueRowActions } from '@/features/playback/features/queue-modal/queueModalTypes';
 
 export function useQueueRowActions(
-	onShowActions: QueueRowActions['onShowActions']
+	onShowActions: QueueRowActions['onShowActions'],
 ): QueueRowActions {
-	const playItem = useQueueState(state => state.playItem);
-	const onRemove = useQueueState(state => state.removeItem);
+	const playItem = useQueueState((state) => state.playItem);
+	const onRemove = useQueueState((state) => state.removeItem);
 	const onPlay = useCallback(
 		(itemId: string) => {
 			void playItem(itemId);
 		},
-		[playItem]
+		[playItem],
 	);
 	return { onPlay, onRemove, onShowActions };
 }

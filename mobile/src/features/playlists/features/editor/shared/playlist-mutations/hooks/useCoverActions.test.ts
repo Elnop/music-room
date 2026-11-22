@@ -9,7 +9,7 @@ import { patchPlaylist } from '@/features/playlists/features/editor/shared/playl
 import type { DetailNavigation } from '@/features/playlists/features/editor/features/detail/types/detailScreenTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 jest.mock('@tanstack/react-query', () => ({ useQueryClient: jest.fn(() => ({})) }));
@@ -28,13 +28,13 @@ jest.mock(
 	() => ({
 		uploadCover: jest.fn(),
 		removeCover: jest.fn(),
-	})
+	}),
 );
 jest.mock(
 	'@/features/playlists/features/editor/shared/playlist-mutations/lib/playlistCacheEdits',
 	() => ({
 		patchPlaylist: jest.fn(),
-	})
+	}),
 );
 jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
 
@@ -86,10 +86,10 @@ describe('useCoverActions', () => {
 		expect(Alert.alert).toHaveBeenCalledWith(
 			'Réservé au Premium',
 			expect.any(String),
-			expect.any(Array)
+			expect.any(Array),
 		);
 		alertButtons()
-			.find(button => button.text === 'Paramètres')
+			.find((button) => button.text === 'Paramètres')
 			?.onPress?.();
 		expect(parentNavigate).toHaveBeenCalledWith('ProfileTab', {
 			screen: 'Settings',
@@ -109,7 +109,7 @@ describe('useCoverActions', () => {
 		expect(Alert.alert).toHaveBeenCalledWith(
 			'Réservé au Premium',
 			expect.any(String),
-			expect.any(Array)
+			expect.any(Array),
 		);
 		expect(patchPlaylist).not.toHaveBeenCalled();
 	});

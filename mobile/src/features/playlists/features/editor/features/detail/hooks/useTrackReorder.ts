@@ -11,7 +11,7 @@ import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/pl
 
 export function useTrackReorder(
 	id: string,
-	playlist: PlaylistWithTracks | undefined
+	playlist: PlaylistWithTracks | undefined,
 ): (from: number, to: number) => Promise<void> {
 	const client = useQueryClient();
 	const moveTrack = useMoveTrack();

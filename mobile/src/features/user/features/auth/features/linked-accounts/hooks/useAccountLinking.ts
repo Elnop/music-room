@@ -15,7 +15,7 @@ type ProviderCall = (provider: OAuthProvider) => Promise<unknown>;
 async function whilePending(
 	provider: OAuthProvider,
 	setPending: SetPendingProvider,
-	action: () => Promise<void>
+	action: () => Promise<void>,
 ): Promise<void> {
 	setPending(provider);
 	try {
@@ -52,7 +52,7 @@ export function useLinkAccount(setPending: SetPendingProvider) {
 	return useCallback(
 		(provider: OAuthProvider) =>
 			whilePending(provider, setPending, () => linkAccount(provider, link)),
-		[link, setPending]
+		[link, setPending],
 	);
 }
 
@@ -61,6 +61,6 @@ export function useUnlinkAccount(setPending: SetPendingProvider) {
 	return useCallback(
 		(provider: OAuthProvider) =>
 			whilePending(provider, setPending, () => unlinkAccount(provider, unlink)),
-		[unlink, setPending]
+		[unlink, setPending],
 	);
 }

@@ -40,7 +40,7 @@ jest.mock('expo-audio', () => {
 });
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 const media = new FakeMediaElement();
@@ -60,7 +60,7 @@ function renderPlayer(source = STREAM, protocol: StreamProtocol = 'hls') {
 			const player = useAudioPlayer(url, kind);
 			return { player, status: useAudioPlayerStatus(player) };
 		},
-		{ initialProps: { url: source, kind: protocol } }
+		{ initialProps: { url: source, kind: protocol } },
 	);
 }
 

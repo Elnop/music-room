@@ -32,11 +32,11 @@ export function miniPlayerPanGesture(translateX: SharedValue<number>, swipe: Min
 		.withTestId('mini-player-pan')
 		.activeOffsetX([-15, 15])
 		.activeOffsetY(-15)
-		.onUpdate(event => {
+		.onUpdate((event) => {
 			translateX.value =
 				Math.abs(event.translationX) > Math.abs(event.translationY) ? event.translationX : 0;
 		})
-		.onEnd(event => {
+		.onEnd((event) => {
 			const outcome = swipeOutcome(event, canGoNext, canGoPrevious);
 			if (outcome === 'next') {
 				runOnJS(onNext)();

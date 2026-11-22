@@ -19,6 +19,6 @@ export function useStackOptions(): NativeStackNavigationOptions {
 			headerTitleStyle: headerTitle(theme),
 			headerTitleAlign: 'center',
 		}),
-		[theme, isWide]
+		[theme, isWide],
 	);
 }

@@ -5,7 +5,7 @@ import { friendsApi } from '@/features/user/features/friends/shared/follows/frie
 import { ON_EVERY_VISIT } from '@/features/user/features/friends/shared/follows/followsQueryConfig';
 
 export function useFollowStatus(userId: string, enabled = true) {
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.friends.status(userId),
 		queryFn: () => friendsApi.getFollowStatus(userId),
@@ -15,7 +15,7 @@ export function useFollowStatus(userId: string, enabled = true) {
 }
 
 export function useUserProfile(userId: string, enabled = true) {
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.profile.user(userId),
 		queryFn: () => friendsApi.getProfile(userId),
@@ -25,7 +25,7 @@ export function useUserProfile(userId: string, enabled = true) {
 }
 
 export function useUserPublicPlaylists(userId: string, enabled = true) {
-	const signedIn = useSession(session => session.isAuthenticated);
+	const signedIn = useSession((session) => session.isAuthenticated);
 	return useQuery({
 		queryKey: queryKeys.playlists.user(userId),
 		queryFn: () => friendsApi.getUserPublicPlaylists(userId),

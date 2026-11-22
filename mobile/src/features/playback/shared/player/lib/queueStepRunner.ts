@@ -28,7 +28,7 @@ function playStepState(
 	state: QueueState,
 	scope: ActionScope,
 	loadCounter: number,
-	options: StepOptions
+	options: StepOptions,
 ): QueueStepOutcome {
 	const item = currentItem(state);
 	if (scope.remote) return item ? 'played' : 'stopped';
@@ -45,7 +45,7 @@ export async function runStep(
 	request: (call: QueueCallTarget) => Promise<QueueStepResult>,
 	label: string,
 	applyState: (state: QueueState) => void,
-	options: StepOptions = {}
+	options: StepOptions = {},
 ): Promise<QueueStepOutcome> {
 	if (stepPending) return 'ignored';
 	stepPending = true;
@@ -76,7 +76,7 @@ export async function mutate(
 	request: (call: QueueCallTarget) => Promise<QueueState>,
 	label: string,
 	applyState: (state: QueueState) => void,
-	errorMessage: string | ((error: unknown) => string)
+	errorMessage: string | ((error: unknown) => string),
 ): Promise<boolean> {
 	const scope = actionScope();
 	try {

@@ -15,7 +15,7 @@ jest.mock('expo-location', () => ({
 }));
 jest.mock('@/features/events/shared/location/lib/geocode', () => ({ geocode: jest.fn() }));
 jest.mock('@/features/events/shared/location/lib/geocoder', () =>
-	jest.requireActual('@/features/events/shared/location/lib/geocoder.web')
+	jest.requireActual('@/features/events/shared/location/lib/geocoder.web'),
 );
 jest.mock('@/features/events/features/event-form/eventFormConfig', () => ({
 	...jest.requireActual('@/features/events/features/event-form/eventFormConfig'),
@@ -94,7 +94,7 @@ describe('useEventPlace (web)', () => {
 		await act(async () => place.current.locateHere());
 
 		expect(showError).toHaveBeenCalledWith(
-			expect.stringContaining('Autorisez la localisation pour utiliser votre position')
+			expect.stringContaining('Autorisez la localisation pour utiliser votre position'),
 		);
 		expect(location.getCurrentPositionAsync).not.toHaveBeenCalled();
 		expect(setAddress).not.toHaveBeenCalled();

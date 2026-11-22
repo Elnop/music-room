@@ -15,7 +15,7 @@ export function useEmailField(initialEmail: string): EmailField {
 
 	return {
 		email,
-		changeEmail: text => {
+		changeEmail: (text) => {
 			setEmail(text);
 			setEmailError(null);
 		},

@@ -25,7 +25,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -95,7 +95,7 @@ afterEach(() => {
 
 function renderSheet() {
 	const view = renderWithClient(
-		<TrackActionsSheetContainer track={track} onClose={onClose} playback={testPlayback} />
+		<TrackActionsSheetContainer track={track} onClose={onClose} playback={testPlayback} />,
 	);
 	clear = () => view.client.clear();
 	return view;
@@ -154,7 +154,7 @@ describe('TrackActionsSheetContainer', () => {
 		fireEvent.press(screen.getByText('Ajouter à une playlist'));
 		fireEvent.press(await screen.findByText('Mine'));
 		await waitFor(() =>
-			expect(showError).toHaveBeenCalledWith('Ce titre est déjà dans la playlist')
+			expect(showError).toHaveBeenCalledWith('Ce titre est déjà dans la playlist'),
 		);
 		expect(showSuccess).not.toHaveBeenCalled();
 	});
@@ -174,14 +174,14 @@ describe('TrackActionsSheetContainer', () => {
 		fireEvent.press(screen.getByText('Partager'));
 		expect(onClose).toHaveBeenCalledWith();
 		expect(shareSpy).toHaveBeenCalledWith(
-			expect.objectContaining({ message: track.trackUri, url: track.trackUri })
+			expect.objectContaining({ message: track.trackUri, url: track.trackUri }),
 		);
 		await waitFor(() =>
 			expect(shareSpy).toHaveBeenCalledWith({
 				message: track.trackUri,
 				url: track.trackUri,
 				title: track.title,
-			})
+			}),
 		);
 		expect(showSuccess).not.toHaveBeenCalled();
 	});
@@ -202,7 +202,7 @@ describe('TrackActionsSheetContainer', () => {
 				message: track.trackUri,
 				url: track.trackUri,
 				title: track.title,
-			})
+			}),
 		);
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(showError).not.toHaveBeenCalled();
@@ -257,8 +257,8 @@ describe('TrackActionsSheetContainer new playlist', () => {
 		expect(sent).toContain(JSON.stringify(track));
 		await waitFor(() =>
 			expect(client.getQueryData<Playlist[]>(queryKeys.playlists.list())).toContainEqual(
-				expect.objectContaining({ id: 'new' })
-			)
+				expect.objectContaining({ id: 'new' }),
+			),
 		);
 	});
 
@@ -287,8 +287,8 @@ describe('TrackActionsSheetContainer new playlist', () => {
 		fireEvent.press(screen.getByText('Créer et ajouter'));
 		await waitFor(() =>
 			expect(showError).toHaveBeenCalledWith(
-				"Playlist « Song » créée, mais le titre n'a pas pu y être ajouté"
-			)
+				"Playlist « Song » créée, mais le titre n'a pas pu y être ajouté",
+			),
 		);
 		expect(showSuccess).not.toHaveBeenCalled();
 	});

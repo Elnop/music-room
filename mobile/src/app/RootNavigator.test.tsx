@@ -10,7 +10,7 @@ import { silenceLogger } from '@test-utils/silenceLogger';
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -240,7 +240,7 @@ describe('RootNavigator session restore', () => {
 						expiresAt,
 					},
 				},
-			})
+			}),
 		);
 
 		await renderColdStart();
@@ -264,7 +264,7 @@ describe('RootNavigator session restore', () => {
 			jsonResponse(401, {
 				success: false,
 				error: { message: 'Invalid or expired refresh token', code: 'INVALID_REFRESH_TOKEN' },
-			})
+			}),
 		);
 
 		await renderColdStart();

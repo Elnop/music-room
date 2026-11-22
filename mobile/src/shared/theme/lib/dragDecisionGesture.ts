@@ -15,11 +15,11 @@ function movedBeyondSlop(event: GestureTouchEvent, start: TouchPoint): boolean {
 
 export function dragDecisionGesture(
 	dragRequested: SharedValue<boolean>,
-	touchStart: SharedValue<TouchPoint>
+	touchStart: SharedValue<TouchPoint>,
 ) {
 	return Gesture.Pan()
 		.manualActivation(true)
-		.onTouchesDown(event => {
+		.onTouchesDown((event) => {
 			touchStart.set({ x: event.allTouches[0].absoluteX, y: event.allTouches[0].absoluteY });
 		})
 		.onTouchesMove((event, manager) => {

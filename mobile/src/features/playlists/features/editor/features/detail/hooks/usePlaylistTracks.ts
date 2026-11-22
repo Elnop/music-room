@@ -18,15 +18,15 @@ import type { PlaylistTracks } from '@/features/playlists/features/editor/featur
 export function usePlaylistTracks(
 	id: string,
 	playlist: PlaylistWithTracks | undefined,
-	playback: PlaybackActions & PlaylistPlayback
+	playback: PlaybackActions & PlaylistPlayback,
 ): PlaylistTracks {
-	const userId = useSession(session => session.user?.id);
+	const userId = useSession((session) => session.user?.id);
 	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 	const canEdit = canEditPlaylist(userId, playlist);
 
 	return {
 		canEdit,
-		isMoving: usePendingMovesState(state => state.count > 0),
+		isMoving: usePendingMovesState((state) => state.count > 0),
 		currentUri: playback.playingUri,
 		actionTrack,
 		showActions: (track, anchor) => {
@@ -34,7 +34,7 @@ export function usePlaylistTracks(
 			setActionTrack(toTrackInput(track));
 		},
 		closeActions: () => setActionTrack(null),
-		addToQueue: track => void playback.addToQueue(toTrackInput(track)),
+		addToQueue: (track) => void playback.addToQueue(toTrackInput(track)),
 		explainUnavailable: () => showInfo("Ce titre n'est plus disponible sur SoundCloud"),
 		deleteTrack: useTrackDelete(id, canEdit),
 		reorder: useTrackReorder(id, playlist),

@@ -10,7 +10,7 @@ import type {
 
 export function usePlaylistCardMenu(
 	navigation: CardMenuNavigation,
-	premium: Pick<PlanState, 'isPremium' | 'refetch'>
+	premium: Pick<PlanState, 'isPremium' | 'refetch'>,
 ): PlaylistCardMenu {
 	const { playlist, ...selection } = useCardMenuSelection();
 	const id = playlist?.id ?? '';

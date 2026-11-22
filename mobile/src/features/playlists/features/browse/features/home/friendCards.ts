@@ -5,9 +5,9 @@ import type {
 } from '@/features/playlists/shared/playlist/playlistTypes';
 
 export function friendCards(
-	friendsPlaylists: FriendPlaylists[]
+	friendsPlaylists: FriendPlaylists[],
 ): { friend: UserSummary; playlist: Playlist }[] {
 	return friendsPlaylists.flatMap(({ friend, playlists }) =>
-		playlists.map(playlist => ({ friend, playlist }))
+		playlists.map((playlist) => ({ friend, playlist })),
 	);
 }

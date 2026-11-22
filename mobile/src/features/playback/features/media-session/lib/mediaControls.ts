@@ -3,13 +3,13 @@ import { logger } from '@/shared/logging/logger';
 import type { NowPlaying } from '@/features/playback/shared/player/types/playerTypes';
 
 export function safely(call: Promise<void>): void {
-	call.catch(err => {
+	call.catch((err) => {
 		logger.debug('[MediaSession] Media control call failed:', err);
 	});
 }
 
 export function mediaCapabilities(
-	nowPlaying: Pick<NowPlaying, 'isRemote' | 'hasNext' | 'hasPrevious'>
+	nowPlaying: Pick<NowPlaying, 'isRemote' | 'hasNext' | 'hasPrevious'>,
 ): Command[] {
 	const capabilities = [Command.PLAY, Command.PAUSE];
 	if (!nowPlaying.isRemote || nowPlaying.hasPrevious) capabilities.push(Command.PREVIOUS_TRACK);

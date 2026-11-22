@@ -1,8 +1,5 @@
 import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/playback/shared/player/configs/playerConfig';
-import {
-	recoverLoadTimeout,
-	startLoadedPlayer,
-} from '@/features/playback/lib/startLoadedPlayer';
+import { recoverLoadTimeout, startLoadedPlayer } from '@/features/playback/lib/startLoadedPlayer';
 import type {
 	AudioPlayer,
 	StreamLoadWatch,
@@ -22,7 +19,7 @@ export function clearLoadTimers(watch: StreamLoadWatch): void {
 export function resetOnTrackChange(
 	watch: StreamLoadWatch,
 	trackId: number | null,
-	player: AudioPlayer
+	player: AudioPlayer,
 ): void {
 	if (trackId === watch.trackId) return;
 	watch.tried = false;

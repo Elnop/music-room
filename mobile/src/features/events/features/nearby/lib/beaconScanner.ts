@@ -11,7 +11,7 @@ function bleManager() {
 }
 
 export function watchBluetoothState(listener: (state: ScannerState) => void): () => void {
-	const subscription = bleManager().onStateChange(state => {
+	const subscription = bleManager().onStateChange((state) => {
 		if (state === State.PoweredOn) listener('on');
 		else if (state === State.Unsupported || state === State.Unauthorized) listener('unsupported');
 		else if (state !== State.Unknown && state !== State.Resetting) listener('off');
@@ -35,7 +35,7 @@ export function scanEventBeacons(onFrame: (frame: BeaconFrame) => void): () => v
 			if (frame && minor !== null) {
 				onFrame({ minor, rssi: device.rssi, measuredPower: frame.measuredPower });
 			}
-		}
+		},
 	);
 	return () => void ble.stopDeviceScan();
 }

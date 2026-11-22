@@ -42,7 +42,7 @@ async function geocodeTypedAddress(address: string): Promise<Coordinates | null>
 
 export async function resolveAddress(
 	located: Located | null,
-	address: string
+	address: string,
 ): Promise<Coordinates | null> {
 	if (located && located.address.trim() === address.trim()) {
 		return { latitude: located.latitude, longitude: located.longitude };

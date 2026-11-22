@@ -24,7 +24,7 @@ function settleDismiss(translateY: SharedValue<number>, event: PanEnd, onClose: 
 			{ duration: 250, easing: Easing.out(Easing.cubic) },
 			() => {
 				runOnJS(onClose)();
-			}
+			},
 		);
 	} else {
 		translateY.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) });
@@ -38,17 +38,17 @@ export function sliderNativeGesture(): NativeGesture {
 export function modalDismissGesture(
 	translateY: SharedValue<number>,
 	sliderGesture: NativeGesture,
-	onClose: () => void
+	onClose: () => void,
 ): PanGesture {
 	return Gesture.Pan()
 		.withTestId('player-modal-pan')
 		.requireExternalGestureToFail(sliderGesture)
 		.activeOffsetY(10)
 		.failOffsetX([-15, 15])
-		.onUpdate(event => {
+		.onUpdate((event) => {
 			if (event.translationY > 0) {
 				translateY.value = event.translationY;
 			}
 		})
-		.onEnd(event => settleDismiss(translateY, event, onClose));
+		.onEnd((event) => settleDismiss(translateY, event, onClose));
 }

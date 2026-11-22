@@ -7,10 +7,10 @@ type NowPlayingPanelState = {
 	toggle: () => void;
 };
 
-export const nowPlayingPanelStore = createStore<NowPlayingPanelState>(set => ({
+export const nowPlayingPanelStore = createStore<NowPlayingPanelState>((set) => ({
 	isOpen: false,
-	setOpen: isOpen => set({ isOpen }),
-	toggle: () => set(state => ({ isOpen: !state.isOpen })),
+	setOpen: (isOpen) => set({ isOpen }),
+	toggle: () => set((state) => ({ isOpen: !state.isOpen })),
 }));
 
 onSessionEnd(() => nowPlayingPanelStore.setState({ isOpen: false }));

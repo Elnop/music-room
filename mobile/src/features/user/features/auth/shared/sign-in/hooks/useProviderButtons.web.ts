@@ -10,7 +10,7 @@ import type {
 
 export function useProviderButtons(
 	onGoogleCredential: () => void,
-	variant: GoogleButtonVariant
+	variant: GoogleButtonVariant,
 ): GoogleButtonSlot | undefined {
 	const [googleFailed, setGoogleFailed] = useState(false);
 	const onCredential = useRef(onGoogleCredential);
@@ -28,7 +28,7 @@ export function useProviderButtons(
 				onFailure: () => setGoogleFailed(true),
 			});
 		},
-		[variant]
+		[variant],
 	);
 
 	return googleFailed ? undefined : slot;

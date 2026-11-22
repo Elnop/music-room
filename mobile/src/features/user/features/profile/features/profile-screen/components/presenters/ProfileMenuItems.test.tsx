@@ -22,7 +22,7 @@ describe('ProfileMenuItems', () => {
 					onMyDevices: jest.fn(),
 					onConfirmLogout: jest.fn(),
 				}}
-			/>
+			/>,
 		);
 
 		fireEvent.press(screen.getByLabelText('Comptes liés'));

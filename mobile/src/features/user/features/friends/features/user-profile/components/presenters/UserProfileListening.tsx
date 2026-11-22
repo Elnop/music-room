@@ -19,7 +19,7 @@ export function UserProfileListening({ listening }: UserProfileListeningProps) {
 						onPause={() => listening.onRemotePause(device.deviceId)}
 						controllable={controllable}
 					/>
-				) : null
+				) : null,
 			)}
 		</>
 	);

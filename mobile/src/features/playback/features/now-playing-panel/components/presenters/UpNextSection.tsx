@@ -27,7 +27,7 @@ export function UpNextSection({ items, total, onPlay, onOpenQueue }: UpNextSecti
 			{items.length === 0 ? (
 				<Text style={styles.caption}>Rien d&apos;autre dans la file après ce titre.</Text>
 			) : (
-				items.map(item => <UpNextRow key={item.id} item={item} onPlay={onPlay} />)
+				items.map((item) => <UpNextRow key={item.id} item={item} onPlay={onPlay} />)
 			)}
 		</PanelCard>
 	);

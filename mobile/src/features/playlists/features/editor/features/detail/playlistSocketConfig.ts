@@ -22,12 +22,12 @@ function detailsPatch(details: PlaylistDetailsEvent) {
 
 function applyTracksAvailability(
 	playlist: PlaylistWithTracks,
-	event: TracksAvailabilityEvent
+	event: TracksAvailabilityEvent,
 ): PlaylistWithTracks {
-	const changes = new Map(event.tracks.map(change => [change.trackId, change.unavailable]));
+	const changes = new Map(event.tracks.map((change) => [change.trackId, change.unavailable]));
 	return {
 		...playlist,
-		tracks: playlist.tracks.map(track => {
+		tracks: playlist.tracks.map((track) => {
 			const unavailable = changes.get(track.id);
 			return unavailable === undefined ? track : { ...track, unavailable };
 		}),
@@ -53,7 +53,7 @@ export const PLAYLIST_SOCKET_RULES = [
 		event: 'playlist:details',
 		queryKey: playlistEventKeys.list,
 		update: (list, details) =>
-			list.map(p => (p.id === details.playlistId ? { ...p, ...detailsPatch(details) } : p)),
+			list.map((p) => (p.id === details.playlistId ? { ...p, ...detailsPatch(details) } : p)),
 	}),
 	socketCacheRule<TracksAvailabilityEvent, PlaylistWithTracks>({
 		event: 'playlist:tracks-availability',
@@ -63,6 +63,6 @@ export const PLAYLIST_SOCKET_RULES = [
 	socketCacheRule<PlaylistDeletedEvent, Playlist[]>({
 		event: 'playlist:deleted',
 		queryKey: playlistEventKeys.list,
-		update: (list, event) => list.filter(p => p.id !== event.playlistId),
+		update: (list, event) => list.filter((p) => p.id !== event.playlistId),
 	}),
 ];

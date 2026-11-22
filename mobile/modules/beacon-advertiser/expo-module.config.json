@@ -1,6 +1,6 @@
 {
-  "platforms": ["android"],
-  "android": {
-    "modules": ["expo.modules.beaconadvertiser.BeaconAdvertiserModule"]
-  }
+	"platforms": ["android"],
+	"android": {
+		"modules": ["expo.modules.beaconadvertiser.BeaconAdvertiserModule"]
+	}
 }

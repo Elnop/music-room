@@ -16,7 +16,7 @@ function openSocket(url: string): Socket {
 		reconnectionDelayMax: 5000,
 		timeout: 20000,
 		forceNew: true,
-		auth: cb => {
+		auth: (cb) => {
 			void buildHandshake().then(cb);
 		},
 	});

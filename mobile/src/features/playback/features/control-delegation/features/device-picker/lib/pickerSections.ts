@@ -30,17 +30,17 @@ function toRow(context: RowContext, owner: DevicePickerOwner, device: PickerDevi
 
 export function pickerSections(loaded: LoadedDevices, selection: PickerSelection): PickerSections {
 	const context = { ...selection, phoneId: loaded.phoneId };
-	const self = loaded.owners.find(owner => owner.isSelf);
-	const phone = self?.devices.find(device => device.deviceId === loaded.phoneId);
-	const myOthers = self?.devices.filter(device => device.deviceId !== loaded.phoneId) ?? [];
+	const self = loaded.owners.find((owner) => owner.isSelf);
+	const phone = self?.devices.find((device) => device.deviceId === loaded.phoneId);
+	const myOthers = self?.devices.filter((device) => device.deviceId !== loaded.phoneId) ?? [];
 	return {
 		phone: self && phone ? toRow(context, self, phone) : null,
-		myOthers: self ? myOthers.map(device => toRow(context, self, device)) : [],
+		myOthers: self ? myOthers.map((device) => toRow(context, self, device)) : [],
 		friends: loaded.owners
-			.filter(owner => !owner.isSelf)
-			.map(owner => ({
+			.filter((owner) => !owner.isSelf)
+			.map((owner) => ({
 				owner,
-				rows: owner.devices.map(device => toRow(context, owner, device)),
+				rows: owner.devices.map((device) => toRow(context, owner, device)),
 			})),
 	};
 }

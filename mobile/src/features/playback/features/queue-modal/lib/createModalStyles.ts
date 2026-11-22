@@ -6,7 +6,7 @@ import type { Theme } from '@/shared/theme/types/themeTypes';
 export function createModalStyles(
 	theme: Theme,
 	insets: { top: number; bottom: number },
-	separator: string
+	separator: string,
 ) {
 	const styles = StyleSheet.create({
 		...sheetHeaderStyles(theme, insets, separator),

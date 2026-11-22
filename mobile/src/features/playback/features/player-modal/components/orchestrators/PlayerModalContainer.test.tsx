@@ -44,7 +44,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 jest.mock('@/shared/backend/deviceService', () => ({
@@ -153,7 +153,7 @@ describe('PlayerModalContainer without a track', () => {
 		expect(screen.getByText('Rien en lecture')).toBeTruthy();
 		expect(screen.getByText('Choisissez un titre pour commencer')).toBeTruthy();
 		expect(screen.getByTestId('seek-slider', { includeHiddenElements: true }).props.disabled).toBe(
-			true
+			true,
 		);
 		for (const label of ['Piste précédente', 'Lecture', 'Piste suivante']) {
 			expect(screen.getByLabelText(label)).toBeDisabled();
@@ -207,7 +207,7 @@ describe('PlayerModalContainer swipe down', () => {
 				{ state: State.ACTIVE, translationY: translationY / 2 },
 				{ state: State.ACTIVE, translationY },
 				{ state: State.END, translationY, velocityY },
-			])
+			]),
 		);
 	}
 
@@ -294,7 +294,7 @@ describe('PlayerModalContainer slider for a screen reader', () => {
 		expect(seekControl().props.testID).not.toBe('seek-slider');
 		expect(
 			screen.getByTestId('seek-slider', { includeHiddenElements: true }).props
-				.importantForAccessibility
+				.importantForAccessibility,
 		).toBe('no-hide-descendants');
 		expect(seekControl().props.accessibilityValue).toStrictEqual({
 			text: '0:30 sur 3:20',
@@ -538,7 +538,7 @@ describe('PlayerModalContainer in remote mode', () => {
 		expect(screen.getByText('Remote song')).toBeTruthy();
 		expect(screen.getByText('Sur Tablette de Léa')).toBeTruthy();
 		expect(screen.getByTestId('seek-slider', { includeHiddenElements: true }).props.disabled).toBe(
-			true
+			true,
 		);
 		expect(screen.getByText('3:00')).toBeTruthy();
 		expect(screen.getByLabelText('Pause')).not.toBeDisabled();
@@ -586,11 +586,11 @@ describe('PlayerModalContainer artwork swipe', () => {
 				{ state: State.BEGAN, translationX: 0, translationY: 0 },
 				{ state: State.ACTIVE, translationX: translationX / 2, translationY: 0 },
 				{ state: State.END, translationX, translationY: 0, velocityX },
-			])
+			]),
 		);
 	}
 	function artworks() {
-		return screen.getAllByTestId('artwork-image').map(image => image.props.source.uri);
+		return screen.getAllByTestId('artwork-image').map((image) => image.props.source.uri);
 	}
 
 	beforeEach(() => {

@@ -23,7 +23,7 @@ function backendError(body: ApiBody<unknown>, status: number, fallback: ErrorFal
 		body.error?.message || body.message || fallback.message,
 		body.error?.code || fallback.code,
 		body.error?.details,
-		status
+		status,
 	);
 	error.why = body.error?.why;
 	error.fix = body.error?.fix;

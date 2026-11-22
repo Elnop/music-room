@@ -10,7 +10,7 @@ import type { FriendListeningResult } from '@/features/playback/features/control
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
@@ -53,7 +53,7 @@ jest.mock('@/features/user/features/friends/shared/follows/friendsApi', () => ({
 				isFriend: false,
 				followersCount: 0,
 				followingCount: 0,
-			})
+			}),
 		),
 		getUserPublicPlaylists: jest.fn(() => Promise.resolve([])),
 		followUser: jest.fn(() =>
@@ -66,7 +66,7 @@ jest.mock('@/features/user/features/friends/shared/follows/friendsApi', () => ({
 					followersCount: 1,
 					followingCount: 0,
 				},
-			})
+			}),
 		),
 		unfollowUser: jest.fn(() =>
 			Promise.resolve({
@@ -78,7 +78,7 @@ jest.mock('@/features/user/features/friends/shared/follows/friendsApi', () => ({
 					followersCount: 0,
 					followingCount: 0,
 				},
-			})
+			}),
 		),
 	},
 }));
@@ -125,7 +125,7 @@ describe('UserProfileContainer', () => {
 			expect(share).toHaveBeenCalledWith({
 				message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`,
 				title: 'Alice',
-			})
+			}),
 		);
 	});
 
@@ -183,7 +183,7 @@ describe('UserProfileContainer', () => {
 				userId={ID}
 				listening={listening}
 				onNavigateToPlaylist={onNavigateToPlaylist}
-			/>
+			/>,
 		);
 
 		expect(await screen.findByText('Rock Classics')).toBeTruthy();
