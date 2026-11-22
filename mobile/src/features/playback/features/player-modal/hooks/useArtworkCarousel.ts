@@ -26,7 +26,7 @@ export function useArtworkCarousel(
 
 	useLayoutEffect(() => {
 		recenterCarousel(center, view.anchor);
-	}, [view.anchor, track?.id, center]);
+	}, [view.anchor, center]);
 
 	return {
 		slots: view.slots,

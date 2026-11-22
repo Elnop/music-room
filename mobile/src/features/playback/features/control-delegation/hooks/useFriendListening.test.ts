@@ -1,9 +1,11 @@
 import { act, renderHook } from '@testing-library/react-native';
+import type * as Zustand from 'zustand';
 import { useFriendListening } from '@/features/playback/features/control-delegation/hooks/useFriendListening';
 import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { controlErrorMessage } from '@/shared/control-error/controlErrorMessage';
 import { musicControlApi } from '@/features/playback/features/control-delegation/shared/delegation/musicControlApi';
 import { logger } from '@/shared/logging/logger';
+import { playerStore } from '@/features/playback/shared/player/stores/playerStore';
 
 const mockSocket = {
 	connected: true,
@@ -14,11 +16,6 @@ const mockSocket = {
 
 const mockSocketState = { socket: mockSocket, isConnected: true };
 const mockAuthState = { user: { id: 'user-1' }, accessToken: 'token', isAuthenticated: true };
-const mockPlayerState = {
-	currentTrack: null,
-	isPlaying: true,
-	seekCount: 0,
-};
 const mockPause = jest.fn();
 const mockResume = jest.fn();
 const mockPlayTrack = jest.fn();
@@ -39,16 +36,19 @@ jest.mock('@/shared/backend/lib/authSession', () => ({
 	getSession: () => mockAuthState,
 }));
 
-jest.mock('@/features/playback/shared/player/stores/playerStore', () => ({
-	playerStore: {
-		getState: () => ({ pause: mockPause, resume: mockResume, playTrack: mockPlayTrack }),
-	},
-}));
-
-jest.mock('@/features/playback/shared/player/hooks/usePlayerState', () => ({
-	usePlayerState: (selector: (state: typeof mockPlayerState) => unknown) =>
-		selector(mockPlayerState),
-}));
+jest.mock('@/features/playback/shared/player/stores/playerStore', () => {
+	const { createStore } = jest.requireActual<typeof Zustand>('zustand');
+	return {
+		playerStore: createStore(() => ({
+			currentTrack: null,
+			isPlaying: true,
+			seekCount: 0,
+			pause: (...args: unknown[]) => mockPause(...args),
+			resume: (...args: unknown[]) => mockResume(...args),
+			playTrack: (...args: unknown[]) => mockPlayTrack(...args),
+		})),
+	};
+});
 
 jest.mock('@/features/playback/shared/player/lib/positionReader', () => ({
 	readPositionMs: () => (mockReader ? mockReader() : null),
@@ -159,7 +159,7 @@ describe('useMusicControlEmitter', () => {
 	it('emits again with the new position when a seek happens', async () => {
 		let position = 1000;
 		mockReader = () => position;
-		const { rerender, unmount } = renderHook(() => useMusicControlEmitter());
+		const { unmount } = renderHook(() => useMusicControlEmitter());
 		await act(async () => {
 			await Promise.resolve();
 		});
@@ -169,8 +169,9 @@ describe('useMusicControlEmitter', () => {
 		mockSocket.emit.mockClear();
 
 		position = 60_000;
-		mockPlayerState.seekCount = 1;
-		rerender({});
+		await act(async () => {
+			playerStore.setState({ seekCount: 1 });
+		});
 		await act(async () => {
 			jest.advanceTimersByTime(200);
 		});
@@ -181,8 +182,8 @@ describe('useMusicControlEmitter', () => {
 			positionMs: 60_000,
 		});
 
-		mockPlayerState.seekCount = 0;
 		unmount();
+		playerStore.setState({ seekCount: 0 });
 		mockReader = null;
 	});
 });
