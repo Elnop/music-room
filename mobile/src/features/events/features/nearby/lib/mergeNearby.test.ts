@@ -1,5 +1,6 @@
 import { musicEvent } from '@test-utils/musicEvent';
-import { mergeNearby, nearbyByGps } from '@/features/events/features/nearby/lib/nearbyEvents';
+import { mergeNearby } from '@/features/events/features/nearby/lib/mergeNearby';
+import { nearbyByGps } from '@/features/events/features/nearby/lib/nearbyByGps';
 
 const HOUR = 3_600_000;
 const here = { latitude: 48.8966, longitude: 2.3185 };

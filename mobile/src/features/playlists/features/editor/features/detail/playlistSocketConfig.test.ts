@@ -1,4 +1,4 @@
-import { createQueryClient } from '@/shared/backend/queryClient';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import type {
 	Playlist,

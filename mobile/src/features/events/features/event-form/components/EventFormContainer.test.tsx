@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { EventFormContainer } from '@/features/events/features/event-form/components/EventFormContainer';
-import { createQueryClient } from '@/shared/backend/queryClient';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError } from '@/shared/theme/lib/toast';

@@ -17,7 +17,7 @@
 ## Où regarder
 
 - [events.md](../../features/events.md)
-- `mobile/src/features/events/` (`utils/ibeacon.ts`, `utils/beaconDistance.ts`, `utils/nearbyEvents.ts`), `backend/src/features/events/`
+- `mobile/src/features/events/` (`utils/ibeacon.ts`, `utils/beaconDistance.ts`, `utils/mergeNearby.ts`), `backend/src/features/events/`
 
 ## Scénario
 

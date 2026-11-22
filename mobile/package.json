@@ -15,7 +15,7 @@
 		"lint:eslint": "eslint . --quiet",
 		"lint:fix": "eslint . --fix",
 		"check": "brutal-check && node ../tools/guardrails/run-checks.mjs lint:eslint check:semgrep check:ast-grep",
-		"unused": "knip",
+		"unused": "knip && knip --production",
 		"deps": "depcruise src main.ts --config .dependency-cruiser.cjs --output-type err-long",
 		"tree": "check-tree src",
 		"duplicates": "jscpd",

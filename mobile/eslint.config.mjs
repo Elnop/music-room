@@ -356,8 +356,6 @@ export default [
 		files: [
 			'src/shared/theme/components/Button.test.tsx',
 			'src/shared/theme/components/Button.tsx',
-			'src/shared/theme/components/Card.test.tsx',
-			'src/shared/theme/components/Card.tsx',
 			'src/shared/theme/components/GenreChip.tsx',
 			'src/shared/theme/components/Input.test.tsx',
 			'src/shared/theme/components/Input.tsx',

@@ -6,7 +6,7 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
-import { formatDuration } from '@/shared/formatting/formatters';
+import { formatDuration } from '@/shared/formatting/formatDuration';
 import { pixelRow } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { SoundCloudTrack } from '@/shared/tracks/types/soundcloudTypes';

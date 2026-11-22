@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { formatDuration } from '@/shared/formatting/formatters';
+import { formatDuration } from '@/shared/formatting/formatDuration';
 import { TrackPhoneArtwork } from '@/features/playlists/features/editor/features/detail/components/presenters/TrackPhoneArtwork';
 import { TrackRowInfo } from '@/shared/theme/components/TrackRowInfo';
 import { TrackPlayingIndicator } from '@/shared/theme/components/TrackPlayingIndicator';

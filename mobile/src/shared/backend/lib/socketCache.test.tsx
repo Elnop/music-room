@@ -1,11 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
-import { createQueryClient } from '@/shared/backend/queryClient';
-import {
-	applySocketEvent,
-	bindSocketCache,
-	socketCacheRule,
-} from '@/shared/backend/lib/socketCache';
+import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { bindSocketCache, socketCacheRule } from '@/shared/backend/lib/socketCache';
 import type { SocketCacheRule } from '@/shared/backend/types/socketCacheTypes';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -68,7 +64,7 @@ describe('socketCache', () => {
 		for (const client of clients.splice(0)) client.clear();
 	});
 
-	describe('applySocketEvent', () => {
+	describe('socketCacheRule', () => {
 		it('patches the cached data with setQueryData', () => {
 			const client = createClient();
 			client.setQueryData<Playlist>(playlistKeys.detail('p1'), {
@@ -77,7 +73,7 @@ describe('socketCache', () => {
 				version: 1,
 			});
 
-			const result = applySocketEvent(client, renameRule, {
+			const result = socketCacheRule(renameRule).apply(client, {
 				playlistId: 'p1',
 				name: 'New',
 				version: 2,
@@ -96,7 +92,7 @@ describe('socketCache', () => {
 			});
 			const invalidate = jest.spyOn(client, 'invalidateQueries');
 
-			const result = applySocketEvent(client, renameRule, {
+			const result = socketCacheRule(renameRule).apply(client, {
 				playlistId: 'p1',
 				name: 'Stale',
 				version: 2,
@@ -112,7 +108,7 @@ describe('socketCache', () => {
 			const invalidate = jest.spyOn(client, 'invalidateQueries');
 
 			expect(
-				applySocketEvent(client, renameRule, { playlistId: 'p1', name: 'X', version: 1 }),
+				socketCacheRule(renameRule).apply(client, { playlistId: 'p1', name: 'X', version: 1 }),
 			).toBe('invalidated');
 			expect(invalidate).toHaveBeenCalledWith({ queryKey: playlistKeys.detail('p1') });
 		});
@@ -125,7 +121,7 @@ describe('socketCache', () => {
 				queryKey: playlistKeys.ofEvent,
 			};
 
-			expect(applySocketEvent(client, rule, { playlistId: 'p1' })).toBe('invalidated');
+			expect(socketCacheRule(rule).apply(client, { playlistId: 'p1' })).toBe('invalidated');
 			expect(invalidate).toHaveBeenCalledWith({ queryKey: playlistKeys.detail('p1') });
 		});
 
@@ -137,7 +133,7 @@ describe('socketCache', () => {
 				queryKey: playlistKeys.ofMineOnly,
 			};
 
-			expect(applySocketEvent(client, rule, { playlistId: 'other' })).toBe('ignored');
+			expect(socketCacheRule(rule).apply(client, { playlistId: 'other' })).toBe('ignored');
 			expect(invalidate).not.toHaveBeenCalled();
 		});
 	});

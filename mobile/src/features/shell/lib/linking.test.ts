@@ -1,7 +1,8 @@
 import type { NavigationContainerRef } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import type { AppTabsParamList } from '@/app/AppNavigator';
-import { createLinking, openPendingLink, stateFromLinkPath } from '@/features/shell/lib/linking';
+import { createLinking, openPendingLink } from '@/features/shell/lib/linking';
+import { stateFromLinkPath } from '@/features/shell/lib/stateFromLinkPath';
 import { clearPendingLink, takePendingLink } from '@/features/shell/lib/pendingLink';
 import { playlistLink, userLink } from '@/shared/share-links/shareLinks';
 

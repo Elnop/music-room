@@ -1,4 +1,4 @@
-import { formatDuration } from '@/shared/formatting/formatters';
+import { formatDuration } from '@/shared/formatting/formatDuration';
 import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/playlistTypes';
 
 export function headerFacts(playlist: PlaylistWithTracks) {

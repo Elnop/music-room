@@ -1,27 +1,9 @@
-import { NEARBY_RADIUS_M } from '@/features/events/features/nearby/configs/nearbyConfig';
 import { isOngoing } from '@/features/events/shared/event-dates/eventDates';
-import { distanceMeters, formatDistance } from '@/features/events/features/nearby/lib/geo';
+import { formatDistance } from '@/features/events/features/nearby/lib/geo';
+import { nearbyByGps } from '@/features/events/features/nearby/lib/nearbyByGps';
 import { estimateDistance } from '@/features/events/features/nearby/lib/beaconDistance';
 import type { BeaconSighting, NearbyItem } from '@/features/events/features/nearby/nearbyTypes';
 import type { Coordinates, MusicEvent } from '@/features/events/eventTypes';
-
-type NearbyEvent = {
-	event: MusicEvent;
-	distance: number;
-};
-
-export function nearbyByGps(
-	events: MusicEvent[],
-	position: Coordinates,
-	now = Date.now(),
-	radius = NEARBY_RADIUS_M,
-): NearbyEvent[] {
-	return events
-		.filter((event) => isOngoing(event, now))
-		.map((event) => ({ event, distance: distanceMeters(position, event) }))
-		.filter((nearby) => nearby.distance <= radius)
-		.toSorted((a, b) => a.distance - b.distance);
-}
 
 export function mergeNearby(
 	events: MusicEvent[],

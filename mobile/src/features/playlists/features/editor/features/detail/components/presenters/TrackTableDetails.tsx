@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/shared/theme/components/Text';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { formatDuration } from '@/shared/formatting/formatters';
+import { formatDuration } from '@/shared/formatting/formatDuration';
 import { createTrackTableColumns } from '@/features/playlists/features/editor/features/detail/lib/createTrackTableColumns';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 import type { Track } from '@/shared/tracks/types/trackTypes';
