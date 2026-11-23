@@ -4,7 +4,7 @@ Read before writing or editing a comment in `backend/` or `mobile/`. The code sa
 
 ## no-comments
 
-oxlint, mobile: no comment at all, from the brutalway config (`no-comments/disallowComments` in `@brutalway/oxlint-config-typescript`). Only tool directives pass (`eslint-disable-next-line`, `oxlint-disable-next-line`, `@ts-expect-error`), with a short reason.
+oxlint, mobile: no comment at all, from the brutalway config (`no-comments/disallowComments` in `@brutalway/oxlint-config-typescript`). Only tool directives pass (`oxlint-disable-next-line`, `@ts-expect-error`), with a short reason.
 
 What a comment would have said goes elsewhere: a name for a function, a constant or a type, an extracted function, a test whose title states the case, or `doc/` when it takes more than a name. The reason for a change goes in the commit message.
 

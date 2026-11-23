@@ -11,7 +11,7 @@ Two kinds of state, two tools (epic #362):
 
 A Zustand store that copies server data and refreshes it by hand moves to TanStack Query when its feature migrates (#378–#385); no new one is written.
 
-The `QueryClient` comes from `createQueryClient()` (`src/shared/backend/createQueryClient.ts`), provided once by `AppProvidersContainer` (`src/features/shell/components/orchestrators/AppProvidersContainer.tsx`). A test renders with its own client (`<AppProvidersContainer queryClient={client}>` or a `QueryClientProvider`) and calls `client.clear()` at the end, so cache timers stop.
+The `QueryClient` is created once by `QueryProvider` (`src/features/shell/components/presenters/QueryProvider.tsx`) with the defaults of `QUERY_DEFAULTS` (`src/shared/backend/configs/queryDefaultsConfig.ts`); it clears the cache when the session ends. `AppProvidersContainer` (`src/features/shell/components/orchestrators/AppProvidersContainer.tsx`) renders it, and the rest of the code reaches the client through `useQueryClient()`. No file is named `queryClient.ts`: in brutalway an `xClient.ts` is a client of an external API. A test renders with its own client, `new QueryClient({ defaultOptions: QUERY_DEFAULTS })` (`<AppProvidersContainer queryClient={client}>` or a `QueryClientProvider`), and calls `client.clear()` at the end, so cache timers stop.
 
 ## query-keys
 
@@ -27,4 +27,4 @@ A Socket.io event that changes server data updates the query cache; the screen n
 
 ## zustand-selectors
 
-A Zustand store hook is always called with a selector: `useAuthState(state => state.user)`, never `useAuthState()` (ESLint `guardrails/zustand-selector`). Without a selector the component subscribes to the whole store and re-renders on every change of any field. Select one value per call, or several with `useShallow` from `zustand/shallow`. Outside React, read the store with `useXStore.getState()`.
+A Zustand store hook is always called with a selector: `useAuthState(state => state.user)`, never `useAuthState()` (oxlint `store-selector/no-restricted-syntax` from `@brutalway/oxlint-config-zustand`). Without a selector the component subscribes to the whole store and re-renders on every change of any field. Select one value per call, or several with `useShallow` from `zustand/shallow`. Outside React, read the store with `useXStore.getState()`.

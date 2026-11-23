@@ -1,6 +1,5 @@
-import { QueryObserver } from '@tanstack/react-query';
-import type { QueryClient } from '@tanstack/react-query';
-import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { QueryClient, QueryObserver } from '@tanstack/react-query';
+import { QUERY_DEFAULTS } from '@/shared/backend/configs/queryDefaultsConfig';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { ApiError } from '@/shared/backend/lib/ApiError';
@@ -77,7 +76,7 @@ function open() {
 
 beforeEach(() => {
 	jest.resetAllMocks();
-	client = createQueryClient();
+	client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 	client.setQueryData(queryKeys.playlists.detail('p'), start());
 	open();
 });

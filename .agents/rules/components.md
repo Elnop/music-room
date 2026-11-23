@@ -1,6 +1,6 @@
 # Component rules
 
-Read before authoring or editing React components, orchestrators, presenters, hooks, or screens in `mobile/`. Every rule here is checked by `npm run check`: the ESLint plugin `components`, whose messages link to their section, and dependency-cruiser for the roles ([roles-by-name](#roles-by-name)). Rules are append-only: see [guardrails.md](guardrails.md#append-only-rules).
+Read before authoring or editing React components, orchestrators, presenters, hooks, or screens in `mobile/`. Every rule here is checked by `npm run check`: dependency-cruiser (`npm run deps`, preset `@brutalway/dependency-cruiser-config`) for the roles and what they import, and oxlint for the hooks. Rules are append-only: see [guardrails.md](guardrails.md#append-only-rules).
 
 The component architecture:
 - **Screens / Navigation** (`src/app/`): define navigation stacks and routes; screens only mount orchestrators.
@@ -10,13 +10,13 @@ The component architecture:
 
 ---
 
-## screen-orchestrator-only
+## app-composes-orchestrators
 
-Screens and navigation stacks/navigators in `src/app/**` or screen component files (`*Screen.tsx`) must only import orchestrators from `src/features/**`.
+`src/app/` composes the features through their orchestrators (dependency-cruiser `app-composes-orchestrators`): a file of `src/app/**` imports from `src/features/**` only components named `XContainer`, `XLayout`, `XPage` or `XProvider`.
 
-- **Forbidden**: Importing presenters directly into a navigation stack or screen file (`import { FooView } from '@/features/.../presenters/FooView'`).
-- **Allowed**: Importing orchestrators (`import { FooContainer } from '@/features/.../FooContainer'`, or any file of an `orchestrators/` folder), type definitions (`import type { ... }`), or shared navigation primitives.
-- **Fix**: Mount an orchestrator that coordinates the feature's presenters and hooks.
+- **Forbidden**: Importing a presenter into a navigation stack or screen file (`import { FooView } from '@/features/.../presenters/FooView'`).
+- **Allowed**: Importing orchestrators (`import { FooContainer } from '@/features/.../FooContainer'`), hooks, types and other `.ts` files of a feature.
+- **Fix**: Mount an orchestrator that coordinates the feature's presenters and hooks. A screen made only of presenters is an `XPage` or an `XLayout` of its feature.
 
 ---
 
@@ -30,13 +30,13 @@ A hook lives in its own `useX.ts` file and contains logic only, no JSX element o
 
 ---
 
-## orchestrator-no-fetch
+## orchestrators-use-hooks
 
-Orchestrators (`*/orchestrators/**`, or a file named `XContainer`, `XLayout`, `XPage`) must not perform direct network calls.
+An orchestrator (a file named `XContainer`, `XLayout` or `XPage`) imports no `xClient.ts` (dependency-cruiser `orchestrators-use-hooks`). An `xClient.ts` is a client of an external API, the only place `fetch` may run ([no-fetch-outside-api-client](guardrails.md#no-fetch-outside-api-client)).
 
-- **Forbidden**: Calling `fetch(...)`, `apiRequest(...)`, `axios(...)`, or importing the raw `apiRequest` client.
+- **Forbidden**: Importing `apiClient.ts`, or any other `xClient.ts`, into an orchestrator.
 - **Allowed**: Delegating all data fetching and mutations to TanStack Query hooks (`use*Query`, `use*Mutation`) or feature service hooks.
-- **Fix**: Extract API calls into feature services and wrap them in TanStack Query hooks.
+- **Fix**: Move the call into a `useX` hook and call the hook from the orchestrator.
 
 ---
 
@@ -50,5 +50,5 @@ The role of a component is read from its name, as in [brutalway](https://brutalw
 
 Example: `TrackActionsButton` measures where it is with `useMeasuredPress` and passes the anchor to its `onPress`; the hook that opens the menu records it in `menuAnchorStore`.
 
-The folder-based ESLint rules `presenter-pure` and `component-role-directory` were replaced by these rules (#622). The `orchestrators/` and `presenters/` folders stay where they are until each feature moves to the brutalway layout; check-tree then sorts components by kind once a folder holds two of them.
+The folder-based rules `presenter-pure` and `component-role-directory` were replaced by these rules (#622). The `orchestrators/` and `presenters/` folders stay where they are until each feature moves to the brutalway layout; check-tree then sorts components by kind once a folder holds two of them.
 

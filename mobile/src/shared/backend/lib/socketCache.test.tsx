@@ -1,6 +1,6 @@
-import type { QueryClient } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
-import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { QueryClient } from '@tanstack/react-query';
+import { QUERY_DEFAULTS } from '@/shared/backend/configs/queryDefaultsConfig';
 import { bindSocketCache, socketCacheRule } from '@/shared/backend/lib/socketCache';
 import type { SocketCacheRule } from '@/shared/backend/types/socketCacheTypes';
 
@@ -56,7 +56,7 @@ function fakeSocket() {
 describe('socketCache', () => {
 	const clients: QueryClient[] = [];
 	function createClient(): QueryClient {
-		const client = createQueryClient();
+		const client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 		clients.push(client);
 		return client;
 	}
