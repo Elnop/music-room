@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { AppProvidersContainer } from '@/features/shell/components/orchestrators/AppProvidersContainer';
-import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { QUERY_DEFAULTS } from '@/shared/backend/configs/queryDefaultsConfig';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { useTheme } from '@/shared/theme/hooks/useTheme';
 import { notifySessionEnd } from '@/shared/backend/lib/sessionEnd';
@@ -28,7 +28,7 @@ function Probe({ onClient }: { onClient: (client: unknown) => void }) {
 
 describe('AppProvidersContainer', () => {
 	it('gives its children the query client and the theme', () => {
-		const client = createQueryClient();
+		const client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 		const onClient = jest.fn();
 
 		render(
@@ -55,7 +55,7 @@ describe('AppProvidersContainer', () => {
 	});
 
 	it('clears the whole query cache when the session ends', () => {
-		const client = createQueryClient();
+		const client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 		client.setQueryData(queryKeys.playlists.friends(), [{ id: 'p1' }]);
 		const { unmount } = render(
 			<AppProvidersContainer queryClient={client}>

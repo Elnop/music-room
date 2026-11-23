@@ -4,7 +4,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { EventFormContainer } from '@/features/events/features/event-form/components/EventFormContainer';
-import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { QueryClient } from '@tanstack/react-query';
+import { QUERY_DEFAULTS } from '@/shared/backend/configs/queryDefaultsConfig';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError } from '@/shared/theme/lib/toast';
@@ -51,7 +52,7 @@ let sent: Record<string, unknown> | undefined;
 let clear: () => void = noop;
 
 function renderForm(eventId?: string) {
-	const client = createQueryClient();
+	const client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 	client.setQueryData(
 		queryKeys.events.detail('e1'),
 		musicEvent({ organizer: { id: 'me', username: 'me' } }),

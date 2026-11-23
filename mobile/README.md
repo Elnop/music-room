@@ -116,11 +116,8 @@ To test the responsive layout, resize the browser window (or use the browser's d
 
 ### Code quality
 
-- `npm run check` - Every guardrail in parallel (types, lint, dead code, dependencies, duplication, patterns, secrets, tests), also run at pre-commit: see [quality-and-ci.md](../doc/development/quality-and-ci.md)
-- `npm run fix` - Format and fix everything automatically
-- `npm run check-all` - Full check (types + lint + format)
-- `npm run lint` - Lint the code
-- `npm run lint:fix` - Fix ESLint errors
+- `npm run check` - Every guardrail in parallel through `brutal-check` (format, types, lint, dead code, dependencies, folder layout, duplication, secrets, exception lists), also run at pre-commit: see [quality-and-ci.md](../doc/development/quality-and-ci.md)
+- `npm run lint` - Lint the code with oxlint
 - `npm run format` - Format with Prettier
 - `npm run typecheck` - Check the TypeScript types only
 
@@ -149,7 +146,7 @@ The web client is published at `https://elnop.github.io/music-room/` by `.github
 ## Most useful commands
 
 1. **`npm run android`** - Install the debug build (it also starts its own Metro: stop it, or use `npx expo run:android --app-id com.zumik.app.dev --no-bundler`), then `make dev-docker` for Metro
-2. **`npm run fix`** - Fix the code automatically
+2. **`npm run format`** - Format the code
 3. **`npm run check`** - Check before a commit
 4. **`npm run reset`** - Solve strange bugs
 5. **`npm run doctor`** - Diagnose problems
@@ -218,7 +215,7 @@ mobile/src/
 
 ### Imports
 
-A single alias, `@/` (to `src/`), for every import that leaves the current folder; never `../` (ESLint). Tests also import the helpers of `test-utils/` through `@test-utils/`:
+A single alias, `@/` (to `src/`), for every import that leaves the current folder; never `../` (oxlint). Tests also import the helpers of `test-utils/` through `@test-utils/`:
 
 ```typescript
 import { Button } from '@/shared/theme/components/Button';
@@ -226,9 +223,9 @@ import { Button } from '@/shared/theme/components/Button';
 
 ### Primitives and theme
 
-Every pressable element goes through `Pressable` or `Button` from `@/shared/theme/components/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden elsewhere (ESLint `guardrails/ui-primitives`). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
+Every pressable element goes through `Pressable` or `Button` from `@/shared/theme/components/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden outside `src/shared/theme/` (oxlint `design-system`, brutalway preset). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
 
-The app has a single theme, `original` (`src/shared/theme/configs/originalThemeConfig.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/configs/tokensThemeConfig.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
+The app has a single theme, `original` (`src/shared/theme/configs/originalThemeConfig.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/configs/tokensThemeConfig.ts`. No hard-coded color outside the `*ThemeConfig.ts` files (oxlint `theme-colors`, brutalway preset): read `theme.colors.*`.
 
 Icons are `PixelIcon` (`src/shared/theme/components/PixelIcon.tsx`), which draws an SVG of the [HackerNoon Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) with `react-native-svg`, filled with the requested colour. Each file imports the SVGs it uses straight from the npm package (`import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg'`) and passes the component: `<PixelIcon icon={PlaySolid} color={...} />`. `react-native-svg-transformer` (`metro.config.cjs`) turns each import into a component. There is no central list: only the icons a screen imports end up in the bundle.
 
@@ -236,10 +233,10 @@ Icons are `PixelIcon` (`src/shared/theme/components/PixelIcon.tsx`), which draws
 
 Component roles are checked automatically, without exception (#386, documentation: `.agents/rules/components.md`):
 
-- **`components/screen-orchestrator-only`**: a navigation screen only imports orchestrators from `features/`, never presenters.
+- **`app-composes-orchestrators`** (dependency-cruiser): `src/app/` only imports orchestrators from `features/`, never presenters.
 - **Roles by name** (dependency-cruiser, `@brutalway/dependency-cruiser-config`): an orchestrator is named `XContainer`; any other component is a presenter, which reaches no Zustand store and no TanStack query through any chain of imports, and renders no orchestrator.
 - **Hooks without JSX** (oxlint `hook-files`, brutalway preset): a `useX.ts` file contains no JSX element or fragment.
-- **`components/orchestrator-no-fetch`**: an orchestrator leaves network calls to TanStack Query or service hooks, with no direct `fetch`.
+- **`orchestrators-use-hooks`** (dependency-cruiser): an orchestrator leaves network calls to TanStack Query or service hooks and imports no `xClient.ts`.
 
 ### Hot reload
 
@@ -255,10 +252,10 @@ Types, validators and versions match the backend:
 
 ## Tests
 
-Unit and component tests run with jest-expo, and the ESLint plugin's rules with `node:test`:
+Unit and component tests run with jest-expo, and the tests of `tools/guardrails/` with `node:test`:
 
 ```bash
-npm test                # Runs the ESLint rule tests then the Jest suite
+npm test                # Runs the tools/guardrails tests then the Jest suite
 npm test -- <path>      # Run one test suite
 npm run test:coverage   # Jest coverage report (above the #364 floor: 69.06% lines)
 ```

@@ -3,7 +3,8 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PlaylistFormContainer } from '@/features/playlists/features/editor/features/playlist-form/components/PlaylistFormContainer';
 import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
-import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { QueryClient } from '@tanstack/react-query';
+import { QUERY_DEFAULTS } from '@/shared/backend/configs/queryDefaultsConfig';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { showError, showSuccess } from '@/shared/theme/lib/toast';
@@ -44,7 +45,7 @@ let sentBody: unknown;
 const created = { id: 'new-id', name: 'Les tubes du Crabe Croustillant' } as Playlist;
 
 function renderScreen(params?: { playlistId?: string }) {
-	const client = createQueryClient();
+	const client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 	client.setQueryData(
 		queryKeys.playlists.detail('p1'),
 		playlistWithTracks({ id: 'p1', name: 'Mix', description: 'Old description' }),

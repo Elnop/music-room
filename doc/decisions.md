@@ -108,7 +108,7 @@ Each decision is weighed against the alternatives considered, with the technical
 
 ### 2.2 Styling: StyleSheet and theme tokens
 
-- **Decision**: React Native `StyleSheet.create` with strict tokens (`theme.colors.*`, `theme.typography.*`, `theme.spacing.*`) defined in `src/shared/theme/`, enforced by the ESLint rule `guardrails/theme-tokens`.
+- **Decision**: React Native `StyleSheet.create` with strict tokens (`theme.colors.*`, `theme.typography.*`, `theme.spacing.*`) defined in `src/shared/theme/`, enforced by the oxlint rules `theme-colors` and `theme-styles` of the brutalway preset.
 - **Why**:
   - **Several themes**: the app has 4 complete themes, switchable instantly without a restart.
   - **Native performance**: `StyleSheet` hands styles straight to the native side with no CSS computation at runtime.
@@ -158,11 +158,11 @@ Each decision is weighed against the alternatives considered, with the technical
 
 - **Decision**: one `npm run check` command in each project (backend and mobile), run at pre-commit by Husky and in GitHub Actions CI, built on these parallel checkers:
   1. `type-check` (`tsc --noEmit`): strict type checking.
-  2. `lint` (ESLint 9 flat config + the in-house `components` plugin): component roles, no `console.*`, no parent relative imports (`@/` required), one component per file.
+  2. `lint` (ESLint 9 flat config on the backend, oxlint with the brutalway presets on mobile): no `console.*`, no parent relative imports (`@/` required), and on mobile component roles, theme tokens and file placement.
   3. `check:dead-code` (`knip`): finds and removes dead code (orphan files, exports, types and dependencies).
   4. `check:deps` (`dependency-cruiser`): no cycles, logical layers respected, features kept apart.
   5. `check:duplication` (`jscpd`): strict duplication control (zero clones tolerated).
-  6. `check:semgrep` and `check:ast-grep`: anti-pattern detection (e.g. no direct `fetch` call or AsyncStorage access outside the allowed modules).
+  6. `check:semgrep` and `check:ast-grep` (backend): anti-pattern detection (e.g. `eval`, `process.env.X!`). On mobile oxlint covers these patterns (`fetch` and AsyncStorage outside their modules, `@ts-ignore`).
   7. `check:secrets` (`gitleaks` through Docker): blocks any leaked token, API key or secret.
   8. `test` (Vitest on the backend, jest-expo on mobile): runs every unit and integration test suite.
   9. `check:exceptions`: checks that the exception lists never grow and trend towards zero.

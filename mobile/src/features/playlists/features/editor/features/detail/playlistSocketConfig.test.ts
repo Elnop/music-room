@@ -1,4 +1,5 @@
-import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { QueryClient } from '@tanstack/react-query';
+import { QUERY_DEFAULTS } from '@/shared/backend/configs/queryDefaultsConfig';
 import { queryKeys } from '@/shared/query-keys/queryKeys';
 import type {
 	Playlist,
@@ -12,7 +13,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
-const client = createQueryClient();
+const client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 
 function emit(event: string, payload: unknown) {
 	return PLAYLIST_SOCKET_RULES.filter((rule) => rule.event === event).map((rule) =>

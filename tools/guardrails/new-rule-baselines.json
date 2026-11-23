@@ -1,7 +1,1 @@
-{
-  "allowedPaths": {
-    "no-asyncstorage-outside-storage": [
-      "*Storage.ts"
-    ]
-  }
-}
+{}

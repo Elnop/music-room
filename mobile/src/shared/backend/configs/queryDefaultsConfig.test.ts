@@ -1,6 +1,7 @@
 import { STALE } from '@/shared/backend/configs/staleQueryConfig';
 import { ApiError } from '@/shared/backend/lib/ApiError';
-import { createQueryClient } from '@/shared/backend/createQueryClient';
+import { QueryClient } from '@tanstack/react-query';
+import { QUERY_DEFAULTS } from '@/shared/backend/configs/queryDefaultsConfig';
 import { shouldRetry } from '@/shared/backend/lib/shouldRetry';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -8,7 +9,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-describe('queryClient', () => {
+describe('QUERY_DEFAULTS', () => {
 	it('orders the cache profiles from never fresh to long-lived', () => {
 		expect(STALE.none).toBe(0);
 		expect(STALE.short).toBeGreaterThan(STALE.none);
@@ -16,16 +17,12 @@ describe('queryClient', () => {
 	});
 
 	it('uses the short profile and the retry policy by default, never retrying mutations', () => {
-		const client = createQueryClient();
+		const client = new QueryClient({ defaultOptions: QUERY_DEFAULTS });
 		const defaults = client.getDefaultOptions();
 
 		expect(defaults.queries?.staleTime).toBe(STALE.short);
 		expect(defaults.queries?.retry).toBe(shouldRetry);
 		expect(defaults.mutations?.retry).toBe(false);
-	});
-
-	it('creates a new client on each call', () => {
-		expect(createQueryClient()).not.toBe(createQueryClient());
 	});
 
 	describe('shouldRetry', () => {

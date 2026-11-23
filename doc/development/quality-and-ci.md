@@ -12,22 +12,22 @@ Subject IV.8: an agile process, tests on each layer, and continuous integration.
 
 ## `npm run check`
 
-One command per project (`backend/`, `mobile/`) runs every guardrail in parallel. The names below are the backend's; the mobile runs the same tools through `brutal-check` under the names `format:check` (prettier), `typecheck`, `lint`, `unused`, `deps`, `tree`, `duplicates`, `secrets` and `exceptions`, without the unit tests:
+One command per project (`backend/`, `mobile/`) runs every guardrail in parallel. The names below are the backend's; the mobile runs only brutalway packages through `brutal-check`, without ESLint, semgrep or ast-grep, under the names `format:check` (prettier), `typecheck`, `lint`, `unused`, `deps`, `tree`, `duplicates`, `secrets` and `exceptions`, without the unit tests:
 
 | Check | Tool | Catches |
 |---|---|---|
 | `type-check` | `tsc --noEmit` | type errors (strict mode, no `any`) |
-| `lint` | ESLint 9 + in-house plugins | component roles, `@/` imports, no `console.*`, UI primitives, theme tokens, Zustand selectors… |
+| `lint` | ESLint 9 (backend), oxlint with the brutalway presets (mobile) | `@/` imports, no `console.*`; on mobile also component roles, UI primitives, theme tokens, Zustand selectors, `fetch` and AsyncStorage placement, `@ts-ignore`… |
 | `check:dead-code` | knip | unused files, exports, types and dependencies |
 | `check:deps` | dependency-cruiser (mobile: `@brutalway/dependency-cruiser-config`) | layer violations, imports between features or between shared features of `shared/`, impure presenters, cycles |
 | `check:tree` | check-tree (mobile only) | folders outside the layout, empty folders, kind folders with a single child |
 | `check:duplication` | jscpd | copied code |
-| `check:semgrep`, `check:ast-grep` | semgrep (Docker image), ast-grep | patterns lint misses: `fetch` outside the API client, AsyncStorage outside the storage modules, `eval`, `@ts-ignore`… |
+| `check:semgrep`, `check:ast-grep` | semgrep (Docker image), ast-grep (backend only) | patterns lint misses: `eval`, `process.env.X!`, comment rules… |
 | `check:secrets` | gitleaks (Docker image; `@brutalway/check-secrets` on mobile) | committed keys and tokens |
 | `test` | Vitest (backend), jest-expo (mobile) | unit tests |
 | `check:exceptions` | `tools/guardrails/check-exceptions.mjs` (backend), `@brutalway/check-exceptions` (mobile) | an exception list that grew compared with `develop` |
 
-semgrep and gitleaks run from Docker images, so Docker must be running. Details: [guardrails.md](../../.agents/rules/guardrails.md#what-check-runs).
+The backend's semgrep and gitleaks run from Docker images, so Docker must be running for the backend check; the mobile check needs none. Details: [guardrails.md](../../.agents/rules/guardrails.md#what-check-runs).
 
 **Rules only get stricter.** No rule is disabled, weakened or switched to a warning to let code through, and the exception lists (`mobile/oxlint-suppressions.json`, `backend/.dependency-cruiser-known-violations.json`, …) can only shrink, and one that reaches zero is deleted: fix the code instead. A new rule comes with its section in `.agents/rules/`.
 
@@ -43,7 +43,7 @@ semgrep and gitleaks run from Docker images, so Docker must be running. Details:
 ## Tests
 
 - **Backend**: Vitest + Supertest. Unit tests mock Supabase, Redis and Socket.io; integration tests (`*.int.test.ts`) run against the local Supabase stack, a real Redis and a real Socket.io server. Concurrency, security protections and real-time access are tested this way.
-- **Mobile**: jest-expo and @testing-library/react-native for stores, hooks and components; the ESLint plugin's rules are tested with `node:test`.
+- **Mobile**: jest-expo and @testing-library/react-native for stores, hooks and components; `npm test` also runs the tests of `tools/guardrails/` with `node:test`.
 - `make test` runs both sides and fails on any failure. Coverage floors were measured before the refactor (#364) and must not drop.
 
 Strategy, mocks and single-test commands: [testing.md](testing.md). Security tests by hand: [security-testing.md](../security/security-testing.md).

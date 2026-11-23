@@ -9,10 +9,7 @@
 		"plugins/withPodsDeploymentTarget.js!",
 		"src/**/*.{web,android,ios,native}.{ts,tsx}!"
 	],
-	"project": [
-		"src/**/*.{ts,tsx}!",
-		"{,test-utils/**/,eslint/**/,plugins/**/}*.{ts,tsx,js,mjs,cjs}"
-	],
+	"project": ["src/**/*.{ts,tsx}!", "{,test-utils/**/,plugins/**/}*.{ts,tsx,js,mjs,cjs}"],
 	"ignoreDependencies": [
 		"@expo/ngrok",
 		"babel-plugin-module-resolver",
